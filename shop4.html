@@ -89,11 +89,10 @@
             cursor: pointer;
             border-radius: 5px;
         }
-		.buy-button:hover {
-    transform: scale(1.1); /* מגביר את הגודל ב-10% */
-    transition: transform 0.2s; /* מוסיף אפקט מעבר חלק */
-}
-
+        .buy-button:hover {
+            transform: scale(1.1);
+            transition: transform 0.2s;
+        }
         .cart {
             margin-top: 20px;
             padding: 10px;
@@ -107,32 +106,39 @@
             background-color: black;
             color: #fff;
         }
-        .shipping-option {
-            margin: 10px 0;
+        .login-modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
         }
-        .credit-card-info {
-            margin-top: 20px;
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 300px;
+            border-radius: 5px;
         }
-		<style>
-    body {
-        font-family: Arial, sans-serif;
-        /* שאר ה-CSS שלך ... */
-    }
-
-    /* שאר ה-CSS שלך ... */
-
-    /* הוספת אנימציות */
-    .buy-button:hover {
-        background-color: darkorange;
-        transition: background-color 0.3s;
-    }
-
-    .product:hover {
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        transition: box-shadow 0.3s;
-    }
-</style>
-
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -150,6 +156,7 @@
                 <li><a href="#cart">סל קניות</a></li>
                 <li><a href="#contact">צרו קשר</a></li>
                 <li><a href="#checkout" onclick="goToCheckout()">דף תשלום</a></li>
+                <li><a href="javascript:void(0)" onclick="openLoginModal()">התחבר</a></li>
             </ul>
         </nav>
     </header>
@@ -240,6 +247,21 @@
     <footer>
         <p>&copy; 2024 Smart Buy. כל הזכויות שמורות.</p>
     </footer>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="login-modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeLoginModal()">&times;</span>
+            <h2>התחברות</h2>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <label for="username">שם משתמש:</label><br>
+                <input type="text" id="username" name="username" required><br><br>
+                <label for="password">סיסמה:</label><br>
+                <input type="password" id="password" name="password" required><br><br>
+                <button type="submit">התחבר</button>
+            </form>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2.6.4/dist/email.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/twilio@3.63.0/dist/twilio.min.js"></script>
@@ -357,6 +379,24 @@
             })
             .then((message) => console.log('הודעה נשלחה:', message.sid))
             .catch((error) => console.error('שגיאה:', error));
+        }
+
+        function openLoginModal() {
+            document.getElementById('loginModal').style.display = 'block';
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').style.display = 'none';
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // כאן תוכל להוסיף לוגיקה לבדוק את השם משתמש והסיסמה
+            console.log(`User: ${username}, Password: ${password}`);
+            closeLoginModal(); // סגור את המודל לאחר ההתחברות
         }
     </script>
 </body>
