@@ -15,6 +15,15 @@
             background-position: center;
             background-repeat: no-repeat;
         }
+        #home {
+             background-image: url('https://media.istockphoto.com/id/1309243817/vector/fast-delivery-truck-with-motion-lines-online-delivery-express-delivery-quick-move-fast.jpg?s=612x612&w=0&k=20&c=l2JlE6VQ4uRS6jABMS558puDgTyhEJW0bSiPhbBgXMc='); /* הוסף את ה-URL שלך כאן */
+             background-size: cover;
+             background-position: center;
+             background-repeat: no-repeat;
+             padding: 100px; /* הגדל את הערך כאן לפי הצורך */
+             border-radius: 8px; /* הוסף גבול אם רוצים */
+             color: orange; /* שנה צבע טקסט אם התמונה כהה */
+        }
         header {
             background-color: rgba(0, 0, 0, 0.8);
             color: #91C8C9;
@@ -151,7 +160,6 @@
         <nav>
             <ul>
                 <li><a href="#home">דף הבית</a></li>
-                <li><a href="#about">אודות</a></li>
                 <li><a href="#products">מוצרים</a></li>
                 <li><a href="#cart">סל קניות</a></li>
                 <li><a href="#contact">צרו קשר</a></li>
@@ -162,11 +170,7 @@
     </header>
     <section id="home">
         <h1>ברוכים הבאים ל-Smart Buy!</h1>
-        <p>מוצרים איכותיים במחירים נמוכים.</p>
-    </section>
-    <section id="about">
-        <h2>אודות</h2>
-        <p>אנחנו מציעים מחירים טובים ומבצעים שווים למוצרים שתמצאו באתרים אחרים מאוד יקרים, ובנוסף משלוח חינם.</p>
+        <p> מוצרים איכותיים במחירים נמוכים. משלוח חינם! (בקנייה מעל 100 שח)</p>
     </section>
     <section id="products">
         <h2>המוצרים הכי טרנדים במחירים הכי שווים!</h2>
@@ -181,7 +185,7 @@
         <div class="product" id="product2">
             <img src="https://ae-pic-a1.aliexpress-media.com/kf/S8886e013deb64d5ca3de15862dbb301e4.jpg_80x80.jpg_.webp" alt="אירפודס 4">
             <h3>אירפודס 4</h3>
-            <p style="text-decoration: line-through;">מחיר: 70 שח </p>
+            <p style="text-decoration: line-through;">מחיר: 70 שח</p>
             <p>מחיר לאחר הנחה: 56 שח (20% הנחה)</p>
             <p>אוזניות אלחוטיות עם סאונד איכותי ועיצוב נוח.</p>
             <button class="buy-button" onclick="addToCart('אוזניות אלחוטיות', 40)">קנה עכשיו</button>
@@ -212,6 +216,10 @@
         <h2>צרו קשר</h2>
         <p>מייל: korenbarshalom@gmail.com</p>
         <p>טלפון: 0522215113</p>
+    </section>
+    <section id="about">
+        <h2>אודות</h2>
+        <p>ב-Smart Buy אנו מתמקדים במתן המוצרים האיכותיים ביותר במחירים המשתלמים ביותר.</p>
     </section>
     <section id="checkout" style="display: none;">
         <h2>דף תשלום</h2>
