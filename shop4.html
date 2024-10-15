@@ -168,10 +168,26 @@
             </ul>
         </nav>
     </header>
-    <section id="home">
-        <h1>ברוכים הבאים ל-Smart Buy!</h1>
-        <p> מוצרים איכותיים במחירים נמוכים. משלוח חינם! (בקנייה מעל 100 שח)</p>
-    </section>
+    <section id="home" style="position: relative;">
+    <h1>ברוכים הבאים ל-Smart Buy!</h1>
+    <p>מוצרים איכותיים במחירים נמוכים. משלוח חינם! (בקנייה מעל 100 שח)</p>
+    <button id="nextImageButton" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 24px; background: none; border: none; cursor: pointer;">➡️</button>
+</section>
+
+
+<script>
+    let currentImage = 0;
+    const images = [
+        'https://media.istockphoto.com/id/1309243817/vector/fast-delivery-truck-with-motion-lines-online-delivery-express-delivery-quick-move-fast.jpg?s=612x612&w=0&k=20&c=l2JlE6VQ4uRS6jABMS558puDgTyhEJW0bSiPhbBgXMc=',
+        'https://magenticians.com/wp-content/uploads/2018/01/promote-your-online-store-702x336.jpg' // הכנס את ה-URL של התמונה השנייה כאן
+    ];
+
+    document.getElementById('nextImageButton').onclick = function() {
+        currentImage = (currentImage + 1) % images.length;
+        document.getElementById('home').style.backgroundImage = `url(${images[currentImage]})`;
+    };
+</script>
+
     <section id="products">
         <h2>המוצרים הכי טרנדים במחירים הכי שווים!</h2>
         <div class="product" id="product1">
