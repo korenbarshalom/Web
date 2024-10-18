@@ -5,6 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Buy</title>
     <style>
+   #products {
+       display: flex;
+       flex-wrap: wrap;
+       justify-content: space-between; /* או center, תלוי איך אתה רוצה */
+       gap: 30px; /* שים כאן את הערך של המרווח הרצוי */
+       }
+
+
+       .arrow {
+       position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        z-index: 1;
+        }
+
+        .arrow.left {
+        left: -40px; /* חץ שמאלי */
+        }
+
+       .arrow.right {
+        right: -40px; /* חץ ימני */
+        }
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -16,7 +44,7 @@
             background-repeat: no-repeat;
         }
         #home {
-             background-image: url('https://media.istockphoto.com/id/1309243817/vector/fast-delivery-truck-with-motion-lines-online-delivery-express-delivery-quick-move-fast.jpg?s=612x612&w=0&k=20&c=l2JlE6VQ4uRS6jABMS558puDgTyhEJW0bSiPhbBgXMc='); /* הוסף את ה-URL שלך כאן */
+             background-image: url('https://www.lngtradingasia.com/wp-content/uploads/2017/04/financing-energy-projects-1.png'); /* הוסף את ה-URL שלך כאן */
              background-size: cover;
              background-position: center;
              background-repeat: no-repeat;
@@ -191,8 +219,8 @@ window.embeddedChatbotConfig = {
 <script>
     let currentImage = 0;
     const images = [
-        'https://media.istockphoto.com/id/1309243817/vector/fast-delivery-truck-with-motion-lines-online-delivery-express-delivery-quick-move-fast.jpg?s=612x612&w=0&k=20&c=l2JlE6VQ4uRS6jABMS558puDgTyhEJW0bSiPhbBgXMc=',
-        'https://magenticians.com/wp-content/uploads/2018/01/promote-your-online-store-702x336.jpg' // הכנס את ה-URL של התמונה השנייה כאן
+        'https://www.lngtradingasia.com/wp-content/uploads/2017/04/financing-energy-projects-1.png',
+        'https://www.cheshireeast.gov.uk/images/business/Business-promotional/busGrowth-1500x300.jpg' // הכנס את ה-URL של התמונה השנייה כאן
     ];
 
     document.getElementById('nextImageButton').onclick = function() {
@@ -202,7 +230,6 @@ window.embeddedChatbotConfig = {
 </script>
 
     <section id="products">
-        <h2>המוצרים הכי טרנדים במחירים הכי שווים!</h2>
         <div class="product" id="product1">
             <img src="https://ae-pic-a1.aliexpress-media.com/kf/Sc8e6f4aeb83b49f7a638f760b7f6cae1R.jpg_120x120.jpg_.webp" alt="שעון חכם">
             <h3>שעון מעורר חכם</h3>
@@ -274,9 +301,9 @@ window.embeddedChatbotConfig = {
             <div class="shipping-option">
                 <label>סוג משלוח:</label><br>
                 <input type="radio" id="standard" name="shipping" value="רגיל" checked>
-                <label for="standard">רגיל (5-7 ימי עסקים)</label><br>
+                <label for="standard">משלוח לנקודת איסוף 0 שח (בין 15-20 ימי עסקים) </label><br>
                 <input type="radio" id="express" name="shipping" value="מהיר">
-                <label for="express">מהיר (2-3 ימי עסקים)</label>
+                <label for="express">משלוח מהיר 35 שח (בין 5-10 ימי עסקים)</label>
             </div>
             <div class="credit-card-info">
                 <label for="card-number">מספר כרטיס אשראי:</label><br>
@@ -295,18 +322,18 @@ window.embeddedChatbotConfig = {
 
     <!-- Login Modal -->
     <div id="loginModal" class="login-modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeLoginModal()">&times;</span>
-            <h2>התחברות</h2>
-            <form id="loginForm" onsubmit="handleLogin(event)">
-                <label for="username">שם משתמש:</label><br>
-                <input type="text" id="username" name="username" required><br><br>
-                <label for="password">סיסמה:</label><br>
-                <input type="password" id="password" name="password" required><br><br>
-                <button type="submit">התחבר</button>
-            </form>
-        </div>
+    <div class="modal-content">
+        <span class="close" onclick="closeLoginModal()">&times;</span>
+        <h2>התחברות</h2>
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <label for="email">אימייל:</label><br>
+            <input type="email" id="email" name="email" required><br><br>
+            <label for="password">סיסמה:</label><br>
+            <input type="password" id="password" name="password" required><br><br>
+            <button type="submit">התחבר</button>
+        </form>
     </div>
+</div>
 
     <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2.6.4/dist/email.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/twilio@3.63.0/dist/twilio.min.js"></script>
@@ -435,14 +462,33 @@ window.embeddedChatbotConfig = {
         }
 
         function handleLogin(event) {
-            event.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+    event.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
 
-            // כאן תוכל להוסיף לוגיקה לבדוק את השם משתמש והסיסמה
-            console.log(`User: ${username}, Password: ${password}`);
-            closeLoginModal(); // סגור את המודל לאחר ההתחברות
+    fetch('/api/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('ההתחברות נכשלה');
         }
+        return response.json();
+    })
+    .then(data => {
+        console.log('התחברות הצליחה:', data);
+        closeLoginModal();
+        // כאן תוכל לנתב את המשתמש לדף הבית או להראות הודעה על הצלחה
+    })
+    .catch(error => {
+        console.error('שגיאה:', error);
+        alert('האימייל או הסיסמה אינם נכונים');
+    });
+    }
     </script>
 </body>
 </html>
