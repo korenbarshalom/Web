@@ -5,33 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Buy</title>
     <style>
+   .prev, .next {
+    transform: translateY(-55px); /* שינוי הערך לפי הצורך */
+    position: relative; /* במקרה שה-transform לא עובד */
+    }
+
    #products {
        display: flex;
        flex-wrap: wrap;
        justify-content: space-between; /* או center, תלוי איך אתה רוצה */
        gap: 30px; /* שים כאן את הערך של המרווח הרצוי */
        }
-
-
-       .arrow {
-       position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        background-color: rgba(0, 0, 0, 0.5);
-        color: white;
-        border: none;
-        padding: 10px;
-        cursor: pointer;
-        z-index: 1;
-        }
-
-        .arrow.left {
-        left: -40px; /* חץ שמאלי */
-        }
-
-       .arrow.right {
-        right: -40px; /* חץ ימני */
-        }
 
         body {
             font-family: Arial, sans-serif;
@@ -231,7 +215,9 @@ window.embeddedChatbotConfig = {
 
     <section id="products">
         <div class="product" id="product1">
+		    <button class="prev">❮</button>
             <img src="https://ae-pic-a1.aliexpress-media.com/kf/Sc8e6f4aeb83b49f7a638f760b7f6cae1R.jpg_120x120.jpg_.webp" alt="שעון חכם">
+            <button class="next">❯</button>
             <h3>שעון מעורר חכם</h3>
             <p style="text-decoration: line-through;">מחיר: 70 שח</p>
             <p>מחיר לאחר הנחה: 56 שח (20% הנחה)</p>
@@ -239,7 +225,9 @@ window.embeddedChatbotConfig = {
             <button class="buy-button" onclick="addToCart('שעון חכם', 56)">קנה עכשיו</button>
         </div>
         <div class="product" id="product2">
+		    <button class="prev">❮</button>
             <img src="https://ae-pic-a1.aliexpress-media.com/kf/S8886e013deb64d5ca3de15862dbb301e4.jpg_80x80.jpg_.webp" alt="אירפודס 4">
+			 <button class="next">❯</button>
             <h3>אירפודס 4</h3>
             <p style="text-decoration: line-through;">מחיר: 70 שח</p>
             <p>מחיר לאחר הנחה: 56 שח (20% הנחה)</p>
@@ -247,7 +235,9 @@ window.embeddedChatbotConfig = {
             <button class="buy-button" onclick="addToCart('אוזניות אלחוטיות', 40)">קנה עכשיו</button>
         </div>
         <div class="product" id="product3">
+		    <button class="prev">❮</button>
             <img src="https://ae-pic-a1.aliexpress-media.com/kf/S53eb445d2ac44611b12750e0dae4996fv.png_80x80.png_.webp" alt="מכונת גילוח מקצועית">
+			<button class="next">❯</button>
             <h3>מכונת גילוח מקצועית עם הרבה פונקציות</h3>
             <p style="text-decoration: line-through;">מחיר: 140 שח</p>
             <p>מחיר לאחר הנחה: 112 שח (20% הנחה)</p>
@@ -255,7 +245,9 @@ window.embeddedChatbotConfig = {
             <button class="buy-button" onclick="addToCart('מכונת גילוח', 80)">קנה עכשיו</button>
         </div>
         <div class="product" id="product4">
+		    <button class="prev">❮</button>
             <img src="https://ae-pic-a1.aliexpress-media.com/kf/Sd5514d9b8bac444197f244f40ae8b180n.jpg_80x80.jpg_.webp" alt="אקדח עיסוי">
+			<button class="next">❯</button>
             <h3>אקדח עיסוי</h3>
             <p style="text-decoration: line-through;">מחיר: 110 שח</p>
             <p>מחיר לאחר הנחה: 88 שח (20% הנחה)</p>
