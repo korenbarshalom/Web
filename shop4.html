@@ -280,49 +280,51 @@ defer>
     };
 </script>
 
-    <section id="products">
-        <div class="product" id="product1">
-       <button class="prev" onclick="prevImage(0)">❮</button>
-        <img src="https://ae-pic-a1.aliexpress-media.com/kf/Sc8e6f4aeb83b49f7a638f760b7f6cae1R.jpg_120x120.jpg_.webp" class="product-image" alt="Product 1">
-        <button class="next" onclick="nextImage(0)">❯</button>
-        <h3>שעון מעורר חכם</h3>
+  <section id="products">
+    <div class="product" id="product1">
+        <button class="prev" onclick="prevAlarmClockImage()">❮</button>
+        <img id="alarmClockImage" src="https://ae-pic-a1.aliexpress-media.com/kf/Sc8e6f4aeb83b49f7a638f760b7f6cae1R.jpg_120x120.jpg_.webp" class="product-image" alt="שעון מעורר">
+        <button class="next" onclick="nextAlarmClockImage()">❯</button>
+        <h3>שעון מעורר</h3>
         <p style="text-decoration: line-through;">מחיר: 70 שח</p>
         <p>מחיר לאחר הנחה: 56 שח (20% הנחה)</p>
-        <p>שעון מעורר חכם עם החלפת צבע</p>
+        <p>שעון מעורר</p>
         <button class="buy-button" onclick="addToCart('שעון חכם', 56)">קנה עכשיו</button>
-        </div>
+    </div>
+    
+    <div class="product" id="product2">
+        <button class="prev" onclick="prevEarPodsImage()">❮</button>
+        <img id="earPodsImage" src="https://ae-pic-a1.aliexpress-media.com/kf/S8886e013deb64d5ca3de15862dbb301e4.jpg_80x80.jpg_.webp" class="product-image" alt="אירפודס 4">
+        <button class="next" onclick="nextEarPodsImage()">❯</button>
+        <h3>אירפודס 4</h3>
+        <p style="text-decoration: line-through;">מחיר: 70 שח</p>
+        <p>מחיר לאחר הנחה: 56 שח (20% הנחה)</p>
+        <p>אוזניות אלחוטיות עם סאונד איכותי ועיצוב נוח.</p>
+        <button class="buy-button" onclick="addToCart('אוזניות אלחוטיות', 40)">קנה עכשיו</button>
+    </div>
 
-        <div class="product" id="product2">
-		    <button class="prev" onclick="prevImage(1)">❮</button>
-            <img src="https://ae-pic-a1.aliexpress-media.com/kf/S8886e013deb64d5ca3de15862dbb301e4.jpg_80x80.jpg_.webp" class="product-image" alt="Product 4">
-		    <button class="next" onclick="nextImage(1)">❯</button>
-            <h3>אירפודס 4</h3>
-            <p style="text-decoration: line-through;">מחיר: 70 שח</p>
-            <p>מחיר לאחר הנחה: 56 שח (20% הנחה)</p>
-            <p>אוזניות אלחוטיות עם סאונד איכותי ועיצוב נוח.</p>
-            <button class="buy-button" onclick="addToCart('אוזניות אלחוטיות', 40)">קנה עכשיו</button>
-        </div>
-        <div class="product" id="product3">
-		    <button class="prev" onclick="prevImage(2)">❮</button>
-            <img src="https://ae-pic-a1.aliexpress-media.com/kf/S53eb445d2ac44611b12750e0dae4996fv.png_80x80.png_.webp" class="product-image" alt="Product 2">
-			<button class="next" onclick="nextImage(2)">❯</button>
-            <h3>מכונת גילוח מקצועית </h3>
-            <p style="text-decoration: line-through;">מחיר: 140 שח</p>
-            <p>מחיר לאחר הנחה: 112 שח (20% הנחה)</p>
-            <p>מכונת גילוח חשמלית, עמידה במים.</p>
-            <button class="buy-button" onclick="addToCart('מכונת גילוח', 80)">קנה עכשיו</button>
-        </div>
-        <div class="product" id="product4">
-		    <button class="prev" onclick="prevImage(3)">❮</button>
-            <img src="https://ae-pic-a1.aliexpress-media.com/kf/Sd5514d9b8bac444197f244f40ae8b180n.jpg_80x80.jpg_.webp" class="product-image" alt="Product 3">
-			<button class="next" onclick="nextImage(3)">❯</button>
-            <h3>אקדח עיסוי</h3>
-            <p style="text-decoration: line-through;">מחיר: 110 שח</p>
-            <p>מחיר לאחר הנחה: 88 שח (20% הנחה)</p>
-            <p>אקדח נייד עמוק רקמות עיסוי מיני מהירות מתכווננת גוף עיסוי.</p>
-            <button class="buy-button" onclick="addToCart('אקדח עיסוי', 40)">קנה עכשיו</button>
-        </div>
-    </section>
+    <div class="product" id="product3">
+        <button class="prev" onclick="prevShaverImage()">❮</button>
+        <img id="shaverImage" src="https://ae-pic-a1.aliexpress-media.com/kf/S53eb445d2ac44611b12750e0dae4996fv.png_80x80.png_.webp" class="product-image" alt="מכונת גילוח">
+        <button class="next" onclick="nextShaverImage()">❯</button>
+        <h3>מכונת גילוח</h3>
+        <p style="text-decoration: line-through;">מחיר: 140 שח</p>
+        <p>מחיר לאחר הנחה: 112 שח (20% הנחה)</p>
+        <p>מכונת גילוח חשמלית, עמידה במים.</p>
+        <button class="buy-button" onclick="addToCart('מכונת גילוח', 80)">קנה עכשיו</button>
+    </div>
+
+    <div class="product" id="product4">
+        <button class="prev" onclick="prevMassageGunImage()">❮</button>
+        <img id="massageGunImage" src="https://ae-pic-a1.aliexpress-media.com/kf/Sd5514d9b8bac444197f244f40ae8b180n.jpg_80x80.jpg_.webp" class="product-image" alt="אקדח עיסוי">
+        <button class="next" onclick="nextMassageGunImage()">❯</button>
+        <h3>אקדח עיסוי</h3>
+        <p style="text-decoration: line-through;">מחיר: 110 שח</p>
+        <p>מחיר לאחר הנחה: 88 שח (20% הנחה)</p>
+        <p>אקדח נייד עמוק רקמות עיסוי מיני מהירות מתכווננת גוף עיסוי.</p>
+        <button class="buy-button" onclick="addToCart('אקדח עיסוי', 40)">קנה עכשיו</button>
+    </div>
+   </section>
     <section id="cart" class="cart">
         <h2>סל קניות</h2>
         <ul id="cartItems"></ul>
@@ -393,6 +395,128 @@ defer>
     <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2.6.4/dist/email.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/twilio@3.63.0/dist/twilio.min.js"></script>
     <script>
+        const alarmClockImages = [
+    "https://ae-pic-a1.aliexpress-media.com/kf/Sc8e6f4aeb83b49f7a638f760b7f6cae1R.jpg_120x120.jpg_.webp",
+    "https://ae-pic-a1.aliexpress-media.com/kf/S3ea7e38d6c734646929f10b108d13cf2Z.png_80x80.png_.webp", // הוסף את התמונה השנייה
+    "https://ae-pic-a1.aliexpress-media.com/kf/Sbb87b59a74d249769aea1878b77626f8l.jpg_80x80.jpg_.webp"  // הוסף את התמונה השלישית
+];
+
+const earPodsImages = [
+    "https://ae-pic-a1.aliexpress-media.com/kf/S8886e013deb64d5ca3de15862dbb301e4.jpg_80x80.jpg_.webp",
+    "https://ae-pic-a1.aliexpress-media.com/kf/S853046a981204d2e80c6afffafd41882r.jpg_80x80.jpg_.webp", // הוסף את התמונה השנייה
+    "https://ae-pic-a1.aliexpress-media.com/kf/S3dc0d484b7e74134b20e71f97220ff76Y.jpg_80x80.jpg_.webp"  // הוסף את התמונה השלישית
+];
+
+const shaverImages = [
+    "https://ae-pic-a1.aliexpress-media.com/kf/S53eb445d2ac44611b12750e0dae4996fv.png_80x80.png_.webp",
+    "https://ae-pic-a1.aliexpress-media.com/kf/S358b4de926de4dda8a58354abff2b803S.png_80x80.png_.webp", // הוסף את התמונה השנייה
+    "https://ae-pic-a1.aliexpress-media.com/kf/S53eb445d2ac44611b12750e0dae4996fv.png_80x80.png_.webp"  // הוסף את התמונה השלישית
+];
+
+const massageGunImages = [
+    "https://ae-pic-a1.aliexpress-media.com/kf/S59be8fb2d7a541019c27cb0c9c710390y.jpg_80x80.jpg_.webp",
+    "https://ae-pic-a1.aliexpress-media.com/kf/S05694a449d4f4269881f5376b26ee69bt.jpg_80x80.jpg_.webp", // הוסף את התמונה השנייה
+    "https://ae-pic-a1.aliexpress-media.com/kf/S0bc6f9f24e1e45c288babacc818a1ddbD.jpg_80x80.jpg_.webp"  // הוסף את התמונה השלישית
+];
+
+let currentAlarmClockIndex = 0;
+let currentEarPodsIndex = 0;
+let currentShaverIndex = 0;
+let currentMassageGunIndex = 0;
+
+function prevAlarmClockImage() {
+    currentAlarmClockIndex--;
+    if (currentAlarmClockIndex < 0) {
+        currentAlarmClockIndex = alarmClockImages.length - 1; // לולאה לאחור
+    }
+    updateAlarmClockImage();
+}
+
+function nextAlarmClockImage() {
+    currentAlarmClockIndex++;
+    if (currentAlarmClockIndex >= alarmClockImages.length) {
+        currentAlarmClockIndex = 0; // לולאה קדימה
+    }
+    updateAlarmClockImage();
+}
+
+function updateAlarmClockImage() {
+    const imgElement = document.getElementById("alarmClockImage");
+    imgElement.src = alarmClockImages[currentAlarmClockIndex];
+}
+
+// פונקציות לאירפודס
+function prevEarPodsImage() {
+    currentEarPodsIndex--;
+    if (currentEarPodsIndex < 0) {
+        currentEarPodsIndex = earPodsImages.length - 1; // לולאה לאחור
+    }
+    updateEarPodsImage();
+}
+
+function nextEarPodsImage() {
+    currentEarPodsIndex++;
+    if (currentEarPodsIndex >= earPodsImages.length) {
+        currentEarPodsIndex = 0; // לולאה קדימה
+    }
+    updateEarPodsImage();
+}
+
+function updateEarPodsImage() {
+    const imgElement = document.getElementById("earPodsImage");
+    imgElement.src = earPodsImages[currentEarPodsIndex];
+}
+
+// פונקציות למכונת גילוח
+function prevShaverImage() {
+    currentShaverIndex--;
+    if (currentShaverIndex < 0) {
+        currentShaverIndex = shaverImages.length - 1; // לולאה לאחור
+    }
+    updateShaverImage();
+}
+
+function nextShaverImage() {
+    currentShaverIndex++;
+    if (currentShaverIndex >= shaverImages.length) {
+        currentShaverIndex = 0; // לולאה קדימה
+    }
+    updateShaverImage();
+}
+
+function updateShaverImage() {
+    const imgElement = document.getElementById("shaverImage");
+    imgElement.src = shaverImages[currentShaverIndex];
+}
+
+// פונקציות לאקדח עיסוי
+function prevMassageGunImage() {
+    currentMassageGunIndex--;
+    if (currentMassageGunIndex < 0) {
+        currentMassageGunIndex = massageGunImages.length - 1; // לולאה לאחור
+    }
+    updateMassageGunImage();
+}
+
+function nextMassageGunImage() {
+    currentMassageGunIndex++;
+    if (currentMassageGunIndex >= massageGunImages.length) {
+        currentMassageGunIndex = 0; // לולאה קדימה
+    }
+    updateMassageGunImage();
+}
+
+function updateMassageGunImage() {
+    const imgElement = document.getElementById("massageGunImage");
+    imgElement.src = massageGunImages[currentMassageGunIndex];
+}
+
+// בהתחלה, נעדכן את התמונות הראשונות
+updateAlarmClockImage();
+updateEarPodsImage();
+updateShaverImage();
+updateMassageGunImage();
+    
         const cart = [];
         const prices = [];
         const products = [
