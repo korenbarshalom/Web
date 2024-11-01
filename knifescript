@@ -1,0 +1,45 @@
+using UnityEngine;
+
+public class KnifeController : MonoBehaviour
+{
+    public float rotationSpeed = 20.0f; // מהירות הסיבוב
+    private bool isRotating = false; // האם הסכין בתהליך סיבוב
+    private float rotationProgress = 0.0f; // כדי לעקוב אחרי התקדמות הסיבוב
+    private float targetAngle = 180.0f; // זווית היעד
+    private Quaternion initialRotation; // משתנה לשמירת הסיבוב ההתחלתי
+
+    void Start()
+    {
+        // שומר את הסיבוב ההתחלתי של הסכין כ-Quaternion
+        initialRotation = Quaternion.Euler(60, -10, 10);
+        transform.localRotation = initialRotation; // מוודא שהסיבוב הוא מקומי ומתחיל מהזווית ההתחלתית
+    }
+
+    void Update()
+    {
+        // בודק אם המקש השמאלי בעכבר נלחץ ומתחיל את הסיבוב
+        if (Input.GetMouseButtonDown(0) && !isRotating)
+        {
+            isRotating = true;
+            rotationProgress = 0.0f; // מאפס את ההתקדמות
+        }
+
+        // אם הסכין בתהליך סיבוב, מבצע את הסיבוב
+        if (isRotating)
+        {
+            float step = rotationSpeed * Time.deltaTime; // חישוב הצעד להסתובב
+            rotationProgress += step; // מעדכן את התקדמות הסיבוב
+
+            // סובב את הסכין ימינה (בכיוון השעון) על ציר ה-Z המקומי שלה
+            transform.Rotate(0, 0, step, Space.Self); // כאן מתבצע הסיבוב על ציר ה-Z
+
+            // בודק אם הגענו או עברנו את ה-180 מעלות
+            if (rotationProgress >= targetAngle)
+            {
+                // מחזיר את הסכין במדויק לסיבוב ההתחלתי
+                transform.localRotation = initialRotation; // מחזיר את הסכין לזווית ההתחלה
+                isRotating = false; // מפסיק את הסיבוב
+            }
+        }
+    }
+}
