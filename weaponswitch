@@ -1,0 +1,40 @@
+using UnityEngine;
+
+public class WeaponSwitcher : MonoBehaviour
+{
+    public GameObject gun;  // הגדרת אובייקט הרובה
+    public GameObject knife; // הגדרת אובייקט הדק
+
+    private void Start()
+    {
+        // הכנס את הרובה והדק לאובייקטים בהתחלה
+        SwitchToGun();
+    }
+
+    private void Update()
+    {
+        // בדוק אם נעשה סיבוב על הגלגלת של העכבר
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+
+        if (scroll > 0f) // גלילה למטה
+        {
+            SwitchToGun();
+        }
+        else if (scroll < 0f) // גלילה למעלה
+        {
+            SwitchToKnife();
+        }
+    }
+
+    private void SwitchToGun()
+    {
+        gun.SetActive(true);  // הצג את הרובה
+        knife.SetActive(false); // הסתר את הדק
+    }
+
+    private void SwitchToKnife()
+    {
+        knife.SetActive(true); // הצג את הדק
+        gun.SetActive(false);  // הסתר את הרובה
+    }
+}
