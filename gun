@@ -1,0 +1,27 @@
+using UnityEngine;
+
+public class Gun : MonoBehaviour
+{
+    public GameObject bulletPrefab; // Drag your bullet prefab here in the Inspector
+    public Transform firePoint; // Point from which the bullet will be fired
+    public float bulletForce = 20f;
+
+    void Update()
+    {
+        // Check if the left mouse button is clicked
+        if (Input.GetMouseButtonDown(0))
+        {
+            Shoot();
+        }
+    }
+
+    void Shoot()
+    {
+        // Create a bullet instance
+        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+
+        // Add force to the bullet to make it move forward
+        Rigidbody rb = bullet.GetComponent<Rigidbody>();
+        rb.AddForce(firePoint.forward * bulletForce, ForceMode.Impulse);
+    }
+}
