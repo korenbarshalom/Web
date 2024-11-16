@@ -1,0 +1,65 @@
+using UnityEngine;
+
+public class AnimationEventsDemo : MonoBehaviour
+{
+    //no parameter
+    public void TriggerEvent()
+    {
+        Debug.Log("event triggered");
+
+        // מחפש את ה-GameObject שנקרא 'enemy'
+        GameObject enemy = GameObject.Find("enemy");
+        if (enemy != null)
+        {
+            // בודק אם יש רכיב BotChase על האויב
+            BotChase enemyBot = enemy.GetComponent<BotChase>();
+            if (enemyBot != null)
+            {
+                enemyBot.TakeDamage(50); // מוריד 50 חיים
+            }
+            else
+            {
+                Debug.LogWarning("Enemy does not have a BotChase component!");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Enemy GameObject not found!");
+        }
+    }
+
+    //float parameter
+    public void ScaleDownEvent(float scale)
+    {
+        transform.localScale = new Vector3(scale, scale, scale);
+    }
+
+    //int parameter
+    public void ScaleUpEvent(int scale)
+    {
+        transform.localScale = new Vector3(scale, scale, scale);
+    }
+
+    //string parameter
+    public void PrintLogEvent(string str)
+    {
+        Debug.Log(str);
+    }
+
+    //Object parameter
+    public void SpawnObjectEvent(Object gameObject)
+    {
+        if (gameObject != null)
+            Instantiate(gameObject);
+    }
+
+    //multiple parameters(float,int,string,object)
+    public void MultiParamEvent(AnimationEvent e)
+    {
+        Debug.Log(e.floatParameter + "," + e.intParameter + "," + e.stringParameter);
+        if (e.objectReferenceParameter != null)
+        {
+            Instantiate(e.objectReferenceParameter);
+        }
+    }
+}
