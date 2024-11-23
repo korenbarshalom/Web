@@ -1,0 +1,43 @@
+using UnityEngine;
+
+public class EnemyShooting : MonoBehaviour
+{
+    public GameObject projectile;         // כאן תוכל לגרור את הקליע מתוך ה-Inspector
+    public Transform shootPoint;          // נקודת הירי (כמו היד או קדימה מהאויב)
+    public float shootingRate = 5f;       // זמן בין יריות (במקרה הזה 5 שניות)
+    public float bulletSpeed = 5f;        // מהירות הקליע
+
+    private Transform player;             // הפנייה לשחקן
+    private float timeUntilNextShot = 0f; // זמן הבא לירי
+
+    private void Start()
+    {
+        // חיפוש השחקן בסצנה
+        player = GameObject.FindGameObjectWithTag("Player").transform;
+    }
+
+    private void Update()
+    {
+        // אם הזמן הנוכחי גדול מהזמן של הירי הבא, הירי יתרחש
+        if (Time.time >= timeUntilNextShot)
+        {
+            ShootAtPlayer(); // ירי על השחקן
+            timeUntilNextShot = Time.time + shootingRate; // הגדרת הזמן הבא לירי (המרווח בין היריות)
+        }
+    }
+
+    private void ShootAtPlayer()
+    {
+        if (shootPoint != null && player != null)
+        {
+            // יצירת הקליע. הקליע נורה מהנקודה של shootPoint (היד/הקדימה של האויב)
+            GameObject bullet = Instantiate(projectile, shootPoint.position, Quaternion.identity);
+
+            // חישוב כיוון הירי כל הזמן לכיוון השחקן
+            Vector2 direction = (player.position - shootPoint.position).normalized;  // חישוב כיוון לכיוון השחקן
+
+            // הגדרת המהירות של הקליע בכיוון חישוב הכיוון
+            bullet.GetComponent<Rigidbody2D>().linearVelocity = direction * bulletSpeed;
+        }
+    }
+}
