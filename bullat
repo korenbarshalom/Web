@@ -1,0 +1,36 @@
+using UnityEngine;
+
+public class Projectile : MonoBehaviour
+{
+    public float speed = 20f;  // מהירות הכדור
+    public float damage = 25f; // נזק הכדור
+
+    void Start()
+    {
+        // קבלת רכיב Rigidbody2D
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.linearVelocity = transform.right * speed;  // הגדרת המהירות של הכדור
+        }
+    }
+
+    // פונקציה שמתבצעת כשיש פגיעת קוליזיה
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        // אם הכדור פוגע בשחקן (נבדוק לפי Tag של השחקן)
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            // קבלת רכיב PlayerHealth מהשחקן
+            PlayerHealth playerHealth = collision.gameObject.GetComponent<PlayerHealth>();
+            if (playerHealth != null)
+            {
+                // הפחתת נזק מהשחקן
+                playerHealth.TakeDamage(damage);
+            }
+
+            // השמדת הכדור כאשר הוא פוגע בשחקן
+            Destroy(gameObject);
+        }
+    }
+}
