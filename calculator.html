@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #333; /* רקע כהה לדף */
+            background-color: #333;
             color: white;
             margin: 0;
             padding: 0;
@@ -18,7 +18,7 @@
         }
 
         .calculator {
-            background-color: black; /* רקע שחור למחשבון */
+            background-color: black;
             padding: 20px;
             border-radius: 15px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
@@ -29,17 +29,17 @@
 
         #display {
             width: 90%;
-            height: 60px; /* הגדלתי את הגובה של המסך */
+            height: 60px;
             background-color: black;
             color: white;
-            font-size: 50px; /* הגדלתי את הגודל של הטקסט */
+            font-size: 50px;
             text-align: right;
             border: none;
             margin-bottom: 12px;
             border-radius: 10px;
-            padding: 15px; /* הוספתי ריפוד פנימי */
+            padding: 15px;
             position: relative;
-            z-index: 3; /* שומרים על המסך למעלה */
+            z-index: 3;
         }
 
         .buttons {
@@ -47,7 +47,7 @@
             grid-template-columns: repeat(4, 1fr);
             grid-gap: 10px;
             position: relative;
-            z-index: 1; /* שומרים על הכפתורים מתחת למסך */
+            z-index: 1;
         }
 
         .btn {
@@ -56,49 +56,48 @@
             padding: 20px;
             font-size: 24px;
             color: white;
-            border-radius: 50%; /* צורת עיגול */
+            border-radius: 50%;
             cursor: pointer;
             transition: background-color 0.2s, box-shadow 0.2s;
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 70px; /* רוחב קבוע */
-            height: 70px; /* גובה קבוע */
+            width: 70px;
+            height: 70px;
         }
 
         .btn:hover {
             background-color: #ff6600;
-            box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.6); /* צל לבן עדין */
+            box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.6);
         }
 
         .operator {
-            background-color: #777; /* צבע אפור לכפתורי הפעולות */
+            background-color: #777;
         }
 
         .operator:hover {
-            background-color: #999; /* צבע אפור בהיר בהובר */
-            box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.6); /* צל לבן עדין */
+            background-color: #999;
+            box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.6);
         }
 
         .btn:active {
             background-color: #cc5200;
         }
 
-        /* Media query for iPhone 12 screen size */
         @media screen and (max-width: 414px) {
             .calculator {
                 width: 100%;
                 padding: 10px;
             }
             #display {
-                font-size: 40px; /* התאם את גודל הפונט למסך קטן יותר */
-                height: 70px; /* התאמת הגובה למסך קטן יותר */
+                font-size: 40px;
+                height: 70px;
             }
             .btn {
                 padding: 15px;
                 font-size: 20px;
-                width: 60px; /* רוחב קטן יותר למסך קטן */
-                height: 60px; /* גובה קטן יותר למסך קטן */
+                width: 60px;
+                height: 60px;
             }
         }
     </style>
@@ -120,9 +119,13 @@
             <button class="btn" onclick="appendNumber(3)">3</button>
             <button class="btn operator" onclick="setOperation('X')">X</button>
             <button class="btn" onclick="appendNumber(0)">0</button>
-            <button class="btn" onclick="clearDisplay()">AC</button>
+            <button class="btn" onclick="appendDecimal()">.</button> <!-- נקודה -->
             <button class="btn" onclick="calculateResult()">=</button>
-            <button class="btn operator" onclick="setOperation('÷')">÷</button> <!-- Changed division symbol -->
+            <button class="btn operator" onclick="setOperation('÷')">÷</button>
+            <button class="btn" onclick="clearDisplay()">AC</button> <!-- AC -->
+            <button class="btn" onclick="calculateReciprocal()">1/x</button> <!-- ערך הופכי -->
+            <button class="btn" onclick="calculatePercentage()">%</button> <!-- אחוזים -->
+            <button class="btn" onclick="toggleSign()">±</button> <!-- שינוי סימן -->
         </div>
     </div>
 
@@ -131,7 +134,7 @@
         let operation = '';
         let previousInput = '';
 
-        // Function to append a number
+        // פונקציה להוסיף מספר
         function appendNumber(number) {
             if (currentInput === '0') {
                 currentInput = number.toString();
@@ -141,7 +144,15 @@
             updateDisplay(currentInput);
         }
 
-        // Function to set an operation (addition, subtraction, etc.)
+        // פונקציה להוסיף נקודה עשרונית
+        function appendDecimal() {
+            if (!currentInput.includes('.')) {
+                currentInput += '.';
+            }
+            updateDisplay(currentInput);
+        }
+
+        // פונקציה להגדיר פעולה
         function setOperation(op) {
             if (currentInput === '') return;
             if (previousInput !== '') {
@@ -152,7 +163,7 @@
             currentInput = '';
         }
 
-        // Function to clear the display
+        // פונקציה לנקות את המסך
         function clearDisplay() {
             currentInput = '';
             previousInput = '';
@@ -160,7 +171,7 @@
             updateDisplay('0');
         }
 
-        // Function to calculate the result
+        // פונקציה לחישוב התוצאה
         function calculateResult() {
             let result;
             const prev = parseFloat(previousInput);
@@ -178,7 +189,7 @@
                 case 'X':
                     result = prev * current;
                     break;
-                case '÷': // Changed to use division symbol
+                case '÷':
                     if (current === 0) {
                         result = 'Error';
                     } else {
@@ -195,7 +206,30 @@
             updateDisplay(currentInput);
         }
 
-        // Function to update the display
+        // פונקציה לחשב אחוזים
+        function calculatePercentage() {
+            currentInput = (parseFloat(currentInput) / 100).toString();
+            updateDisplay(currentInput);
+        }
+
+        // פונקציה לשנות את סימן המספר
+        function toggleSign() {
+            currentInput = (parseFloat(currentInput) * -1).toString();
+            updateDisplay(currentInput);
+        }
+
+        // פונקציה לחשב את הערך ההופכי
+        function calculateReciprocal() {
+            if (parseFloat(currentInput) !== 0) {
+                currentInput = (1 / parseFloat(currentInput)).toString();
+                updateDisplay(currentInput);
+            } else {
+                currentInput = 'Error';
+                updateDisplay(currentInput);
+            }
+        }
+
+        // פונקציה לעדכן את המסך
         function updateDisplay(value) {
             document.getElementById('display').value = value;
         }
