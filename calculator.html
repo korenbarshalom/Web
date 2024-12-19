@@ -84,6 +84,11 @@
             background-color: #cc5200;
         }
 
+        .operator.active {
+            background-color: white;
+            color: black;
+        }
+
         @media screen and (max-width: 414px) {
             .calculator {
                 width: 100%;
@@ -100,32 +105,37 @@
                 height: 60px;
             }
         }
+
     </style>
 </head>
 <body>
     <div class="calculator">
         <input type="text" id="display" disabled value="0">
         <div class="buttons">
+            <!-- Row 1 -->
+            <button class="btn" onclick="clearDisplay()">AC</button>
+            <button class="btn" onclick="appendNumber(0)">0</button>
+            <button class="btn" onclick="appendDecimal()">.</button>
+            <button class="btn operator" onclick="setOperation('+')">+</button>
+            <!-- Row 2 -->
             <button class="btn" onclick="appendNumber(7)">7</button>
             <button class="btn" onclick="appendNumber(8)">8</button>
             <button class="btn" onclick="appendNumber(9)">9</button>
-            <button class="btn operator" onclick="setOperation('+')">+</button>
+            <button class="btn operator" onclick="setOperation('÷')">÷</button>
+            <!-- Row 3 -->
             <button class="btn" onclick="appendNumber(4)">4</button>
             <button class="btn" onclick="appendNumber(5)">5</button>
             <button class="btn" onclick="appendNumber(6)">6</button>
-            <button class="btn operator" onclick="setOperation('-')">-</button>
+            <button class="btn operator" onclick="setOperation('X')">X</button>
+            <!-- Row 4 -->
             <button class="btn" onclick="appendNumber(1)">1</button>
             <button class="btn" onclick="appendNumber(2)">2</button>
             <button class="btn" onclick="appendNumber(3)">3</button>
-            <button class="btn operator" onclick="setOperation('X')">X</button>
-            <button class="btn" onclick="appendNumber(0)">0</button>
-            <button class="btn" onclick="appendDecimal()">.</button> <!-- נקודה -->
+            <button class="btn operator" onclick="setOperation('-')">-</button>
+            <!-- Row 5 -->
             <button class="btn" onclick="calculateResult()">=</button>
-            <button class="btn operator" onclick="setOperation('÷')">÷</button>
-            <button class="btn" onclick="clearDisplay()">AC</button> <!-- AC -->
-            <button class="btn" onclick="calculateReciprocal()">1/x</button> <!-- ערך הופכי -->
-            <button class="btn" onclick="calculatePercentage()">%</button> <!-- אחוזים -->
-            <button class="btn" onclick="toggleSign()">±</button> <!-- שינוי סימן -->
+            <!-- Row 6 (Moved % button to the right of the - button) -->
+            <button class="btn operator" onclick="calculatePercentage()">%</button>
         </div>
     </div>
 
@@ -133,9 +143,14 @@
         let currentInput = '';
         let operation = '';
         let previousInput = '';
+        let activeOperator = null;
 
-        // פונקציה להוסיף מספר
         function appendNumber(number) {
+            if (activeOperator) {
+                activeOperator.classList.remove('active');
+                activeOperator = null;
+            }
+
             if (currentInput === '0') {
                 currentInput = number.toString();
             } else {
@@ -144,7 +159,6 @@
             updateDisplay(currentInput);
         }
 
-        // פונקציה להוסיף נקודה עשרונית
         function appendDecimal() {
             if (!currentInput.includes('.')) {
                 currentInput += '.';
@@ -152,7 +166,6 @@
             updateDisplay(currentInput);
         }
 
-        // פונקציה להגדיר פעולה
         function setOperation(op) {
             if (currentInput === '') return;
             if (previousInput !== '') {
@@ -161,17 +174,29 @@
             operation = op;
             previousInput = currentInput;
             currentInput = '';
+
+            const buttons = document.querySelectorAll('.operator');
+            buttons.forEach((button) => {
+                if (button.textContent.trim() === op) {
+                    button.classList.add('active');
+                    activeOperator = button;
+                } else {
+                    button.classList.remove('active');
+                }
+            });
         }
 
-        // פונקציה לנקות את המסך
         function clearDisplay() {
             currentInput = '';
             previousInput = '';
             operation = '';
             updateDisplay('0');
+            if (activeOperator) {
+                activeOperator.classList.remove('active');
+                activeOperator = null;
+            }
         }
 
-        // פונקציה לחישוב התוצאה
         function calculateResult() {
             let result;
             const prev = parseFloat(previousInput);
@@ -204,32 +229,32 @@
             operation = '';
             previousInput = '';
             updateDisplay(currentInput);
-        }
-
-        // פונקציה לחשב אחוזים
-        function calculatePercentage() {
-            currentInput = (parseFloat(currentInput) / 100).toString();
-            updateDisplay(currentInput);
-        }
-
-        // פונקציה לשנות את סימן המספר
-        function toggleSign() {
-            currentInput = (parseFloat(currentInput) * -1).toString();
-            updateDisplay(currentInput);
-        }
-
-        // פונקציה לחשב את הערך ההופכי
-        function calculateReciprocal() {
-            if (parseFloat(currentInput) !== 0) {
-                currentInput = (1 / parseFloat(currentInput)).toString();
-                updateDisplay(currentInput);
-            } else {
-                currentInput = 'Error';
-                updateDisplay(currentInput);
+            if (activeOperator) {
+                activeOperator.classList.remove('active');
+                activeOperator = null;
             }
         }
 
-        // פונקציה לעדכן את המסך
+        function calculatePercentage() {
+            if (currentInput === '') return;
+
+            let result;
+            
+            // אם יש מספר קודם, נחשב אחוז
+            if (previousInput !== '') {
+                const prev = parseFloat(previousInput);
+                const current = parseFloat(currentInput);
+                result = (prev * current) / 100;
+            } else {
+                // אם אין מספר קודם, נחשב אחוז מהמספר הנוכחי בלבד
+                const current = parseFloat(currentInput);
+                result = current / 100;
+            }
+
+            currentInput = result.toString();
+            updateDisplay(currentInput);
+        }
+
         function updateDisplay(value) {
             document.getElementById('display').value = value;
         }
