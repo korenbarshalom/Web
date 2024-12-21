@@ -40,6 +40,7 @@
             border-radius: 10px;
             min-height: 30px;
             word-wrap: break-word;
+            height: auto;
         }
 
         #display {
@@ -131,33 +132,28 @@
         <div id="history"></div> <!-- היסטוריית חישובים -->
         <input type="text" id="display" disabled value="0">
         <div class="buttons">
-            <!-- Row 1 -->
             <button class="btn" onclick="clearDisplay()">AC</button>
             <button class="btn" onclick="toggleSign()">±</button>
-            <button class="btn" onclick="appendDecimal()">.</button>
+            <button class="btn" onclick="calculatePercentage()">%</button>
             <button class="btn operator" onclick="setOperation('+')">+</button>
-            <!-- Row 2 -->
             <button class="btn" onclick="appendNumber(7)">7</button>
             <button class="btn" onclick="appendNumber(8)">8</button>
             <button class="btn" onclick="appendNumber(9)">9</button>
             <button class="btn operator" onclick="setOperation('÷')">÷</button>
-            <!-- Row 3 -->
             <button class="btn" onclick="appendNumber(4)">4</button>
             <button class="btn" onclick="appendNumber(5)">5</button>
             <button class="btn" onclick="appendNumber(6)">6</button>
             <button class="btn operator" onclick="setOperation('X')">X</button>
-            <!-- Row 4 -->
             <button class="btn" onclick="appendNumber(1)">1</button>
             <button class="btn" onclick="appendNumber(2)">2</button>
             <button class="btn" onclick="appendNumber(3)">3</button>
             <button class="btn operator" onclick="setOperation('-')">-</button>
-            <!-- Row 5 -->
-            <button class="btn" onclick="alert('Calculator Button Clicked!')">
+            <button class="btn" onclick="changeToCurrencyConversion()">
                 <i class="fas fa-calculator"></i>
             </button>
             <button class="btn" onclick="appendNumber(0)">0</button>
-            <button class="btn" onclick="calculateResult()">=</button>
-            <button class="btn operator" onclick="calculatePercentage()">%</button>
+            <button class="btn" onclick="appendDecimal()">.</button>
+            <button class="btn operator" onclick="calculateResult()">=</button>
         </div>
     </div>
 
@@ -166,9 +162,11 @@
         let operation = '';
         let previousInput = '';
         let activeOperator = null;
-        let history = ''; // משתנה להיסטוריית החישובים
-        let calculationHistory = ''; // היסטוריית חישובים שתתעדכן לאחר לחיצה על "="
-        let currentCalculation = ''; // נוסיף את החישוב הנוכחי כאן
+        let history = ''; 
+        let calculationHistory = ''; 
+        let currentCalculation = ''; 
+        let isCurrencyConversion = false; // משתנה עבור המרה לדולר-שקל
+        let isDollarToShekel = true; // ברירת המחדל היא דולר לשקל
 
         function appendNumber(number) {
             if (activeOperator) {
@@ -181,14 +179,14 @@
             } else {
                 currentInput += number.toString();
             }
-            currentCalculation += number.toString(); // נוסיף את המספר הנוכחי לחשבון
+            currentCalculation += number.toString(); 
             updateDisplay(currentInput);
         }
 
         function appendDecimal() {
             if (!currentInput.includes('.')) {
                 currentInput += '.';
-                currentCalculation += '.'; // נוסיף נקודה לחשבון
+                currentCalculation += '.'; 
             }
             updateDisplay(currentInput);
         }
@@ -215,55 +213,84 @@
         }
 
         function clearDisplay() {
-            currentInput = '';
-            previousInput = '';
-            operation = '';
-            currentCalculation = ''; // מאפס את החישוב הנוכחי
-            updateDisplay('0');
-            updateHistory('');
-            if (activeOperator) {
-                activeOperator.classList.remove('active');
-                activeOperator = null;
+            if (!isCurrencyConversion) {
+                currentInput = '';
+                previousInput = '';
+                operation = '';
+                currentCalculation = ''; 
+                updateDisplay('0');
+                updateHistory('');
+                if (activeOperator) {
+                    activeOperator.classList.remove('active');
+                    activeOperator = null;
+                }
+            } else {
+                // אם אנחנו במצב של המרה, נמשיך להציג את הערך הנוכחי
+                currentInput = '';
+                previousInput = '';
+                operation = '';
+                updateDisplay(currentInput); 
+                updateHistory(`Currency Conversion Mode (USD to ILS)`); 
             }
         }
 
         function calculateResult() {
             let result;
-            const prev = parseFloat(previousInput);
             const current = parseFloat(currentInput);
 
-            if (isNaN(prev) || isNaN(current)) return;
+            // אם לא הוזן מספר נכון, נבטל את החישוב
+            if (isNaN(current)) return;
 
-            switch (operation) {
-                case '+':
-                    result = prev + current;
-                    break;
-                case '-':
-                    result = prev - current;
-                    break;
-                case 'X':
-                    result = prev * current;
-                    break;
-                case '÷':
-                    if (current === 0) {
-                        result = 'Error';
-                    } else {
-                        result = prev / current;
+            if (isCurrencyConversion) {
+                // המרה לדולרים לשקלים או הפוך לפי הכיוון הנוכחי
+                if (isDollarToShekel) {
+                    result = current * 3.65; // דולר לשקל
+                    updateHistory(`Converted ${current} USD to ${result} ILS`);
+                } else {
+                    result = current / 3.65; // שקל לדולר
+                    updateHistory(`Converted ${current} ILS to ${result} USD`);
+                }
+                currentInput = result.toString();
+                updateDisplay(currentInput);
+                return;
+            } else {
+                // חישובים רגילים (לא המרה)
+                if (previousInput === '') {
+                    result = current;
+                } else {
+                    const prev = parseFloat(previousInput);
+                    switch (operation) {
+                        case '+':
+                            result = prev + current;
+                            break;
+                        case '-':
+                            result = prev - current;
+                            break;
+                        case 'X':
+                            result = prev * current;
+                            break;
+                        case '÷':
+                            if (current === 0) {
+                                result = 'Error';
+                            } else {
+                                result = prev / current;
+                            }
+                            break;
+                        default:
+                            return;
                     }
-                    break;
-                default:
-                    return;
+                }
             }
 
+            // עדכון התצוגה עם התוצאה
             currentInput = result.toString();
             operation = '';
             previousInput = '';
             updateDisplay(currentInput);
 
-            // עכשיו נוסיף את החישוב המלא להיסטוריה אחרי "="
             calculationHistory = currentCalculation + ' = ' + currentInput;
             updateHistory(calculationHistory);
-            currentCalculation = ''; // לאפס את החישוב הנוכחי לאחר ביצוע החישוב
+            currentCalculation = '';
         }
 
         function calculatePercentage() {
@@ -301,6 +328,16 @@
 
         function updateHistory(value) {
             document.getElementById('history').textContent = value;
+        }
+
+        function changeToCurrencyConversion() {
+            isCurrencyConversion = !isCurrencyConversion; // מתחלף בין מצבי המחשבון
+            updateHistory(isCurrencyConversion ? 'Currency Conversion (USD to ILS)' : '');
+        }
+
+        function toggleCurrencyDirection() {
+            isDollarToShekel = !isDollarToShekel; // החלפה בין דולר לשקל לשקל לדולר
+            updateHistory(isDollarToShekel ? 'Currency Conversion (USD to ILS)' : 'Currency Conversion (ILS to USD)');
         }
     </script>
 </body>
