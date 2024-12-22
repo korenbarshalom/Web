@@ -6,31 +6,70 @@
     <title>Calculator</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
-	#backButton i {
-    font-size: 20px; /* גודל החצים */
-    margin: 0 1px; /* רווח קטן בין החצים */
-    height: 40px; /* גובה החץ */
-    line-height: 40px; /* שולי קו טקסט כדי ליישר את החץ */
+/* סגנון כפתור המחשבון */
+.btn {
+    position: relative; /* הכפתור משמש כבסיס למיקום התפריט */
 }
 
-	#backButton {
-    padding: 8px;
-    font-size: 16px;
-    width: 40px; /* רוחב הכפתור */
-    height: 40px; /* גובה הכפתור */
-    display: flex;
-    flex-direction: row; /* משנה את כיוון החצים להיות ליד אחד את השני */
-    justify-content: space-between; /* פיזור החצים בקצוות הכפתור */
-    align-items: center; /* מיישר את החצים אנכית */
-    border: none; /* הסרת גבול */
-    outline: none; /* הסרת מסגרת */
-    border-radius: 40%; /* הופך את הכפתור לעגול */
+/* סגנון התפריט הנפתח */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #444;
+    width: 120px; /* גודל התפריט */
+    max-height: 150px; /* גובה מקסימלי של התפריט */
+    overflow-y: auto; /* אפשרות לגלול אם יש יותר מדי פריטים */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 5px; /* מעגל זוויות */
+    top: 400px; /* מיקום התפריט קצת יותר למטה (הוזז מ-190px ל-150px) */
+    left: 20%; /* מיקום התפריט במרכז הכפתור */
+    transform: translateX(-50%); /* מכוונן את התפריט למרכז הכפתור */
 }
 
-#backButton i {
-    font-size: 10px;
-    margin: 0 1px; /* רווח קטן בין החצים */
+.dropdown-content a {
+    color: white;
+    padding: 10px 15px;
+    text-decoration: none;
+    display: block;
+    border-bottom: 1px solid #555;
 }
+
+.dropdown-content a:hover {
+    background-color: #555;
+}
+
+/* מציג את התפריט */
+.show {
+    display: block;
+}
+
+
+        #backButton i {
+            font-size: 20px; /* גודל החצים */
+            margin: 0 1px; /* רווח קטן בין החצים */
+            height: 40px; /* גובה החץ */
+            line-height: 40px; /* שולי קו טקסט כדי ליישר את החץ */
+        }
+
+        #backButton {
+            padding: 8px;
+            font-size: 16px;
+            width: 40px; /* רוחב הכפתור */
+            height: 40px; /* גובה הכפתור */
+            display: none; /* הכפתור מוסתר בהתחלה */
+            flex-direction: row; /* משנה את כיוון החצים להיות ליד אחד את השני */
+            justify-content: space-between; /* פיזור החצים בקצוות הכפתור */
+            align-items: center; /* מיישר את החצים אנכית */
+            border: none; /* הסרת גבול */
+            outline: none; /* הסרת מסגרת */
+            border-radius: 40%; /* הופך את הכפתור לעגול */
+        }
+
+        #backButton i {
+            font-size: 10px;
+            margin: 0 1px; /* רווח קטן בין החצים */
+        }
 
         body {
             font-family: Arial, sans-serif;
@@ -172,11 +211,12 @@
     </style>
 </head>
 <body>
+
     <div class="calculator">
-      <button id="backButton" onclick="toggleCurrencyDirection()">
-    <i class="fas fa-arrow-up"></i>
-    <i class="fas fa-arrow-down"></i>
-</button>
+        <button id="backButton" onclick="toggleCurrencyDirection()">
+            <i class="fas fa-arrow-up"></i>
+            <i class="fas fa-arrow-down"></i>
+        </button>
 
         <div id="history"></div> <!-- היסטוריית חישובים -->
         <input type="text" id="display" disabled value="0">
@@ -197,13 +237,19 @@
             <button class="btn" onclick="appendNumber(2)">2</button>
             <button class="btn" onclick="appendNumber(3)">3</button>
             <button class="btn operator" onclick="setOperation('-')">-</button>
-            <button class="btn" onclick="changeToCurrencyConversion()">
-                <i class="fas fa-calculator"></i>
+            <button class="btn" onclick="changeToCurrencyConversion(); toggleMenu()">
+    <i class="fas fa-calculator"></i>
+
+
             </button>
             <button class="btn" onclick="appendNumber(0)">0</button>
             <button class="btn" onclick="appendDecimal()">.</button>
             <button class="btn operator" onclick="calculateResult()">=</button>
         </div>
+		<div id="menu" class="dropdown-content">
+    <a href="#">המרה</a>
+    <a href="#">מדעי</a>
+    <a href="#">Option 3</a>
     </div>
 
     <script>
@@ -218,10 +264,16 @@
         let isDollarToShekel = true; // ברירת המחדל היא דולר לשקל
 		
 		
-        function toggleCurrencyDirection() {
-    isDollarToShekel = !isDollarToShekel; // החלפה בין דולר לשקל לשקל לדולר
-    updateHistory(isDollarToShekel ? 'Currency Conversion (USD to ILS)' : 'Currency Conversion (ILS to USD)');
+		function toggleMenu() {
+    const menu = document.getElementById('menu');
+    menu.classList.toggle('show'); // משנה את מצב התצוגה של התפריט
 }
+
+
+        function toggleCurrencyDirection() {
+            isDollarToShekel = !isDollarToShekel; // החלפה בין דולר לשקל לשקל לדולר
+            updateHistory(isDollarToShekel ? 'Currency Conversion (USD to ILS)' : 'Currency Conversion (ILS to USD)');
+        }
 
         function appendNumber(number) {
             if (activeOperator) {
@@ -388,15 +440,12 @@
         function changeToCurrencyConversion() {
             isCurrencyConversion = !isCurrencyConversion; // מתחלף בין מצבי המחשבון
             updateHistory(isCurrencyConversion ? 'Currency Conversion (USD to ILS)' : '');
-        }
-
-        function toggleCurrencyDirection() {
-            isDollarToShekel = !isDollarToShekel; // החלפה בין דולר לשקל לשקל לדולר
-            updateHistory(isDollarToShekel ? 'Currency Conversion (USD to ILS)' : 'Currency Conversion (ILS to USD)');
-        }
-
-        function goBack() {
-            window.history.back();
+            const backButton = document.getElementById('backButton');
+            if (isCurrencyConversion) {
+                backButton.style.display = 'flex'; // הצגת הכפתור
+            } else {
+                backButton.style.display = 'none'; // הסתרת הכפתור
+            }
         }
     </script>
 </body>
