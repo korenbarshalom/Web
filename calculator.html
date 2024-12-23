@@ -6,6 +6,7 @@
     <title>Calculator</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
+	
 /* סגנון כפתור המחשבון */
 .btn {
     position: relative; /* הכפתור משמש כבסיס למיקום התפריט */
@@ -22,8 +23,8 @@
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     z-index: 1;
     border-radius: 5px; /* מעגל זוויות */
-    top: 400px; /* מיקום התפריט קצת יותר למטה (הוזז מ-190px ל-150px) */
-    left: 20%; /* מיקום התפריט במרכז הכפתור */
+    top: 385px; /* מיקום התפריט קצת יותר למטה (הוזז מ-190px ל-150px) */
+    left: 18%; /* מיקום התפריט במרכז הכפתור */
     transform: translateX(-50%); /* מכוונן את התפריט למרכז הכפתור */
 }
 
@@ -237,8 +238,10 @@
             <button class="btn" onclick="appendNumber(2)">2</button>
             <button class="btn" onclick="appendNumber(3)">3</button>
             <button class="btn operator" onclick="setOperation('-')">-</button>
-            <button class="btn" onclick="changeToCurrencyConversion(); toggleMenu()">
+            <button class="btn" onclick="toggleMenu()">
     <i class="fas fa-calculator"></i>
+</button>
+
 
 
             </button>
@@ -247,10 +250,11 @@
             <button class="btn operator" onclick="calculateResult()">=</button>
         </div>
 		<div id="menu" class="dropdown-content">
-    <a href="#">המרה</a>
-    <a href="#">מדעי</a>
-    <a href="#">Option 3</a>
-    </div>
+    <a href="#" onclick="changeToCurrencyConversion(); toggleMenu()">Conversion</a>
+   <a href="#" onclick="switchToScientificCalculator(); toggleMenu()">Scientific</a>
+    <a href="#" onclick="returnToCalculator(); toggleMenu()">Calculator</a>
+</div>
+
 
     <script>
         let currentInput = '';
@@ -262,6 +266,17 @@
         let currentCalculation = ''; 
         let isCurrencyConversion = false; // משתנה עבור המרה לדולר-שקל
         let isDollarToShekel = true; // ברירת המחדל היא דולר לשקל
+		
+
+
+		function returnToCalculator() {
+    isCurrencyConversion = false; // החזרה למצב מחשבון
+    updateHistory(''); // ניקוי היסטוריית ההמרה
+    const backButton = document.getElementById('backButton');
+    backButton.style.display = 'none'; // הסתרת כפתור החזרה
+    updateDisplay('0'); // עדכון התצוגה למצב ברירת מחדל
+}
+
 		
 		
 		function toggleMenu() {
