@@ -7,6 +7,34 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
 	
+	.scientific-buttons {
+    display: grid; /* שימוש ב-grid לסידור הכפתורים */
+    grid-template-columns: repeat(4, 1fr); /* 4 כפתורים בכל שורה */
+    gap: 10px; /* רווח בין הכפתורים */
+    padding: 10px;
+    direction: rtl; /* כיוון מימין לשמאל */
+    margin-bottom: 10px; /* רווח בין הכפתורים המדעיים לכפתורים הרגילים */
+    background-color: black; /* צבע רקע שחור */
+    border-bottom: 2px solid #444; /* קו הפרדה מהמחשבון בצבע כהה */
+}
+
+.btn-scientific {
+    background-color: #333; /* צבע רקע לכפתור */
+    color: white; /* צבע טקסט */
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.btn-scientific:hover {
+    background-color: #555; /* שינוי צבע בריחוף */
+}
+
+
+	
 /* סגנון כפתור המחשבון */
 .btn {
     position: relative; /* הכפתור משמש כבסיס למיקום התפריט */
@@ -240,6 +268,7 @@
             <button class="btn operator" onclick="setOperation('-')">-</button>
             <button class="btn" onclick="toggleMenu()">
     <i class="fas fa-calculator"></i>
+	
 </button>
 
 
@@ -248,11 +277,13 @@
             <button class="btn" onclick="appendNumber(0)">0</button>
             <button class="btn" onclick="appendDecimal()">.</button>
             <button class="btn operator" onclick="calculateResult()">=</button>
+
         </div>
 		<div id="menu" class="dropdown-content">
     <a href="#" onclick="changeToCurrencyConversion(); toggleMenu()">Conversion</a>
-   <a href="#" onclick="switchToScientificCalculator(); toggleMenu()">Scientific</a>
+    <a href="#" onclick="switchToScientificCalculator(); toggleMenu()">Scientific</a>
     <a href="#" onclick="returnToCalculator(); toggleMenu()">Calculator</a>
+
 </div>
 
 
@@ -266,6 +297,114 @@
         let currentCalculation = ''; 
         let isCurrencyConversion = false; // משתנה עבור המרה לדולר-שקל
         let isDollarToShekel = true; // ברירת המחדל היא דולר לשקל
+		
+		
+		
+		// Function that will be triggered when the menu option is clicked
+function handleMenuOptionClick(option) {
+    if (option === 'calculator') {
+        returnToCalculator();  // Return to regular calculator mode
+    } else if (option === 'scientific') {
+        switchToScientificCalculator(); // Switch to scientific calculator
+    }
+}
+
+// Function to return to regular calculator
+function returnToCalculator() {
+    const scientificContainer = document.querySelector('.scientific-buttons');
+    if (scientificContainer) {
+        scientificContainer.remove(); // Remove the scientific buttons
+    }
+    // Make sure the normal calculator is visible again
+    const calculator = document.querySelector('.calculator');
+    calculator.style.display = 'block';
+}
+
+// Function to switch to scientific calculator
+function switchToScientificCalculator() {
+    const calculator = document.querySelector('.calculator');
+    calculator.style.display = 'block'; // Show the calculator
+
+    // Create scientific buttons if they don't already exist
+    const existingButtons = calculator.querySelectorAll('.btn-scientific');
+    if (existingButtons.length === 0) {
+        const scientificContainer = document.createElement('div');
+        scientificContainer.className = 'scientific-buttons'; // Container for scientific buttons
+        const scientificButtons = [
+            { text: 'sin', class: 'btn btn-scientific', action: 'sin' },
+            { text: 'cos', class: 'btn btn-scientific', action: 'cos' },
+            { text: 'tan', class: 'btn btn-scientific', action: 'tan' },
+            { text: 'log', class: 'btn btn-scientific', action: 'log' },
+            { text: 'ln', class: 'btn btn-scientific', action: 'ln' },
+            { text: '√', class: 'btn btn-scientific', action: 'sqrt' },
+            { text: '^', class: 'btn btn-scientific', action: 'power' },
+            { text: 'π', class: 'btn btn-scientific', action: 'pi' }
+        ];
+
+        scientificButtons.forEach(button => {
+            const btn = document.createElement('button');
+            btn.textContent = button.text;
+            btn.className = button.class;
+            btn.onclick = () => performScientificOperation(button.action); // Attach function to button
+            scientificContainer.appendChild(btn);
+        });
+
+        // Add scientific container before the normal buttons
+        const calculatorContainer = document.querySelector('.buttons');
+        calculatorContainer.insertAdjacentElement('beforebegin', scientificContainer);
+    }
+}
+
+// Function to perform scientific operations
+function performScientificOperation(operation) {
+    const screen = document.querySelector('.screen'); // Display screen
+    let currentInput = screen.value;
+
+    switch (operation) {
+        case 'sin':
+            screen.value = Math.sin(parseFloat(currentInput)).toFixed(5); // Calculate sin
+            break;
+        case 'cos':
+            screen.value = Math.cos(parseFloat(currentInput)).toFixed(5); // Calculate cos
+            break;
+        case 'tan':
+            screen.value = Math.tan(parseFloat(currentInput)).toFixed(5); // Calculate tan
+            break;
+        case 'log':
+            screen.value = Math.log10(parseFloat(currentInput)).toFixed(5); // Log base 10
+            break;
+        case 'ln':
+            screen.value = Math.log(parseFloat(currentInput)).toFixed(5); // Natural log
+            break;
+        case 'sqrt':
+            screen.value = Math.sqrt(parseFloat(currentInput)).toFixed(5); // Square root
+            break;
+        case 'power':
+            screen.value = Math.pow(parseFloat(currentInput), 2).toFixed(5); // Power of 2
+            break;
+        case 'pi':
+            screen.value = Math.PI.toFixed(5); // Display π
+            break;
+        default:
+            break;
+			function returnToCalculator() {
+    const scientificContainer = document.querySelector('.scientific-buttons');
+    if (scientificContainer) {
+        scientificContainer.remove(); // מוחק את הכפתורים המדעיים
+    }
+
+    // הצגת המחשבון הרגיל
+    const calculator = document.querySelector('.calculator');
+    calculator.style.display = 'block'; // ודא שהמחשבון הרגיל מוצג
+}
+
+    }
+}
+
+
+		
+	
+
 		
 
 
