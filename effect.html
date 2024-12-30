@@ -1,0 +1,48 @@
+using UnityEngine;
+
+public class EffectTrigger : MonoBehaviour
+{
+    public ParticleSystem attackEffect; // ה-Particle System שלך
+
+    private bool isEffectActive = false; // משתנה שמוודא אם האפקט פעיל
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.R)) // בדוק אם נלחץ המקש R
+        {
+            // אם האפקט לא פעיל, הפעל אותו
+            if (!isEffectActive)
+            {
+                PlayAttackEffect();
+            }
+        }
+    }
+
+    void PlayAttackEffect()
+    {
+        if (attackEffect != null)
+        {
+            // הפעל את האפקט
+            attackEffect.Play();
+            isEffectActive = true; // סימן שהאפקט פועל
+            Debug.Log("הפעלת את האפקט.");
+
+            // עצור את האפקט אחרי 5 שניות
+            Invoke("StopAttackEffect", 5f);
+        }
+        else
+        {
+            Debug.LogWarning("לא הוגדר ה־ParticleSystem.");
+        }
+    }
+
+    void StopAttackEffect()
+    {
+        if (attackEffect != null)
+        {
+            attackEffect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            isEffectActive = false; // סימן שהאפקט לא פעיל יותר
+            Debug.Log("האפקט נעצר אחרי 5 שניות.");
+        }
+    }
+}
