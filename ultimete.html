@@ -1,0 +1,105 @@
+using UnityEngine;
+
+public class EffectTrigger : MonoBehaviour
+{
+    public ParticleSystem attackEffect; // ה-Particle System שלך
+    private bool isEffectActive = false; // משתנה שמוודא אם האפקט פעיל
+    private int treesDestroyed = 0; // ספירת העצים שהושמדו
+    private int requiredTrees = 5; // מספר העצים הנדרש להפעלת האפקט
+    public float destructionRadius = 12f; // הטווח שבו ה־Box יהרס
+    public GameObject piecePrefab; // Prefab של חתיכת האבן
+    public int numberOfPieces = 100; // מספר החלקים שמהם האבן תורכב
+    public float destructionForce = 5f; // כוח הפיזור של החלקים
+    public float pieceLifetime = 5f; // זמן חיים של החלקים
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.R)) // בדוק אם נלחץ המקש R
+        {
+            // אם האפקט לא פעיל ויש מספיק עצים שהושמדו
+            if (!isEffectActive && treesDestroyed >= requiredTrees)
+            {
+                PlayAttackEffect();
+                treesDestroyed = 0; // אפס את הספירה אחרי הפעלת האפקט
+            }
+            else if (treesDestroyed < requiredTrees)
+            {
+                Debug.Log($"צריך להשמיד עוד {requiredTrees - treesDestroyed} עצים לפני הפעלת האפקט.");
+            }
+        }
+    }
+
+    public void DestroyTree()
+    {
+        treesDestroyed++; // עדכון מספר העצים שהושמדו
+        Debug.Log($"השמדת עץ! סך הכול: {treesDestroyed}/{requiredTrees} עצים שהושמדו.");
+    }
+
+    void PlayAttackEffect()
+    {
+        if (attackEffect != null)
+        {
+            // הפעל את האפקט
+            attackEffect.Play();
+            isEffectActive = true; // סימן שהאפקט פועל
+            Debug.Log("הפעלת את האפקט.");
+
+            DestroyNearbyBoxes(); // השמדת כל האובייקטים עם ה-Tag "Box" בטווח
+
+            // עצור את האפקט אחרי 5 שניות
+            Invoke("StopAttackEffect", 5f);
+        }
+        else
+        {
+            Debug.LogWarning("לא הוגדר ה־ParticleSystem.");
+        }
+    }
+
+    void DestroyNearbyBoxes()
+    {
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, destructionRadius); // בדיקת כל האובייקטים בטווח
+        foreach (Collider collider in hitColliders)
+        {
+            if (collider.CompareTag("Box")) // בדוק אם יש לו את ה-Tag "Box"
+            {
+                // פירוק האבן לחתיכות
+                BreakIntoPieces(collider.transform.position);
+
+                // השמדת האובייקט המקורי
+                Destroy(collider.gameObject);
+                Debug.Log($"Box בשם {collider.name} הושמד.");
+            }
+        }
+    }
+
+    void BreakIntoPieces(Vector3 position)
+    {
+        for (int i = 0; i < numberOfPieces; i++)
+        {
+            // יצירת חתיכה קטנה במיקום רנדומלי סביב האובייקט שנהרס
+            Vector3 randomPosition = position + Random.insideUnitSphere * 0.5f; // טווח קטן מסביב
+            GameObject piece = Instantiate(piecePrefab, randomPosition, Random.rotation);
+
+            // הוספת כוח פיזור לחתיכה
+            Rigidbody rb = piece.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                Vector3 randomDirection = Random.insideUnitSphere; // כיוון רנדומלי
+                rb.AddForce(randomDirection * destructionForce, ForceMode.Impulse);
+            }
+
+            // השמדת החתיכה לאחר זמן מסוים
+            Destroy(piece, pieceLifetime);
+        }
+    }
+
+    void StopAttackEffect()
+    {
+        if (attackEffect != null)
+        {
+            attackEffect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            isEffectActive = false; // סימן שהאפקט לא פעיל יותר
+            Debug.Log("האפקט נעצר אחרי 5 שניות.");
+        }
+    }
+}
