@@ -1,0 +1,82 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+public class SimpleEnemyHealth : MonoBehaviour
+{
+    [Header("Health Settings")]
+    public float maxHealth = 100f; // כמות הבריאות המקסימלית של האויב
+    private float currentHealth;   // כמות הבריאות הנוכחית
+
+    [Header("UI Settings")]
+    public Slider healthBar; // ה-Health Bar שמחובר ל-Canvas
+    public GameObject healthBarUI; // GameObject של ה-Health Bar ב-Canvas
+
+    void Start()
+    {
+        // אתחול הבריאות
+        currentHealth = maxHealth;
+
+        // הגדרת ה-Health Bar אם מחובר
+        if (healthBar != null)
+        {
+            healthBar.maxValue = maxHealth;
+            healthBar.value = currentHealth;
+            healthBarUI.SetActive(false); // הסתרת ה-Health Bar בהתחלה
+        }
+    }
+
+    void Update(
+    {
+        // בדיקה אם האויב בטווח מסוים כדי להציג את ה-Health Bar
+        if (healthBar != null && IsPlayerInRange(80f)) // טווח של 50 מטר לדוגמה
+        {
+            healthBarUI.SetActive(true);
+            healthBar.value = currentHealth;
+        }
+        else if (healthBarUI != null)
+        {
+            healthBarUI.SetActive(false);
+        }
+    }
+
+    public void TakeDamage(float damage)
+    {
+        // הפחתת נזק מהבריאות
+        currentHealth -= damage;
+
+        // עדכון ה-Health Bar
+        if (healthBar != null)
+        {
+            healthBar.value = currentHealth;
+        }
+
+        // בדיקה אם הבריאות נגמרה
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        // השמדת ה-Health Bar מה-Canvas
+        if (healthBarUI != null)
+        {
+            Destroy(healthBarUI);
+        }
+
+        // השמדת האויב
+        Destroy(gameObject);
+    }
+
+    private bool IsPlayerInRange(float range)
+    {
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            float distance = Vector3.Distance(player.transform.position, transform.position);
+            return distance <= range;
+        }
+        return false;
+    }
+}
