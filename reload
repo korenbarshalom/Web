@@ -1,0 +1,94 @@
+using UnityEngine;
+
+public class WeaponSwitcher : MonoBehaviour
+{
+    public GameObject gun;  // הגדרת אובייקט הרובה
+    public GameObject knife; // הגדרת אובייקט הדק
+
+    public GameObject bulletPrefab; // הפריפאב של הכדור
+    public Transform firePoint;     // נקודת הירי של הכדור
+    public float bulletSpeed = 20f; // מהירות הכדור
+    public Transform bulletsParent; // האובייקט ההורה לכדורים
+    public float fireRate = 0.5f;   // קצב ירי (כמה שניות בין יריות)
+    public ParticleSystem muzzleFlash; // אפקט פלש ירי (Particle System)
+
+    private float nextFireTime = 0f; // זמן הירי הבא
+
+    public float recoilAmount = 0.1f; // כמות הזעזוע של הרובה
+    public float recoilSpeed = 5f; // מהירות הזעזוע של הרובה
+    private Vector3 initialGunPosition; // מיקום הרובה ההתחלתי
+
+    private void Start()
+    {
+        // הכנס את הרובה והדק לאובייקטים בהתחלה
+        SwitchToGun();
+        initialGunPosition = gun.transform.localPosition; // שמור את המיקום ההתחלתי של הרובה
+    }
+
+    private void Update()
+    {
+        // בדוק אם נעשה סיבוב על הגלגלת של העכבר
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+
+        if (scroll > 0f) // גלילה למטה
+        {
+            SwitchToGun();
+        }
+        else if (scroll < 0f) // גלילה למעלה
+        {
+            SwitchToKnife();
+        }
+
+        // אם הרובה מוצג והכפתור לירי נלחץ והגיע הזמן לירות
+        if (gun.activeSelf && Input.GetButton("Fire1") && Time.time >= nextFireTime)
+        {
+            Shoot();
+            nextFireTime = Time.time + fireRate; // עדכון זמן הירי הבא
+        }
+
+        // הזזת הרובה אחורה וקדימה בצורה עדינה
+        if (gun.activeSelf)
+        {
+            Vector3 targetPosition = initialGunPosition + (Input.GetButton("Fire1") ? -Vector3.forward * recoilAmount : Vector3.zero);
+            gun.transform.localPosition = Vector3.Lerp(gun.transform.localPosition, targetPosition, recoilSpeed * Time.deltaTime);
+        }
+    }
+
+    private void Shoot()
+    {
+        // יצירת פריפאב הכדור עם רוטציה מותאמת
+        Quaternion adjustedRotation = firePoint.rotation * Quaternion.Euler(90f, 0f, 0f);
+        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, adjustedRotation);
+
+        // קביעת הורה לכדור
+        if (bulletsParent != null)
+        {
+            bullet.transform.SetParent(bulletsParent);
+        }
+
+        // הוספת מהירות לכדור
+        Rigidbody rb = bullet.GetComponent<Rigidbody>();
+        rb.linearVelocity = firePoint.forward * bulletSpeed;
+
+        // מחיקת הכדור אחרי 4 שניות
+        Destroy(bullet, 4f);
+
+        // הפעלת האפקט
+        if (muzzleFlash != null)
+        {
+            muzzleFlash.Play(); // הפעלת ה-Particle System
+        }
+    }
+
+    private void SwitchToGun()
+    {
+        gun.SetActive(true);  // הצג את הרובה
+        knife.SetActive(false); // הסתר את הדק
+    }
+
+    private void SwitchToKnife()
+    {
+        knife.SetActive(true); // הצג את הדק
+        gun.SetActive(false);  // הסתר את הרובה
+    }
+}
