@@ -1,0 +1,115 @@
+using System.Collections;
+using UnityEngine;
+
+public class ZiplineGun : MonoBehaviour
+{
+    public GameObject ropePrefab; // Prefab של החבל
+    public Transform gunTip; // נקודת יציאת החבל מהרובה
+    public float ropeSpeed = 10f; // מהירות התנועה על החבל
+    public Material ropeMaterial; // חומר החבל (ניתן להגדיר דרך ה-Inspector)
+    public LayerMask wallLayer; // שכבת הקירות שמותר לפגוע בהם
+    public GameObject playerGun; // האקדח של השחקן (חובה להיות עליו כדי להשתמש ב-Zipline)
+    public Camera mainCamera; // המצלמה הראשית שהשחקן בוחר (דרך ה-Inspector)
+
+    private GameObject currentRope; // החבל שנורה
+    private Vector3 targetPoint; // נקודת הפגיעה
+    private bool isAttached = false; // האם השחקן מחובר לחבל
+    private Coroutine movementCoroutine; // שמירת קורוטינה של תנועה
+
+    void Update()
+    {
+        // בדיקה אם השחקן מחזיק באקדח
+        if (playerGun == null || !playerGun.activeInHierarchy)
+        {
+            if (isAttached)
+            {
+                DetachRope(); // אם האקדח הופך ללא פעיל באמצע השימוש, מנתקים את החבל
+            }
+            return; // אם השחקן לא מחזיק באקדח, לא ניתן להשתמש ב-Zipline
+        }
+
+        // יצירת החבל והתחלת תנועה אם לוחצים על המקש הימני
+        if (Input.GetMouseButtonDown(1) && !isAttached)
+        {
+            ShootRope();
+        }
+
+        // מחיקת החבל ועצירת תנועה אם משחררים את המקש הימני
+        if (Input.GetMouseButtonUp(1) && isAttached)
+        {
+            DetachRope();
+        }
+
+        // תנועה קדימה אם המקש הימני מוחזק והשחקן מחובר לחבל
+        if (Input.GetMouseButton(1) && isAttached && movementCoroutine == null)
+        {
+            movementCoroutine = StartCoroutine(MoveAlongRope());
+        }
+    }
+
+    void ShootRope()
+    {
+        if (mainCamera == null)
+        {
+            Debug.LogError("Main camera is not assigned!");
+            return;
+        }
+
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, 100f, wallLayer)) // בדיקה אם פגענו באובייקט בשכבת Wall
+        {
+            Debug.Log("Raycast hit at: " + hit.point);
+            targetPoint = hit.point;
+
+            // יצירת החבל
+            currentRope = Instantiate(ropePrefab, gunTip.position, Quaternion.identity);
+            LineRenderer line = currentRope.GetComponent<LineRenderer>();
+            line.SetPosition(0, gunTip.position); // נקודת התחלה (הרובה)
+            line.SetPosition(1, targetPoint); // נקודת פגיעה (המטרה)
+
+            // הגדרת חומר
+            if (ropeMaterial != null)
+            {
+                line.material = ropeMaterial; // מגדיר את ה-Material על החבל
+            }
+
+            isAttached = true; // השחקן מחובר לחבל
+        }
+        else
+        {
+            Debug.Log("No hit detected.");
+        }
+    }
+
+    IEnumerator MoveAlongRope()
+    {
+        while (isAttached && Input.GetMouseButton(1)) // תנועה כל עוד המקש לחוץ
+        {
+            if (transform.position == targetPoint) break; // עצור אם הגעת לנקודת היעד
+
+            transform.position = Vector3.MoveTowards(transform.position, targetPoint, ropeSpeed * Time.deltaTime);
+            yield return null;
+        }
+        movementCoroutine = null; // איפוס הקורוטינה כשהתנועה נעצרת
+    }
+
+    void DetachRope()
+    {
+        isAttached = false;
+
+        // עצירת תנועה אם קורוטינה פעילה
+        if (movementCoroutine != null)
+        {
+            StopCoroutine(movementCoroutine);
+            movementCoroutine = null;
+        }
+
+        // מחיקת החבל
+        if (currentRope != null)
+        {
+            Destroy(currentRope);
+        }
+    }
+}
