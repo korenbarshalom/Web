@@ -1,0 +1,147 @@
+using UnityEngine;
+
+public class TeleportObject : MonoBehaviour
+{
+    public KeyCode teleportKey = KeyCode.E; // כפתור לשיגור
+    public Transform objectToTeleport; // האובייקט לשיגור
+    public Transform teleportPoint; // נקודת השיגור
+    public bool keepRotation = true; // האם לשמור על הסיבוב הקיים
+    public float rotationOffset = 90f; // סיבוב נוסף שיתווסף לנקודת השיגור
+    public Camera playerCamera; // המצלמה שדרכה נבצע את השיגור
+    public float moveSpeed = 10f; // מהירות התנועה קדימה
+
+    public GameObject objectPrefab; // פריפאב של האובייקט לשחזור
+    private bool isTeleporting = false;
+    private Vector3 forwardDirection;
+
+    public ParticleSystem hitEffect; // אפקט פגיעה
+    private bool isEffectActive = false;
+    private float effectDuration = 5f;
+    public Transform effectParent;
+
+    public string enemyTag = "enemy"; // תג של האויב
+    public GameObject enemy;
+    private bool isObjectEnemy = false;
+
+    void Start()
+    {
+        if (hitEffect != null)
+        {
+            hitEffect.Stop();
+            hitEffect.gameObject.SetActive(false);
+        }
+
+        if (enemy != null && enemy.CompareTag(enemyTag))
+        {
+            isObjectEnemy = true;
+        }
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(teleportKey))
+        {
+            TeleportToPoint();
+        }
+
+        if (isTeleporting)
+        {
+            MoveForward();
+        }
+    }
+
+    void TeleportToPoint()
+    {
+        if (teleportPoint != null && objectToTeleport != null)
+        {
+            objectToTeleport.position = teleportPoint.position;
+
+            if (keepRotation)
+            {
+                objectToTeleport.rotation = teleportPoint.rotation * Quaternion.Euler(0, rotationOffset, 0);
+            }
+            else
+            {
+                objectToTeleport.rotation = Quaternion.identity;
+            }
+
+            if (playerCamera != null)
+            {
+                forwardDirection = playerCamera.transform.forward;
+                forwardDirection.y = 0;
+                forwardDirection.Normalize();
+            }
+
+            isTeleporting = true;
+        }
+        else
+        {
+            Debug.LogWarning("Teleport point or object to teleport is not assigned!");
+        }
+    }
+
+    void MoveForward()
+    {
+        if (forwardDirection != Vector3.zero)
+        {
+            objectToTeleport.position += forwardDirection * moveSpeed * Time.deltaTime;
+        }
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag(enemyTag) && isObjectEnemy)
+        {
+            if (!isEffectActive && hitEffect != null)
+            {
+                isEffectActive = true;
+                hitEffect.gameObject.SetActive(true);
+                hitEffect.Play();
+                Debug.Log("הפעלת את האפקט.");
+
+                Invoke("StopHitEffect", effectDuration);
+
+                EnemyHealth enemyHealth = other.GetComponent<EnemyHealth>();
+                if (enemyHealth != null)
+                {
+                    enemyHealth.TakeDamage(200);
+                }
+
+                DestroyObjectWithRespawn(); // השמדת האובייקט והחזרתו
+            }
+        }
+    }
+
+    void DestroyObjectWithRespawn()
+    {
+        // השמדת האובייקט הנוכחי
+        Destroy(gameObject);
+
+        // קריאה לפונקציה שתשחזר את האובייקט אחרי 10 שניות
+        Invoke("RespawnObject", 10f);
+    }
+
+    void RespawnObject()
+    {
+        if (objectPrefab != null)
+        {
+            // יצירת עותק חדש של האובייקט במקום בו הוא נהרס
+            GameObject newObject = Instantiate(objectPrefab, transform.position, transform.rotation);
+            Debug.Log("האובייקט חזר לחיים!");
+        }
+        else
+        {
+            Debug.LogWarning("לא הוגדר פריפאב לאובייקט לשחזור!");
+        }
+    }
+
+    void StopHitEffect()
+    {
+        if (hitEffect != null)
+        {
+            hitEffect.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            isEffectActive = false;
+            Debug.Log("האפקט נעצר.");
+        }
+    }
+}
