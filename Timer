@@ -1,0 +1,69 @@
+using UnityEngine;
+using TMPro;
+using UnityEngine.UI;  // כדי להשתמש בכפתור
+using System.Collections;
+public class Timer : MonoBehaviour
+{
+    [SerializeField] TextMeshProUGUI timerText;  // הטקסט שמציג את הזמן
+    [SerializeField] TextMeshProUGUI levelCompleteText;  // הטקסט שמציג את "Level 1 Complete"
+    [SerializeField] GameObject objectToDestroy;  // אובייקט שיביא להפסקת הטיימר
+    [SerializeField] Button level2Button;  // כפתור שמוביל ל-Level 2
+    float elapsedTime;
+    bool isTimerActive = true; // משתנה שמוודא שהטיימר פעיל
+
+    void Start()
+    {
+        // מתחילים בהסתרת טקסט "Level 1 Complete" וכפתור Level 2
+        levelCompleteText.gameObject.SetActive(false);
+        level2Button.gameObject.SetActive(false);
+    }
+
+    void Update()
+    {
+        // אם הטיימר לא פעיל, אנחנו לא עושים כלום
+        if (!isTimerActive) return;
+
+        elapsedTime += Time.deltaTime;
+        int minutes = Mathf.FloorToInt(elapsedTime / 60);
+        int seconds = Mathf.FloorToInt(elapsedTime % 60);
+        timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+
+        // אם האובייקט הושמד, נעצור את הטיימר ונדגים את הודעת הסיום
+        if (objectToDestroy == null)
+        {
+            StopTimer();
+        }
+    }
+
+    // פונקציה להפסקת הטיימר
+    void StopTimer()
+    {
+        isTimerActive = false;
+
+        // הצגת זמן סיום המשחק במרכז
+        int minutes = Mathf.FloorToInt(elapsedTime / 60);
+        int seconds = Mathf.FloorToInt(elapsedTime % 60);
+        timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+
+        // הצגת הודעה "Level 1 Complete"
+        levelCompleteText.gameObject.SetActive(true);  // הופך את הטקסט להופיע
+        levelCompleteText.text = "Level 1 Complete\nTime: " + string.Format("{0:00}:{1:00}", minutes, seconds);  // מציג את הזמן
+
+        // עצירת המשחק - הזמן במשחק יפסיק לפעול
+        Time.timeScale = 0;  // עוצר את הזמן במשחק
+
+        // המתנה של 3 שניות ואז הצגת כפתור "Level 2" והסתרת הטקסטים
+        StartCoroutine(ShowLevel2ButtonAndHideTexts());
+    }
+
+    // קורוטינה שממתינה 3 שניות ואז מציגה את כפתור "Level 2" ומסתירה את הטקסטים
+    private IEnumerator ShowLevel2ButtonAndHideTexts()
+    {
+        yield return new WaitForSecondsRealtime(3f);  // המתנה של 3 שניות בזמן אמיתי (בלי תלות ב-Time.timeScale)
+
+        levelCompleteText.gameObject.SetActive(false);  // מסתיר את הטקסט "Level 1 Complete"
+        timerText.gameObject.SetActive(false);  // מסתיר את הטקסט של הזמן
+
+        level2Button.gameObject.SetActive(true);  // הצגת כפתור Level 2
+    }
+}
