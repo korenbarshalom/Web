@@ -23,6 +23,9 @@ public class TeleportObject : MonoBehaviour
     public GameObject enemy;
     private bool isObjectEnemy = false;
 
+    public GameObject requiredObject; // האובייקט שנדרש להיות מושמד
+    private bool isRequiredObjectDestroyed = false; // האם האובייקט הנדרש הושמד
+
     void Start()
     {
         if (hitEffect != null)
@@ -39,7 +42,13 @@ public class TeleportObject : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(teleportKey))
+        if (requiredObject == null && !isRequiredObjectDestroyed)
+        {
+            isRequiredObjectDestroyed = true;
+            Debug.Log("האובייקט הנדרש הושמד. ניתן כעת להשתמש בכפתור השיגור.");
+        }
+
+        if (Input.GetKeyDown(teleportKey) && isRequiredObjectDestroyed)
         {
             TeleportToPoint();
         }
