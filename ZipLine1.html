@@ -8,6 +8,7 @@ public class ZiplineGun : MonoBehaviour
     public float ropeSpeed = 10f; // מהירות התנועה על החבל
     public Material ropeMaterial; // חומר החבל (ניתן להגדיר דרך ה-Inspector)
     public LayerMask wallLayer; // שכבת הקירות שמותר לפגוע בהם
+    public LayerMask enemyLayer; // שכבת האויבים
     public GameObject playerGun; // האקדח של השחקן (חובה להיות עליו כדי להשתמש ב-Zipline)
     public Camera mainCamera; // המצלמה הראשית שהשחקן בוחר (דרך ה-Inspector)
 
@@ -15,32 +16,30 @@ public class ZiplineGun : MonoBehaviour
     private Vector3 targetPoint; // נקודת הפגיעה
     private bool isAttached = false; // האם השחקן מחובר לחבל
     private Coroutine movementCoroutine; // שמירת קורוטינה של תנועה
+    private GameObject targetEnemy; // שמירה של האויב שאליו החבל נורה
+    private bool ropeHitEnemy = false; // בודק אם החבל פגע באויב
 
     void Update()
     {
-        // בדיקה אם השחקן מחזיק באקדח
         if (playerGun == null || !playerGun.activeInHierarchy)
         {
             if (isAttached)
             {
-                DetachRope(); // אם האקדח הופך ללא פעיל באמצע השימוש, מנתקים את החבל
+                DetachRope();
             }
-            return; // אם השחקן לא מחזיק באקדח, לא ניתן להשתמש ב-Zipline
+            return;
         }
 
-        // יצירת החבל והתחלת תנועה אם לוחצים על המקש הימני
         if (Input.GetMouseButtonDown(1) && !isAttached)
         {
             ShootRope();
         }
 
-        // מחיקת החבל ועצירת תנועה אם משחררים את המקש הימני
         if (Input.GetMouseButtonUp(1) && isAttached)
         {
             DetachRope();
         }
 
-        // תנועה קדימה אם המקש הימני מוחזק והשחקן מחובר לחבל
         if (Input.GetMouseButton(1) && isAttached && movementCoroutine == null)
         {
             movementCoroutine = StartCoroutine(MoveAlongRope());
@@ -58,24 +57,30 @@ public class ZiplineGun : MonoBehaviour
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, 100f, wallLayer)) // בדיקה אם פגענו באובייקט בשכבת Wall
+        if (Physics.Raycast(ray, out hit, 100f, wallLayer | enemyLayer)) // בדיקה אם פגענו באובייקט בשכבת Wall או enemy
         {
             Debug.Log("Raycast hit at: " + hit.point);
             targetPoint = hit.point;
 
-            // יצירת החבל
-            currentRope = Instantiate(ropePrefab, gunTip.position, Quaternion.identity);
-            LineRenderer line = currentRope.GetComponent<LineRenderer>();
-            line.SetPosition(0, gunTip.position); // נקודת התחלה (הרובה)
-            line.SetPosition(1, targetPoint); // נקודת פגיעה (המטרה)
-
-            // הגדרת חומר
-            if (ropeMaterial != null)
+            // אם הפגענו באויב, נשמור אותו
+            if (((1 << hit.collider.gameObject.layer) & enemyLayer) != 0)
             {
-                line.material = ropeMaterial; // מגדיר את ה-Material על החבל
+                targetEnemy = hit.collider.gameObject; // שמירה של האויב
+                ropeHitEnemy = true; // החבל פגע באויב
+                Debug.Log("Rope hit an enemy!");
             }
 
-            isAttached = true; // השחקן מחובר לחבל
+            currentRope = Instantiate(ropePrefab, gunTip.position, Quaternion.identity);
+            LineRenderer line = currentRope.GetComponent<LineRenderer>();
+            line.SetPosition(0, gunTip.position);
+            line.SetPosition(1, targetPoint);
+
+            if (ropeMaterial != null)
+            {
+                line.material = ropeMaterial;
+            }
+
+            isAttached = true;
         }
         else
         {
@@ -85,31 +90,75 @@ public class ZiplineGun : MonoBehaviour
 
     IEnumerator MoveAlongRope()
     {
-        while (isAttached && Input.GetMouseButton(1)) // תנועה כל עוד המקש לחוץ
+        while (isAttached && Input.GetMouseButton(1))
         {
-            if (transform.position == targetPoint) break; // עצור אם הגעת לנקודת היעד
+            if (transform.position == targetPoint) break;
 
             transform.position = Vector3.MoveTowards(transform.position, targetPoint, ropeSpeed * Time.deltaTime);
+
+            // אם יש אויב בטווח, נבדוק אם הוא פוגע בו
+            if (ropeHitEnemy && targetEnemy != null && Vector3.Distance(transform.position, targetEnemy.transform.position) < 1f)
+            {
+                // לוודא שהאויב לא null
+                SimpleEnemyHealth enemyHealth = targetEnemy.GetComponent<SimpleEnemyHealth>();
+                if (enemyHealth != null)
+                {
+                    enemyHealth.TakeDamage(100); // הפחתת 100 חיים לאויב
+                    Debug.Log("Enemy took 100 damage from rope!");
+                    ropeHitEnemy = false; // מניעת פגיעה נוספת
+                }
+
+                // הוספה של הפחתת חיים גם מ-SimpleEnemyHealth1
+                SimpleEnemyHealth1 enemyHealth1 = targetEnemy.GetComponent<SimpleEnemyHealth1>();
+                if (enemyHealth1 != null)
+                {
+                    enemyHealth1.TakeDamage(100); // הפחתת 100 חיים גם ל-SimpleEnemyHealth1
+                    Debug.Log("Enemy took 100 damage from rope (SimpleEnemyHealth1)!");
+                }
+            }
+
             yield return null;
         }
-        movementCoroutine = null; // איפוס הקורוטינה כשהתנועה נעצרת
+        movementCoroutine = null;
     }
 
     void DetachRope()
     {
         isAttached = false;
 
-        // עצירת תנועה אם קורוטינה פעילה
         if (movementCoroutine != null)
         {
             StopCoroutine(movementCoroutine);
             movementCoroutine = null;
         }
 
-        // מחיקת החבל
         if (currentRope != null)
         {
             Destroy(currentRope);
+        }
+    }
+
+    // הפונקציה הזו תפעל כאשר החבל פוגע במשהו
+    void OnTriggerEnter(Collider other)
+    {
+        // אם החבל פוגע באויב
+        if (ropeHitEnemy && other.CompareTag("enemy"))
+        {
+            SimpleEnemyHealth enemyHealth = other.GetComponent<SimpleEnemyHealth>();
+            if (enemyHealth != null)
+            {
+                enemyHealth.TakeDamage(100); // הפחתת 100 חיים לאויב
+                Debug.Log("Rope hit the enemy and it took 100 damage!");
+                ropeHitEnemy = false; // מניעת פגיעה נוספת
+            }
+
+            // הוספה של הפחתת חיים גם מ-SimpleEnemyHealth1
+            SimpleEnemyHealth1 enemyHealth1 = other.GetComponent<SimpleEnemyHealth1>();
+            if (enemyHealth1 != null)
+            {
+                enemyHealth1.TakeDamage(100); // הפחתת 100 חיים גם ל-SimpleEnemyHealth1
+                Debug.Log("Rope hit the enemy and it took 100 damage (SimpleEnemyHealth1)!");
+            }
         }
     }
 }
