@@ -1,0 +1,279 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[RequireComponent(typeof(CharacterController))]
+public class PlayerMovement : MonoBehaviour
+{
+    [Header("Player & Cameras")]
+    // השחקן עצמו – כדי לבדוק את המרחק ולהציב אותו כ-child במידת הצורך
+    public Transform playerTransform;
+    // המצלמה הראשית (first camera)
+    public Camera playerCamera;
+    // האובייקט המכיל את מצלמת המכונית (מצלמה ייעודית למצב "במכונית")
+    public GameObject secondaryCameraObject;
+    // האובייקט שאליו השחקן יהיה מחובר בעת החלפת המצלמה (למשל, המכונית)
+    public Transform attachedObject;
+    // האובייקט ממנו נמדד המרחק (למשל, אובייקט מסוים בסצנה)
+    public GameObject targetObject;
+    // המרחק המקסימלי לביצוע ההחלפה (8 מטרים)
+    public float switchDistance = 8f;
+
+    [Header("Movement Settings")]
+    public float walkSpeed = 10f;
+    public float runSpeed = 15f;
+    public float jumpPower = 7f;
+    public float gravity = 10f;
+    public float lookSpeed = 2f;
+    public float lookXLimit = 45f;
+    public float defaultHeight = 2f;
+    public float crouchHeight = 1f;
+    public float crouchSpeed = 3f;
+
+    // אובייקט שמפעיל בוסט לקפיצה – כשנחסל, נקבל קפיצה חזקה
+    [SerializeField] private GameObject jumpPowerObject;
+
+    private Vector3 moveDirection = Vector3.zero;
+    private float rotationX = 0f;
+    private CharacterController characterController;
+
+    // כאשר canMove הוא false – השחקן לא יזוז באופן עצמאי
+    private bool canMove = true;
+    // משתנה המציין האם אנחנו במצב "במכונית" (כלומר, המצב שהוחלף באמצעות V)
+    private bool isUsingSecondaryCamera = false;
+    // בתוך מצב "במכונית": אם הערך false – מופעלת מצלמת המכונית (secondary), ואם true – מופעלת המצלמה הראשית (first)
+    private bool isUsingCarPlayerCamera = false;
+
+    // משתנים עבור קפיצה מקיר ובוסט לקפיצה
+    private bool canJumpOnWall = false;
+    private bool jumpPowerBoostActive = false;
+    private bool jumpPowerBoostTriggered = false;
+
+    void Start()
+    {
+        characterController = GetComponent<CharacterController>();
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        jumpPower = 18f;
+
+        // אתחול המצלמות: ודא שהמצלמה הראשית פעילה, ומצלמת המכונית מושבתת בתחילת המשחק
+        if (playerCamera != null)
+            playerCamera.enabled = true;
+        if (secondaryCameraObject != null)
+            secondaryCameraObject.SetActive(false);
+    }
+
+    void Update()
+    {
+        // בודקים אם יש בוסט לקפיצה – אם האובייקט jumpPowerObject נחסל, נפעיל בוסט לקפיצה
+        if (!jumpPowerBoostTriggered && jumpPowerObject == null)
+        {
+            jumpPowerBoostTriggered = true;
+            StartCoroutine(JumpPowerBoostCoroutine());
+        }
+
+        // מעבר/חזרה בין מצב תנועה רגילה לבין מצב "במכונית" בלחיצה על V
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            ToggleCameraAndMovement();
+        }
+
+        // בתוך מצב "במכונית", לחיצה על U תחליף בין מצלמת המכונית למצלמה הראשית (first camera)
+        if (isUsingSecondaryCamera && Input.GetKeyDown(KeyCode.U))
+        {
+            ToggleCarCameraView();
+        }
+
+        if (canMove)
+        {
+            HandleMovement();
+        }
+    }
+
+    void HandleMovement()
+    {
+        Vector3 forward = transform.TransformDirection(Vector3.forward);
+        Vector3 right = transform.TransformDirection(Vector3.right);
+
+        bool isRunning = Input.GetKey(KeyCode.LeftShift);
+        float curSpeedX = (isRunning ? runSpeed : walkSpeed) * Input.GetAxis("Vertical");
+        float curSpeedY = (isRunning ? runSpeed : walkSpeed) * Input.GetAxis("Horizontal");
+        float movementDirectionY = moveDirection.y;
+        moveDirection = (forward * curSpeedX) + (right * curSpeedY);
+
+        // לוגיקת קפיצה: קפיצה מהרצפה או קפיצה מקיר
+        if (Input.GetButton("Jump") && canMove)
+        {
+            if (characterController.isGrounded)
+            {
+                moveDirection.y = jumpPower;
+            }
+            else if (canJumpOnWall)
+            {
+                moveDirection.y = jumpPower;
+                canJumpOnWall = false; // מניעת קפיצה חוזרת מיד
+            }
+            else
+            {
+                moveDirection.y = movementDirectionY;
+            }
+        }
+        else
+        {
+            moveDirection.y = movementDirectionY;
+        }
+
+        // יישום כוח הכובד
+        if (!characterController.isGrounded)
+        {
+            moveDirection.y -= gravity * Time.deltaTime;
+        }
+
+        // מצב כריעה
+        if (Input.GetKey(KeyCode.LeftControl))
+        {
+            characterController.height = crouchHeight;
+            walkSpeed = crouchSpeed;
+            runSpeed = crouchSpeed;
+        }
+        else
+        {
+            characterController.height = defaultHeight;
+            walkSpeed = 25f;
+            runSpeed = 30f;
+        }
+
+        // העברת השחקן לפי הכיוון
+        characterController.Move(moveDirection * Time.deltaTime);
+
+        // סיבוב המצלמה לפי תנועת העכבר
+        rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
+        rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
+        playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
+        transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
+    }
+
+    /// <summary>
+    /// מתג בין מצב "במכונית" למצב תנועה רגילה (לחיצה על V)
+    /// </summary>
+    void ToggleCameraAndMovement()
+    {
+        if (targetObject == null || playerTransform == null || secondaryCameraObject == null)
+            return;
+
+        float distance = Vector3.Distance(playerTransform.position, targetObject.transform.position);
+
+        if (distance <= switchDistance)
+        {
+            // הפיכת המצב (מצב "במכונית" או מצב תנועה רגילה)
+            isUsingSecondaryCamera = !isUsingSecondaryCamera;
+
+            if (isUsingSecondaryCamera)
+            {
+                // מעבר למצב "במכונית":
+                // השבתת המצלמה הראשית והפעלת מצלמת המכונית
+                playerCamera.enabled = false;
+                secondaryCameraObject.SetActive(true);
+                // בתוך מצב "במכונית", כברירת מחדל מופעלת מצלמת המכונית (ולא המצלמה הראשית)
+                isUsingCarPlayerCamera = false;
+
+                canMove = false; // השבתת תנועת השחקן
+
+                if (attachedObject != null)
+                {
+                    // הפיכת השחקן ל-child של האובייקט (המכונית)
+                    playerTransform.SetParent(attachedObject);
+                    // איפוס המיקום והסיבוב המקומיים – כך שהשחקן יהיה "דבוק" למכונית
+                    playerTransform.localPosition = Vector3.zero;
+                    playerTransform.localRotation = Quaternion.identity;
+                }
+                // השבתת ה-CharacterController כדי שלא יתבצע תזוזה עצמאית
+                if (characterController != null)
+                {
+                    characterController.enabled = false;
+                }
+
+                Debug.Log("השחקן נכנס למצב 'במכונית'. מופעלת מצלמת המכונית.");
+            }
+            else
+            {
+                // חזרה למצב תנועה רגילה:
+                // במידה ובמצב "במכונית" השתמשנו במצלמה הראשית (בלחיצה על U) – לא נדרשת כאן החלפה נוספת
+                playerCamera.enabled = true;
+                secondaryCameraObject.SetActive(false);
+                canMove = true;
+
+                // ניתוק השחקן מהמכונית
+                playerTransform.SetParent(null);
+
+                // הפעלה מחדש של ה-CharacterController כדי לאפשר תנועה רגילה
+                if (characterController != null)
+                {
+                    characterController.enabled = true;
+                }
+
+                // איפוס מצב התצוגה במצב "במכונית"
+                isUsingCarPlayerCamera = false;
+
+                Debug.Log("השחקן יצא ממצב 'במכונית'. מופעלת המצלמה הראשית.");
+            }
+        }
+        else
+        {
+            Debug.Log("השחקן רחוק מדי מהאובייקט (מקסימום " + switchDistance + " מטר) כדי לבצע את המעבר.");
+        }
+    }
+
+    /// <summary>
+    /// בתוך מצב "במכונית" – מתג בין מצלמת המכונית (secondaryCameraObject) למצלמה הראשית (playerCamera)
+    /// בלחיצה על U
+    /// </summary>
+    void ToggleCarCameraView()
+    {
+        if (playerCamera == null || secondaryCameraObject == null)
+            return;
+
+        if (!isUsingCarPlayerCamera)
+        {
+            // מעבר למצלמה הראשית (first camera) – השבתת מצלמת המכונית והפעלת המצלמה הראשית
+            secondaryCameraObject.SetActive(false);
+            playerCamera.enabled = true;
+            isUsingCarPlayerCamera = true;
+            Debug.Log("Switched to main (first) camera view in car mode.");
+        }
+        else
+        {
+            // חזרה למצלמת המכונית – השבתת המצלמה הראשית והפעלת מצלמת המכונית
+            playerCamera.enabled = false;
+            secondaryCameraObject.SetActive(true);
+            isUsingCarPlayerCamera = false;
+            Debug.Log("Switched back to secondary car camera view.");
+        }
+    }
+
+    // מתודה זו מופעלת בכל התנגשות – אם נתקלים באובייקט עם תגית "Wall" נאפשר קפיצה מקיר
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (hit.gameObject.CompareTag("Wall"))
+        {
+            canJumpOnWall = true;
+            StartCoroutine(DisableWallJumpAfterDelay());
+        }
+    }
+
+    // קורוטינה שמבטלת את אפשרות הקפיצה מקיר לאחר שנייה
+    IEnumerator DisableWallJumpAfterDelay()
+    {
+        yield return new WaitForSeconds(1f);
+        canJumpOnWall = false;
+    }
+
+    // קורוטינה שמפעילה בוסט לקפיצה: מעלים את כוח הקפיצה ל־36f למשך 30 שניות, ואז מחזירים אותו ל־18f
+    IEnumerator JumpPowerBoostCoroutine()
+    {
+        jumpPowerBoostActive = true;
+        jumpPower = 36f;
+        yield return new WaitForSeconds(30f);
+        jumpPower = 18f;
+    }
+}
