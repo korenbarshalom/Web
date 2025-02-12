@@ -1,0 +1,184 @@
+using UnityEngine;
+
+public class CarController : MonoBehaviour
+{
+    // שדות חדשים: הפניה לשחקן, מרחק הפעלה, ושדה לבדיקת טווח בין השחקן למכונית
+    public Transform playerTransform;      // הפניה לשחקן
+    public float activationDistance = 7f;    // מרחק ההפעלה במטרים (7 מטר)
+    public bool isPlayerInRange = false;     // האם השחקן נמצא בטווח של 7 מטר מהמכונית
+
+    private bool canDrive = false;           // האם המכונית הופעלה לנסיעה
+
+    // מהירות התנועה (קדימה ואחורה)
+    public float moveSpeed = 5f;
+    // מהירות הסיבוב של המכונית (במעלות לשנייה)
+    public float turnSpeed = 90f;
+    // מהירות החזרת זווית ההיגוי לאפס כאשר אין קלט היגוי
+    public float steeringReturnSpeed = 120f;
+    // מקדם להתאמת ההיגוי לסיבוב המכונית בפועל
+    public float turnFactor = 0.5f;
+
+    // משתנה להגדרת הכיוון "הקדמי" של המכונית, בהתאם למודל.
+    // לדוגמה, אם המודל סובב ב־90 מעלות, יש להגדיר כאן: Vector3.right.
+    public Vector3 modelForward = Vector3.right;
+
+    // הזווית הנוכחית של ההיגוי (במעלות)
+    private float steeringAngle = 0f;
+
+    // הפניות לגלגלים הקדמיים (להמחשת סיבוב ההיגוי, אם יש)
+    public Transform frontLeftWheel;
+    public Transform frontRightWheel;
+
+    // הפניות לגלגלים האחוריים
+    public Transform rearLeftWheel;
+    public Transform rearRightWheel;
+
+    // מערך לאובייקטים המייצגים את חלקי הגלגלים הנוספים.
+    // יש להגדיר 4 חלקים במערך לפי הסדר: 
+    // 0 - גלגל קדמי שמאל, 1 - גלגל קדמי ימין, 2 - גלגל אחורי שמאל, 3 - גלגל אחורי ימין.
+    public Transform[] extraWheelParts;
+
+    // מערך לאובייקטים המייצגים את חלקי ידית ההגה (לדוגמה, שני חלקים נפרדים)
+    public Transform[] steeringWheelParts;
+
+    void Update()
+    {
+        // עדכון השדה isPlayerInRange לפי המרחק בין השחקן למכונית
+        if (playerTransform != null)
+        {
+            isPlayerInRange = Vector3.Distance(playerTransform.position, transform.position) <= activationDistance;
+        }
+        else
+        {
+            isPlayerInRange = false;
+        }
+
+        // בדיקה אם המכונית הופעלה לנסיעה
+        if (!canDrive)
+        {
+            // אם השחקן נמצא בטווח ולחץ על מקש V, הפעילו את המכונית
+            if (isPlayerInRange && Input.GetKeyDown(KeyCode.V))
+            {
+                canDrive = true;
+                Debug.Log("המכונית הופעלה לנסיעה!");
+            }
+            // אם לא הופעלה, לא נמשיך בביצוע שאר הקוד
+            return;
+        }
+
+        // קבלת קלט לתנועה:
+        // Y – תנועה קדימה, H – תנועה אחורה
+        float verticalInput = 0f;
+        if (Input.GetKey(KeyCode.Y))
+        {
+            verticalInput = 1f;
+        }
+        else if (Input.GetKey(KeyCode.H))
+        {
+            verticalInput = -1f;
+        }
+
+        // עדכון זווית ההיגוי לפי מקשי היגוי:
+        // G – להיגוי שמאלה (מקטין את הזווית)
+        if (Input.GetKey(KeyCode.G))
+        {
+            steeringAngle -= turnSpeed * Time.deltaTime;
+        }
+        // J – להיגוי ימינה (מגדיל את הזווית)
+        if (Input.GetKey(KeyCode.J))
+        {
+            steeringAngle += turnSpeed * Time.deltaTime;
+        }
+
+        // הגבלת זווית ההיגוי לטווח הרצוי (למשל, בין -30 ל־30 מעלות)
+        steeringAngle = Mathf.Clamp(steeringAngle, -30f, 30f);
+
+        // החזרת זווית ההיגוי לאפס כאשר לא נלחצים מקשי היגוי
+        if (!Input.GetKey(KeyCode.G) && !Input.GetKey(KeyCode.J))
+        {
+            if (steeringAngle > 0f)
+            {
+                steeringAngle -= steeringReturnSpeed * Time.deltaTime;
+                if (steeringAngle < 0f)
+                    steeringAngle = 0f;
+            }
+            else if (steeringAngle < 0f)
+            {
+                steeringAngle += steeringReturnSpeed * Time.deltaTime;
+                if (steeringAngle > 0f)
+                    steeringAngle = 0f;
+            }
+        }
+
+        // סיבוב המכונית בעת תנועה – רק אם יש תנועה (קדימה/אחורה)
+        if (verticalInput != 0f)
+        {
+            // הסיבוב תלוי בזווית ההיגוי ובכיוון התנועה
+            float turn = steeringAngle * verticalInput * turnFactor * Time.deltaTime;
+            transform.Rotate(0, turn, 0);
+        }
+
+        // חישוב הכיוון "הקדמי" בהתאם לסיבוב הנוכחי של המכונית:
+        Vector3 actualForward = transform.TransformDirection(modelForward);
+
+        // עדכון מיקום המכונית בהתאם לתנועה ובכיוון הנכון:
+        transform.position += actualForward * verticalInput * moveSpeed * Time.deltaTime;
+
+        // עדכון סיבוב הגלגלים הקדמיים להמחשת זווית ההיגוי (אם הוגדרו)
+        if (frontLeftWheel != null)
+        {
+            Vector3 leftWheelEuler = frontLeftWheel.localEulerAngles;
+            leftWheelEuler.y = steeringAngle;
+            frontLeftWheel.localEulerAngles = leftWheelEuler;
+        }
+        if (frontRightWheel != null)
+        {
+            Vector3 rightWheelEuler = frontRightWheel.localEulerAngles;
+            rightWheelEuler.y = steeringAngle;
+            frontRightWheel.localEulerAngles = rightWheelEuler;
+        }
+
+        // עדכון סיבוב הגלגלים האחוריים בהתאם לזווית ההיגוי (אם הוגדרו)
+        if (rearLeftWheel != null)
+        {
+            Vector3 leftRearWheelEuler = rearLeftWheel.localEulerAngles;
+            leftRearWheelEuler.y = steeringAngle;
+            rearLeftWheel.localEulerAngles = leftRearWheelEuler;
+        }
+        if (rearRightWheel != null)
+        {
+            Vector3 rightRearWheelEuler = rearRightWheel.localEulerAngles;
+            rightRearWheelEuler.y = steeringAngle;
+            rearRightWheel.localEulerAngles = rightRearWheelEuler;
+        }
+
+        // עדכון סיבוב חלקי הגלגלים הנוספים, אם הוגדר מערך עם 4 חלקים.
+        if (extraWheelParts != null && extraWheelParts.Length == 4)
+        {
+            for (int i = 0; i < extraWheelParts.Length; i++)
+            {
+                if (extraWheelParts[i] != null)
+                {
+                    Vector3 extraWheelEuler = extraWheelParts[i].localEulerAngles;
+                    extraWheelEuler.y = steeringAngle;
+                    extraWheelParts[i].localEulerAngles = extraWheelEuler;
+                }
+            }
+        }
+
+        // עדכון סיבוב ידית ההגה - כל האובייקטים במערך יסובבו יחד לפי זווית ההיגוי
+        if (steeringWheelParts != null)
+        {
+            foreach (Transform part in steeringWheelParts)
+            {
+                if (part != null)
+                {
+                    Vector3 newEuler = part.localEulerAngles;
+                    // כאן אנו מסובבים סביב ציר ה-Z (ניתן לשנות לפי הצורך בהתאם למודל)
+                    newEuler.z = -steeringAngle;
+                    part.localEulerAngles = newEuler;
+                }
+            }
+        }
+    }
+}
