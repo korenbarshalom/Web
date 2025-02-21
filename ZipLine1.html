@@ -3,24 +3,38 @@ using UnityEngine;
 
 public class ZiplineGun : MonoBehaviour
 {
-    public GameObject ropePrefab; // Prefab של החבל
-    public Transform gunTip; // נקודת יציאת החבל מהרובה
-    public float ropeSpeed = 10f; // מהירות התנועה על החבל
-    public Material ropeMaterial; // חומר החבל (ניתן להגדיר דרך ה-Inspector)
-    public LayerMask wallLayer; // שכבת הקירות שמותר לפגוע בהם
-    public LayerMask enemyLayer; // שכבת האויבים
-    public GameObject playerGun; // האקדח של השחקן (חובה להיות עליו כדי להשתמש ב-Zipline)
-    public Camera mainCamera; // המצלמה הראשית שהשחקן בוחר (דרך ה-Inspector)
+    [Header("Rope Settings")]
+    public GameObject ropePrefab;         // Prefab של החבל
+    public Transform gunTip;              // נקודת יציאת החבל מהרובה
+    public float ropeSpeed = 10f;         // מהירות התנועה (משמשת גם לחישוב המהירות הזוויתית)
+    public Material ropeMaterial;         // חומר החבל (ניתן להגדיר דרך ה-Inspector)
 
-    private GameObject currentRope; // החבל שנורה
-    private Vector3 targetPoint; // נקודת הפגיעה
-    private bool isAttached = false; // האם השחקן מחובר לחבל
-    private Coroutine movementCoroutine; // שמירת קורוטינה של תנועה
-    private GameObject targetEnemy; // שמירה של האויב שאליו החבל נורה
-    private bool ropeHitEnemy = false; // בודק אם החבל פגע באויב
+    [Header("Layers & Tags")]
+    public LayerMask wallLayer;           // שכבת הקירות שמותר לפגוע בהם
+    public LayerMask enemyLayer;          // שכבת האויבים
+    // נניח שאובייקטים עם תג "box" לא בהכרח בשכבה מסוימת ולכן נבדוק את התג
+
+    [Header("Player & Camera")]
+    public GameObject playerGun;          // האקדח של השחקן (יש להניח שהוא מופעל בשביל להשתמש ב-Zipline)
+    public Camera mainCamera;             // המצלמה הראשית (דרך ה-Inspector)
+
+    [Header("Swing Settings")]
+    public float swingAcceleration = 2f;  // האצה שמצטרפת למהירות הזוויתית במהלך הסווינג
+
+    private GameObject currentRope;       // החבל שנורה
+    private Vector3 targetPoint;          // נקודת הפגיעה (עיגון החבל)
+    private bool isAttached = false;      // האם החבל מחובר
+    private Coroutine movementCoroutine;// קורוטינה לתנועה
+    private GameObject targetEnemy;       // שמירה של האויב שאליו החבל נורה
+    private bool ropeHitEnemy = false;    // בודק אם החבל פגע באויב
+
+    // משתנים לשליטה בין תנועה בקו ישר לבין תנועת סווינג
+    private bool isSwinging = false;      // אם true – נעשה תנועת סווינג סביב targetPoint
+    private float currentSwingSpeed = 0f; // מהירות זוויתית מצטברת לסווינג
 
     void Update()
     {
+        // במידה ואין שחקן (או שהאקדח לא פעיל), נבטל את החיבור
         if (playerGun == null || !playerGun.activeInHierarchy)
         {
             if (isAttached)
@@ -30,16 +44,19 @@ public class ZiplineGun : MonoBehaviour
             return;
         }
 
+        // לחיצה על העכבר הימני כדי לירות את החבל, אם לא מחוברים עדיין
         if (Input.GetMouseButtonDown(1) && !isAttached)
         {
             ShootRope();
         }
 
+        // שחרור לחיצה מבטל את החיבור
         if (Input.GetMouseButtonUp(1) && isAttached)
         {
             DetachRope();
         }
 
+        // בזמן שהחבל מחובר – מתחילים להזיז את השחקן
         if (Input.GetMouseButton(1) && isAttached && movementCoroutine == null)
         {
             movementCoroutine = StartCoroutine(MoveAlongRope());
@@ -57,19 +74,36 @@ public class ZiplineGun : MonoBehaviour
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, 100f, wallLayer | enemyLayer)) // בדיקה אם פגענו באובייקט בשכבת Wall או enemy
+        // הרחבנו את מסנן ה-Raycast כך שגם אובייקטים עם תג "box" יזוהו
+        LayerMask combinedMask = wallLayer | enemyLayer;
+        if (Physics.Raycast(ray, out hit, 100f, combinedMask))
         {
             Debug.Log("Raycast hit at: " + hit.point);
             targetPoint = hit.point;
 
-            // אם הפגענו באויב, נשמור אותו
+            // בדיקה האם פגענו באויב
             if (((1 << hit.collider.gameObject.layer) & enemyLayer) != 0)
             {
-                targetEnemy = hit.collider.gameObject; // שמירה של האויב
-                ropeHitEnemy = true; // החבל פגע באויב
+                targetEnemy = hit.collider.gameObject;
+                ropeHitEnemy = true;
                 Debug.Log("Rope hit an enemy!");
+                isSwinging = false; // במצב זה נמשיך בתנועה בקו ישר
+            }
+            // בדיקה האם הפגיעה הייתה באובייקט עם תג "box"
+            else if (hit.collider.CompareTag("box"))
+            {
+                isSwinging = true;
+                // אתחול מהירות הסווינג למהירות הבסיסית
+                currentSwingSpeed = ropeSpeed;
+                Debug.Log("Rope hit a box – swing mode activated!");
+            }
+            else
+            {
+                // במידה ופגענו במשהו אחר (למשל קיר) – נמשיך בתנועה בקו ישר
+                isSwinging = false;
             }
 
+            // יצירת החבל וקביעת קצוות הקו
             currentRope = Instantiate(ropePrefab, gunTip.position, Quaternion.identity);
             LineRenderer line = currentRope.GetComponent<LineRenderer>();
             line.SetPosition(0, gunTip.position);
@@ -92,30 +126,45 @@ public class ZiplineGun : MonoBehaviour
     {
         while (isAttached && Input.GetMouseButton(1))
         {
-            if (transform.position == targetPoint) break;
-
-            transform.position = Vector3.MoveTowards(transform.position, targetPoint, ropeSpeed * Time.deltaTime);
-
-            // אם יש אויב בטווח, נבדוק אם הוא פוגע בו
-            if (ropeHitEnemy && targetEnemy != null && Vector3.Distance(transform.position, targetEnemy.transform.position) < 1f)
+            // במידה ואנחנו במצב סווינג – נעשה סיבוב סביב נקודת העיגון
+            if (isSwinging)
             {
-                // לוודא שהאויב לא null
-                SimpleEnemyHealth enemyHealth = targetEnemy.GetComponent<SimpleEnemyHealth>();
-                if (enemyHealth != null)
-                {
-                    enemyHealth.TakeDamage(100); // הפחתת 100 חיים לאויב
-                    Debug.Log("Enemy took 100 damage from rope!");
-                    ropeHitEnemy = false; // מניעת פגיעה נוספת
-                }
+                // חשב את הוקטור מהנקודה (targetPoint) למיקום השחקן
+                Vector3 offset = transform.position - targetPoint;
+                float radius = offset.magnitude;
 
-                // הוספה של הפחתת חיים גם מ-SimpleEnemyHealth1
-                SimpleEnemyHealth1 enemyHealth1 = targetEnemy.GetComponent<SimpleEnemyHealth1>();
-                if (enemyHealth1 != null)
+                // חשב מהירות זוויתית (הקטן את הזווית במעלות) – ניתן להעלות עם הזמן כדי "לצבור תנופה"
+                currentSwingSpeed += swingAcceleration * Time.deltaTime;
+                float angularSpeed = currentSwingSpeed / radius; // רדיאנים לשנייה
+
+                // לחשב את ציר הסיבוב – נבחר בציר שהוא הוקטור התוצאה של Cross בין offset ל-Up (כך הסווינג יהיה במישור אופקי)
+                Vector3 swingAxis = Vector3.Cross(offset, Vector3.up).normalized;
+
+                // סובב את ה-offset סביב targetPoint לפי מהירות זוויתית זו
+                Quaternion swingRotation = Quaternion.AngleAxis(angularSpeed * Time.deltaTime * Mathf.Rad2Deg, swingAxis);
+                Vector3 newPos = targetPoint + swingRotation * offset;
+                transform.position = newPos;
+            }
+            else
+            {
+                // במצב רגיל – תנועה בקו ישר לקראת נקודת העיגון
+                transform.position = Vector3.MoveTowards(transform.position, targetPoint, ropeSpeed * Time.deltaTime);
+            }
+
+            // אפשרות: עדכון גרפי של החבל (אם רוצים לעדכן את קצה הקו)
+            if (currentRope != null)
+            {
+                LineRenderer line = currentRope.GetComponent<LineRenderer>();
+                if (line != null)
                 {
-                    enemyHealth1.TakeDamage(100); // הפחתת 100 חיים גם ל-SimpleEnemyHealth1
-                    Debug.Log("Enemy took 100 damage from rope (SimpleEnemyHealth1)!");
+                    line.SetPosition(0, gunTip.position);
+                    line.SetPosition(1, targetPoint);
                 }
             }
+
+            // אם הגענו לנקודת העיגון – עוצרים את הקורוטינה (במיוחד במצב תנועה ישרה)
+            if (!isSwinging && Vector3.Distance(transform.position, targetPoint) < 0.1f)
+                break;
 
             yield return null;
         }
@@ -125,6 +174,7 @@ public class ZiplineGun : MonoBehaviour
     void DetachRope()
     {
         isAttached = false;
+        isSwinging = false; // אתחול מצב הסווינג
 
         if (movementCoroutine != null)
         {
@@ -138,27 +188,27 @@ public class ZiplineGun : MonoBehaviour
         }
     }
 
-    // הפונקציה הזו תפעל כאשר החבל פוגע במשהו
+    // הפונקציה הזו תפעל כאשר החבל נוגע במשהו (לדוגמה, אויב או אובייקט אחר)
     void OnTriggerEnter(Collider other)
     {
-        // אם החבל פוגע באויב
+        // אם החבל פוגע באויב – מתבצעת הלוגיקה הקיימת (הפחתת חיים וכו')
         if (ropeHitEnemy && other.CompareTag("enemy"))
         {
             SimpleEnemyHealth enemyHealth = other.GetComponent<SimpleEnemyHealth>();
             if (enemyHealth != null)
             {
-                enemyHealth.TakeDamage(100); // הפחתת 100 חיים לאויב
+                enemyHealth.TakeDamage(100);
                 Debug.Log("Rope hit the enemy and it took 100 damage!");
-                ropeHitEnemy = false; // מניעת פגיעה נוספת
+                ropeHitEnemy = false;
             }
 
-            // הוספה של הפחתת חיים גם מ-SimpleEnemyHealth1
             SimpleEnemyHealth1 enemyHealth1 = other.GetComponent<SimpleEnemyHealth1>();
             if (enemyHealth1 != null)
             {
-                enemyHealth1.TakeDamage(100); // הפחתת 100 חיים גם ל-SimpleEnemyHealth1
+                enemyHealth1.TakeDamage(100);
                 Debug.Log("Rope hit the enemy and it took 100 damage (SimpleEnemyHealth1)!");
             }
         }
+        // אפשר להוסיף כאן התנהגות נוספת במידה והחבל פוגע באובייקט אחר, אך את הלוגיקה לסווינג כבר מגדירים ב-ShootRope
     }
 }
