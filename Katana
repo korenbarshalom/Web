@@ -1,0 +1,222 @@
+using UnityEngine;
+using System.Collections; // כדי להשתמש ב-Coroutine
+
+public class KnifeController : MonoBehaviour
+{
+    [Header("הגדרות לסיבוב התקפה 1")]
+    public float rotationSpeed = 20.0f; // מהירות הסיבוב עבור התקפת הסכין הפנימית
+    private bool isRotating = false; // האם הסכין בתהליך סיבוב
+    private float rotationProgress = 0.0f; // כדי לעקוב אחרי התקדמות הסיבוב
+    private float targetAngle = 180.0f; // זווית היעד לסיבוב התקפת הסכין
+    public float damageRange = 5.0f; // טווח הפגיעה מהאויב
+    public int damageAmount = 100; // כמות הנזק
+    private bool hasDealtDamage = false; // כדי לוודא שהנזק יינתן פעם אחת בלבד בסיבוב
+    private bool canRotate = true; // בודק אם ניתן להתחיל סיבוב חדש
+
+    [Header("הגדרות להתקפות 2 ו-3 (ימין)")]
+    public float launchSpeed = 10f; // מהירות המעבר לנקודת ההתקפה (מיקום מקומי)
+    private bool isLaunching = false; // האם תהליך ההתקפה פעיל בזמן העברת החרב
+    public float launchRotationSpeed = 180f; // מהירות הסיבוב בזמן ההעברה
+
+    // נקודת התקפה יחסית להורה – החרב תעבור אליה במהלך התקפת ימין
+    public Vector3 attackLocalTargetPosition = new Vector3(0.5f, 0.0f, 0.5f);
+
+    // אובייקט הסיבוב – אם מוגדר, נעביר אליו את תנועת הסיבוב (אחרת נשתמש ב-transform של הסכין עצמו)
+    public Transform objectToRotate;
+
+    // ערכי ברירת מחדל – מיקום וסיבוב (הבסיס לקביעת הזוויות)
+    private Vector3 defaultLocalPosition;
+    private Quaternion defaultLocalRotation = Quaternion.Euler(-24.743f, 74.341f, -102.245f);
+
+    // משתנה לעקוב אחרי לחיצות ימניות (Attack 2 ואז Attack 3)
+    private bool rightAttackTriggered = false;
+
+    void Start()
+    {
+        // אתחול הסכין למיקום ולסיבוב ההתחלתי
+        if (objectToRotate != null)
+        {
+            objectToRotate.localRotation = defaultLocalRotation;
+            defaultLocalPosition = objectToRotate.localPosition;
+        }
+        else
+        {
+            transform.localRotation = defaultLocalRotation;
+            defaultLocalPosition = transform.localPosition;
+        }
+    }
+
+    void Update()
+    {
+        // Attack1 – לחיצה על כפתור העכבר השמאלי (סיבוב פנימי)
+        if (Input.GetMouseButtonDown(0) && !isRotating && canRotate)
+        {
+            isRotating = true;
+            rotationProgress = 0.0f;
+            hasDealtDamage = false;
+            canRotate = false;
+            StartCoroutine(AllowRotationAfterDelay(0.4f));
+        }
+
+        // Attack2 ו–Attack3 – לחיצה על כפתור העכבר הימני
+        if (Input.GetMouseButtonDown(1) && !isLaunching && !isRotating)
+        {
+            if (!rightAttackTriggered)
+            {
+                rightAttackTriggered = true;
+                StartCoroutine(Attack2Coroutine());
+            }
+            else
+            {
+                rightAttackTriggered = false;
+                StartCoroutine(Attack3Coroutine());
+            }
+        }
+
+        // ביצוע סיבוב Attack1 – סביב ציר X בכיוון חיובי (Vector3.right)
+        if (isRotating)
+        {
+            float step = rotationSpeed * Time.deltaTime;
+            rotationProgress += step;
+            transform.Rotate(Vector3.right * step, Space.Self);
+
+            if (rotationProgress >= targetAngle)
+            {
+                transform.localRotation = defaultLocalRotation;
+                isRotating = false;
+                rotationProgress = 0.0f;
+                if (!hasDealtDamage)
+                {
+                    DealDamageToEnemyInRange();
+                    hasDealtDamage = true;
+                }
+            }
+        }
+    }
+
+    // Attack2 – לחיצה ימנית ראשונה
+    private IEnumerator Attack2Coroutine()
+    {
+        isLaunching = true;
+        Transform workingObject = objectToRotate != null ? objectToRotate : transform;
+        Vector3 targetLocalPosition = attackLocalTargetPosition;
+
+        // מחשבים targetLocalRotation ביחס ל-defaultLocalRotation עם offset של 40 מעלות בציר X
+        Quaternion targetLocalRotation = Quaternion.Euler(
+            defaultLocalRotation.eulerAngles.x + -40f,
+            defaultLocalRotation.eulerAngles.y,
+            defaultLocalRotation.eulerAngles.z);
+
+        while (Vector3.Distance(workingObject.localPosition, targetLocalPosition) > 0.1f)
+        {
+            workingObject.localPosition = Vector3.MoveTowards(workingObject.localPosition, targetLocalPosition, launchSpeed * Time.deltaTime);
+            workingObject.localRotation = Quaternion.RotateTowards(workingObject.localRotation, targetLocalRotation, launchRotationSpeed * Time.deltaTime);
+            yield return null;
+        }
+        workingObject.localPosition = targetLocalPosition;
+        workingObject.localRotation = targetLocalRotation;
+
+        // ביצוע סיבוב נוסף של 180 מעלות סביב ציר X (אותו כיוון)
+        yield return StartCoroutine(RotateKnifeAfterLaunch(180f));
+
+        DealDamageToEnemyInRange();
+        yield return StartCoroutine(ResetSwordCoroutine());
+        isLaunching = false;
+    }
+
+    // Attack3 – לחיצה ימנית חוזרת
+    private IEnumerator Attack3Coroutine()
+    {
+        isLaunching = true;
+        Transform workingObject = objectToRotate != null ? objectToRotate : transform;
+        Vector3 targetLocalPosition = attackLocalTargetPosition;
+
+        // מחשבים targetLocalRotation ביחס ל-defaultLocalRotation עם offset של 70 מעלות בציר X
+        Quaternion targetLocalRotation = Quaternion.Euler(
+            defaultLocalRotation.eulerAngles.x + 70f,
+            defaultLocalRotation.eulerAngles.y,
+            defaultLocalRotation.eulerAngles.z);
+
+        while (Vector3.Distance(workingObject.localPosition, targetLocalPosition) > 0.1f)
+        {
+            workingObject.localPosition = Vector3.MoveTowards(workingObject.localPosition, targetLocalPosition, launchSpeed * Time.deltaTime);
+            workingObject.localRotation = Quaternion.RotateTowards(workingObject.localRotation, targetLocalRotation, launchRotationSpeed * Time.deltaTime);
+            yield return null;
+        }
+        workingObject.localPosition = targetLocalPosition;
+        workingObject.localRotation = targetLocalRotation;
+
+        // ביצוע סיבוב נוסף של 180 מעלות סביב ציר X (אותו כיוון)
+        yield return StartCoroutine(RotateKnifeAfterLaunch(180f));
+
+        DealDamageToEnemyInRange();
+        yield return StartCoroutine(ResetSwordCoroutine());
+        isLaunching = false;
+    }
+
+    // סיבוב נוסף – סביב ציר X בכיוון חיובי
+    private IEnumerator RotateKnifeAfterLaunch(float totalRotation)
+    {
+        float rotationSpeedAfterLaunch = 500f;
+        float rotated = 0f;
+        Transform rotationTarget = objectToRotate != null ? objectToRotate : transform;
+
+        while (rotated < totalRotation)
+        {
+            float step = rotationSpeedAfterLaunch * Time.deltaTime;
+            if (rotated + step > totalRotation)
+                step = totalRotation - rotated;
+            rotationTarget.Rotate(step, 0, 0, Space.Self);
+            rotated += step;
+            yield return null;
+        }
+    }
+
+    // החזרת החרב למיקום ולסיבוב ההתחלתי
+    private IEnumerator ResetSwordCoroutine()
+    {
+        Transform workingObject = objectToRotate != null ? objectToRotate : transform;
+        float resetDuration = 0.5f;
+        float elapsed = 0f;
+        Vector3 startLocalPosition = workingObject.localPosition;
+        Quaternion startRotation = workingObject.localRotation;
+
+        while (elapsed < resetDuration)
+        {
+            elapsed += Time.deltaTime;
+            workingObject.localPosition = Vector3.Lerp(startLocalPosition, defaultLocalPosition, elapsed / resetDuration);
+            workingObject.localRotation = Quaternion.Slerp(startRotation, defaultLocalRotation, elapsed / resetDuration);
+            yield return null;
+        }
+        workingObject.localPosition = defaultLocalPosition;
+        workingObject.localRotation = defaultLocalRotation;
+    }
+
+    // טיפול בנזק לאויבים בסביבת החרב
+    void DealDamageToEnemyInRange()
+    {
+        Collider[] hitEnemies = Physics.OverlapSphere(transform.position, damageRange);
+        foreach (Collider enemy in hitEnemies)
+        {
+            if (enemy.CompareTag("enemy"))
+            {
+                EnemyHealth enemyHealth = enemy.GetComponent<EnemyHealth>();
+                if (enemyHealth != null)
+                    enemyHealth.TakeDamage(damageAmount);
+                SimpleEnemyHealth simpleEnemyHealth = enemy.GetComponent<SimpleEnemyHealth>();
+                if (simpleEnemyHealth != null)
+                    simpleEnemyHealth.TakeDamage(damageAmount);
+                SimpleEnemyHealth1 simpleEnemyHealth1 = enemy.GetComponent<SimpleEnemyHealth1>();
+                if (simpleEnemyHealth1 != null)
+                    simpleEnemyHealth1.TakeDamage(damageAmount);
+            }
+        }
+    }
+
+    // מאפשר התחלת סיבוב חדש לאחר עיכוב
+    private IEnumerator AllowRotationAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        canRotate = true;
+    }
+}
