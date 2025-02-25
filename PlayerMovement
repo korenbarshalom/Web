@@ -32,6 +32,10 @@ public class PlayerMovement : MonoBehaviour
     public PhysicsMaterial normalMaterial;
     // The low-friction material (applied when sliding)
     public PhysicsMaterial slideMaterial;
+    // משתנה שמגדיר מתי מתחילה ההאטה (כאשר הזמן שנותר להחלקה קטן מערך זה)
+    public float slideDecelerationThreshold = 0.3f;
+    // משתנה לקצב ההאטה כאשר מתחילים להאט
+    public float slideDeceleration = 3f;
 
     // Object that boosts jump power – when destroyed, the player gets a higher jump
     [SerializeField] private GameObject jumpPowerObject;
@@ -56,13 +60,13 @@ public class PlayerMovement : MonoBehaviour
     private bool isSliding = false;
     private float slideTimer = 0f;
     private Vector3 slideVelocity = Vector3.zero;
-    // We'll cache the Collider (assumed to be on the same GameObject) to change its PhysicMaterial.
+    // נזהה את הקוליידר של השחקן כדי לשנות את החומר הפיזיקלי
     private Collider playerCollider;
 
     void Start()
     {
         characterController = GetComponent<CharacterController>();
-        playerCollider = GetComponent<Collider>(); // Make sure your player has a Collider component
+        playerCollider = GetComponent<Collider>(); // Ensure the player has a Collider component
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         jumpPower = 18f;
@@ -108,7 +112,6 @@ public class PlayerMovement : MonoBehaviour
         float inputHorizontal = Input.GetAxis("Horizontal");
 
         // --- Slide initiation ---
-        // כאשר לוחצים על Ctrl, ואם השחקן נמצא על הקרקע ולא כבר במצב החלקה – מתחילים החלקה.
         if (!isSliding && characterController.isGrounded && Input.GetKeyDown(KeyCode.LeftControl))
         {
             isSliding = true;
@@ -136,8 +139,18 @@ public class PlayerMovement : MonoBehaviour
             }
             else
             {
-                // עדכון מהירות ההחלקה עם כבידה.
+                // עדכון רכיב האנכי (Y) עם כבידה.
                 slideVelocity.y -= gravity * Time.deltaTime;
+
+                // אם הזמן שנותר להחלקה קטן מהסף – מתחילים להאט את הרכיב האופקי.
+                if (slideTimer < slideDecelerationThreshold)
+                {
+                    Vector3 horizontalVelocity = new Vector3(slideVelocity.x, 0, slideVelocity.z);
+                    horizontalVelocity = Vector3.Lerp(horizontalVelocity, Vector3.zero, slideDeceleration * Time.deltaTime);
+                    slideVelocity.x = horizontalVelocity.x;
+                    slideVelocity.z = horizontalVelocity.z;
+                }
+
                 slideTimer -= Time.deltaTime;
                 if (slideTimer <= 0f)
                 {
@@ -155,7 +168,6 @@ public class PlayerMovement : MonoBehaviour
             // תנועה רגילה – אם Ctrl לחוץ אבל לא במצב slide, לא נרשה תנועת הליכה.
             if (Input.GetKey(KeyCode.LeftControl))
             {
-                // אם Ctrl לחוץ אך לא במצב slide, נעצור את התנועה האופקית.
                 moveDirection.x = 0f;
                 moveDirection.z = 0f;
             }
@@ -188,20 +200,13 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // --- Crouch effect ---
-        // במצב של לחיצה על Ctrl, נעדכן את גובה הדמות ל־crouchHeight.
         if (Input.GetKey(KeyCode.LeftControl))
         {
             characterController.height = crouchHeight;
-            // אם לא במצב slide, לא נאפשר תנועת הליכה (כפי שמוגדר לעיל).
-            if (!isSliding)
-            {
-                // נשאיר את המהירויות כפי שהוגדרו – אין עדכון של walkSpeed/runSpeed במקרה זה.
-            }
         }
         else
         {
             characterController.height = defaultHeight;
-            // ניתן לעדכן את המהירויות לערכים רגילים אם רוצים.
             walkSpeed = 22f;
             runSpeed = 22f;
         }
@@ -213,7 +218,6 @@ public class PlayerMovement : MonoBehaviour
 
         // --- Camera & Rotation ---
         rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
-        // rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
         playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
         transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
     }
