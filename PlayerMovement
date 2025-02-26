@@ -60,6 +60,8 @@ public class PlayerMovement : MonoBehaviour
     private bool isSliding = false;
     private float slideTimer = 0f;
     private Vector3 slideVelocity = Vector3.zero;
+    // משתנה לציון אם השחקן נמצא כרגע על אובייקט עם תג "slide"
+    private bool isOnSlideSurface = false;
     // נזהה את הקוליידר של השחקן כדי לשנות את החומר הפיזיקלי
     private Collider playerCollider;
 
@@ -112,10 +114,19 @@ public class PlayerMovement : MonoBehaviour
         float inputHorizontal = Input.GetAxis("Horizontal");
 
         // --- Slide initiation ---
+        // בעת לחיצה על LeftControl במצב על הקרקע - מתחילים החלקה.
+        // כאן, במידה והשחקן נמצא על משטח "slide", נשתמש ב-slideDuration אינסופי (או ניתן להתעלם מהטיימר) כדי לשמור את ההחלקה עד ליציאה.
         if (!isSliding && characterController.isGrounded && Input.GetKeyDown(KeyCode.LeftControl))
         {
             isSliding = true;
-            slideTimer = slideDuration;
+            if (isOnSlideSurface)
+            {
+                slideTimer = Mathf.Infinity;
+            }
+            else
+            {
+                slideTimer = slideDuration;
+            }
             // קליטת תנועת השחקן כהתנעת ההחלקה.
             slideVelocity = (forward * (isRunning ? runSpeed : walkSpeed) * inputVertical) +
                             (right * (isRunning ? runSpeed : walkSpeed) * inputHorizontal);
@@ -128,29 +139,9 @@ public class PlayerMovement : MonoBehaviour
         // --- Movement calculation ---
         if (isSliding)
         {
-            // אם המשתמש שוחרר את Ctrl – מפסיקים את ההחלקה.
-            if (!Input.GetKey(KeyCode.LeftControl))
+            // במצב החלקה, אם השחקן כבר אינו נמצא על משטח עם תג "slide", נוריד את הטיימר ונפסיק את ההחלקה כשיגמר.
+            if (!isOnSlideSurface)
             {
-                isSliding = false;
-                if (playerCollider != null && normalMaterial != null)
-                {
-                    playerCollider.material = normalMaterial;
-                }
-            }
-            else
-            {
-                // עדכון רכיב האנכי (Y) עם כבידה.
-                slideVelocity.y -= gravity * Time.deltaTime;
-
-                // אם הזמן שנותר להחלקה קטן מהסף – מתחילים להאט את הרכיב האופקי.
-                if (slideTimer < slideDecelerationThreshold)
-                {
-                    Vector3 horizontalVelocity = new Vector3(slideVelocity.x, 0, slideVelocity.z);
-                    horizontalVelocity = Vector3.Lerp(horizontalVelocity, Vector3.zero, slideDeceleration * Time.deltaTime);
-                    slideVelocity.x = horizontalVelocity.x;
-                    slideVelocity.z = horizontalVelocity.z;
-                }
-
                 slideTimer -= Time.deltaTime;
                 if (slideTimer <= 0f)
                 {
@@ -160,8 +151,18 @@ public class PlayerMovement : MonoBehaviour
                         playerCollider.material = normalMaterial;
                     }
                 }
-                moveDirection = slideVelocity;
+                else if (slideTimer < slideDecelerationThreshold)
+                {
+                    Vector3 horizontalVelocity = new Vector3(slideVelocity.x, 0, slideVelocity.z);
+                    horizontalVelocity = Vector3.Lerp(horizontalVelocity, Vector3.zero, slideDeceleration * Time.deltaTime);
+                    slideVelocity.x = horizontalVelocity.x;
+                    slideVelocity.z = horizontalVelocity.z;
+                }
             }
+
+            // עדכון רכיב האנכי (Y) עם כבידה.
+            slideVelocity.y -= gravity * Time.deltaTime;
+            moveDirection = slideVelocity;
         }
         else
         {
@@ -316,12 +317,39 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    // שיטת OnControllerColliderHit קיימת לטיפול בהתנגשות עם קירות (Wall) בלבד.
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
         if (hit.gameObject.CompareTag("Wall"))
         {
             canJumpOnWall = true;
             StartCoroutine(DisableWallJumpAfterDelay());
+        }
+    }
+
+    // להלן הוספת שיטות OnCollisionEnter ו-OnCollisionExit לטיפול במשטחי "slide"
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("slide"))
+        {
+            isOnSlideSurface = true;
+        }
+    }
+
+    void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("slide"))
+        {
+            isOnSlideSurface = false;
+            // עצירה מיידית של ההחלקה ברגע עזיבת המשטח
+            if (isSliding)
+            {
+                isSliding = false;
+                if (playerCollider != null && normalMaterial != null)
+                {
+                    playerCollider.material = normalMaterial;
+                }
+            }
         }
     }
 
