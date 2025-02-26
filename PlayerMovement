@@ -40,6 +40,8 @@ public class PlayerMovement : MonoBehaviour
     public float slideSpeedMultiplier = 1.5f;
     // סף מינימלי לזווית (במעלות) להגדרת מדרון אמיתי להחלקה
     public float minSlideAngle = 5f;
+    // משתנה לשליטה צידית עם אינרציה – ככל שהערך גבוה יותר, התגובה תהיה חלקה יותר
+    public float lateralControlSmooth = 5f;
 
     // Object that boosts jump power – when destroyed, the player gets a higher jump
     [SerializeField] private GameObject jumpPowerObject;
@@ -68,6 +70,8 @@ public class PlayerMovement : MonoBehaviour
     private bool isOnSlideSurface = false;
     // נזהה את הקוליידר של השחקן כדי לשנות את החומר הפיזיקלי
     private Collider playerCollider;
+    // משתנה לשמירת המהירות הצידית הנוכחית (לצורך אינרציה)
+    private float lateralVelocity = 0f;
 
     void Start()
     {
@@ -150,13 +154,12 @@ public class PlayerMovement : MonoBehaviour
         // בעת לחיצה על LeftControl במצב על הקרקע, נבדוק האם השחקן נמצא על משטח slide עם שיפוע אמיתי (מורד)
         if (!isSliding && characterController.isGrounded && Input.GetKeyDown(KeyCode.LeftControl))
         {
-            // אם נמצא על משטח slide ומדובר במורד – נעבור למצב החלקה ממושכת
             if (isOnSlideSurface && onSlope)
             {
                 isSliding = true;
                 slideTimer = Mathf.Infinity; // החלקה ממושכת עד עזיבת המשטח
-                // במהירות ההחלקה נשתמש במהירות ההליכה (או ריצה) כפול מקדם מהירות
                 float baseSpeed = isRunning ? runSpeed : walkSpeed;
+                // slideVelocity מוגדר על פי כיוון המדרון ומהירות מוגברת
                 slideVelocity = slopeDirection * baseSpeed * slideSpeedMultiplier;
                 if (playerCollider != null && slideMaterial != null)
                 {
@@ -165,7 +168,7 @@ public class PlayerMovement : MonoBehaviour
             }
             else
             {
-                // אם השחקן לוחץ LeftControl במצב רגיל (ולא על משטח עם שיפוע), נשתמש בהחלקה רגילה לתקופה קצרה
+                // החלקה רגילה לתקופה קצרה
                 isSliding = true;
                 slideTimer = slideDuration;
                 slideVelocity = (forward * (isRunning ? runSpeed : walkSpeed) * inputVertical) +
@@ -202,7 +205,19 @@ public class PlayerMovement : MonoBehaviour
             }
             // עדכון רכיב האנכי (Y) עם כבידה
             slideVelocity.y -= gravity * Time.deltaTime;
-            moveDirection = slideVelocity;
+
+            // --- תוספת: תנועה צידית חופשית ---
+            // קבלת קלט אופקי (A/D) ותנועה צידית עם אינרציה
+            float horizontalInput = Input.GetAxis("Horizontal");
+            // מחשבים מהירות החלקה אופקית (מתעלמים מרכיב Y)
+            float currentSlideSpeed = new Vector3(slideVelocity.x, 0, slideVelocity.z).magnitude;
+            // עדכון המהירות הצידית בהדרגה
+            lateralVelocity = Mathf.Lerp(lateralVelocity, horizontalInput * currentSlideSpeed, lateralControlSmooth * Time.deltaTime);
+            // וקטור תנועה צידי בכיוון ימינה (transform.right)
+            Vector3 lateralMove = transform.right * lateralVelocity;
+
+            // שילוב התנועה: החלקה במורד המשטח + תנועה צידית
+            moveDirection = slideVelocity + lateralMove;
         }
         else
         {
