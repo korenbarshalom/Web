@@ -36,6 +36,10 @@ public class PlayerMovement : MonoBehaviour
     public float slideDecelerationThreshold = 0.3f;
     // משתנה לקצב ההאטה כאשר מתחילים להאט
     public float slideDeceleration = 3f;
+    // מהירות החלקה – נדרשת להיות גבוהה יותר מהמהירות הרגילה
+    public float slideSpeedMultiplier = 1.5f;
+    // סף מינימלי לזווית (במעלות) להגדרת מדרון אמיתי להחלקה
+    public float minSlideAngle = 5f;
 
     // Object that boosts jump power – when destroyed, the player gets a higher jump
     [SerializeField] private GameObject jumpPowerObject;
@@ -113,30 +117,67 @@ public class PlayerMovement : MonoBehaviour
         float inputVertical = Input.GetAxis("Vertical");
         float inputHorizontal = Input.GetAxis("Horizontal");
 
-        // --- Slide initiation ---
-        // בעת לחיצה על LeftControl במצב על הקרקע - מתחילים החלקה.
-        // כאן, במידה והשחקן נמצא על משטח "slide", נשתמש ב-slideDuration אינסופי (או ניתן להתעלם מהטיימר) כדי לשמור את ההחלקה עד ליציאה.
-        if (!isSliding && characterController.isGrounded && Input.GetKeyDown(KeyCode.LeftControl))
+        // --- בדיקת השיפוע מתחת לשחקן ---
+        // מבצעים Raycast מלמעלה למטה כדי לקבל את המשטח שמתחת לשחקן
+        RaycastHit hit;
+        bool onSlope = false;
+        float slopeAngle = 0f;
+        Vector3 slopeDirection = Vector3.zero;
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, 2f))
         {
-            isSliding = true;
-            if (isOnSlideSurface)
+            if (hit.collider.CompareTag("slide"))
             {
-                slideTimer = Mathf.Infinity;
+                isOnSlideSurface = true;
+                slopeAngle = Vector3.Angle(hit.normal, Vector3.up);
+                // אם השיפוע עובר את הסף, נחשב את כיוון ההחלקה – נשתמש ב-ProjectOnPlane של הכבידה
+                if (slopeAngle > minSlideAngle)
+                {
+                    onSlope = true;
+                    slopeDirection = Vector3.ProjectOnPlane(Vector3.down, hit.normal).normalized;
+                }
             }
             else
             {
-                slideTimer = slideDuration;
+                isOnSlideSurface = false;
             }
-            // קליטת תנועת השחקן כהתנעת ההחלקה.
-            slideVelocity = (forward * (isRunning ? runSpeed : walkSpeed) * inputVertical) +
-                            (right * (isRunning ? runSpeed : walkSpeed) * inputHorizontal);
-            if (playerCollider != null && slideMaterial != null)
+        }
+        else
+        {
+            isOnSlideSurface = false;
+        }
+
+        // --- התחלת מצב החלקה ---
+        // בעת לחיצה על LeftControl במצב על הקרקע, נבדוק האם השחקן נמצא על משטח slide עם שיפוע אמיתי (מורד)
+        if (!isSliding && characterController.isGrounded && Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            // אם נמצא על משטח slide ומדובר במורד – נעבור למצב החלקה ממושכת
+            if (isOnSlideSurface && onSlope)
             {
-                playerCollider.material = slideMaterial;
+                isSliding = true;
+                slideTimer = Mathf.Infinity; // החלקה ממושכת עד עזיבת המשטח
+                // במהירות ההחלקה נשתמש במהירות ההליכה (או ריצה) כפול מקדם מהירות
+                float baseSpeed = isRunning ? runSpeed : walkSpeed;
+                slideVelocity = slopeDirection * baseSpeed * slideSpeedMultiplier;
+                if (playerCollider != null && slideMaterial != null)
+                {
+                    playerCollider.material = slideMaterial;
+                }
+            }
+            else
+            {
+                // אם השחקן לוחץ LeftControl במצב רגיל (ולא על משטח עם שיפוע), נשתמש בהחלקה רגילה לתקופה קצרה
+                isSliding = true;
+                slideTimer = slideDuration;
+                slideVelocity = (forward * (isRunning ? runSpeed : walkSpeed) * inputVertical) +
+                                (right * (isRunning ? runSpeed : walkSpeed) * inputHorizontal);
+                if (playerCollider != null && slideMaterial != null)
+                {
+                    playerCollider.material = slideMaterial;
+                }
             }
         }
 
-        // --- Movement calculation ---
+        // --- חישוב תנועת השחקן ---
         if (isSliding)
         {
             // במצב החלקה, אם השחקן כבר אינו נמצא על משטח עם תג "slide", נוריד את הטיימר ונפסיק את ההחלקה כשיגמר.
@@ -159,8 +200,7 @@ public class PlayerMovement : MonoBehaviour
                     slideVelocity.z = horizontalVelocity.z;
                 }
             }
-
-            // עדכון רכיב האנכי (Y) עם כבידה.
+            // עדכון רכיב האנכי (Y) עם כבידה
             slideVelocity.y -= gravity * Time.deltaTime;
             moveDirection = slideVelocity;
         }
@@ -180,7 +220,7 @@ public class PlayerMovement : MonoBehaviour
                 moveDirection.y = previousY;
             }
 
-            // קפיצה – מתבצעת רק בתנאי שמדובר בתנועה רגילה.
+            // קפיצה – מתבצעת רק בתנועה רגילה.
             if (Input.GetButton("Jump") && canMove)
             {
                 if (characterController.isGrounded)
@@ -327,7 +367,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // להלן הוספת שיטות OnCollisionEnter ו-OnCollisionExit לטיפול במשטחי "slide"
+    // טיפול במגע עם משטחי "slide" – עדכון isOnSlideSurface בהתבסס על התגית.
     void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("slide"))
