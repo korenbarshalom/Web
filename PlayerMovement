@@ -73,6 +73,9 @@ public class PlayerMovement : MonoBehaviour
     // משתנה לשמירת המהירות הצידית הנוכחית (לצורך אינרציה)
     private float lateralVelocity = 0f;
 
+    // משתנה לשליטה במצב בו LeftControl מתבטל
+    private bool leftControlDisabled = false;
+
     void Start()
     {
         characterController = GetComponent<CharacterController>();
@@ -89,6 +92,12 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        // הפעלה של קורוטינה לביטול LeftControl למשך שניה בעת לחיצה על Space
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            StartCoroutine(DisableLeftControlCoroutine());
+        }
+
         if (!jumpPowerBoostTriggered && jumpPowerObject == null)
         {
             jumpPowerBoostTriggered = true;
@@ -122,7 +131,6 @@ public class PlayerMovement : MonoBehaviour
         float inputHorizontal = Input.GetAxis("Horizontal");
 
         // --- בדיקת השיפוע מתחת לשחקן ---
-        // מבצעים Raycast מלמעלה למטה כדי לקבל את המשטח שמתחת לשחקן
         RaycastHit hit;
         bool onSlope = false;
         float slopeAngle = 0f;
@@ -133,7 +141,6 @@ public class PlayerMovement : MonoBehaviour
             {
                 isOnSlideSurface = true;
                 slopeAngle = Vector3.Angle(hit.normal, Vector3.up);
-                // אם השיפוע עובר את הסף, נחשב את כיוון ההחלקה – נשתמש ב-ProjectOnPlane של הכבידה
                 if (slopeAngle > minSlideAngle)
                 {
                     onSlope = true;
@@ -151,15 +158,13 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // --- התחלת מצב החלקה ---
-        // בעת לחיצה על LeftControl במצב על הקרקע, נבדוק האם השחקן נמצא על משטח slide עם שיפוע אמיתי (מורד)
-        if (!isSliding && characterController.isGrounded && Input.GetKeyDown(KeyCode.LeftControl))
+        if (!isSliding && characterController.isGrounded && Input.GetKeyDown(KeyCode.LeftControl) && !leftControlDisabled)
         {
             if (isOnSlideSurface && onSlope)
             {
                 isSliding = true;
-                slideTimer = Mathf.Infinity; // החלקה ממושכת עד עזיבת המשטח
+                slideTimer = Mathf.Infinity;
                 float baseSpeed = isRunning ? runSpeed : walkSpeed;
-                // slideVelocity מוגדר על פי כיוון המדרון ומהירות מוגברת
                 slideVelocity = slopeDirection * baseSpeed * slideSpeedMultiplier;
                 if (playerCollider != null && slideMaterial != null)
                 {
@@ -168,7 +173,6 @@ public class PlayerMovement : MonoBehaviour
             }
             else
             {
-                // החלקה רגילה לתקופה קצרה
                 isSliding = true;
                 slideTimer = slideDuration;
                 slideVelocity = (forward * (isRunning ? runSpeed : walkSpeed) * inputVertical) +
@@ -183,7 +187,6 @@ public class PlayerMovement : MonoBehaviour
         // --- חישוב תנועת השחקן ---
         if (isSliding)
         {
-            // במצב החלקה, אם השחקן כבר אינו נמצא על משטח עם תג "slide", נוריד את הטיימר ונפסיק את ההחלקה כשיגמר.
             if (!isOnSlideSurface)
             {
                 slideTimer -= Time.deltaTime;
@@ -203,26 +206,19 @@ public class PlayerMovement : MonoBehaviour
                     slideVelocity.z = horizontalVelocity.z;
                 }
             }
-            // עדכון רכיב האנכי (Y) עם כבידה
             slideVelocity.y -= gravity * Time.deltaTime;
 
-            // --- תוספת: תנועה צידית חופשית ---
-            // קבלת קלט אופקי (A/D) ותנועה צידית עם אינרציה
             float horizontalInput = Input.GetAxis("Horizontal");
-            // מחשבים מהירות החלקה אופקית (מתעלמים מרכיב Y)
             float currentSlideSpeed = new Vector3(slideVelocity.x, 0, slideVelocity.z).magnitude;
-            // עדכון המהירות הצידית בהדרגה
             lateralVelocity = Mathf.Lerp(lateralVelocity, horizontalInput * currentSlideSpeed, lateralControlSmooth * Time.deltaTime);
-            // וקטור תנועה צידי בכיוון ימינה (transform.right)
             Vector3 lateralMove = transform.right * lateralVelocity;
 
-            // שילוב התנועה: החלקה במורד המשטח + תנועה צידית
             moveDirection = slideVelocity + lateralMove;
         }
         else
         {
             // תנועה רגילה – אם Ctrl לחוץ אבל לא במצב slide, לא נרשה תנועת הליכה.
-            if (Input.GetKey(KeyCode.LeftControl))
+            if (Input.GetKey(KeyCode.LeftControl) && !leftControlDisabled)
             {
                 moveDirection.x = 0f;
                 moveDirection.z = 0f;
@@ -256,7 +252,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // --- Crouch effect ---
-        if (Input.GetKey(KeyCode.LeftControl))
+        if (Input.GetKey(KeyCode.LeftControl) && !leftControlDisabled)
         {
             characterController.height = crouchHeight;
         }
@@ -420,5 +416,13 @@ public class PlayerMovement : MonoBehaviour
         jumpPower = 36f;
         yield return new WaitForSeconds(30f);
         jumpPower = 18f;
+    }
+
+    // קורוטינה לביטול פעולת LeftControl למשך שניה
+    IEnumerator DisableLeftControlCoroutine()
+    {
+        leftControlDisabled = true;
+        yield return new WaitForSeconds(1f);
+        leftControlDisabled = false;
     }
 }
