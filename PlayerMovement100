@@ -1,0 +1,434 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[RequireComponent(typeof(CharacterController))]
+public class PlayerMovement : MonoBehaviour
+{
+    [Header("Player & Cameras")]
+    public Transform playerTransform;
+    public Camera playerCamera;
+    public GameObject secondaryCameraObject;
+    public Transform attachedObject;
+    public Transform parentAttachmentPoint;
+    public GameObject targetObject;
+    public float switchDistance = 8f;
+
+    [Header("Movement Settings")]
+    public float walkSpeed = 10f;
+    public float runSpeed = 15f;
+    public float jumpPower = 7f;
+    public float gravity = 10f;
+    public float lookSpeed = 2f;
+    // You can adjust or remove this limit if you want full vertical rotation
+    public float lookXLimit = 45f;
+    public float defaultHeight = 2f;
+    public float crouchHeight = 1f;
+    public float crouchSpeed = 3f;
+
+    [Header("Slide Settings")]
+    public float slideDuration = 1f;
+    // The normal friction material (applied when not sliding)
+    public PhysicsMaterial normalMaterial;
+    // The low-friction material (applied when sliding)
+    public PhysicsMaterial slideMaterial;
+    // משתנה שמגדיר מתי מתחילה ההאטה (כאשר הזמן שנותר להחלקה קטן מערך זה)
+    public float slideDecelerationThreshold = 0.3f;
+    // משתנה לקצב ההאטה כאשר מתחילים להאט
+    public float slideDeceleration = 3f;
+    // מהירות החלקה – נדרשת להיות גבוהה יותר מהמהירות הרגילה
+    public float slideSpeedMultiplier = 1.5f;
+    // סף מינימלי לזווית (במעלות) להגדרת מדרון אמיתי להחלקה
+    public float minSlideAngle = 5f;
+    // משתנה לשליטה צידית עם אינרציה – ככל שהערך גבוה יותר, התגובה תהיה חלקה יותר
+    public float lateralControlSmooth = 5f;
+
+    // Object that boosts jump power – when destroyed, the player gets a higher jump
+    [SerializeField] private GameObject jumpPowerObject;
+
+    // External force applied to the player (for boost, etc.)
+    private Vector3 externalForce = Vector3.zero;
+    public float boostDecay = 0.5f;
+
+    private Vector3 moveDirection = Vector3.zero;
+    private float rotationX = 0f;
+    private CharacterController characterController;
+
+    private bool canMove = true;
+    private bool isUsingSecondaryCamera = false;
+    private bool isUsingCarPlayerCamera = false;
+
+    private bool canJumpOnWall = false;
+    private bool jumpPowerBoostActive = false;
+    private bool jumpPowerBoostTriggered = false;
+
+    // --- Slide variables ---
+    private bool isSliding = false;
+    private float slideTimer = 0f;
+    private Vector3 slideVelocity = Vector3.zero;
+    // משתנה לציון אם השחקן נמצא כרגע על אובייקט עם תג "slide"
+    private bool isOnSlideSurface = false;
+    // נזהה את הקוליידר של השחקן כדי לשנות את החומר הפיזיקלי
+    private Collider playerCollider;
+    // משתנה לשמירת המהירות הצידית הנוכחית (לצורך אינרציה)
+    private float lateralVelocity = 0f;
+
+    // משתנה לשליטה במצב בו LeftControl מתבטל
+    private bool leftControlDisabled = false;
+
+    void Start()
+    {
+        characterController = GetComponent<CharacterController>();
+        playerCollider = GetComponent<Collider>(); // Ensure the player has a Collider component
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        jumpPower = 18f;
+
+        if (playerCamera != null)
+            playerCamera.enabled = true;
+        if (secondaryCameraObject != null)
+            secondaryCameraObject.SetActive(false);
+    }
+
+    void Update()
+    {
+        // הפעלה של קורוטינה לביטול LeftControl למשך שניה בעת לחיצה על Space
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            StartCoroutine(DisableLeftControlCoroutine());
+        }
+
+        if (!jumpPowerBoostTriggered && jumpPowerObject == null)
+        {
+            jumpPowerBoostTriggered = true;
+            StartCoroutine(JumpPowerBoostCoroutine());
+        }
+
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            ToggleCameraAndMovement();
+        }
+
+        if (isUsingSecondaryCamera && Input.GetKeyDown(KeyCode.U))
+        {
+            ToggleCarCameraView();
+        }
+
+        if (canMove)
+        {
+            HandleMovement();
+        }
+    }
+
+    void HandleMovement()
+    {
+        // הכינו את הכיוונים
+        Vector3 forward = transform.TransformDirection(Vector3.forward);
+        Vector3 right = transform.TransformDirection(Vector3.right);
+
+        bool isRunning = Input.GetKey(KeyCode.LeftShift);
+        float inputVertical = Input.GetAxis("Vertical");
+        float inputHorizontal = Input.GetAxis("Horizontal");
+
+        // --- בדיקת השיפוע מתחת לשחקן ---
+        RaycastHit hit;
+        bool onSlope = false;
+        float slopeAngle = 0f;
+        Vector3 slopeDirection = Vector3.zero;
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, 2f))
+        {
+            if (hit.collider.CompareTag("slide"))
+            {
+                isOnSlideSurface = true;
+                slopeAngle = Vector3.Angle(hit.normal, Vector3.up);
+                if (slopeAngle > minSlideAngle)
+                {
+                    onSlope = true;
+                    slopeDirection = Vector3.ProjectOnPlane(Vector3.down, hit.normal).normalized;
+                }
+            }
+            else
+            {
+                isOnSlideSurface = false;
+            }
+        }
+        else
+        {
+            isOnSlideSurface = false;
+        }
+
+        // --- התחלת מצב החלקה ---
+        if (!isSliding && characterController.isGrounded && Input.GetKeyDown(KeyCode.LeftControl) && !leftControlDisabled)
+        {
+            if (isOnSlideSurface && onSlope)
+            {
+                isSliding = true;
+                slideTimer = Mathf.Infinity;
+                float baseSpeed = isRunning ? runSpeed : walkSpeed;
+                slideVelocity = slopeDirection * baseSpeed * slideSpeedMultiplier;
+                if (playerCollider != null && slideMaterial != null)
+                {
+                    playerCollider.material = slideMaterial;
+                }
+            }
+            else
+            {
+                isSliding = true;
+                slideTimer = slideDuration;
+                slideVelocity = (forward * (isRunning ? runSpeed : walkSpeed) * inputVertical) +
+                                (right * (isRunning ? runSpeed : walkSpeed) * inputHorizontal);
+                if (playerCollider != null && slideMaterial != null)
+                {
+                    playerCollider.material = slideMaterial;
+                }
+            }
+        }
+
+        // --- בדיקה: אם במצב slide על משטח עם תג "slide" ושחררתי Ctrl – עצירה ---
+        if (isSliding && isOnSlideSurface && !Input.GetKey(KeyCode.LeftControl))
+        {
+            isSliding = false;
+            if (playerCollider != null && normalMaterial != null)
+            {
+                playerCollider.material = normalMaterial;
+            }
+        }
+
+        // --- חישוב תנועת השחקן ---
+        if (isSliding)
+        {
+            if (!isOnSlideSurface)
+            {
+                slideTimer -= Time.deltaTime;
+                if (slideTimer <= 0f)
+                {
+                    isSliding = false;
+                    if (playerCollider != null && normalMaterial != null)
+                    {
+                        playerCollider.material = normalMaterial;
+                    }
+                }
+                else if (slideTimer < slideDecelerationThreshold)
+                {
+                    Vector3 horizontalVelocity = new Vector3(slideVelocity.x, 0, slideVelocity.z);
+                    horizontalVelocity = Vector3.Lerp(horizontalVelocity, Vector3.zero, slideDeceleration * Time.deltaTime);
+                    slideVelocity.x = horizontalVelocity.x;
+                    slideVelocity.z = horizontalVelocity.z;
+                }
+            }
+            slideVelocity.y -= gravity * Time.deltaTime;
+
+            float horizontalInput = Input.GetAxis("Horizontal");
+            float currentSlideSpeed = new Vector3(slideVelocity.x, 0, slideVelocity.z).magnitude;
+            lateralVelocity = Mathf.Lerp(lateralVelocity, horizontalInput * currentSlideSpeed, lateralControlSmooth * Time.deltaTime);
+            Vector3 lateralMove = transform.right * lateralVelocity;
+
+            moveDirection = slideVelocity + lateralMove;
+        }
+        else
+        {
+            // תנועה רגילה – אם Ctrl לחוץ אבל לא במצב slide, לא נרשה תנועת הליכה.
+            if (Input.GetKey(KeyCode.LeftControl) && !leftControlDisabled)
+            {
+                moveDirection.x = 0f;
+                moveDirection.z = 0f;
+            }
+            else
+            {
+                float currentSpeed = isRunning ? runSpeed : walkSpeed;
+                float previousY = moveDirection.y;
+                moveDirection = (forward * currentSpeed * inputVertical) + (right * currentSpeed * inputHorizontal);
+                moveDirection.y = previousY;
+            }
+
+            // קפיצה – מתבצעת רק בתנועה רגילה.
+            if (Input.GetButton("Jump") && canMove)
+            {
+                if (characterController.isGrounded)
+                {
+                    moveDirection.y = jumpPower;
+                }
+                else if (canJumpOnWall)
+                {
+                    moveDirection.y = jumpPower;
+                    canJumpOnWall = false;
+                }
+            }
+
+            if (!characterController.isGrounded)
+            {
+                moveDirection.y -= gravity * Time.deltaTime;
+            }
+        }
+
+        // --- Crouch effect ---
+        if (Input.GetKey(KeyCode.LeftControl) && !leftControlDisabled)
+        {
+            characterController.height = crouchHeight;
+        }
+        else
+        {
+            characterController.height = defaultHeight;
+            walkSpeed = 22f;
+            runSpeed = 22f;
+        }
+
+        moveDirection += externalForce;
+        externalForce = Vector3.Lerp(externalForce, Vector3.zero, Time.deltaTime * boostDecay);
+
+        characterController.Move(moveDirection * Time.deltaTime);
+
+        // --- Camera & Rotation ---
+        rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
+        playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
+        transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
+    }
+
+    /// <summary>
+    /// Adds an external boost force to the player.
+    /// </summary>
+    /// <param name="boost">The vector force to add.</param>
+    public void ApplyBoost(Vector3 boost)
+    {
+        externalForce = boost;
+    }
+
+    void ToggleCameraAndMovement()
+    {
+        if (targetObject == null || playerTransform == null || secondaryCameraObject == null)
+            return;
+
+        float distance = Vector3.Distance(playerTransform.position, targetObject.transform.position);
+
+        if (distance <= switchDistance)
+        {
+            isUsingSecondaryCamera = !isUsingSecondaryCamera;
+
+            if (isUsingSecondaryCamera)
+            {
+                playerCamera.enabled = false;
+                secondaryCameraObject.SetActive(true);
+                isUsingCarPlayerCamera = false;
+                canMove = false;
+
+                if (attachedObject != null)
+                {
+                    playerTransform.SetParent(attachedObject);
+
+                    if (parentAttachmentPoint != null)
+                    {
+                        playerTransform.position = parentAttachmentPoint.position;
+                        playerTransform.rotation = parentAttachmentPoint.rotation;
+                    }
+                    else
+                    {
+                        playerTransform.localPosition = Vector3.zero;
+                        playerTransform.localRotation = Quaternion.identity;
+                    }
+                }
+                if (characterController != null)
+                {
+                    characterController.enabled = false;
+                }
+                Debug.Log("Player switched to car mode (secondary camera).");
+            }
+            else
+            {
+                playerCamera.enabled = true;
+                secondaryCameraObject.SetActive(false);
+                canMove = true;
+                playerTransform.SetParent(null);
+
+                if (attachedObject != null)
+                {
+                    playerTransform.position = attachedObject.position - attachedObject.forward * 5f;
+                }
+                if (characterController != null)
+                {
+                    characterController.enabled = true;
+                }
+                isUsingCarPlayerCamera = false;
+                Debug.Log("Player exited car mode (primary camera active).");
+            }
+        }
+        else
+        {
+            Debug.Log("Player is too far away (max " + switchDistance + "m) to switch.");
+        }
+    }
+
+    void ToggleCarCameraView()
+    {
+        if (playerCamera == null || secondaryCameraObject == null)
+            return;
+
+        if (!isUsingCarPlayerCamera)
+        {
+            secondaryCameraObject.SetActive(false);
+            playerCamera.enabled = true;
+            isUsingCarPlayerCamera = true;
+            Debug.Log("Switched to main camera view in car mode.");
+        }
+        else
+        {
+            playerCamera.enabled = false;
+            secondaryCameraObject.SetActive(true);
+            isUsingCarPlayerCamera = false;
+            Debug.Log("Switched back to secondary car camera view.");
+        }
+    }
+
+    // שיטת OnControllerColliderHit קיימת לטיפול בהתנגשות עם קירות (Wall) בלבד.
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (hit.gameObject.CompareTag("Wall"))
+        {
+            canJumpOnWall = true;
+            StartCoroutine(DisableWallJumpAfterDelay());
+        }
+    }
+
+    // טיפול במגע עם משטחי "slide" – עדכון isOnSlideSurface בהתבסס על התגית.
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("slide"))
+        {
+            isOnSlideSurface = true;
+        }
+    }
+
+    // כאשר יוצאים ממשטח עם תג "slide" נעדכן כך שהחלקה תימשך לשנייה נוספת ואז תתחיל להאט בהדרגה.
+    void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("slide"))
+        {
+            isOnSlideSurface = false;
+            if (isSliding && float.IsInfinity(slideTimer))
+            {
+                slideTimer = 0.5f;
+            }
+        }
+    }
+
+    IEnumerator DisableWallJumpAfterDelay()
+    {
+        yield return new WaitForSeconds(1f);
+        canJumpOnWall = false;
+    }
+
+    IEnumerator JumpPowerBoostCoroutine()
+    {
+        jumpPowerBoostActive = true;
+        jumpPower = 36f;
+        yield return new WaitForSeconds(30f);
+        jumpPower = 18f;
+    }
+
+    // קורוטינה לביטול פעולת LeftControl למשך שניה
+    IEnumerator DisableLeftControlCoroutine()
+    {
+        leftControlDisabled = true;
+        yield return new WaitForSeconds(1f);
+        leftControlDisabled = false;
+    }
+}
