@@ -42,6 +42,12 @@ public class PlayerMovement : MonoBehaviour
     public float minSlideAngle = 5f;
     // משתנה לשליטה צידית עם אינרציה – ככל שהערך גבוה יותר, התגובה תהיה חלקה יותר
     public float lateralControlSmooth = 5f;
+    // משתנה לקביעת המקדמה לקפיצה תוך כדי החלקה (ניתן לכוונן)
+    public float slideJumpForwardMultiplier = 0.5f;
+    // משתנה לצמצום תנועת הצדדים בעת החלקה רגילה (אם לא על אובייקט עם תג "slide")
+    public float slideLateralMultiplier = 0.5f;
+    // משתנה חדש: מהירות ההחלקה הצידית כאשר השחקן נמצא על אובייקט עם התג "slide"
+    public float slideLateralSpeed = 5f;
 
     // Object that boosts jump power – when destroyed, the player gets a higher jump
     [SerializeField] private GameObject jumpPowerObject;
@@ -219,11 +225,33 @@ public class PlayerMovement : MonoBehaviour
             slideVelocity.y -= gravity * Time.deltaTime;
 
             float horizontalInput = Input.GetAxis("Horizontal");
-            float currentSlideSpeed = new Vector3(slideVelocity.x, 0, slideVelocity.z).magnitude;
-            lateralVelocity = Mathf.Lerp(lateralVelocity, horizontalInput * currentSlideSpeed, lateralControlSmooth * Time.deltaTime);
+            // אם השחקן נמצא על משטח עם תג "slide" – נעשה שימוש במהירות קבועה (slideLateralSpeed)
+            // אחרת, נבטל את התנועה הצידית (ללא side sliding במצב רגיל)
+            if (isOnSlideSurface)
+            {
+                lateralVelocity = Mathf.Lerp(lateralVelocity, horizontalInput * slideLateralSpeed, lateralControlSmooth * Time.deltaTime);
+            }
+            else
+            {
+                lateralVelocity = 0f;
+            }
             Vector3 lateralMove = transform.right * lateralVelocity;
 
             moveDirection = slideVelocity + lateralMove;
+
+            // --- קפיצה תוך כדי החלקה ---
+            if (Input.GetButtonDown("Jump") && characterController.isGrounded)
+            {
+                Vector3 horizontalMomentum = new Vector3(slideVelocity.x, 0, slideVelocity.z);
+                moveDirection.y = jumpPower;
+                moveDirection += horizontalMomentum * slideJumpForwardMultiplier;
+                isSliding = false;
+                slideTimer = 0f;
+                if (playerCollider != null && normalMaterial != null)
+                {
+                    playerCollider.material = normalMaterial;
+                }
+            }
         }
         else
         {
