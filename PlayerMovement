@@ -20,7 +20,6 @@ public class PlayerMovement : MonoBehaviour
     public float jumpPower = 7f;
     public float gravity = 10f;
     public float lookSpeed = 2f;
-    // You can adjust or remove this limit if you want full vertical rotation
     public float lookXLimit = 45f;
     public float defaultHeight = 2f;
     public float crouchHeight = 1f;
@@ -28,22 +27,37 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Slide Settings")]
     public float slideDuration = 1f;
-    // The normal friction material (applied when not sliding)
     public PhysicsMaterial normalMaterial;
-    // The low-friction material (applied when sliding)
     public PhysicsMaterial slideMaterial;
-    // משתנה שמגדיר מתי מתחילה ההאטה (כאשר הזמן שנותר להחלקה קטן מערך זה)
     public float slideDecelerationThreshold = 0.3f;
-    // משתנה לקצב ההאטה כאשר מתחילים להאט
     public float slideDeceleration = 3f;
-    // מהירות החלקה – נדרשת להיות גבוהה יותר מהמהירות הרגילה
     public float slideSpeedMultiplier = 1.5f;
-    // סף מינימלי לזווית (במעלות) להגדרת מדרון אמיתי להחלקה
     public float minSlideAngle = 5f;
-    // משתנה לשליטה צידית עם אינרציה – ככל שהערך גבוה יותר, התגובה תהיה חלקה יותר
     public float lateralControlSmooth = 5f;
+    public float slideJumpForwardMultiplier = 0.5f;
+    public float slideLateralMultiplier = 0.5f;
+    public float slideLateralSpeed = 5f;
 
-    // Object that boosts jump power – when destroyed, the player gets a higher jump
+    [Header("Dash Settings")]
+    // בעת לחיצה על Space נפתח חלון ל־1.5 שניות שבו ניתן לבצע Dash בלחיצה על F
+    public float dashWindowDuration = 1.5f;
+    // Cooldown של 10 שניות לאחר כל Dash
+    public float dashCooldown = 10f;
+    // Dash יזיז את השחקן 9 מטר קדימה
+    public float dashDistance = 9f;
+    // נניח שמשך הדאש הוא 0.2 שניות (ניתן לשנות)
+    public float dashDuration = 0.2f;
+
+    // הפניה ל-Particle System עבור אפקט הדאש/slide (שמכובה כברירת מחדל)
+    public ParticleSystem dashParticleSystem;
+
+    // משתנים פנימיים עבור Dash
+    private bool dashWindowOpen = false;
+    private bool isDashing = false;
+    private float dashCooldownTimer = 0f;
+    private float savedVerticalVelocity = 0f;
+
+    // Object for jump power boost
     [SerializeField] private GameObject jumpPowerObject;
 
     // External force applied to the player (for boost, etc.)
@@ -62,24 +76,19 @@ public class PlayerMovement : MonoBehaviour
     private bool jumpPowerBoostActive = false;
     private bool jumpPowerBoostTriggered = false;
 
-    // --- Slide variables ---
+    // Slide variables
     private bool isSliding = false;
     private float slideTimer = 0f;
     private Vector3 slideVelocity = Vector3.zero;
-    // משתנה לציון אם השחקן נמצא כרגע על אובייקט עם תג "slide"
     private bool isOnSlideSurface = false;
-    // נזהה את הקוליידר של השחקן כדי לשנות את החומר הפיזיקלי
     private Collider playerCollider;
-    // משתנה לשמירת המהירות הצידית הנוכחית (לצורך אינרציה)
     private float lateralVelocity = 0f;
-
-    // משתנה לשליטה במצב בו LeftControl מתבטל
     private bool leftControlDisabled = false;
 
     void Start()
     {
         characterController = GetComponent<CharacterController>();
-        playerCollider = GetComponent<Collider>(); // Ensure the player has a Collider component
+        playerCollider = GetComponent<Collider>();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         jumpPower = 18f;
@@ -92,7 +101,27 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        // הפעלה של קורוטינה לביטול LeftControl למשך שניה בעת לחיצה על Space
+        // עדכון קירור הדאש
+        if (dashCooldownTimer > 0f)
+            dashCooldownTimer -= Time.deltaTime;
+
+        // אם נמצא במצב Dash, לא מעבדים את שאר התנועות
+        if (isDashing)
+            return;
+
+        // כאשר לוחצים על Space, פותחים חלון dash (אם הדאש לא בקירור)
+        if (!dashWindowOpen && dashCooldownTimer <= 0f && Input.GetKeyDown(KeyCode.Space))
+        {
+            StartCoroutine(DashWindow());
+        }
+
+        // במהלך חלון ה-Dash, אם לוחצים על F, מתבצע Dash
+        if (dashWindowOpen && Input.GetKeyDown(KeyCode.F))
+        {
+            StartCoroutine(PerformDash());
+        }
+
+        // שאר עדכון הקלט, לדוגמה השבתת LeftControl בעת לחיצה על Space
         if (Input.GetKeyDown(KeyCode.Space))
         {
             StartCoroutine(DisableLeftControlCoroutine());
@@ -122,7 +151,10 @@ public class PlayerMovement : MonoBehaviour
 
     void HandleMovement()
     {
-        // הכינו את הכיוונים
+        // אם Dash מתבצע, לא מעבדים תנועה רגילה
+        if (isDashing)
+            return;
+
         Vector3 forward = transform.TransformDirection(Vector3.forward);
         Vector3 right = transform.TransformDirection(Vector3.right);
 
@@ -130,7 +162,7 @@ public class PlayerMovement : MonoBehaviour
         float inputVertical = Input.GetAxis("Vertical");
         float inputHorizontal = Input.GetAxis("Horizontal");
 
-        // --- בדיקת השיפוע מתחת לשחקן ---
+        // בדיקת השיפוע מתחת לשחקן – לזיהוי משטח עם תג "slide"
         RaycastHit hit;
         bool onSlope = false;
         float slopeAngle = 0f;
@@ -157,7 +189,7 @@ public class PlayerMovement : MonoBehaviour
             isOnSlideSurface = false;
         }
 
-        // --- התחלת מצב החלקה ---
+        // התחלת מצב החלקה
         if (!isSliding && characterController.isGrounded && Input.GetKeyDown(KeyCode.LeftControl) && !leftControlDisabled)
         {
             if (isOnSlideSurface && onSlope)
@@ -184,7 +216,17 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        // --- חישוב תנועת השחקן ---
+        // סיום מצב החלקה כאשר לוחצים Ctrl או תנאים אחרים
+        if (isSliding && isOnSlideSurface && !Input.GetKey(KeyCode.LeftControl))
+        {
+            isSliding = false;
+            if (playerCollider != null && normalMaterial != null)
+            {
+                playerCollider.material = normalMaterial;
+            }
+        }
+
+        // חישוב תנועת השחקן
         if (isSliding)
         {
             if (!isOnSlideSurface)
@@ -209,15 +251,37 @@ public class PlayerMovement : MonoBehaviour
             slideVelocity.y -= gravity * Time.deltaTime;
 
             float horizontalInput = Input.GetAxis("Horizontal");
-            float currentSlideSpeed = new Vector3(slideVelocity.x, 0, slideVelocity.z).magnitude;
-            lateralVelocity = Mathf.Lerp(lateralVelocity, horizontalInput * currentSlideSpeed, lateralControlSmooth * Time.deltaTime);
+            // במצב שבו השחקן נמצא על משטח עם תג "slide" (ולא במצב slide רגיל)
+            // מאפשרים תנועה צידית לפי slideLateralSpeed.
+            if (isOnSlideSurface)
+            {
+                lateralVelocity = Mathf.Lerp(lateralVelocity, horizontalInput * slideLateralSpeed, lateralControlSmooth * Time.deltaTime);
+            }
+            else
+            {
+                lateralVelocity = 0f;
+            }
             Vector3 lateralMove = transform.right * lateralVelocity;
 
             moveDirection = slideVelocity + lateralMove;
+
+            // קפיצה תוך כדי החלקה
+            if (Input.GetButtonDown("Jump") && characterController.isGrounded)
+            {
+                Vector3 horizontalMomentum = new Vector3(slideVelocity.x, 0, slideVelocity.z);
+                moveDirection.y = jumpPower;
+                moveDirection += horizontalMomentum * slideJumpForwardMultiplier;
+                isSliding = false;
+                slideTimer = 0f;
+                if (playerCollider != null && normalMaterial != null)
+                {
+                    playerCollider.material = normalMaterial;
+                }
+            }
         }
         else
         {
-            // תנועה רגילה – אם Ctrl לחוץ אבל לא במצב slide, לא נרשה תנועת הליכה.
+            // תנועה רגילה
             if (Input.GetKey(KeyCode.LeftControl) && !leftControlDisabled)
             {
                 moveDirection.x = 0f;
@@ -231,7 +295,7 @@ public class PlayerMovement : MonoBehaviour
                 moveDirection.y = previousY;
             }
 
-            // קפיצה – מתבצעת רק בתנועה רגילה.
+            // קפיצה בתנועה רגילה
             if (Input.GetButton("Jump") && canMove)
             {
                 if (characterController.isGrounded)
@@ -251,7 +315,26 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        // --- Crouch effect ---
+        // הפעלה/כיבוי של מערכת החלקיקים עבור slide על משטחים עם תג "slide"
+        // (פעיל רק כאשר אנו במצב slide ובמשטח עם תג "slide")
+        if (isSliding && isOnSlideSurface)
+        {
+            if (dashParticleSystem != null && !dashParticleSystem.isPlaying)
+            {
+                dashParticleSystem.gameObject.SetActive(true);
+                dashParticleSystem.Play();
+            }
+        }
+        else
+        {
+            if (dashParticleSystem != null && dashParticleSystem.isPlaying)
+            {
+                dashParticleSystem.Stop();
+                dashParticleSystem.gameObject.SetActive(false);
+            }
+        }
+
+        // הגדרת גובה השחקן (Crouch)
         if (Input.GetKey(KeyCode.LeftControl) && !leftControlDisabled)
         {
             characterController.height = crouchHeight;
@@ -268,16 +351,71 @@ public class PlayerMovement : MonoBehaviour
 
         characterController.Move(moveDirection * Time.deltaTime);
 
-        // --- Camera & Rotation ---
+        // סיבוב המצלמה והסובייקט
         rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
         playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
         transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
     }
 
     /// <summary>
-    /// Adds an external boost force to the player.
+    /// קורוטינה שמטפלת בחלון ה-Dash – פתוח למשך dashWindowDuration.
+    /// במהלך חלון זה, אם לוחצים על F, הדאש יתבצע.
     /// </summary>
-    /// <param name="boost">The vector force to add.</param>
+    IEnumerator DashWindow()
+    {
+        dashWindowOpen = true;
+        yield return new WaitForSeconds(dashWindowDuration);
+        dashWindowOpen = false;
+    }
+
+    /// <summary>
+    /// קורוטינה לביצוע Dash.
+    /// במהלך הדאש, השחקן נע בכיוון התנועה הנוכחית במהירות שמחושבת כך שהמרחק הכולל יהיה dashDistance.
+    /// לאחר סיום הדאש, מהירות הקפיצה (הרכיב האנכי) שהיתה נשמרת חוזרת לפעולה.
+    /// במהלך הדאש, לא ניתן לקפוץ או להחליק.
+    /// </summary>
+    IEnumerator PerformDash()
+    {
+        dashWindowOpen = false;
+        isDashing = true;
+        dashCooldownTimer = dashCooldown;
+        // שומר את הרכיב האנכי של התנועה (מהירות הקפיצה)
+        savedVerticalVelocity = moveDirection.y;
+        // הדאש מתבצע בכיוון ההסתכלות (או כיוון התנועה הנוכחית)
+        Vector3 dashDirection = transform.forward.normalized;
+        float dashSpeed = dashDistance / dashDuration;
+        float timer = 0f;
+
+        // הפעלת אפקט החלקיקים: הפעלה וגם setActive
+        if (dashParticleSystem != null)
+        {
+            dashParticleSystem.gameObject.SetActive(true);
+            dashParticleSystem.Play();
+        }
+
+        // מבצע את הדאש בתנועה חלקה למשך dashDuration
+        while (timer < dashDuration)
+        {
+            characterController.Move(dashDirection * dashSpeed * Time.deltaTime);
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        // כיבוי אפקט החלקיקים: עצירה וגם setActive(false)
+        if (dashParticleSystem != null)
+        {
+            dashParticleSystem.Stop();
+            dashParticleSystem.gameObject.SetActive(false);
+        }
+
+        isDashing = false;
+        // מחזיר את הרכיב האנכי של המהירות מהקפיצה ששורדה
+        moveDirection.y = savedVerticalVelocity;
+    }
+
+    /// <summary>
+    /// מוסיף כוח חיצוני לשחקן (למשל, לצורך בוסט)
+    /// </summary>
     public void ApplyBoost(Vector3 boost)
     {
         externalForce = boost;
@@ -368,7 +506,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // שיטת OnControllerColliderHit קיימת לטיפול בהתנגשות עם קירות (Wall) בלבד.
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
         if (hit.gameObject.CompareTag("Wall"))
@@ -378,12 +515,17 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // טיפול במגע עם משטחי "slide" – עדכון isOnSlideSurface בהתבסס על התגית.
     void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("slide"))
         {
             isOnSlideSurface = true;
+            // הפעלת מערכת החלקיקים במידה ואנו במצב slide על אובייקט עם תג "slide"
+            if (!isSliding && dashParticleSystem != null && !dashParticleSystem.isPlaying)
+            {
+                dashParticleSystem.gameObject.SetActive(true);
+                dashParticleSystem.Play();
+            }
         }
     }
 
@@ -392,14 +534,15 @@ public class PlayerMovement : MonoBehaviour
         if (collision.gameObject.CompareTag("slide"))
         {
             isOnSlideSurface = false;
-            // עצירה מיידית של ההחלקה ברגע עזיבת המשטח
-            if (isSliding)
+            if (isSliding && float.IsInfinity(slideTimer))
             {
-                isSliding = false;
-                if (playerCollider != null && normalMaterial != null)
-                {
-                    playerCollider.material = normalMaterial;
-                }
+                slideTimer = 0.5f;
+            }
+            // כיבוי מערכת החלקיקים כאשר לא נמצאים עוד על אובייקט עם תג "slide"
+            if (dashParticleSystem != null && dashParticleSystem.isPlaying)
+            {
+                dashParticleSystem.Stop();
+                dashParticleSystem.gameObject.SetActive(false);
             }
         }
     }
@@ -418,7 +561,6 @@ public class PlayerMovement : MonoBehaviour
         jumpPower = 18f;
     }
 
-    // קורוטינה לביטול פעולת LeftControl למשך שניה
     IEnumerator DisableLeftControlCoroutine()
     {
         leftControlDisabled = true;
