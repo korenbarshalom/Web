@@ -51,6 +51,10 @@ public class PlayerMovement : MonoBehaviour
     // הפניה ל-Particle System עבור אפקט הדאש/slide (שמכובה כברירת מחדל)
     public ParticleSystem dashParticleSystem;
 
+    [Header("Rigidbody Settings")]
+    // שדה זה מאפשר לך להכניס את ה־Rigidbody של השחקן, אותו אנו נשנה ל־isKinematic בזמן התפסה
+    public Rigidbody playerRigidbody;
+
     // משתנים פנימיים עבור Dash
     private bool dashWindowOpen = false;
     private bool isDashing = false;
@@ -68,7 +72,9 @@ public class PlayerMovement : MonoBehaviour
     private float rotationX = 0f;
     private CharacterController characterController;
 
-    private bool canMove = true;
+    // מאפשר גישה חיצונית (למשל, עבור מערכות אחרות)
+    public bool canMove = true;
+
     private bool isUsingSecondaryCamera = false;
     private bool isUsingCarPlayerCamera = false;
 
@@ -84,6 +90,9 @@ public class PlayerMovement : MonoBehaviour
     private Collider playerCollider;
     private float lateralVelocity = 0f;
     private bool leftControlDisabled = false;
+
+    // Ledge grabbing – מצב בו השחקן "נתפס" על אובייקט עם Ledge
+    private bool isLedgeGrabbing = false;
 
     void Start()
     {
@@ -105,9 +114,33 @@ public class PlayerMovement : MonoBehaviour
         if (dashCooldownTimer > 0f)
             dashCooldownTimer -= Time.deltaTime;
 
-        // אם נמצא במצב Dash, לא מעבדים את שאר התנועות
+        // אם מתבצע Dash, לא מעבדים תנועה רגילה
         if (isDashing)
             return;
+
+        // טיפול במצב Ledge Grabbing:
+        // כאשר השחקן "נתפס" על האובייקט, אנו לא מעדכנים תנועת גוף – השחקן "קפוא" במיקום שקבענו
+        if (isLedgeGrabbing)
+        {
+            // עדכון סיבוב המצלמה – השחקן עדיין יכול לסובב
+            rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
+            playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
+            transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
+
+            // לחיצה על Space תשחרר את השחקן
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                isLedgeGrabbing = false;
+                // הפעל מחדש את ה־CharacterController
+                characterController.enabled = true;
+                // החזרת ה־Rigidbody למצב דינמי
+                if (playerRigidbody != null)
+                    playerRigidbody.isKinematic = false;
+                moveDirection.y = jumpPower; // תנופה לשחרור
+                Debug.Log("Released from Ledge with impulse");
+            }
+            return; // אין לעדכן תנועת גוף בזמן שהשחקן קפוא
+        }
 
         // כאשר לוחצים על Space, פותחים חלון dash (אם הדאש לא בקירור)
         if (!dashWindowOpen && dashCooldownTimer <= 0f && Input.GetKeyDown(KeyCode.Space))
@@ -121,7 +154,7 @@ public class PlayerMovement : MonoBehaviour
             StartCoroutine(PerformDash());
         }
 
-        // שאר עדכון הקלט, לדוגמה השבתת LeftControl בעת לחיצה על Space
+        // שאר עדכון הקלט – למשל, השבתת LeftControl בעת לחיצה על Space
         if (Input.GetKeyDown(KeyCode.Space))
         {
             StartCoroutine(DisableLeftControlCoroutine());
@@ -251,8 +284,6 @@ public class PlayerMovement : MonoBehaviour
             slideVelocity.y -= gravity * Time.deltaTime;
 
             float horizontalInput = Input.GetAxis("Horizontal");
-            // במצב שבו השחקן נמצא על משטח עם תג "slide" (ולא במצב slide רגיל)
-            // מאפשרים תנועה צידית לפי slideLateralSpeed.
             if (isOnSlideSurface)
             {
                 lateralVelocity = Mathf.Lerp(lateralVelocity, horizontalInput * slideLateralSpeed, lateralControlSmooth * Time.deltaTime);
@@ -265,7 +296,6 @@ public class PlayerMovement : MonoBehaviour
 
             moveDirection = slideVelocity + lateralMove;
 
-            // קפיצה תוך כדי החלקה
             if (Input.GetButtonDown("Jump") && characterController.isGrounded)
             {
                 Vector3 horizontalMomentum = new Vector3(slideVelocity.x, 0, slideVelocity.z);
@@ -281,7 +311,6 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            // תנועה רגילה
             if (Input.GetKey(KeyCode.LeftControl) && !leftControlDisabled)
             {
                 moveDirection.x = 0f;
@@ -295,7 +324,6 @@ public class PlayerMovement : MonoBehaviour
                 moveDirection.y = previousY;
             }
 
-            // קפיצה בתנועה רגילה
             if (Input.GetButton("Jump") && canMove)
             {
                 if (characterController.isGrounded)
@@ -315,8 +343,6 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        // הפעלה/כיבוי של מערכת החלקיקים עבור slide על משטחים עם תג "slide"
-        // (פעיל רק כאשר אנו במצב slide ובמשטח עם תג "slide")
         if (isSliding && isOnSlideSurface)
         {
             if (dashParticleSystem != null && !dashParticleSystem.isPlaying)
@@ -334,7 +360,6 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        // הגדרת גובה השחקן (Crouch)
         if (Input.GetKey(KeyCode.LeftControl) && !leftControlDisabled)
         {
             characterController.height = crouchHeight;
@@ -351,16 +376,11 @@ public class PlayerMovement : MonoBehaviour
 
         characterController.Move(moveDirection * Time.deltaTime);
 
-        // סיבוב המצלמה והסובייקט
         rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
         playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
         transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
     }
 
-    /// <summary>
-    /// קורוטינה שמטפלת בחלון ה-Dash – פתוח למשך dashWindowDuration.
-    /// במהלך חלון זה, אם לוחצים על F, הדאש יתבצע.
-    /// </summary>
     IEnumerator DashWindow()
     {
         dashWindowOpen = true;
@@ -368,32 +388,22 @@ public class PlayerMovement : MonoBehaviour
         dashWindowOpen = false;
     }
 
-    /// <summary>
-    /// קורוטינה לביצוע Dash.
-    /// במהלך הדאש, השחקן נע בכיוון התנועה הנוכחית במהירות שמחושבת כך שהמרחק הכולל יהיה dashDistance.
-    /// לאחר סיום הדאש, מהירות הקפיצה (הרכיב האנכי) שהיתה נשמרת חוזרת לפעולה.
-    /// במהלך הדאש, לא ניתן לקפוץ או להחליק.
-    /// </summary>
     IEnumerator PerformDash()
     {
         dashWindowOpen = false;
         isDashing = true;
         dashCooldownTimer = dashCooldown;
-        // שומר את הרכיב האנכי של התנועה (מהירות הקפיצה)
         savedVerticalVelocity = moveDirection.y;
-        // הדאש מתבצע בכיוון ההסתכלות (או כיוון התנועה הנוכחית)
         Vector3 dashDirection = transform.forward.normalized;
         float dashSpeed = dashDistance / dashDuration;
         float timer = 0f;
 
-        // הפעלת אפקט החלקיקים: הפעלה וגם setActive
         if (dashParticleSystem != null)
         {
             dashParticleSystem.gameObject.SetActive(true);
             dashParticleSystem.Play();
         }
 
-        // מבצע את הדאש בתנועה חלקה למשך dashDuration
         while (timer < dashDuration)
         {
             characterController.Move(dashDirection * dashSpeed * Time.deltaTime);
@@ -401,7 +411,6 @@ public class PlayerMovement : MonoBehaviour
             yield return null;
         }
 
-        // כיבוי אפקט החלקיקים: עצירה וגם setActive(false)
         if (dashParticleSystem != null)
         {
             dashParticleSystem.Stop();
@@ -409,13 +418,9 @@ public class PlayerMovement : MonoBehaviour
         }
 
         isDashing = false;
-        // מחזיר את הרכיב האנכי של המהירות מהקפיצה ששורדה
         moveDirection.y = savedVerticalVelocity;
     }
 
-    /// <summary>
-    /// מוסיף כוח חיצוני לשחקן (למשל, לצורך בוסט)
-    /// </summary>
     public void ApplyBoost(Vector3 boost)
     {
         externalForce = boost;
@@ -506,8 +511,28 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    // כאן מתבצעת "snapping" כאשר מתבצעת התנגשות עם אובייקט ששייך לשכבת Ledge.
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
+        // אם השחקן אינו על הקרקע ונוגע באובייקט בשכבת "Ledge"
+        if (!isLedgeGrabbing && !characterController.isGrounded &&
+            hit.gameObject.layer == LayerMask.NameToLayer("Ledge"))
+        {
+            // חישוב נקודת המגע והוספת offset
+            Vector3 contactPoint = hit.point;
+            contactPoint.y += defaultHeight * 0.5f;
+            transform.position = contactPoint;
+            moveDirection = Vector3.zero;
+            isLedgeGrabbing = true;
+            // השבתת ה-CharacterController כדי למנוע דחיפה אחורה
+            characterController.enabled = false;
+            // הפיכת ה־Rigidbody ל־isKinematic כדי למנוע נפילה
+            if (playerRigidbody != null)
+                playerRigidbody.isKinematic = true;
+            Debug.Log("Attached to Ledge at: " + transform.position);
+            return; // לא מעבדים התנגשות נוספת בזמן שהתפיסה מופעלת
+        }
+
         if (hit.gameObject.CompareTag("Wall"))
         {
             canJumpOnWall = true;
@@ -520,7 +545,6 @@ public class PlayerMovement : MonoBehaviour
         if (collision.gameObject.CompareTag("slide"))
         {
             isOnSlideSurface = true;
-            // הפעלת מערכת החלקיקים במידה ואנו במצב slide על אובייקט עם תג "slide"
             if (!isSliding && dashParticleSystem != null && !dashParticleSystem.isPlaying)
             {
                 dashParticleSystem.gameObject.SetActive(true);
@@ -538,7 +562,6 @@ public class PlayerMovement : MonoBehaviour
             {
                 slideTimer = 0.5f;
             }
-            // כיבוי מערכת החלקיקים כאשר לא נמצאים עוד על אובייקט עם תג "slide"
             if (dashParticleSystem != null && dashParticleSystem.isPlaying)
             {
                 dashParticleSystem.Stop();
