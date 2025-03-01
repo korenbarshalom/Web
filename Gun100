@@ -1,0 +1,419 @@
+using UnityEngine;
+using System.Collections;
+using TMPro; // TextMesh Pro
+
+public class WeaponSwitcher : MonoBehaviour
+{
+    // --- Weapon Switching & Shooting Settings ---
+    public GameObject gun;    // Weapon 1 (e.g., Rifle)
+    public GameObject ak47;   // AK47
+    public GameObject knife;  // Knife
+    public GameObject pistol; // Pistol
+
+    // General shooting settings for the rifle
+    public GameObject bulletPrefab; // Bullet prefab
+    public Transform firePoint;     // Fire point for the rifle
+    public float bulletSpeed = 20f; // Bullet speed
+    public float fireRate = 0.5f;   // Fire rate for the rifle
+    public ParticleSystem muzzleFlash; // Muzzle flash Particle System for the rifle
+
+    // Shooting settings for the AK47
+    public Transform akFirePoint;   // Fire point for the AK47
+    public float akFireRate = 0.3f;   // Fire rate for the AK47
+    public ParticleSystem akMuzzleFlash; // Muzzle flash Particle System for the AK47
+
+    public Transform bulletsParent; // Parent for instantiated bullets
+
+    // Shooting management variables
+    private float nextFireTime = 0f; // Next allowed fire time
+    private int shotCount = 0;       // Shot counter (e.g., for reload every 30 bullets)
+    private bool isReloading = false; // Is reloading in progress
+
+    // Tracking fired bullets for each weapon (assumes maximum ammo = 90)
+    private int gunFiredCount = 0;    // Bullets fired from gun
+    private int ak47FiredCount = 0;   // Bullets fired from AK47
+    private int pistolFiredCount = 0; // Bullets fired from pistol
+
+    // Recoil settings for shooting weapons
+    public float recoilAmount = 0.1f; // Recoil offset amount
+    public float recoilSpeed = 5f;    // Recoil smoothing speed
+    private Vector3 initialGunPosition;   // Initial local position for gun
+    private Vector3 initialAK47Position;    // Initial local position for AK47
+
+    // Example field for a slide (e.g., for the pistol)
+    public Transform slide;
+    private Vector3 initialSlidePosition;
+
+    // Array of weapons and the active weapon index
+    private int currentWeaponIndex = 0; // Active weapon index
+    private GameObject[] weapons;       // Array of all weapons
+
+    // Weapon sway settings
+    [Header("Weapon Sway Settings")]
+    public float swayAmount = 0.05f;      // How much the weapon sways
+    public float swaySmoothing = 5f;      // Smoothing factor for sway
+    private Vector3[] initialPositions;   // Store each weapon's initial local position
+
+    // Unlock settings for AK47
+    private bool akUnlocked = false;
+    public Transform akPickupObject; // Pickup object to unlock the AK47
+
+    // No-shoot zone: if player is within 5 meters of this object, shooting is disabled
+    public Transform noShootObject;
+    // Player transform
+    public Transform player;
+
+    // TextMesh Pro for ammo countdown
+    public TMP_Text ammoCountdownText;
+
+    // Ammo pickups: each pickup adds 15 bullets to both gun and AK47
+    public GameObject[] ammoPickupObjects;
+    private bool[] ammoPickupUsedFlags; // Flags to track if a pickup was used
+
+    // שדות לבוסט - יש להגדיר ערכי חיזוק לפי הצורך
+    public float backwardBoost = 10f;
+    public float upwardBoost = 5f;
+    // הגבלת שימוש ב־boost: כל 15 שניות ניתן לבצע בוסט
+    public float boostCooldown = 15f;
+    private float lastBoostTime = -15f; // אתחול כך שבפעם הראשונה יוכל לבצע בוסט
+
+    // שדה להפניה לסקריפט PlayerMovement (יש להקצות באינפקטור)
+    public PlayerMovement playerMovement;
+
+    // משתנים למעבר חלק בין הנשקים
+    [Header("Weapon Switch Smooth Transition")]
+    public float switchOutDuration = 0.25f; // זמן מעבר להוצאת הנשק מהמסך
+    public float switchInDuration = 0.25f;  // זמן מעבר להכנסת הנשק החדש
+    private bool isSwitching = false;       // האם מתבצע מעבר כרגע
+
+    private void Start()
+    {
+        // Initialize the weapons array – order matters: gun, ak47, knife, pistol
+        weapons = new GameObject[] { gun, ak47, knife, pistol };
+
+        // Store the initial local positions for each weapon for sway calculations.
+        initialPositions = new Vector3[weapons.Length];
+        for (int i = 0; i < weapons.Length; i++)
+        {
+            if (weapons[i] != null)
+                initialPositions[i] = weapons[i].transform.localPosition;
+        }
+
+        // Activate the first weapon (index 0)
+        SwitchWeaponImmediate(0);
+
+        // Save initial positions for recoil-enabled weapons
+        if (gun != null)
+        {
+            initialGunPosition = gun.transform.localPosition;
+        }
+        if (ak47 != null)
+        {
+            initialAK47Position = ak47.transform.localPosition;
+        }
+        if (slide != null)
+        {
+            initialSlidePosition = slide.localPosition;
+        }
+
+        // Initialize the ammo pickup flags
+        if (ammoPickupObjects != null && ammoPickupObjects.Length > 0)
+        {
+            ammoPickupUsedFlags = new bool[ammoPickupObjects.Length];
+        }
+    }
+
+    private void Update()
+    {
+        // --- AK47 Unlocking ---
+        if (!akUnlocked && akPickupObject != null && Input.GetKeyDown(KeyCode.F))
+        {
+            float distance = Vector3.Distance(transform.position, akPickupObject.position);
+            if (distance <= 3f)
+            {
+                akUnlocked = true;
+                ak47FiredCount = 0;
+                Debug.Log("AK47 unlocked!");
+                Destroy(akPickupObject.gameObject);
+            }
+        }
+
+        // --- Weapon Switching via Mouse Scroll Wheel ---
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        if (scroll != 0f && !isSwitching)
+        {
+            int direction = scroll > 0f ? 1 : -1;
+            int nextIndex = currentWeaponIndex;
+            int attempts = 0;
+            // Loop to find the next weapon – skip AK47 if locked.
+            do
+            {
+                nextIndex = (nextIndex + direction + weapons.Length) % weapons.Length;
+                attempts++;
+                if (attempts > weapons.Length) break;
+            }
+            while (weapons[nextIndex] == ak47 && !akUnlocked);
+
+            if (nextIndex != currentWeaponIndex)
+            {
+                StartCoroutine(SmoothSwitchWeapon(nextIndex));
+            }
+        }
+
+        // --- Check if shooting is allowed ---
+        bool canShoot = true;
+        if (noShootObject != null && player != null)
+        {
+            float distanceToNoShoot = Vector3.Distance(player.position, noShootObject.position);
+            if (distanceToNoShoot <= 5f)
+            {
+                canShoot = false;
+            }
+        }
+
+        // --- Shooting for weapons ---
+        // Shooting for gun (rifle) – only if active.
+        if (gun.activeSelf && Input.GetButton("Fire1") && !isReloading && canShoot)
+        {
+            if (gunFiredCount < 90)
+            {
+                if (Time.time >= nextFireTime)
+                {
+                    Shoot(firePoint, muzzleFlash);
+                    nextFireTime = Time.time + fireRate;
+                    gunFiredCount++;
+                    shotCount++;
+                }
+            }
+            else
+            {
+                Debug.Log("No more ammo in the gun!");
+            }
+
+            if (shotCount >= 30)
+            {
+                StartCoroutine(Reload());
+            }
+        }
+        // Shooting for AK47 – only if active.
+        else if (ak47.activeSelf && Input.GetButton("Fire1") && !isReloading && canShoot)
+        {
+            if (ak47FiredCount < 90)
+            {
+                if (Time.time >= nextFireTime)
+                {
+                    Shoot(akFirePoint, akMuzzleFlash);
+                    nextFireTime = Time.time + akFireRate;
+                    ak47FiredCount++;
+                    shotCount++;
+                }
+            }
+            else
+            {
+                Debug.Log("No more ammo in the AK47!");
+            }
+
+            if (shotCount >= 30)
+            {
+                StartCoroutine(Reload());
+            }
+        }
+        // The pistol does not fire.
+
+        // --- Boost באמצעות לחיצה על מקש C בנשק Gun ---
+        if (gun.activeSelf && Input.GetKeyDown(KeyCode.C))
+        {
+            // בדיקה האם חלף מספיק זמן מאז השימוש האחרון
+            if (Time.time >= lastBoostTime + boostCooldown)
+            {
+                if (playerMovement != null)
+                {
+                    // מחשבים את הכוח: אחורה (מהכיוון של playerMovement) ומעלה.
+                    Vector3 boost = (-playerMovement.transform.forward * backwardBoost) + (Vector3.up * upwardBoost);
+                    playerMovement.ApplyBoost(boost);
+                    lastBoostTime = Time.time;
+                    Debug.Log("Boost applied to the player!");
+                }
+                else
+                {
+                    Debug.LogWarning("PlayerMovement not assigned!");
+                }
+            }
+            else
+            {
+                float timeLeft = (lastBoostTime + boostCooldown) - Time.time;
+                Debug.Log("Boost on cooldown. Try again in " + timeLeft.ToString("F1") + " seconds.");
+            }
+        }
+
+        // --- Recoil & Weapon Sway ---
+        // For gun: combine recoil and sway.
+        if (gun.activeSelf)
+        {
+            Vector3 recoilTarget = initialGunPosition + (Input.GetButton("Fire1") ? -Vector3.forward * recoilAmount : Vector3.zero);
+            Vector3 swayOffset = new Vector3(-Input.GetAxis("Mouse X") * swayAmount, -Input.GetAxis("Mouse Y") * swayAmount, 0);
+            Vector3 combinedTarget = recoilTarget + swayOffset;
+            gun.transform.localPosition = Vector3.Lerp(gun.transform.localPosition, combinedTarget, Time.deltaTime * recoilSpeed);
+        }
+        // For AK47: combine recoil and sway.
+        if (ak47.activeSelf)
+        {
+            Vector3 recoilTarget = initialAK47Position + (Input.GetButton("Fire1") ? -Vector3.forward * recoilAmount : Vector3.zero);
+            Vector3 swayOffset = new Vector3(-Input.GetAxis("Mouse X") * swayAmount, -Input.GetAxis("Mouse Y") * swayAmount, 0);
+            Vector3 combinedTarget = recoilTarget + swayOffset;
+            ak47.transform.localPosition = Vector3.Lerp(ak47.transform.localPosition, combinedTarget, Time.deltaTime * recoilSpeed);
+        }
+        // For knife: apply sway based on its initial position.
+        if (knife.activeSelf)
+        {
+            int index = System.Array.IndexOf(weapons, knife);
+            Vector3 target = initialPositions[index] + new Vector3(-Input.GetAxis("Mouse X") * swayAmount, -Input.GetAxis("Mouse Y") * swayAmount, 0);
+            knife.transform.localPosition = Vector3.Lerp(knife.transform.localPosition, target, Time.deltaTime * swaySmoothing);
+        }
+        // For pistol: apply sway based on its initial position.
+        if (pistol.activeSelf)
+        {
+            int index = System.Array.IndexOf(weapons, pistol);
+            Vector3 target = initialPositions[index] + new Vector3(-Input.GetAxis("Mouse X") * swayAmount, -Input.GetAxis("Mouse Y") * swayAmount, 0);
+            pistol.transform.localPosition = Vector3.Lerp(pistol.transform.localPosition, target, Time.deltaTime * swaySmoothing);
+        }
+
+        // --- Knife usage ---
+        if (knife.activeSelf && Input.GetButtonDown("Fire2"))
+        {
+            UseKnife();
+        }
+
+        // --- Update ammo countdown text ---
+        if (gun.activeSelf)
+        {
+            ammoCountdownText.text = (90 - gunFiredCount).ToString();
+        }
+        else if (ak47.activeSelf)
+        {
+            ammoCountdownText.text = (90 - ak47FiredCount).ToString();
+        }
+        else
+        {
+            ammoCountdownText.text = "";
+        }
+
+        // --- Handle ammo pickups ---
+        if (ammoPickupObjects != null && ammoPickupUsedFlags != null)
+        {
+            for (int i = 0; i < ammoPickupObjects.Length; i++)
+            {
+                if (!ammoPickupUsedFlags[i] && ammoPickupObjects[i] == null)
+                {
+                    int currentAmmoGun = 90 - gunFiredCount;
+                    currentAmmoGun = Mathf.Min(currentAmmoGun + 15, 90);
+                    gunFiredCount = 90 - currentAmmoGun;
+
+                    int currentAmmoAK = 90 - ak47FiredCount;
+                    currentAmmoAK = Mathf.Min(currentAmmoAK + 15, 90);
+                    ak47FiredCount = 90 - currentAmmoAK;
+
+                    ammoPickupUsedFlags[i] = true;
+                    Debug.Log("Ammo pickup applied: +15 bullets to both gun and AK47");
+                }
+            }
+        }
+    }
+
+    private void Shoot(Transform point, ParticleSystem flash)
+    {
+        Quaternion adjustedRotation = point.rotation * Quaternion.Euler(90f, 0f, 0f);
+        GameObject bullet = Instantiate(bulletPrefab, point.position, adjustedRotation);
+
+        if (bulletsParent != null)
+        {
+            bullet.transform.SetParent(bulletsParent);
+        }
+
+        Rigidbody rb = bullet.GetComponent<Rigidbody>();
+        rb.linearVelocity = point.forward * bulletSpeed;
+
+        Destroy(bullet, 4f);
+
+        if (flash != null)
+        {
+            flash.Play();
+        }
+    }
+
+    private IEnumerator Reload()
+    {
+        isReloading = true;
+        Debug.Log("Reloading...");
+        yield return new WaitForSeconds(1f);
+        shotCount = 0;
+        nextFireTime = Time.time;
+        isReloading = false;
+    }
+
+    // מעבר מיידי (למשל בהתחלה) – ללא אנימציה
+    private void SwitchWeaponImmediate(int weaponIndex)
+    {
+        for (int i = 0; i < weapons.Length; i++)
+        {
+            weapons[i].SetActive(i == weaponIndex);
+        }
+        currentWeaponIndex = weaponIndex;
+    }
+
+    // מעבר חלק בין הנשקים – יוצא הנשק הנוכחי מהתצוגה ומכניס את הנשק החדש
+    private IEnumerator SmoothSwitchWeapon(int newIndex)
+    {
+        if (isSwitching)
+            yield break;
+        isSwitching = true;
+
+        // אם הנשק החדש זהה לנוכחי, אין מה לעשות
+        if (newIndex == currentWeaponIndex)
+        {
+            isSwitching = false;
+            yield break;
+        }
+
+        // אנימציית יציאה לנשק הנוכחי
+        GameObject currentWeapon = weapons[currentWeaponIndex];
+        Vector3 startPos = currentWeapon.transform.localPosition;
+        Vector3 exitPos = startPos + new Vector3(0, -0.5f, 0); // הזזה כלפי מטה – ניתן לשנות
+        float timer = 0f;
+        while (timer < switchOutDuration)
+        {
+            timer += Time.deltaTime;
+            float t = timer / switchOutDuration;
+            currentWeapon.transform.localPosition = Vector3.Lerp(startPos, exitPos, t);
+            yield return null;
+        }
+        currentWeapon.transform.localPosition = exitPos;
+        currentWeapon.SetActive(false);
+
+        // הפעלה של הנשק החדש והגדרת מיקום כניסה (מתחת למיקום המקורי)
+        currentWeaponIndex = newIndex;
+        GameObject newWeapon = weapons[newIndex];
+        newWeapon.SetActive(true);
+        Vector3 newInitialPos = initialPositions[newIndex];
+        Vector3 entryPos = newInitialPos + new Vector3(0, -0.5f, 0);
+        newWeapon.transform.localPosition = entryPos;
+
+        // אנימציית כניסה לנשק החדש
+        timer = 0f;
+        while (timer < switchInDuration)
+        {
+            timer += Time.deltaTime;
+            float t = timer / switchInDuration;
+            newWeapon.transform.localPosition = Vector3.Lerp(entryPos, newInitialPos, t);
+            yield return null;
+        }
+        newWeapon.transform.localPosition = newInitialPos;
+
+        isSwitching = false;
+    }
+
+    private void UseKnife()
+    {
+        Debug.Log("Used Knife");
+    }
+}
