@@ -40,9 +40,16 @@ public class WeaponSwitcher : MonoBehaviour
     private Vector3 initialGunPosition;   // Initial local position for gun
     private Vector3 initialAK47Position;    // Initial local position for AK47
 
-    // Example field for a slide (e.g., for the pistol)
-    public Transform slide;
-    private Vector3 initialSlidePosition;
+    // במקום שדה אחד של slide, נעבוד עם מערך של אובייקטים שיזוזו יחד
+    public Transform[] slides;
+    // משתנה לקביעת המרחק שהאובייקטים יעברו (ניתן להתאים)
+    public float slideBackDistance = 0.2f;
+    // משך האנימציה להזזת ה־slides אחורה ולחזרה
+    public float slideAnimDuration = 0.2f;
+    private Vector3[] initialSlidePositions; // שמירת המיקום ההתחלתי של כל slide
+
+    // משתנה חדש להגדרת ציר ההזזה (ברירת מחדל: ציר X)
+    public Vector3 slideDirection = new Vector3(1f, 0f, 0f);
 
     // Array of weapons and the active weapon index
     private int currentWeaponIndex = 0; // Active weapon index
@@ -111,9 +118,16 @@ public class WeaponSwitcher : MonoBehaviour
         {
             initialAK47Position = ak47.transform.localPosition;
         }
-        if (slide != null)
+
+        // שמירת המיקום ההתחלתי של כל slide במערך (אם הוגדר)
+        if (slides != null && slides.Length > 0)
         {
-            initialSlidePosition = slide.localPosition;
+            initialSlidePositions = new Vector3[slides.Length];
+            for (int i = 0; i < slides.Length; i++)
+            {
+                if (slides[i] != null)
+                    initialSlidePositions[i] = slides[i].localPosition;
+            }
         }
 
         // Initialize the ammo pickup flags
@@ -345,7 +359,58 @@ public class WeaponSwitcher : MonoBehaviour
     {
         isReloading = true;
         Debug.Log("Reloading...");
-        yield return new WaitForSeconds(1f);
+
+        // הזזת ה־slides לאחור לאורך הציר המוגדר (slideDirection)
+        if (slides != null && slides.Length > 0)
+        {
+            Vector3[] targetPositions = new Vector3[slides.Length];
+            for (int i = 0; i < slides.Length; i++)
+            {
+                targetPositions[i] = initialSlidePositions[i] + slideDirection.normalized * slideBackDistance;
+            }
+            float elapsed = 0f;
+            while (elapsed < slideAnimDuration)
+            {
+                for (int i = 0; i < slides.Length; i++)
+                {
+                    slides[i].localPosition = Vector3.Lerp(initialSlidePositions[i], targetPositions[i], elapsed / slideAnimDuration);
+                }
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+            for (int i = 0; i < slides.Length; i++)
+            {
+                slides[i].localPosition = targetPositions[i];
+            }
+        }
+
+        // המתנה בזמן ההרמה של הנשק (או כל זמן שנדרש)
+        yield return new WaitForSeconds(0.6f);
+
+        // החזרת ה־slides למקומם המקורי לאורך אותו ציר
+        if (slides != null && slides.Length > 0)
+        {
+            Vector3[] targetPositions = new Vector3[slides.Length];
+            for (int i = 0; i < slides.Length; i++)
+            {
+                targetPositions[i] = initialSlidePositions[i] + slideDirection.normalized * slideBackDistance;
+            }
+            float elapsed = 0f;
+            while (elapsed < slideAnimDuration)
+            {
+                for (int i = 0; i < slides.Length; i++)
+                {
+                    slides[i].localPosition = Vector3.Lerp(targetPositions[i], initialSlidePositions[i], elapsed / slideAnimDuration);
+                }
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+            for (int i = 0; i < slides.Length; i++)
+            {
+                slides[i].localPosition = initialSlidePositions[i];
+            }
+        }
+
         shotCount = 0;
         nextFireTime = Time.time;
         isReloading = false;
