@@ -139,7 +139,7 @@ public class WeaponSwitcher : MonoBehaviour
 
     private void Update()
     {
-        // --- AK47 Unlocking ---
+        // --- AK47 Unlocking with Smooth Transition ---
         if (!akUnlocked && akPickupObject != null && Input.GetKeyDown(KeyCode.F))
         {
             float distance = Vector3.Distance(transform.position, akPickupObject.position);
@@ -149,6 +149,11 @@ public class WeaponSwitcher : MonoBehaviour
                 ak47FiredCount = 0;
                 Debug.Log("AK47 unlocked!");
                 Destroy(akPickupObject.gameObject);
+                // מעבר חלק לנשק ה-AK47 – אם הנשק לא כבר פעיל
+                if (currentWeaponIndex != 1)
+                {
+                    StartCoroutine(SmoothSwitchWeapon(1));
+                }
             }
         }
 
