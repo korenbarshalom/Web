@@ -45,6 +45,7 @@ public class PlayerMovement : MonoBehaviour
     public float dashCooldown = 10f;
     public float dashDistance = 9f;
     public float dashDuration = 0.2f;
+    // Particle System עבור Dash וגם עבור Side – אותו אובייקט, ומכובה כברירת מחדל
     public ParticleSystem dashParticleSystem;
 
     [Header("Wall Run Settings")]
@@ -114,6 +115,9 @@ public class PlayerMovement : MonoBehaviour
     public AudioSource ledgeAudioSource;      // AudioSource לשינוי עוצמת הקול עבור Ledge
     public float ledgeSoundVolume = 1f;         // עוצמת קול של Ledge
 
+    // משתנה לזיהוי אזור מהירות (Speed Pad)
+    private bool onSpeedPad = false;
+
     void Start()
     {
         characterController = GetComponent<CharacterController>();
@@ -153,6 +157,12 @@ public class PlayerMovement : MonoBehaviour
                 ledgeAudioSource = gameObject.AddComponent<AudioSource>();
         }
         ledgeAudioSource.volume = ledgeSoundVolume;
+
+        // כבה את ה־Particle System כברירת מחדל
+        if (dashParticleSystem != null)
+        {
+            dashParticleSystem.gameObject.SetActive(false);
+        }
     }
 
     void Update()
@@ -226,6 +236,13 @@ public class PlayerMovement : MonoBehaviour
         currentTilt = Mathf.Lerp(currentTilt, targetTilt, tiltSmooth * Time.deltaTime);
         playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, currentTilt);
         transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
+
+        // אם איננו במצב Slide או Dash, ודא שה־Particle System כבוי
+        if (!isSliding && !isDashing && dashParticleSystem != null && dashParticleSystem.isPlaying)
+        {
+            dashParticleSystem.Stop();
+            dashParticleSystem.gameObject.SetActive(false);
+        }
     }
 
     void HandleMovement()
@@ -383,30 +400,22 @@ public class PlayerMovement : MonoBehaviour
                 moveDirection.y -= gravity * Time.deltaTime;
         }
 
-        if (isSliding && isOnSlideSurface)
-        {
-            if (dashParticleSystem != null && !dashParticleSystem.isPlaying)
-            {
-                dashParticleSystem.gameObject.SetActive(true);
-                dashParticleSystem.Play();
-            }
-        }
-        else
-        {
-            if (dashParticleSystem != null && dashParticleSystem.isPlaying)
-            {
-                dashParticleSystem.Stop();
-                dashParticleSystem.gameObject.SetActive(false);
-            }
-        }
-
+        // שינוי מהירות בהתאם למצב – אם השחקן נמצא על Speed Pad, המהירות תהיה 40f, אחרת 22f.
         if (Input.GetKey(KeyCode.LeftControl) && !leftControlDisabled)
             characterController.height = crouchHeight;
         else
         {
             characterController.height = defaultHeight;
-            walkSpeed = 22f;
-            runSpeed = 22f;
+            if (onSpeedPad)
+            {
+                walkSpeed = 60f;
+                runSpeed = 40f;
+            }
+            else
+            {
+                walkSpeed = 22f;
+                runSpeed = 22f;
+            }
         }
 
         moveDirection += externalForce;
@@ -432,6 +441,7 @@ public class PlayerMovement : MonoBehaviour
         float dashSpeed = dashDistance / dashDuration;
         float timer = 0f;
 
+        // הפעלת ה־Particle System עם SetActive(true) והפעלת האפקט
         if (dashParticleSystem != null)
         {
             dashParticleSystem.gameObject.SetActive(true);
@@ -445,6 +455,7 @@ public class PlayerMovement : MonoBehaviour
             yield return null;
         }
 
+        // עצירת ה־Particle System וסגירתו
         if (dashParticleSystem != null)
         {
             dashParticleSystem.Stop();
@@ -606,6 +617,15 @@ public class PlayerMovement : MonoBehaviour
                 Debug.Log("Wall running activated.");
             }
         }
+        // הפעלת ה־Particle System כאשר נוגעים באובייקט עם תגית "side"
+        if (hit.gameObject.CompareTag("slide"))
+        {
+            if (dashParticleSystem != null && !dashParticleSystem.isPlaying)
+            {
+                dashParticleSystem.gameObject.SetActive(true);
+                dashParticleSystem.Play();
+            }
+        }
     }
 
     void OnCollisionEnter(Collision collision)
@@ -613,11 +633,8 @@ public class PlayerMovement : MonoBehaviour
         if (collision.gameObject.CompareTag("slide"))
         {
             isOnSlideSurface = true;
-            if (!isSliding && dashParticleSystem != null && !dashParticleSystem.isPlaying)
-            {
-                dashParticleSystem.gameObject.SetActive(true);
-                dashParticleSystem.Play();
-            }
+            // כאן נמנע הפעלת ה־Particle System על ידי התנגשות עם "slide"
+            // מכיוון שהאפקט אמור להפעיל רק בדאש או במגע עם "side"
         }
     }
 
@@ -628,7 +645,7 @@ public class PlayerMovement : MonoBehaviour
             isOnSlideSurface = false;
             if (isSliding && float.IsInfinity(slideTimer))
                 slideTimer = 0.5f;
-            if (dashParticleSystem != null && dashParticleSystem.isPlaying)
+            if (dashParticleSystem != null && dashParticleSystem.isPlaying && !isDashing)
             {
                 dashParticleSystem.Stop();
                 dashParticleSystem.gameObject.SetActive(false);
@@ -655,5 +672,24 @@ public class PlayerMovement : MonoBehaviour
         leftControlDisabled = true;
         yield return new WaitForSeconds(1f);
         leftControlDisabled = false;
+    }
+
+    // --- Trigger methods for Speed Pad ---
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("speed"))
+        {
+            onSpeedPad = true;
+            Debug.Log("Entered Speed Pad: Speed set to 40f.");
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("speed"))
+        {
+            onSpeedPad = false;
+            Debug.Log("Exited Speed Pad: Speed restored to normal.");
+        }
     }
 }
