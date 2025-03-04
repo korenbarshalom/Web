@@ -24,6 +24,8 @@ public class PlayerMovement : MonoBehaviour
     public float defaultHeight = 2f;
     public float crouchHeight = 1f;
     public float crouchSpeed = 3f;
+    // משתנה עבור JumpPad
+    public float jumpPadForce = 30f;
 
     [Header("Slide Settings")]
     public float slideDuration = 1f;
@@ -46,9 +48,7 @@ public class PlayerMovement : MonoBehaviour
     public ParticleSystem dashParticleSystem;
 
     [Header("Wall Run Settings")]
-    // במהירות מוגברת קדימה בזמן Wall Run
     public float wallRunForwardSpeed = 20f;
-    // בוסט קדימה בעת קפיצה מה-WallRun
     public float wallRunJumpBoost = 5f;
 
     [Header("Wall Run Camera Tilt")]
@@ -96,8 +96,23 @@ public class PlayerMovement : MonoBehaviour
     private float wallRunTimer = 0f;
     public float wallRunDuration = 0.5f;
 
-    // משתנה לקביעת הטיית המצלמה במצב Wall Run (-1 = הטיה שמאלית, 1 = הטיה ימנית, 0 = ללא הטיה)
+    // משתנה לקביעת הטיית המצלמה במצב Wall Run (-1 = שמאל, 1 = ימין, 0 = ללא)
     private int wallRunSide = 0;
+
+    [Header("Slide Audio Settings")]
+    public AudioClip slideSound;              // הצליל שירוץ כאשר מתחילים Slide
+    public AudioSource slideAudioSource;      // AudioSource לשינוי עוצמת הקול
+    public float slideSoundVolume = 1f;       // עוצמת קול (ניתן לשנות דרך המפעיל)
+
+    [Header("Jump Pad Audio Settings")]
+    public AudioClip jumpPadSound;            // הצליל שירוץ כאשר נוגעים ב-JumpPad
+    public AudioSource jumpPadAudioSource;    // AudioSource לשינוי עוצמת הקול עבור JumpPad
+    public float jumpPadSoundVolume = 1f;       // עוצמת קול של JumpPad
+
+    [Header("Ledge Audio Settings")]
+    public AudioClip ledgeSound;              // הצליל שירוץ כאשר נוגעים ב-Ledge
+    public AudioSource ledgeAudioSource;      // AudioSource לשינוי עוצמת הקול עבור Ledge
+    public float ledgeSoundVolume = 1f;         // עוצמת קול של Ledge
 
     void Start()
     {
@@ -111,6 +126,33 @@ public class PlayerMovement : MonoBehaviour
             playerCamera.enabled = true;
         if (secondaryCameraObject != null)
             secondaryCameraObject.SetActive(false);
+
+        // ודא שיש AudioSource עבור Slide – אם לא, הוסף אחד
+        if (slideAudioSource == null)
+        {
+            slideAudioSource = GetComponent<AudioSource>();
+            if (slideAudioSource == null)
+                slideAudioSource = gameObject.AddComponent<AudioSource>();
+        }
+        slideAudioSource.volume = slideSoundVolume;
+
+        // ודא שיש AudioSource עבור JumpPad – אם לא, הוסף אחד
+        if (jumpPadAudioSource == null)
+        {
+            jumpPadAudioSource = GetComponent<AudioSource>();
+            if (jumpPadAudioSource == null)
+                jumpPadAudioSource = gameObject.AddComponent<AudioSource>();
+        }
+        jumpPadAudioSource.volume = jumpPadSoundVolume;
+
+        // ודא שיש AudioSource עבור Ledge – אם לא, הוסף אחד
+        if (ledgeAudioSource == null)
+        {
+            ledgeAudioSource = GetComponent<AudioSource>();
+            if (ledgeAudioSource == null)
+                ledgeAudioSource = gameObject.AddComponent<AudioSource>();
+        }
+        ledgeAudioSource.volume = ledgeSoundVolume;
     }
 
     void Update()
@@ -224,8 +266,15 @@ public class PlayerMovement : MonoBehaviour
             isOnSlideSurface = false;
         }
 
+        // התחלת Slide - כאשר לוחצים על LeftControl
         if (!isSliding && characterController.isGrounded && Input.GetKeyDown(KeyCode.LeftControl) && !leftControlDisabled)
         {
+            // הפעלת הצליל פעם אחת בעת התחלת Slide
+            if (slideAudioSource != null && slideSound != null)
+            {
+                slideAudioSource.PlayOneShot(slideSound);
+            }
+
             if (isOnSlideSurface && onSlope)
             {
                 isSliding = true;
@@ -309,12 +358,10 @@ public class PlayerMovement : MonoBehaviour
                 moveDirection.y = previousY;
             }
 
-            // עדכון קפיצה: אם השחקן לוחץ על קפיצה
             if (Input.GetButton("Jump") && canMove)
             {
                 if (isWallRunning)
                 {
-                    // במצב Wall Run, הקפיצה תקבל בוסט קדימה
                     moveDirection.y = jumpPower;
                     moveDirection += transform.forward * wallRunJumpBoost;
                     isWallRunning = false;
@@ -494,9 +541,29 @@ public class PlayerMovement : MonoBehaviour
 
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
+        if (hit.gameObject.CompareTag("JumpPad"))
+        {
+            moveDirection.y = jumpPadForce;
+            // הפעלת הצליל עבור JumpPad פעם אחת
+            if (jumpPadAudioSource != null && jumpPadSound != null)
+            {
+                jumpPadAudioSource.volume = jumpPadSoundVolume;
+                jumpPadAudioSource.PlayOneShot(jumpPadSound);
+            }
+            Debug.Log("JumpPad activated!");
+            return;
+        }
+
         if (!isLedgeGrabbing && !characterController.isGrounded &&
             hit.gameObject.layer == LayerMask.NameToLayer("Ledge"))
         {
+            // הפעלת הצליל עבור Ledge פעם אחת
+            if (ledgeAudioSource != null && ledgeSound != null)
+            {
+                ledgeAudioSource.volume = ledgeSoundVolume;
+                ledgeAudioSource.PlayOneShot(ledgeSound);
+            }
+
             Vector3 contactPoint = hit.point;
             contactPoint.y += defaultHeight * 0.5f;
             transform.position = contactPoint;
@@ -515,17 +582,14 @@ public class PlayerMovement : MonoBehaviour
             StartCoroutine(DisableWallJumpAfterDelay());
         }
 
-        // לוגיקת Wall Running: כאשר מתנגשים באובייקט עם layer "WallRun"
         if (hit.gameObject.layer == LayerMask.NameToLayer("WallRun"))
         {
             if (!characterController.isGrounded)
             {
                 isWallRunning = true;
                 wallRunTimer = wallRunDuration;
-
-                // העברת השחקן קדימה במהירות מוגברת במצב Wall Run, ללא תוספת אנכית.
                 moveDirection = transform.forward * wallRunForwardSpeed;
-                moveDirection.y = 0f; // ביטול המרכיב האנכי
+                moveDirection.y = 0f;
 
                 if (hit.gameObject.CompareTag("Right"))
                 {
@@ -582,7 +646,7 @@ public class PlayerMovement : MonoBehaviour
     {
         jumpPowerBoostActive = true;
         jumpPower = 36f;
-        yield return new WaitForSeconds(30f);
+        yield return new WaitForSeconds(60f);
         jumpPower = 18f;
     }
 
