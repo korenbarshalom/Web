@@ -118,6 +118,10 @@ public class PlayerMovement : MonoBehaviour
     // משתנה לזיהוי אזור מהירות (Speed Pad)
     private bool onSpeedPad = false;
 
+    [Header("Speed Pad Particle System Settings")]
+    // שדה חדש להזנת ה־Particle System עבור Speed Pad
+    public ParticleSystem speedPadParticleSystem;
+
     void Start()
     {
         characterController = GetComponent<CharacterController>();
@@ -158,10 +162,15 @@ public class PlayerMovement : MonoBehaviour
         }
         ledgeAudioSource.volume = ledgeSoundVolume;
 
-        // כבה את ה־Particle System כברירת מחדל
+        // כבה את ה־Particle System כברירת מחדל (ל-Dash)
         if (dashParticleSystem != null)
         {
             dashParticleSystem.gameObject.SetActive(false);
+        }
+        // כבה את ה־Particle System עבור Speed Pad כברירת מחדל
+        if (speedPadParticleSystem != null)
+        {
+            speedPadParticleSystem.gameObject.SetActive(false);
         }
     }
 
@@ -237,7 +246,7 @@ public class PlayerMovement : MonoBehaviour
         playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, currentTilt);
         transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
 
-        // אם איננו במצב Slide או Dash, ודא שה־Particle System כבוי
+        // אם איננו במצב Slide או Dash, ודא שה־Particle System של Dash כבוי
         if (!isSliding && !isDashing && dashParticleSystem != null && dashParticleSystem.isPlaying)
         {
             dashParticleSystem.Stop();
@@ -617,7 +626,7 @@ public class PlayerMovement : MonoBehaviour
                 Debug.Log("Wall running activated.");
             }
         }
-        // הפעלת ה־Particle System כאשר נוגעים באובייקט עם תגית "side"
+        // הפעלת ה־Particle System כאשר נוגעים באובייקט עם תגית "slide"
         if (hit.gameObject.CompareTag("slide"))
         {
             if (dashParticleSystem != null && !dashParticleSystem.isPlaying)
@@ -681,6 +690,12 @@ public class PlayerMovement : MonoBehaviour
         {
             onSpeedPad = true;
             Debug.Log("Entered Speed Pad: Speed set to 40f.");
+            // הפעלת ה־Particle System עבור Speed Pad
+            if (speedPadParticleSystem != null && !speedPadParticleSystem.isPlaying)
+            {
+                speedPadParticleSystem.gameObject.SetActive(true);
+                speedPadParticleSystem.Play();
+            }
         }
     }
 
@@ -690,6 +705,12 @@ public class PlayerMovement : MonoBehaviour
         {
             onSpeedPad = false;
             Debug.Log("Exited Speed Pad: Speed restored to normal.");
+            // עצירת ה־Particle System עבור Speed Pad
+            if (speedPadParticleSystem != null && speedPadParticleSystem.isPlaying)
+            {
+                speedPadParticleSystem.Stop();
+                speedPadParticleSystem.gameObject.SetActive(false);
+            }
         }
     }
 }
