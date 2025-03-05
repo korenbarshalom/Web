@@ -1,0 +1,128 @@
+using System.Collections;
+using UnityEngine;
+
+public class PlayerController : MonoBehaviour
+{
+    [Header("References")]
+    public Animator animator;         // Animator component for the character
+    public AudioSource audioSource;   // Audio source for sound effects
+    public Camera cam;                // Camera used to determine attack direction
+
+    // ---------- //
+    // ANIMATIONS //
+    // ---------- //
+
+    public const string IDLE = "Idle";
+    public const string ATTACK1 = "Attack 1";
+    public const string ATTACK2 = "Attack 2";
+
+    string currentAnimationState;
+
+    public void ChangeAnimationState(string newState)
+    {
+        // מאפשרים קריאה חוזרת גם אם newState זהה למצב הנוכחי
+        currentAnimationState = newState;
+        animator.CrossFadeInFixedTime(currentAnimationState, 0.2f);
+    }
+
+    // ------------------- //
+    // ATTACKING BEHAVIOUR //
+    // ------------------- //
+
+    [Header("Attacking")]
+    public float attackDistance = 3f;     // מרחק התקפה
+    public int attackDamage = 1;          // נזק ההתקפה (ניתן להוסיף טיפול בהמשך)
+    public LayerMask attackLayer;         // שכבות בהן נבדקת קרן ההתקפה
+
+    public GameObject hitEffect;          // אפקט חלקיקים לנקודת הפגיעה
+    public AudioClip swordSwing;          // סאונד התקפה (חרב)
+    public AudioClip hitSound;            // סאונד פגיעה
+
+    // משתנה לניהול זמן המתנה בין התקפות
+    private bool canAttack = true;
+
+    // התקפה בלחיצה על כפתור העכבר השמאלי – Attack 1
+    public void AttackLeft()
+    {
+        if (!canAttack)
+            return;
+
+        canAttack = false;
+        ChangeAnimationState(ATTACK1);
+        StartCoroutine(PlaySoundWhenAnimationPlays(ATTACK1));
+        AttackRaycast();
+        StartCoroutine(AttackCooldown());
+    }
+
+    // התקפה בלחיצה על כפתור העכבר הימני – Attack 2
+    public void AttackRight()
+    {
+        if (!canAttack)
+            return;
+
+        canAttack = false;
+        ChangeAnimationState(ATTACK2);
+        StartCoroutine(PlaySoundWhenAnimationPlays(ATTACK2));
+        AttackRaycast();
+        StartCoroutine(AttackCooldown());
+    }
+
+    // קורוטינה שממתינה עד שהאנימציה הרצויה מופעלת ואז מנגנת את סאונד הנפת החרב
+    private IEnumerator PlaySoundWhenAnimationPlays(string attackAnimation)
+    {
+        // חכה עד שהאנימציה הרצויה מופעלת בלייאר 0
+        while (!animator.GetCurrentAnimatorStateInfo(0).IsName(attackAnimation))
+        {
+            yield return null;
+        }
+        // כשהאנימציה פעילה, השמע את סאונד הנפת החרב עם וריאציה קלה בפיץ'
+        audioSource.pitch = Random.Range(0.9f, 1.1f);
+        audioSource.PlayOneShot(swordSwing);
+    }
+
+    void AttackRaycast()
+    {
+        if (Physics.Raycast(cam.transform.position, cam.transform.forward, out RaycastHit hit, attackDistance, attackLayer))
+        {
+            // במידה והתקבלה התנגשות עם ה-attack layer,
+            // השהייה של חצי שניה לפני הפעלת אפקט הפגיעה
+            StartCoroutine(DelayedHitTarget(hit.point));
+        }
+    }
+
+    private IEnumerator DelayedHitTarget(Vector3 pos)
+    {
+        yield return new WaitForSeconds(0.5f);
+        HitTarget(pos);
+    }
+
+    void HitTarget(Vector3 pos)
+    {
+        audioSource.pitch = 1f;
+        audioSource.PlayOneShot(hitSound);
+
+        GameObject effect = Instantiate(hitEffect, pos, Quaternion.identity);
+        Destroy(effect, 20f);
+    }
+
+    // קורוטינה שמאפשרת התקפה חדשה רק לאחר חצי שניה
+    private IEnumerator AttackCooldown()
+    {
+        yield return new WaitForSeconds(0.5f);
+        canAttack = true;
+    }
+
+    void Update()
+    {
+        // לחיצה על כפתור העכבר השמאלי מפעילה את AttackLeft
+        if (Input.GetMouseButtonDown(0))
+        {
+            AttackLeft();
+        }
+        // לחיצה על כפתור העכבר הימני מפעילה את AttackRight
+        if (Input.GetMouseButtonDown(1))
+        {
+            AttackRight();
+        }
+    }
+}
