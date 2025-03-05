@@ -62,6 +62,9 @@ public class PlayerMovement : MonoBehaviour
     public float tiltSmooth = 5f;
     private float currentTilt = 0f;
 
+    [Header("Wall Run Particle System Settings")]
+    public ParticleSystem wallRunParticleSystem; // Particle System להפעלת אפקט Wall Run
+
     [Header("Rigidbody Settings")]
     public Rigidbody playerRigidbody;
 
@@ -202,6 +205,11 @@ public class PlayerMovement : MonoBehaviour
         {
             speedPadParticleSystem.gameObject.SetActive(false);
         }
+        // כבה את ה־Particle System עבור Wall Run כברירת מחדל
+        if (wallRunParticleSystem != null)
+        {
+            wallRunParticleSystem.gameObject.SetActive(false);
+        }
     }
 
     void Update()
@@ -275,6 +283,13 @@ public class PlayerMovement : MonoBehaviour
         currentTilt = Mathf.Lerp(currentTilt, targetTilt, tiltSmooth * Time.deltaTime);
         playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, currentTilt);
         transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
+
+        // בדיקה: אם לא במצב Wall Run וכעת ה־Particle System פעיל, כבהו
+        if (!isWallRunning && wallRunParticleSystem != null && wallRunParticleSystem.isPlaying)
+        {
+            wallRunParticleSystem.Stop();
+            wallRunParticleSystem.gameObject.SetActive(false);
+        }
 
         // אם איננו במצב Slide או Dash, ודא שה־Particle System של Dash כבוי
         if (!isSliding && !isDashing && dashParticleSystem != null && dashParticleSystem.isPlaying)
@@ -693,6 +708,12 @@ public class PlayerMovement : MonoBehaviour
                 {
                     wallRunSide = 0;
                 }
+                // הפעלת אפקט ה־Particle System עבור Wall Run
+                if (wallRunParticleSystem != null && !wallRunParticleSystem.isPlaying)
+                {
+                    wallRunParticleSystem.gameObject.SetActive(true);
+                    wallRunParticleSystem.Play();
+                }
                 Debug.Log("Wall running activated.");
             }
         }
@@ -760,7 +781,7 @@ public class PlayerMovement : MonoBehaviour
         {
             onSpeedPad = true;
             Debug.Log("Entered Speed Pad: Speed set to 40f.");
-            // לא מפעילים כאן את האפקט או הסאונד – ההפעלה מתבצעת ב־Update רק במידה וקיים תנועה
+            // לא מפעינים כאן את האפקט או הסאונד – ההפעלה מתבצעת ב־Update רק במידה וקיים תנועה
         }
     }
 
