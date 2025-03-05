@@ -8,11 +8,6 @@ public class PlayerMovement : MonoBehaviour
     [Header("Player & Cameras")]
     public Transform playerTransform;
     public Camera playerCamera;
-    public GameObject secondaryCameraObject;
-    public Transform attachedObject;
-    public Transform parentAttachmentPoint;
-    public GameObject targetObject;
-    public float switchDistance = 8f;
 
     [Header("Movement Settings")]
     public float walkSpeed = 10f;
@@ -49,9 +44,9 @@ public class PlayerMovement : MonoBehaviour
     public ParticleSystem dashParticleSystem;
 
     [Header("Dash Audio Settings")]
-    public AudioClip dashSound;             // הצליל שירוץ פעם אחת בעת ביצוע Dash
-    public AudioSource dashAudioSource;     // AudioSource לשינוי עוצמת הקול עבור Dash
-    public float dashSoundVolume = 1f;        // עוצמת קול עבור Dash
+    public AudioClip dashSound;
+    public AudioSource dashAudioSource;
+    public float dashSoundVolume = 1f;
 
     [Header("Wall Run Settings")]
     public float wallRunForwardSpeed = 20f;
@@ -63,7 +58,7 @@ public class PlayerMovement : MonoBehaviour
     private float currentTilt = 0f;
 
     [Header("Wall Run Particle System Settings")]
-    public ParticleSystem wallRunParticleSystem; // Particle System להפעלת אפקט Wall Run
+    public ParticleSystem wallRunParticleSystem;
 
     [Header("Rigidbody Settings")]
     public Rigidbody playerRigidbody;
@@ -83,9 +78,6 @@ public class PlayerMovement : MonoBehaviour
     private CharacterController characterController;
 
     public bool canMove = true;
-
-    private bool isUsingSecondaryCamera = false;
-    private bool isUsingCarPlayerCamera = false;
 
     private bool canJumpOnWall = false;
     private bool jumpPowerBoostActive = false;
@@ -109,32 +101,31 @@ public class PlayerMovement : MonoBehaviour
     private int wallRunSide = 0;
 
     [Header("Slide Audio Settings")]
-    public AudioClip slideSound;              // הצליל שירוץ כאשר מתחילים Slide
-    public AudioSource slideAudioSource;      // AudioSource לשינוי עוצמת הקול עבור Slide
-    public float slideSoundVolume = 1f;       // עוצמת קול עבור Slide
+    public AudioClip slideSound;
+    public AudioSource slideAudioSource;
+    public float slideSoundVolume = 1f;
 
     [Header("Jump Pad Audio Settings")]
-    public AudioClip jumpPadSound;            // הצליל שירוץ כאשר נוגעים ב-JumpPad
-    public AudioSource jumpPadAudioSource;    // AudioSource לשינוי עוצמת הקול עבור JumpPad
-    public float jumpPadSoundVolume = 1f;       // עוצמת קול עבור JumpPad
+    public AudioClip jumpPadSound;
+    public AudioSource jumpPadAudioSource;
+    public float jumpPadSoundVolume = 1f;
 
     [Header("Ledge Audio Settings")]
-    public AudioClip ledgeSound;              // הצליל שירוץ כאשר נוגעים ב-Ledge
-    public AudioSource ledgeAudioSource;      // AudioSource לשינוי עוצמת הקול עבור Ledge
-    public float ledgeSoundVolume = 1f;         // עוצמת קול עבור Ledge
+    public AudioClip ledgeSound;
+    public AudioSource ledgeAudioSource;
+    public float ledgeSoundVolume = 1f;
 
     [Header("Speed Pad Sound Settings")]
-    public AudioClip speedPadSound;           // הצליל שירוץ פעם אחת כאשר נוגעים באובייקט עם תגית "speed"
-    public AudioSource speedPadAudioSource;   // AudioSource לשינוי עוצמת הקול עבור Speed Pad
-    public float speedPadSoundVolume = 1f;      // עוצמת קול עבור Speed Pad
+    public AudioClip speedPadSound;
+    public AudioSource speedPadAudioSource;
+    public float speedPadSoundVolume = 1f;
 
     // משתנה לזיהוי אזור מהירות (Speed Pad)
     private bool onSpeedPad = false;
-    // משתנה בוליאני למעקב האם אפקט ה-Speed Pad כבר הופעל (למניעת הפעלה חוזרת)
+    // משתנה בוליאני למעקב האם אפקט ה-Speed Pad כבר הופעל
     private bool speedPadEffectStarted = false;
 
     [Header("Speed Pad Particle System Settings")]
-    // שדה להזנת ה־Particle System עבור Speed Pad
     public ParticleSystem speedPadParticleSystem;
 
     void Start()
@@ -147,8 +138,6 @@ public class PlayerMovement : MonoBehaviour
 
         if (playerCamera != null)
             playerCamera.enabled = true;
-        if (secondaryCameraObject != null)
-            secondaryCameraObject.SetActive(false);
 
         // ודא שיש AudioSource עבור Slide – אם לא, הוסף אחד
         if (slideAudioSource == null)
@@ -159,7 +148,6 @@ public class PlayerMovement : MonoBehaviour
         }
         slideAudioSource.volume = slideSoundVolume;
 
-        // ודא שיש AudioSource עבור JumpPad – אם לא, הוסף אחד
         if (jumpPadAudioSource == null)
         {
             jumpPadAudioSource = GetComponent<AudioSource>();
@@ -168,7 +156,6 @@ public class PlayerMovement : MonoBehaviour
         }
         jumpPadAudioSource.volume = jumpPadSoundVolume;
 
-        // ודא שיש AudioSource עבור Ledge – אם לא, הוסף אחד
         if (ledgeAudioSource == null)
         {
             ledgeAudioSource = GetComponent<AudioSource>();
@@ -177,7 +164,6 @@ public class PlayerMovement : MonoBehaviour
         }
         ledgeAudioSource.volume = ledgeSoundVolume;
 
-        // ודא שיש AudioSource עבור SpeedPad – אם לא, הוסף אחד
         if (speedPadAudioSource == null)
         {
             speedPadAudioSource = GetComponent<AudioSource>();
@@ -186,7 +172,6 @@ public class PlayerMovement : MonoBehaviour
         }
         speedPadAudioSource.volume = speedPadSoundVolume;
 
-        // ודא שיש AudioSource עבור Dash – אם לא, הוסף אחד
         if (dashAudioSource == null)
         {
             dashAudioSource = GetComponent<AudioSource>();
@@ -195,17 +180,14 @@ public class PlayerMovement : MonoBehaviour
         }
         dashAudioSource.volume = dashSoundVolume;
 
-        // כבה את ה־Particle System כברירת מחדל (ל-Dash)
         if (dashParticleSystem != null)
         {
             dashParticleSystem.gameObject.SetActive(false);
         }
-        // כבה את ה־Particle System עבור Speed Pad כברירת מחדל
         if (speedPadParticleSystem != null)
         {
             speedPadParticleSystem.gameObject.SetActive(false);
         }
-        // כבה את ה־Particle System עבור Wall Run כברירת מחדל
         if (wallRunParticleSystem != null)
         {
             wallRunParticleSystem.gameObject.SetActive(false);
@@ -258,15 +240,7 @@ public class PlayerMovement : MonoBehaviour
             StartCoroutine(JumpPowerBoostCoroutine());
         }
 
-        if (Input.GetKeyDown(KeyCode.V))
-        {
-            ToggleCameraAndMovement();
-        }
-
-        if (isUsingSecondaryCamera && Input.GetKeyDown(KeyCode.U))
-        {
-            ToggleCarCameraView();
-        }
+        // הקוד למעבר בין מצלמות הוסר
 
         if (canMove)
         {
@@ -284,26 +258,22 @@ public class PlayerMovement : MonoBehaviour
         playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, currentTilt);
         transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
 
-        // בדיקה: אם לא במצב Wall Run וכעת ה־Particle System פעיל, כבהו
         if (!isWallRunning && wallRunParticleSystem != null && wallRunParticleSystem.isPlaying)
         {
             wallRunParticleSystem.Stop();
             wallRunParticleSystem.gameObject.SetActive(false);
         }
 
-        // אם איננו במצב Slide או Dash, ודא שה־Particle System של Dash כבוי
         if (!isSliding && !isDashing && dashParticleSystem != null && dashParticleSystem.isPlaying)
         {
             dashParticleSystem.Stop();
             dashParticleSystem.gameObject.SetActive(false);
         }
 
-        // בדיקה אם השחקן נמצא על Speed Pad ובודקים תנועה
         if (onSpeedPad)
         {
             float horizontalInput = Input.GetAxis("Horizontal");
             float verticalInput = Input.GetAxis("Vertical");
-            // אם יש תנועה – הפעלת אפקט וסאונד (פעם אחת)
             if (Mathf.Abs(horizontalInput) > 0.1f || Mathf.Abs(verticalInput) > 0.1f)
             {
                 if (speedPadParticleSystem != null && !speedPadParticleSystem.isPlaying)
@@ -320,7 +290,6 @@ public class PlayerMovement : MonoBehaviour
                     speedPadEffectStarted = true;
                 }
             }
-            // אם אין תנועה – סגירת האפקט
             else
             {
                 if (speedPadParticleSystem != null && speedPadParticleSystem.isPlaying)
@@ -371,10 +340,8 @@ public class PlayerMovement : MonoBehaviour
             isOnSlideSurface = false;
         }
 
-        // התחלת Slide - כאשר לוחצים על LeftControl
         if (!isSliding && characterController.isGrounded && Input.GetKeyDown(KeyCode.LeftControl) && !leftControlDisabled)
         {
-            // הפעלת הצליל פעם אחת בעת התחלת Slide
             if (slideAudioSource != null && slideSound != null)
             {
                 slideAudioSource.PlayOneShot(slideSound);
@@ -488,7 +455,6 @@ public class PlayerMovement : MonoBehaviour
                 moveDirection.y -= gravity * Time.deltaTime;
         }
 
-        // שינוי מהירות בהתאם למצב – אם השחקן נמצא על Speed Pad, המהירות תהיה 40f, אחרת 22f.
         if (Input.GetKey(KeyCode.LeftControl) && !leftControlDisabled)
             characterController.height = crouchHeight;
         else
@@ -529,13 +495,11 @@ public class PlayerMovement : MonoBehaviour
         float dashSpeed = dashDistance / dashDuration;
         float timer = 0f;
 
-        // הפעלת הסאונד עבור Dash פעם אחת
         if (dashAudioSource != null && dashSound != null)
         {
             dashAudioSource.PlayOneShot(dashSound, dashSoundVolume);
         }
 
-        // הפעלת ה־Particle System עם SetActive(true) והפעלת האפקט
         if (dashParticleSystem != null)
         {
             dashParticleSystem.gameObject.SetActive(true);
@@ -549,7 +513,6 @@ public class PlayerMovement : MonoBehaviour
             yield return null;
         }
 
-        // עצירת ה־Particle System וסגירתו
         if (dashParticleSystem != null)
         {
             dashParticleSystem.Stop();
@@ -565,91 +528,11 @@ public class PlayerMovement : MonoBehaviour
         externalForce = boost;
     }
 
-    void ToggleCameraAndMovement()
-    {
-        if (targetObject == null || playerTransform == null || secondaryCameraObject == null)
-            return;
-
-        float distance = Vector3.Distance(playerTransform.position, targetObject.transform.position);
-
-        if (distance <= switchDistance)
-        {
-            isUsingSecondaryCamera = !isUsingSecondaryCamera;
-
-            if (isUsingSecondaryCamera)
-            {
-                playerCamera.enabled = false;
-                secondaryCameraObject.SetActive(true);
-                isUsingCarPlayerCamera = false;
-                canMove = false;
-
-                if (attachedObject != null)
-                {
-                    playerTransform.SetParent(attachedObject);
-
-                    if (parentAttachmentPoint != null)
-                    {
-                        playerTransform.position = parentAttachmentPoint.position;
-                        playerTransform.rotation = parentAttachmentPoint.rotation;
-                    }
-                    else
-                    {
-                        playerTransform.localPosition = Vector3.zero;
-                        playerTransform.localRotation = Quaternion.identity;
-                    }
-                }
-                if (characterController != null)
-                    characterController.enabled = false;
-                Debug.Log("Player switched to car mode (secondary camera).");
-            }
-            else
-            {
-                playerCamera.enabled = true;
-                secondaryCameraObject.SetActive(false);
-                canMove = true;
-                playerTransform.SetParent(null);
-
-                if (attachedObject != null)
-                    playerTransform.position = attachedObject.position - attachedObject.forward * 5f;
-                if (characterController != null)
-                    characterController.enabled = true;
-                isUsingCarPlayerCamera = false;
-                Debug.Log("Player exited car mode (primary camera active).");
-            }
-        }
-        else
-        {
-            Debug.Log("Player is too far away (max " + switchDistance + "m) to switch.");
-        }
-    }
-
-    void ToggleCarCameraView()
-    {
-        if (playerCamera == null || secondaryCameraObject == null)
-            return;
-
-        if (!isUsingCarPlayerCamera)
-        {
-            secondaryCameraObject.SetActive(false);
-            playerCamera.enabled = true;
-            isUsingCarPlayerCamera = true;
-            Debug.Log("Switched to main camera view in car mode.");
-        }
-        else
-        {
-            playerCamera.enabled = false;
-            secondaryCameraObject.SetActive(true);
-            isUsingCarPlayerCamera = false;
-            Debug.Log("Switched back to secondary car camera view.");
-        }
-    }
-
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
         if (hit.gameObject.CompareTag("JumpPad"))
         {
             moveDirection.y = jumpPadForce;
-            // הפעלת הצליל עבור JumpPad פעם אחת
             if (jumpPadAudioSource != null && jumpPadSound != null)
             {
                 jumpPadAudioSource.volume = jumpPadSoundVolume;
@@ -662,7 +545,6 @@ public class PlayerMovement : MonoBehaviour
         if (!isLedgeGrabbing && !characterController.isGrounded &&
             hit.gameObject.layer == LayerMask.NameToLayer("Ledge"))
         {
-            // הפעלת הצליל עבור Ledge פעם אחת
             if (ledgeAudioSource != null && ledgeSound != null)
             {
                 ledgeAudioSource.volume = ledgeSoundVolume;
@@ -708,7 +590,6 @@ public class PlayerMovement : MonoBehaviour
                 {
                     wallRunSide = 0;
                 }
-                // הפעלת אפקט ה־Particle System עבור Wall Run
                 if (wallRunParticleSystem != null && !wallRunParticleSystem.isPlaying)
                 {
                     wallRunParticleSystem.gameObject.SetActive(true);
@@ -717,7 +598,6 @@ public class PlayerMovement : MonoBehaviour
                 Debug.Log("Wall running activated.");
             }
         }
-        // הפעלת ה־Particle System כאשר נוגעים באובייקט עם תגית "slide"
         if (hit.gameObject.CompareTag("slide"))
         {
             if (dashParticleSystem != null && !dashParticleSystem.isPlaying)
@@ -733,8 +613,6 @@ public class PlayerMovement : MonoBehaviour
         if (collision.gameObject.CompareTag("slide"))
         {
             isOnSlideSurface = true;
-            // כאן נמנע הפעלת ה־Particle System על ידי התנגשות עם "slide"
-            // מכיוון שהאפקט אמור להפעיל רק בדאש או במגע עם "side"
         }
     }
 
@@ -774,14 +652,12 @@ public class PlayerMovement : MonoBehaviour
         leftControlDisabled = false;
     }
 
-    // --- Trigger methods for Speed Pad ---
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("speed"))
         {
             onSpeedPad = true;
             Debug.Log("Entered Speed Pad: Speed set to 40f.");
-            // לא מפעינים כאן את האפקט או הסאונד – ההפעלה מתבצעת ב־Update רק במידה וקיים תנועה
         }
     }
 
