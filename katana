@@ -8,11 +8,17 @@ public class PlayerController : MonoBehaviour
     public AudioSource audioSource;   // Audio source for sound effects
     public Camera cam;                // Camera used to determine attack direction
 
+    [Header("Player Reference")]
+    public GameObject player;         // שדה להזנת השחקן
+
+    [Header("Enemy Reference")]
+    public GameObject enemy;          // שדה להזנת האויב (ניתן לגרור את האובייקט מה־Inspector)
+
     // ---------- //
     // ANIMATIONS //
     // ---------- //
-
     public const string IDLE = "Idle";
+    public const string WALK = "Walk";
     public const string ATTACK1 = "Attack 1";
     public const string ATTACK2 = "Attack 2";
 
@@ -20,7 +26,6 @@ public class PlayerController : MonoBehaviour
 
     public void ChangeAnimationState(string newState)
     {
-        // מאפשרים קריאה חוזרת גם אם newState זהה למצב הנוכחי
         currentAnimationState = newState;
         animator.CrossFadeInFixedTime(currentAnimationState, 0.2f);
     }
@@ -28,17 +33,15 @@ public class PlayerController : MonoBehaviour
     // ------------------- //
     // ATTACKING BEHAVIOUR //
     // ------------------- //
-
     [Header("Attacking")]
-    public float attackDistance = 3f;     // מרחק התקפה
-    public int attackDamage = 1;          // נזק ההתקפה (ניתן להוסיף טיפול בהמשך)
-    public LayerMask attackLayer;         // שכבות בהן נבדקת קרן ההתקפה
+    public float attackDistance = 3f;
+    public int attackDamage = 50;          // כל התקפה מורידה 50 נקודות חיים
+    public LayerMask attackLayer;
 
-    public GameObject hitEffect;          // אפקט חלקיקים לנקודת הפגיעה
-    public AudioClip swordSwing;          // סאונד התקפה (חרב)
-    public AudioClip hitSound;            // סאונד פגיעה
+    public GameObject hitEffect;
+    public AudioClip swordSwing;
+    public AudioClip hitSound;
 
-    // משתנה לניהול זמן המתנה בין התקפות
     private bool canAttack = true;
 
     // התקפה בלחיצה על כפתור העכבר השמאלי – Attack 1
@@ -48,9 +51,11 @@ public class PlayerController : MonoBehaviour
             return;
 
         canAttack = false;
+        animator.SetBool(WALK, false);
         ChangeAnimationState(ATTACK1);
         StartCoroutine(PlaySoundWhenAnimationPlays(ATTACK1));
         AttackRaycast();
+        TryDamageEnemy();
         StartCoroutine(AttackCooldown());
     }
 
@@ -61,21 +66,21 @@ public class PlayerController : MonoBehaviour
             return;
 
         canAttack = false;
+        animator.SetBool(WALK, false);
         ChangeAnimationState(ATTACK2);
         StartCoroutine(PlaySoundWhenAnimationPlays(ATTACK2));
         AttackRaycast();
+        TryDamageEnemy();
         StartCoroutine(AttackCooldown());
     }
 
-    // קורוטינה שממתינה עד שהאנימציה הרצויה מופעלת ואז מנגנת את סאונד הנפת החרב
+    // קורוטינה שממתינה עד שהאנימציה הרצויה מופעלת ואז מנגנת את סאונד החרב
     private IEnumerator PlaySoundWhenAnimationPlays(string attackAnimation)
     {
-        // חכה עד שהאנימציה הרצויה מופעלת בלייאר 0
         while (!animator.GetCurrentAnimatorStateInfo(0).IsName(attackAnimation))
         {
             yield return null;
         }
-        // כשהאנימציה פעילה, השמע את סאונד הנפת החרב עם וריאציה קלה בפיץ'
         audioSource.pitch = Random.Range(0.9f, 1.1f);
         audioSource.PlayOneShot(swordSwing);
     }
@@ -84,8 +89,6 @@ public class PlayerController : MonoBehaviour
     {
         if (Physics.Raycast(cam.transform.position, cam.transform.forward, out RaycastHit hit, attackDistance, attackLayer))
         {
-            // במידה והתקבלה התנגשות עם ה-attack layer,
-            // השהייה של חצי שניה לפני הפעלת אפקט הפגיעה
             StartCoroutine(DelayedHitTarget(hit.point));
         }
     }
@@ -112,17 +115,54 @@ public class PlayerController : MonoBehaviour
         canAttack = true;
     }
 
+    // בודקת אם האויב נמצא במרחק 5 מטר מהשחקן ומוודאת שהאויב לא מת
+    private void TryDamageEnemy()
+    {
+        GameObject enemyObj = enemy != null ? enemy : GameObject.FindGameObjectWithTag("enemy");
+        if (enemyObj != null)
+        {
+            SimpleEnemyHealth enemyHealth = enemyObj.GetComponent<SimpleEnemyHealth>();
+            // אם האויב קיים ועדיין חי
+            if (enemyHealth != null && !enemyHealth.isDead)
+            {
+                Vector3 playerPos = (player != null) ? player.transform.position : transform.position;
+                float distance = Vector3.Distance(playerPos, enemyObj.transform.position);
+                if (distance <= 7f)
+                {
+                    StartCoroutine(DamageEnemy(enemyObj));
+                }
+            }
+        }
+    }
+
+    // קורוטינה שממתינה חצי שניה ואז מורידה 50 נקודות חיים מהאויב דרך SimpleEnemyHealth
+    private IEnumerator DamageEnemy(GameObject enemyObj)
+    {
+        yield return new WaitForSeconds(0.5f);
+        SimpleEnemyHealth enemyHealth = enemyObj.GetComponent<SimpleEnemyHealth>();
+        if (enemyHealth != null && !enemyHealth.isDead)
+        {
+            enemyHealth.TakeDamage(attackDamage);
+        }
+    }
+
     void Update()
     {
-        // לחיצה על כפתור העכבר השמאלי מפעילה את AttackLeft
         if (Input.GetMouseButtonDown(0))
         {
             AttackLeft();
         }
-        // לחיצה על כפתור העכבר הימני מפעילה את AttackRight
         if (Input.GetMouseButtonDown(1))
         {
             AttackRight();
+        }
+
+        if (!animator.GetCurrentAnimatorStateInfo(0).IsName(ATTACK1) &&
+            !animator.GetCurrentAnimatorStateInfo(0).IsName(ATTACK2))
+        {
+            bool isMoving = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) ||
+                            Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D);
+            animator.SetBool(WALK, isMoving);
         }
     }
 }
