@@ -1,0 +1,126 @@
+using UnityEngine;
+using System.Collections;
+
+public class MoveForward : MonoBehaviour
+{
+    public float forwardSpeed = 10f;      // מהירות תנועה קדימה
+    public float turnSpeed = 100f;        // מהירות סיבוב (מעלות לשנייה)
+    public GameObject mainCamera;         // המצלמה הראשית
+    public GameObject objectCamera;       // מצלמת האובייקט (אם בשימוש)
+    public Transform startPosition;       // נקודת ההתחלה של האובייקט כאשר נורית
+    public Transform respawnPosition;     // נקודה קבועה להחזרת האובייקט לאחר שהוא נעלם
+
+    // אובייקט דרוש לירי – ניתן להגדירו בשדה זה, והירי יתאפשר רק אם הוא פעיל
+    public GameObject requiredShootObject;
+
+    private bool shouldMove = false;      // האם האובייקט בתנועה
+    private bool canShoot = true;         // האם מותר לשגר את האובייקט (ניתן לשיגור חדש רק אחרי שהאובייקט "מתעורר")
+
+    void Update()
+    {
+        // בדיקה: ניתן ללחוץ על לחצן העכבר השמאלי רק אם canShoot=true וגם requiredShootObject (אם מוגדר) פעיל
+        if (Input.GetMouseButtonDown(0) && canShoot)
+        {
+            if (requiredShootObject != null && !requiredShootObject.activeSelf)
+            {
+                Debug.Log("אין אפשרות לירות – האובייקט הדרוש אינו פעיל.");
+                return;
+            }
+
+            // מעבירים את האובייקט לנקודת ההתחלה ומגדירים את הסיבוב לפי המצלמה הראשית
+            if (startPosition != null)
+            {
+                transform.position = startPosition.position;
+            }
+            else
+            {
+                Debug.LogWarning("startPosition לא הוגדר במשתנה");
+            }
+
+            if (mainCamera != null)
+            {
+                transform.rotation = mainCamera.transform.rotation;
+            }
+            else
+            {
+                Debug.LogWarning("mainCamera לא הוגדר במשתנה");
+            }
+
+            // מתחילים את התנועה ומעדכנים שאין אפשרות לשיגור נוסף עד להחזרה
+            shouldMove = true;
+            canShoot = false;
+
+            // החלפת מצלמות: כיבוי המצלמה הראשית והפעלת מצלמת האובייקט (אם רלוונטי)
+            if (mainCamera != null)
+                mainCamera.SetActive(false);
+            if (objectCamera != null)
+                objectCamera.SetActive(true);
+        }
+
+        if (shouldMove)
+        {
+            // מאפשר סיבוב עם העכבר כך שהשחקן יכול לשנות את כיוון התנועה לאחר השיגור
+            float mouseX = Input.GetAxis("Mouse X");
+            float mouseY = Input.GetAxis("Mouse Y");
+
+            // סיבוב סביב ציר Y (ימינה/שמאלה)
+            transform.Rotate(0, mouseX * turnSpeed * Time.deltaTime, 0);
+            // סיבוב סביב ציר X (למעלה/למטה)
+            transform.Rotate(-mouseY * turnSpeed * Time.deltaTime, 0, 0);
+
+            // תנועה קדימה בהתאם לכיוון הנוכחי של האובייקט
+            transform.Translate(Vector3.forward * forwardSpeed * Time.deltaTime, Space.Self);
+        }
+    }
+
+    // מתודה שתופעל כאשר האובייקט מתנגש עם Collider שהוגדר כ־trigger
+    void OnTriggerEnter(Collider other)
+    {
+        // עוצרים את התנועה
+        shouldMove = false;
+
+        // מחליפים חזרה למצלמה הראשית
+        if (mainCamera != null)
+            mainCamera.SetActive(true);
+        if (objectCamera != null)
+            objectCamera.SetActive(false);
+
+        // "מסתירים" את האובייקט ע"י כיבוי המרכיבים הגרפיים והפיזיים
+        MeshRenderer mr = GetComponent<MeshRenderer>();
+        if (mr != null)
+            mr.enabled = false;
+        Collider coll = GetComponent<Collider>();
+        if (coll != null)
+            coll.enabled = false;
+
+        // מפעילים קורוטינה שממתינה שניה ואז מחזירה את האובייקט "לחיים"
+        StartCoroutine(Respawn());
+    }
+
+    // קורוטינה שממתינה שניה ואז מחזירה את האובייקט "לחיים"
+    IEnumerator Respawn()
+    {
+        yield return new WaitForSeconds(1f);
+
+        // מעבירים את האובייקט לנקודת ההחזרה שהוגדרה
+        if (respawnPosition != null)
+        {
+            transform.position = respawnPosition.position;
+        }
+        else
+        {
+            Debug.LogWarning("respawnPosition לא הוגדר במשתנה");
+        }
+
+        // מחזירים את המרכיבים הגרפיים והפיזיים כדי שהאובייקט יופיע שוב
+        MeshRenderer mr = GetComponent<MeshRenderer>();
+        if (mr != null)
+            mr.enabled = true;
+        Collider coll = GetComponent<Collider>();
+        if (coll != null)
+            coll.enabled = true;
+
+        // מאפשרים שוב לשגר את האובייקט
+        canShoot = true;
+    }
+}
