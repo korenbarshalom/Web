@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI; // הוספת שימוש ב-UI
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : MonoBehaviour
@@ -14,7 +15,7 @@ public class PlayerMovement : MonoBehaviour
     public float runSpeed = 15f;
     public float jumpPower = 7f;
     public float gravity = 10f;
-    public float lookSpeed = 2f;
+    public float lookSpeed = 2f;   // רגישות עכבר (ניתן לעדכן באמצעות הסליידר)
     public float lookXLimit = 45f;
     public float defaultHeight = 2f;
     public float crouchHeight = 1f;
@@ -104,9 +105,17 @@ public class PlayerMovement : MonoBehaviour
     private int wallRunSide = 0;
 
     [Header("Slide Audio Settings")]
-    public AudioClip slideSound;              // הצליל שירוץ כאשר מתחילים Slide
+    public AudioClip slideSound;              // הצליל שירוץ כאשר מתחילים Slide (למשטחים שאינם "slide")
     public AudioSource slideAudioSource;      // AudioSource לשינוי עוצמת הקול עבור Slide
     public float slideSoundVolume = 1f;       // עוצמת קול עבור Slide
+
+    [Header("Slide Object Audio Settings")]
+    // הצלילים עבור מצב החלקה על אובייקטים עם תגית "slide"
+    public AudioClip slideStartSound;         // סאונד התחלה
+    public AudioClip slideLoopSound;          // סאונד לופ
+    public AudioClip slideEndSound;           // סאונד סיום
+    public AudioSource slideObjectAudioSource;// AudioSource עבור Slide על אובייקטים עם תגית "slide"
+    public float slideObjectSoundVolume = 1f; // עוצמת קול עבור Slide על אובייקטים עם תגית "slide"
 
     [Header("Jump Pad Audio Settings")]
     public AudioClip jumpPadSound;            // הצליל שירוץ כאשר נוגעים ב-JumpPad
@@ -132,6 +141,63 @@ public class PlayerMovement : MonoBehaviour
     // שדה להזנת ה־Particle System עבור Speed Pad
     public ParticleSystem speedPadParticleSystem;
 
+    [Header("UI Settings")]
+    // שדה לחיבור הסליידר לשליטה ברגישות העכבר (Mouse Sensitivity)
+    public Slider mouseSensitivitySlider;
+
+    // --- משתנים עבור ניהול סאונד Slide על אובייקטים עם תגית "slide" ---
+    private Coroutine slideObjectSoundCoroutineRef = null;
+    private bool _objectSlidingSoundActive = false;
+    private bool objectSlidingSoundActive
+    {
+        get { return _objectSlidingSoundActive; }
+        set
+        {
+            if (value != _objectSlidingSoundActive)
+            {
+                if (value)
+                {
+                    // התחלת מצב החלקה – מנגן את סאונד ההתחלה ואחריו הלופ
+                    if (slideObjectSoundCoroutineRef != null)
+                        StopCoroutine(slideObjectSoundCoroutineRef);
+                    slideObjectSoundCoroutineRef = StartCoroutine(SlideObjectSoundCoroutine());
+                }
+                else
+                {
+                    // סיום מצב החלקה – עוצר את הקורוטינה ומנגן את סאונד הסיום
+                    if (slideObjectSoundCoroutineRef != null)
+                    {
+                        StopCoroutine(slideObjectSoundCoroutineRef);
+                        slideObjectSoundCoroutineRef = null;
+                    }
+                    if (slideObjectAudioSource.isPlaying)
+                        slideObjectAudioSource.Stop();
+                    slideObjectAudioSource.loop = false;
+                    slideObjectAudioSource.PlayOneShot(slideEndSound, slideObjectSoundVolume);
+                }
+            }
+            _objectSlidingSoundActive = value;
+        }
+    }
+
+    // קורוטינה שמתחילה את סאונד ההתחלה ואז עובר ללופ
+    private IEnumerator SlideObjectSoundCoroutine()
+    {
+        slideObjectAudioSource.loop = false;
+        slideObjectAudioSource.clip = slideStartSound;
+        slideObjectAudioSource.Play();
+        // ממתינים לסיום סאונד ההתחלה
+        while (slideObjectAudioSource.isPlaying)
+        {
+            yield return null;
+        }
+        // לאחר מכן, מעבירים ללופ
+        slideObjectAudioSource.clip = slideLoopSound;
+        slideObjectAudioSource.loop = true;
+        slideObjectAudioSource.Play();
+    }
+    // --- סוף ניהול סאונד Slide ---
+
     void Start()
     {
         characterController = GetComponent<CharacterController>();
@@ -151,6 +217,15 @@ public class PlayerMovement : MonoBehaviour
                 slideAudioSource = gameObject.AddComponent<AudioSource>();
         }
         slideAudioSource.volume = slideSoundVolume;
+
+        // ודא שיש AudioSource עבור Slide Object – אם לא, הוסף אחד
+        if (slideObjectAudioSource == null)
+        {
+            slideObjectAudioSource = GetComponent<AudioSource>();
+            if (slideObjectAudioSource == null)
+                slideObjectAudioSource = gameObject.AddComponent<AudioSource>();
+        }
+        slideObjectAudioSource.volume = slideObjectSoundVolume;
 
         // ודא שיש AudioSource עבור JumpPad – אם לא, הוסף אחד
         if (jumpPadAudioSource == null)
@@ -207,6 +282,12 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        // עדכון רגישות העכבר לפי ערך הסליידר, במידה והוא מחובר
+        if (mouseSensitivitySlider != null)
+        {
+            lookSpeed = mouseSensitivitySlider.value;
+        }
+
         if (dashCooldownTimer > 0f)
             dashCooldownTimer -= Time.deltaTime;
 
@@ -315,6 +396,13 @@ public class PlayerMovement : MonoBehaviour
                 speedPadEffectStarted = false;
             }
         }
+
+        // ניהול סאונד Slide עבור אובייקטים עם תגית "slide"
+        bool shouldPlaySlideObjectSound = isOnSlideSurface && isSliding;
+        if (shouldPlaySlideObjectSound != objectSlidingSoundActive)
+        {
+            objectSlidingSoundActive = shouldPlaySlideObjectSound;
+        }
     }
 
     void HandleMovement()
@@ -358,10 +446,13 @@ public class PlayerMovement : MonoBehaviour
         // התחלת Slide - כאשר לוחצים על LeftControl
         if (!isSliding && characterController.isGrounded && Input.GetKeyDown(KeyCode.LeftControl) && !leftControlDisabled)
         {
-            // הפעלת הצליל פעם אחת בעת התחלת Slide
-            if (slideAudioSource != null && slideSound != null)
+            // במידה ומתחילים החלקה על משטח עם תגית "slide" – לא מנגנים כאן סאונד חד פעמי,
+            // אלא הסאונד ינוהל דרך מערכת הסאונד שהוספנו (objectSlidingSoundActive).
+            if (!isOnSlideSurface)
             {
-                slideAudioSource.PlayOneShot(slideSound);
+                // במידה והמשטח אינו "slide" – מנגנים את הסאונד הרגיל ל-Slide
+                if (slideAudioSource != null && slideSound != null)
+                    slideAudioSource.PlayOneShot(slideSound, slideSoundVolume);
             }
 
             if (isOnSlideSurface && onSlope)
@@ -549,8 +640,6 @@ public class PlayerMovement : MonoBehaviour
         externalForce = boost;
     }
 
-    // המתודות הבאות הוסרו: ToggleCameraAndMovement() ו-ToggleCarCameraView()
-
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
         if (hit.gameObject.CompareTag("JumpPad"))
@@ -641,7 +730,6 @@ public class PlayerMovement : MonoBehaviour
         {
             isOnSlideSurface = true;
             // כאן נמנע הפעלת ה־Particle System על ידי התנגשות עם "slide"
-            // מכיוון שהאפקט אמור להפעיל רק בדאש או במגע עם "side"
         }
     }
 
