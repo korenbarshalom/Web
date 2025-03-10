@@ -1,0 +1,153 @@
+using UnityEngine;
+using System.Collections;
+
+public class Gun11 : MonoBehaviour
+{
+    // נקודת ה-FirePoint שממנה יוצא הכדור
+    public Transform firePoint;
+    // הפריפאב של הכדור
+    public GameObject bulletPrefab;
+    // האובייקט שיסובב בזמן ה־reload
+    public Transform reloadRotateObject;
+    // מערך של אובייקטים נוספים שיסובבו (וגם יזוזו) בזמן ה־reload
+    public Transform[] additionalReloadRotateObjects;
+
+    // רכיבי AudioSource נפרדים לכל אחד מהצלילים
+    public AudioSource shootAudioSource;
+    public AudioSource reloadAudioSource;
+    // הצליל שישמע בכל יריה
+    public AudioClip shootSound;
+    // הצליל שישמע פעם אחת כאשר מתבצע reload
+    public AudioClip reloadSound;
+
+    // Particle System שיפעל פעם אחת בכל יריה
+    public ParticleSystem shootParticle;
+
+    // ספירת יריות כדי לדעת מתי לבצע reload (כל 2 יריות)
+    private int shotCounter = 0;
+    // משתנה לבדיקת מצב reload
+    private bool isReloading = false;
+
+    void Update()
+    {
+        // בזמן reload אין אפשרות לירות
+        if (isReloading)
+            return;
+
+        // כאשר לוחצים על המקש השמאלי בעכבר
+        if (Input.GetMouseButtonDown(0))
+        {
+            // יורים כדור
+            Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+
+            // הפעלת Particle System במקרה שהוא מוגדר
+            if (shootParticle != null)
+            {
+                shootParticle.Play();
+            }
+
+            // ניגון צליל יריה דרך רכיב ה-shootAudioSource
+            if (shootAudioSource != null && shootSound != null)
+            {
+                shootAudioSource.PlayOneShot(shootSound);
+            }
+
+            shotCounter++;
+
+            // כאשר נורים 2 פעמים, מתחילים את תהליך ה-reload
+            if (shotCounter >= 2)
+            {
+                shotCounter = 0;
+                StartCoroutine(ReloadCoroutine());
+            }
+        }
+    }
+
+    private IEnumerator ReloadCoroutine()
+    {
+        isReloading = true;
+
+        // ניגון צליל reload פעם אחת בתחילת תהליך ה-reload דרך רכיב ה-reloadAudioSource
+        if (reloadAudioSource != null && reloadSound != null)
+        {
+            reloadAudioSource.PlayOneShot(reloadSound);
+        }
+
+        // משך זמן ה-reload
+        float reloadDuration = 1f;
+        float halfDuration = reloadDuration / 2f;  // 0.5 שניות לכל כיוון
+
+        // --- סיבוב האובייקט הראשי ---
+        // שמירת הסיבוב המקומי המקורי של האובייקט הראשי
+        Quaternion originalLocalRotation = reloadRotateObject.localRotation;
+        // הגדרת הסיבוב המטרה: +40 מעלות סביב ציר ה-X
+        Quaternion targetLocalRotation = originalLocalRotation * Quaternion.Euler(40, 0, 0);
+
+        // --- סיבוב ואנימציית תזוזת האובייקטים הנוספים ---
+        // שמירת הסיבובים המקוריים לאובייקטים הנוספים
+        Quaternion[] additionalOriginalRotations = new Quaternion[additionalReloadRotateObjects.Length];
+        Quaternion[] additionalTargetRotations = new Quaternion[additionalReloadRotateObjects.Length];
+        // שמירת המיקומים המקוריים והגדרת המיקומים המטרה (הסטה של 3 יחידות לאורך ציר ה-Y)
+        Vector3[] additionalOriginalPositions = new Vector3[additionalReloadRotateObjects.Length];
+        Vector3[] additionalTargetPositions = new Vector3[additionalReloadRotateObjects.Length];
+
+        for (int i = 0; i < additionalReloadRotateObjects.Length; i++)
+        {
+            additionalOriginalRotations[i] = additionalReloadRotateObjects[i].localRotation;
+            additionalTargetRotations[i] = additionalOriginalRotations[i] * Quaternion.Euler(40, 0, 0);
+
+            additionalOriginalPositions[i] = additionalReloadRotateObjects[i].localPosition;
+            additionalTargetPositions[i] = additionalOriginalPositions[i] + new Vector3(0f, -0.2f, 0f);
+        }
+
+        // --- חצי ראשון של אנימציית ה-reload ---
+        // סיבוב בהדרגה מהמצב המקורי למצב המטרה במשך 0.5 שניות
+        float elapsed = 0f;
+        while (elapsed < halfDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / halfDuration);
+
+            // עדכון סיבוב האובייקט הראשי
+            reloadRotateObject.localRotation = Quaternion.Lerp(originalLocalRotation, targetLocalRotation, t);
+
+            // עדכון סיבוב ומיקום האובייקטים הנוספים
+            for (int i = 0; i < additionalReloadRotateObjects.Length; i++)
+            {
+                additionalReloadRotateObjects[i].localRotation = Quaternion.Lerp(additionalOriginalRotations[i], additionalTargetRotations[i], t);
+                additionalReloadRotateObjects[i].localPosition = Vector3.Lerp(additionalOriginalPositions[i], additionalTargetPositions[i], t);
+            }
+            yield return null;
+        }
+
+        // --- חצי שני של אנימציית ה-reload ---
+        // חזרה בהדרגה למצב המקורי במשך 0.5 שניות
+        elapsed = 0f;
+        while (elapsed < halfDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / halfDuration);
+
+            // עדכון סיבוב האובייקט הראשי
+            reloadRotateObject.localRotation = Quaternion.Lerp(targetLocalRotation, originalLocalRotation, t);
+
+            // עדכון סיבוב ומיקום האובייקטים הנוספים
+            for (int i = 0; i < additionalReloadRotateObjects.Length; i++)
+            {
+                additionalReloadRotateObjects[i].localRotation = Quaternion.Lerp(additionalTargetRotations[i], additionalOriginalRotations[i], t);
+                additionalReloadRotateObjects[i].localPosition = Vector3.Lerp(additionalTargetPositions[i], additionalOriginalPositions[i], t);
+            }
+            yield return null;
+        }
+
+        // ווידוא שהאובייקטים חוזרים בדיוק למצב המקורי
+        reloadRotateObject.localRotation = originalLocalRotation;
+        for (int i = 0; i < additionalReloadRotateObjects.Length; i++)
+        {
+            additionalReloadRotateObjects[i].localRotation = additionalOriginalRotations[i];
+            additionalReloadRotateObjects[i].localPosition = additionalOriginalPositions[i];
+        }
+
+        isReloading = false;
+    }
+}
