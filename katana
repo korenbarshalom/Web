@@ -9,10 +9,16 @@ public class PlayerController : MonoBehaviour
     public Camera cam;                // Camera used to determine attack direction
 
     [Header("Player Reference")]
-    public GameObject player;         // שדה להזנת השחקן
+    public GameObject player;         // Reference to the player
 
     [Header("Enemy Reference")]
-    public GameObject enemy;          // שדה להזנת האויב (ניתן לגרור את האובייקט מה־Inspector)
+    public GameObject enemy;          // Reference to the enemy (can be assigned from the Inspector)
+
+    [Header("Enemy Damage Particle")]
+    public GameObject enemyDamageParticle; // Particle effect when the enemy takes damage
+
+    [Header("Enemy Damage Particle Spawn Location")]
+    public Transform enemyDamageSpawnLocation; // The location where the enemy damage particle effect should appear
 
     // ---------- //
     // ANIMATIONS //
@@ -21,6 +27,8 @@ public class PlayerController : MonoBehaviour
     public const string WALK = "Walk";
     public const string ATTACK1 = "Attack 1";
     public const string ATTACK2 = "Attack 2";
+    public const string ATTACK3 = "Attack 3"; // הוספת אנימציית התקפה 3
+    public const string ATTACK4 = "Attack 4"; // הוספת אנימציית התקפה 4
 
     string currentAnimationState;
 
@@ -35,7 +43,7 @@ public class PlayerController : MonoBehaviour
     // ------------------- //
     [Header("Attacking")]
     public float attackDistance = 3f;
-    public int attackDamage = 50;          // כל התקפה מורידה 50 נקודות חיים
+    public int attackDamage = 50;          // Each attack reduces health by 50 points
     public LayerMask attackLayer;
 
     public GameObject hitEffect;
@@ -43,8 +51,12 @@ public class PlayerController : MonoBehaviour
     public AudioClip hitSound;
 
     private bool canAttack = true;
+    // Variable to flip hitEffect rotation alternately
+    private bool flipHitEffectRotation = false;
+    // משתנה שמחליף בין התקפה 1 להתקפה 2 בלחיצה על העכבר השמאלי
+    private bool useAttack1 = true;
 
-    // התקפה בלחיצה על כפתור העכבר השמאלי – Attack 1
+    // Attack with left click – Attack 1
     public void AttackLeft()
     {
         if (!canAttack)
@@ -59,7 +71,7 @@ public class PlayerController : MonoBehaviour
         StartCoroutine(AttackCooldown());
     }
 
-    // התקפה בלחיצה על כפתור העכבר הימני – Attack 2
+    // Attack with left click – Attack 2 (בלחיצה השניה על העכבר השמאלי)
     public void AttackRight()
     {
         if (!canAttack)
@@ -74,7 +86,37 @@ public class PlayerController : MonoBehaviour
         StartCoroutine(AttackCooldown());
     }
 
-    // קורוטינה שממתינה עד שהאנימציה הרצויה מופעלת ואז מנגנת את סאונד החרב
+    // Attack with right click – Attack 3 (הועבר למקש העכבר הימני)
+    public void Attack3()
+    {
+        if (!canAttack)
+            return;
+
+        canAttack = false;
+        animator.SetBool(WALK, false);
+        ChangeAnimationState(ATTACK3);
+        StartCoroutine(PlaySoundWhenAnimationPlays(ATTACK3));
+        AttackRaycast();
+        TryDamageEnemy();
+        StartCoroutine(AttackCooldown());
+    }
+
+    // Attack with key R – Attack 4
+    public void Attack4()
+    {
+        if (!canAttack)
+            return;
+
+        canAttack = false;
+        animator.SetBool(WALK, false);
+        ChangeAnimationState(ATTACK4);
+        StartCoroutine(PlaySoundWhenAnimationPlays(ATTACK4));
+        AttackRaycast();
+        TryDamageEnemy();
+        StartCoroutine(AttackCooldown());
+    }
+
+    // Coroutine that waits until the animation state is active before playing the sword swing sound
     private IEnumerator PlaySoundWhenAnimationPlays(string attackAnimation)
     {
         while (!animator.GetCurrentAnimatorStateInfo(0).IsName(attackAnimation))
@@ -89,40 +131,52 @@ public class PlayerController : MonoBehaviour
     {
         if (Physics.Raycast(cam.transform.position, cam.transform.forward, out RaycastHit hit, attackDistance, attackLayer))
         {
-            StartCoroutine(DelayedHitTarget(hit.point));
+            // Pass both the hit point and hit normal to align the effect with the impacted surface.
+            StartCoroutine(DelayedHitTarget(hit.point, hit.normal));
         }
     }
 
-    private IEnumerator DelayedHitTarget(Vector3 pos)
+    private IEnumerator DelayedHitTarget(Vector3 pos, Vector3 normal)
     {
         yield return new WaitForSeconds(0.5f);
-        HitTarget(pos);
+        HitTarget(pos, normal);
     }
 
-    void HitTarget(Vector3 pos)
+    void HitTarget(Vector3 pos, Vector3 normal)
     {
         audioSource.pitch = 1f;
         audioSource.PlayOneShot(hitSound);
 
-        GameObject effect = Instantiate(hitEffect, pos, Quaternion.identity);
+        // Create rotation based on the surface normal from the hit
+        Quaternion rotation = Quaternion.LookRotation(normal);
+
+        // Optionally, apply an extra 180° rotation on the Y-axis on alternate hits if needed
+        if (flipHitEffectRotation)
+        {
+            rotation = rotation * Quaternion.Euler(0, 180, 0);
+        }
+
+        GameObject effect = Instantiate(hitEffect, pos, rotation);
         Destroy(effect, 20f);
+
+        // Toggle the flip for the next hit effect
+        flipHitEffectRotation = !flipHitEffectRotation;
     }
 
-    // קורוטינה שמאפשרת התקפה חדשה רק לאחר חצי שניה
+    // Coroutine to allow attacking again after a short cooldown
     private IEnumerator AttackCooldown()
     {
         yield return new WaitForSeconds(0.5f);
         canAttack = true;
     }
 
-    // בודקת אם האויב נמצא במרחק 5 מטר מהשחקן ומוודאת שהאויב לא מת
+    // Checks if the enemy is within range and not dead
     private void TryDamageEnemy()
     {
         GameObject enemyObj = enemy != null ? enemy : GameObject.FindGameObjectWithTag("enemy");
         if (enemyObj != null)
         {
             SimpleEnemyHealth enemyHealth = enemyObj.GetComponent<SimpleEnemyHealth>();
-            // אם האויב קיים ועדיין חי
             if (enemyHealth != null && !enemyHealth.isDead)
             {
                 Vector3 playerPos = (player != null) ? player.transform.position : transform.position;
@@ -135,30 +189,69 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // קורוטינה שממתינה חצי שניה ואז מורידה 50 נקודות חיים מהאויב דרך SimpleEnemyHealth
+    // Coroutine that deals damage to the enemy and plays the damage particle effect
     private IEnumerator DamageEnemy(GameObject enemyObj)
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.1f);
         SimpleEnemyHealth enemyHealth = enemyObj.GetComponent<SimpleEnemyHealth>();
         if (enemyHealth != null && !enemyHealth.isDead)
         {
             enemyHealth.TakeDamage(attackDamage);
+
+            if (enemyDamageParticle != null)
+            {
+                // אם מוגדר מיקום ספציפי, משתמשים בו, אחרת משתמשים במיקום האויב
+                Vector3 spawnPosition = enemyDamageSpawnLocation != null ? enemyDamageSpawnLocation.position : enemyObj.transform.position;
+                Quaternion spawnRotation = enemyDamageSpawnLocation != null ? enemyDamageSpawnLocation.rotation : enemyObj.transform.rotation;
+                GameObject dmgEffect = Instantiate(enemyDamageParticle, spawnPosition, spawnRotation);
+                Destroy(dmgEffect, 5f);
+            }
         }
     }
 
     void Update()
     {
+        // הפעלת ההתקפות:
+        // לחיצה על כפתור העכבר השמאלי מפעילה את Attack1 ו–Attack2 לסירוגין
         if (Input.GetMouseButtonDown(0))
         {
-            AttackLeft();
-        }
-        if (Input.GetMouseButtonDown(1))
-        {
-            AttackRight();
+            if (useAttack1)
+            {
+                AttackLeft();
+            }
+            else
+            {
+                AttackRight();
+            }
+            useAttack1 = !useAttack1; // החלפת התקפה לסירוגין
         }
 
-        if (!animator.GetCurrentAnimatorStateInfo(0).IsName(ATTACK1) &&
-            !animator.GetCurrentAnimatorStateInfo(0).IsName(ATTACK2))
+        // לחיצה על כפתור העכבר הימני מפעילה את Attack3 (הועבר ממקש E)
+        if (Input.GetMouseButtonDown(1))
+        {
+            Attack3();
+        }
+
+        // לחיצה על מקש R מפעילה את Attack4
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            Attack4();
+        }
+
+        // בדיקה אם האנימציה של Attack3 או Attack4 הסתיימה – normalizedTime >= 1.
+        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        if ((stateInfo.IsName(ATTACK3) || stateInfo.IsName(ATTACK4)) &&
+            stateInfo.normalizedTime >= 1f &&
+            !animator.IsInTransition(0))
+        {
+            ChangeAnimationState(IDLE);
+        }
+
+        // עדכון מצב ההליכה כאשר אין אנימציית התקפה פעילה
+        if (!stateInfo.IsName(ATTACK1) &&
+            !stateInfo.IsName(ATTACK2) &&
+            !stateInfo.IsName(ATTACK3) &&
+            !stateInfo.IsName(ATTACK4))
         {
             bool isMoving = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) ||
                             Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D);
