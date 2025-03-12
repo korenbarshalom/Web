@@ -1,0 +1,61 @@
+ using UnityEngine;
+using System.Collections.Generic;
+
+public class ParticleDamage : MonoBehaviour
+{
+    // כמה זמן (בשניות) צריך לעבור בין פגיעות באותו אויב
+    public float damageInterval = 0.05f;
+    // כמות הנזק בכל פגיעה
+    public int damageAmount = 1;
+
+    // מילון לשמירת הזמן האחרון שהופעל נזק לכל אויב
+    private Dictionary<GameObject, float> lastDamageTime = new Dictionary<GameObject, float>();
+
+    // הפניה למערכת החלקיקים
+    private ParticleSystem ps;
+    // רשימת אירועי התנגשות
+    private List<ParticleCollisionEvent> collisionEvents;
+
+    void Start()
+    {
+        ps = GetComponent<ParticleSystem>();
+        collisionEvents = new List<ParticleCollisionEvent>();
+    }
+
+    // הפונקציה נקראת בכל פעם שחלקיק מתנגש באובייקט אחר
+    void OnParticleCollision(GameObject other)
+    {
+        Debug.Log("התנגשות עם: " + other.name);
+
+        // בדיקה אם האובייקט מתויג כ-"enemy"
+        if (other.CompareTag("enemy"))
+        {
+            // קבלת הקומפוננטה שמנהלת את מערכת החיים
+            SimpleEnemyHealth health = other.GetComponent<SimpleEnemyHealth>();
+            if (health != null)
+            {
+                float currentTime = Time.time;
+                // בדיקה אם האויב נפגע בעבר
+                if (lastDamageTime.ContainsKey(other))
+                {
+                    if (currentTime - lastDamageTime[other] >= damageInterval)
+                    {
+                        health.TakeDamage(damageAmount);
+                        lastDamageTime[other] = currentTime;
+                        Debug.Log("נזק מופחת ל-" + other.name + ": " + damageAmount);
+                    }
+                }
+                else
+                {
+                    health.TakeDamage(damageAmount);
+                    lastDamageTime.Add(other, currentTime);
+                    Debug.Log("נזק מופחת ל-" + other.name + ": " + damageAmount);
+                }
+            }
+            else
+            {
+                Debug.Log("האויב " + other.name + " אינו מכיל את הקומפוננטה SimpleEnemyHealth1");
+            }
+        }
+    }
+}
