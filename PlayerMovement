@@ -519,37 +519,44 @@ public class PlayerMovement : MonoBehaviour
                     playerCollider.material = normalMaterial;
             }
         }
+        else if (isWallRunning)
+        {
+            // במצב Wall Run, נשתמש במהירות שהוגדרה ב-wallRunForwardSpeed (הוגדרה כבר באירוע OnControllerColliderHit)
+            // נעדכן רק את השפעת הכבידה
+            moveDirection.y -= gravity * Time.deltaTime;
+        }
         else
         {
             // במצב תנועה רגיל – נבדוק האם המשתמש לוחץ על LeftShift לצורך crouch
-            float currentSpeed = Input.GetKey(KeyCode.LeftShift) && !leftControlDisabled ? crouchSpeed : walkSpeed;
+            float currentSpeed = (Input.GetKey(KeyCode.LeftShift) && !leftControlDisabled) ? crouchSpeed : walkSpeed;
             float previousY = moveDirection.y;
             moveDirection = (forward * currentSpeed * inputVertical) + (right * currentSpeed * inputHorizontal);
             moveDirection.y = previousY;
 
-            if (Input.GetButton("Jump") && canMove)
-            {
-                if (isWallRunning)
-                {
-                    moveDirection.y = jumpPower;
-                    moveDirection += transform.forward * wallRunJumpBoost;
-                    isWallRunning = false;
-                    wallRunTimer = 0f;
-                    Debug.Log("Wall run jump with forward boost.");
-                }
-                else if (characterController.isGrounded)
-                {
-                    moveDirection.y = jumpPower;
-                }
-                else if (canJumpOnWall)
-                {
-                    moveDirection.y = jumpPower;
-                    canJumpOnWall = false;
-                }
-            }
-
             if (!characterController.isGrounded)
                 moveDirection.y -= gravity * Time.deltaTime;
+        }
+
+        // טיפול בקפיצה
+        if (Input.GetButton("Jump") && canMove)
+        {
+            if (isWallRunning)
+            {
+                moveDirection.y = jumpPower;
+                moveDirection += transform.forward * wallRunJumpBoost;
+                isWallRunning = false;
+                wallRunTimer = 0f;
+                Debug.Log("Wall run jump with forward boost.");
+            }
+            else if (characterController.isGrounded)
+            {
+                moveDirection.y = jumpPower;
+            }
+            else if (canJumpOnWall)
+            {
+                moveDirection.y = jumpPower;
+                canJumpOnWall = false;
+            }
         }
 
         // שינוי גובה הקוליידר: במצב crouch (LeftShift) או במצב Sliding – נשתמש ב-crouchHeight
