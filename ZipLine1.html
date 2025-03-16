@@ -114,6 +114,12 @@ public class ZiplineGun : MonoBehaviour
                 Debug.Log("Flinging object with mouse force: " + appliedForce);
             }
         }
+
+        // עדכון מתמיד של סיבוב הנקודה האדומה כך שתפנה לעבר המצלמה (השחקן)
+        if (currentRedDot != null)
+        {
+            currentRedDot.transform.LookAt(mainCamera.transform.position);
+        }
     }
 
     void ShootRope()
@@ -131,10 +137,12 @@ public class ZiplineGun : MonoBehaviour
             Debug.Log("Raycast hit at: " + hit.point);
             targetPoint = hit.point;
 
-            // יצירת הנקודה האדומה במיקום הפגיעה
+            // יצירת הנקודה האדומה במיקום הפגיעה, אך מוזחת מטר 1 בכיוון הפוך לקרן
             if (redDotPrefab != null)
             {
-                currentRedDot = Instantiate(redDotPrefab, targetPoint, Quaternion.identity);
+                Vector3 redDotPosition = hit.point - ray.direction.normalized * 1f;
+                Vector3 directionToCamera = (mainCamera.transform.position - redDotPosition).normalized;
+                currentRedDot = Instantiate(redDotPrefab, redDotPosition, Quaternion.LookRotation(directionToCamera));
             }
 
             if (((1 << hit.collider.gameObject.layer) & enemyLayer) != 0)
@@ -201,10 +209,12 @@ public class ZiplineGun : MonoBehaviour
             targetPoint = targetRigidbody.transform.position + direction * hitOffset;
             Debug.Log("Using target Rigidbody center with offset, targetPoint: " + targetPoint);
 
-            // יצירת הנקודה האדומה גם במצב לחיצה שמאלית
+            // יצירת הנקודה האדומה גם במצב לחיצה שמאלית, כשהיא מוזחת מטר 1 בכיוון הפוך לחץ
             if (redDotPrefab != null)
             {
-                currentRedDot = Instantiate(redDotPrefab, targetPoint, Quaternion.identity);
+                Vector3 redDotPosition = targetPoint - direction * 1f;
+                Vector3 directionToCamera = (mainCamera.transform.position - redDotPosition).normalized;
+                currentRedDot = Instantiate(redDotPrefab, redDotPosition, Quaternion.LookRotation(directionToCamera));
             }
 
             if (Vector3.Distance(gunTip.position, targetPoint) < minDistance)
