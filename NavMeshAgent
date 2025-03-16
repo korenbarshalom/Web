@@ -1,0 +1,256 @@
+using System.Collections;
+using UnityEngine;
+using UnityEngine.AI;
+
+public class EnemyChaseNavMeshSmart : MonoBehaviour
+{
+    public Transform player;             // השחקן שהאויב רודף אחריו
+    public float detectionRange = 50f;     // טווח זיהוי
+    public float attackRange = 15f;        // טווח התקיפה
+    public float chaseSpeed = 5f;          // מהירות רדיפה (למצב ריצה)
+    public float walkSpeed = 3f;           // מהירות הליכה (למצב הליכה)
+    public float idleSpeed = 2f;           // מהירות במצב נוח
+    public float attackCooldown = 3f;      // זמן בין התקפות
+    public float lateralOffsetAmount = 5f; // כמות ההסטה הצידית
+    public float repositionInterval = 2f;  // מרווח זמן לעדכון נתיב
+
+    public Animator animator;            // האנימטור של האויב
+
+    // שדה לאובייקט שחייב להיות פעיל כדי שהאנימציה תופעל
+    public GameObject blockActivator;
+
+    // שדות להסאונד
+    public AudioSource audioSource;      // מקור השמע
+    public AudioClip blockSound;         // הסאונד שינגן בעת חסימה
+
+    private NavMeshAgent agent;          // הסוכן (NavMeshAgent) של האויב
+    private float nextAttackTime = 0f;    // הזמן הבא להתקפה
+    private float nextRepositionTime = 0f; // הזמן הבא לעדכון הנתיב
+
+    // משתנים לבדיקת מצב מעבר על OffMeshLink ומצב הליכה
+    private bool isOffMeshLinkActive = false;
+    private bool isWalking = false;
+
+    // משתנה למצב חסימה
+    private bool isBlocking = false;
+    // משתנה לתפיסת התקפה שמתעכבת בגלל חסימה
+    private bool attackQueued = false;
+
+    void Start()
+    {
+        if (animator == null)
+        {
+            animator = GetComponent<Animator>();
+            if (animator == null)
+            {
+                Debug.LogError("Animator is missing on the enemy!");
+                return;
+            }
+        }
+
+        agent = GetComponent<NavMeshAgent>();
+        if (agent == null)
+        {
+            Debug.LogError("NavMeshAgent is missing on the enemy!");
+            return;
+        }
+
+        agent.speed = idleSpeed;
+        animator.SetBool("Run", false);
+        animator.SetBool("Walk", false);
+        isWalking = false;
+    }
+
+    void Update()
+    {
+        if (player == null)
+            return;
+
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Death"))
+        {
+            StopChase();
+            return;
+        }
+
+        // טיפול ב-OffMeshLink (קפיצה/מעבר מיוחד)
+        if (agent.isOnOffMeshLink)
+        {
+            if (!isOffMeshLinkActive)
+            {
+                isOffMeshLinkActive = true;
+                StartCoroutine(DoOffMeshLink());
+            }
+        }
+        else
+        {
+            isOffMeshLinkActive = false;
+        }
+
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+
+        if (distanceToPlayer <= detectionRange)
+        {
+            // הפעלת חסימה: אם המרחק לשחקן קטן או שווה ל-3 מטר,
+            // האובייקט blockActivator פעיל, האויב לא כבר במצב חסימה,
+            // ולוחצים על אחד ממקשי העכבר – בהתאם ללחיצה הסיכוי שונה:
+            // לחיצה ימנית - 35% ולחיצה שמאלית - 15%
+            if (distanceToPlayer <= 3f && blockActivator != null && blockActivator.activeSelf && !isBlocking)
+            {
+                if (Input.GetMouseButtonDown(1)) // לחיצה ימנית
+                {
+                    if (Random.value < 0.35f)
+                    {
+                        StartCoroutine(BlockCoroutine());
+                    }
+                }
+                else if (Input.GetMouseButtonDown(0)) // לחיצה שמאלית
+                {
+                    if (Random.value < 0.15f)
+                    {
+                        StartCoroutine(BlockCoroutine());
+                    }
+                }
+            }
+
+            // בדיקה: אם מרחק קטן או שווה ל-5.5 מטר – מצב הליכה
+            if (distanceToPlayer <= 5.5f)
+            {
+                if (!isWalking)
+                {
+                    isWalking = true;
+                    animator.SetBool("Walk", true);
+                    animator.SetBool("Run", false);
+                    agent.speed = walkSpeed;
+                }
+            }
+            else // מרחק גדול מ-5.5 מטר – מצב ריצה
+            {
+                if (isWalking)
+                {
+                    isWalking = false;
+                    animator.SetBool("Walk", false);
+                    animator.SetBool("Run", true);
+                    agent.speed = chaseSpeed;
+                }
+                else
+                {
+                    // וודא שהמצב ריצה פעיל אם כבר לא במצב הליכה
+                    animator.SetBool("Run", true);
+                    animator.SetBool("Walk", false);
+                    agent.speed = chaseSpeed;
+                }
+            }
+
+            // בחירת יעד – מיקום השחקן עם תוספת תנועה צדדית
+            Vector3 targetPosition = player.position;
+            if (Time.time >= nextRepositionTime)
+            {
+                Vector3 directionToPlayer = (player.position - transform.position).normalized;
+                Vector3 perpendicular = Vector3.Cross(directionToPlayer, Vector3.up);
+                float randomSign = Random.value < 0.5f ? -1f : 1f;
+                Vector3 lateralOffset = perpendicular * lateralOffsetAmount * randomSign;
+                targetPosition += lateralOffset;
+
+                nextRepositionTime = Time.time + repositionInterval;
+            }
+            agent.SetDestination(targetPosition);
+
+            if (distanceToPlayer <= attackRange)
+            {
+                Vector3 directionToPlayer = (player.position - transform.position).normalized;
+                Quaternion lookRotation = Quaternion.LookRotation(directionToPlayer);
+                transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
+
+                // אם הזמן מאפשר התקפה
+                if (Time.time >= nextAttackTime)
+                {
+                    // אם מצב חסימה פעיל, תורם את ההתקפה לביצוע לאחר סיום חסימה
+                    if (isBlocking)
+                    {
+                        attackQueued = true;
+                    }
+                    else
+                    {
+                        Attack();
+                        nextAttackTime = Time.time + attackCooldown;
+                    }
+                }
+            }
+        }
+        else
+        {
+            StopChase();
+        }
+    }
+
+    void Attack()
+    {
+        animator.SetTrigger("Attack");
+    }
+
+    void StopChase()
+    {
+        if (agent != null)
+        {
+            agent.speed = idleSpeed;
+            agent.ResetPath();
+        }
+        animator.SetBool("Run", false);
+        animator.SetBool("Walk", false);
+        isWalking = false;
+    }
+
+    // Coroutine לטיפול במעבר על OffMeshLink
+    private IEnumerator DoOffMeshLink()
+    {
+        agent.isStopped = true;
+        animator.SetTrigger("Jump");
+
+        OffMeshLinkData data = agent.currentOffMeshLinkData;
+        Vector3 startPos = transform.position;
+        Vector3 endPos = data.endPos + Vector3.up * agent.baseOffset;
+
+        float jumpDuration = 1.0f;
+        float elapsed = 0f;
+
+        while (elapsed < jumpDuration)
+        {
+            float t = elapsed / jumpDuration;
+            float jumpHeight = 2f * (1f - (t - 0.5f) * (t - 0.5f) * 4f);
+            Vector3 currentPosition = Vector3.Lerp(startPos, endPos, t);
+            currentPosition.y += jumpHeight;
+            transform.position = currentPosition;
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        agent.CompleteOffMeshLink();
+        agent.isStopped = false;
+    }
+
+    // Coroutine לטיפול באנימציית החסימה (Block) למשך 1 שניה
+    private IEnumerator BlockCoroutine()
+    {
+        isBlocking = true;
+        animator.SetBool("Block", true);
+
+        // ניגון סאונד החסימה
+        if (audioSource != null && blockSound != null)
+        {
+            audioSource.PlayOneShot(blockSound);
+        }
+
+        yield return new WaitForSeconds(1f);
+
+        animator.SetBool("Block", false);
+        isBlocking = false;
+
+        // במידה והתקפה הוזמנה בזמן חסימה, תבוצע כעת
+        if (attackQueued)
+        {
+            Attack();
+            nextAttackTime = Time.time + attackCooldown;
+            attackQueued = false;
+        }
+    }
+}
