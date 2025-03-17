@@ -23,6 +23,10 @@ public class EnemyChaseNavMeshSmart : MonoBehaviour
     public AudioSource audioSource;      // מקור השמע
     public AudioClip blockSound;         // הסאונד שינגן בעת חסימה
 
+    // שדה חדש להגדרת avoidancePriority דרך Inspector
+    [Range(1, 99)]
+    public int customAvoidancePriority = 50; // ניתן לשנות ערך זה לכל סוכן
+
     private NavMeshAgent agent;          // הסוכן (NavMeshAgent) של האויב
     private float nextAttackTime = 0f;    // הזמן הבא להתקפה
     private float nextRepositionTime = 0f; // הזמן הבא לעדכון הנתיב
@@ -38,6 +42,13 @@ public class EnemyChaseNavMeshSmart : MonoBehaviour
 
     // משתנה למעקב אחרי החלפה בין התקפות
     private bool alternateAttack = false;
+
+    // מתודת Awake – ביטול התנגשות פיזית בין אויבים (ודא שהאויבים נמצאים ב־Layer "Enemy")
+    void Awake()
+    {
+        int enemyLayer = LayerMask.NameToLayer("Enemy");
+        Physics.IgnoreLayerCollision(enemyLayer, enemyLayer);
+    }
 
     void Start()
     {
@@ -57,6 +68,9 @@ public class EnemyChaseNavMeshSmart : MonoBehaviour
             Debug.LogError("NavMeshAgent is missing on the enemy!");
             return;
         }
+
+        // הגדרת ערך avoidancePriority לפי הערך המוגדר ב-Inspector
+        agent.avoidancePriority = customAvoidancePriority;
 
         agent.speed = idleSpeed;
         animator.SetBool("Run", false);
@@ -282,21 +296,29 @@ public class EnemyChaseNavMeshSmart : MonoBehaviour
         yield return StartCoroutine(DashForward());
     }
 
-    // Coroutine לדאש: האויב זז 5 מטרים בכיוון השחקן על פני פרק זמן קצר
+    // Coroutine לדאש: האויב זז 7 מטרים בכיוון השחקן על פני פרק זמן קצר עם אינטרפולציה חלקה יותר,
+    // תוך התעלמות ממימד הגובה (y) כדי שלא יעזוב את הרצפה.
     private IEnumerator DashForward()
     {
         // מבטלים את השליטה של ה-Agent במהלך הדאש
         agent.enabled = false;
         Vector3 startPosition = transform.position;
-        // חישוב הכיוון מהאויב לשחקן בזמן ביצוע הדאש
-        Vector3 dashDirection = (player.position - transform.position).normalized;
-        Vector3 dashTarget = startPosition + dashDirection * 5f;
-        float dashDuration = 0.2f;
+        // חישוב הכיוון מהאויב לשחקן תוך התעלמות ממימד הגובה
+        Vector3 dashDirection = player.position - transform.position;
+        dashDirection.y = 0f;
+        dashDirection = dashDirection.normalized;
+        Vector3 dashTarget = startPosition + dashDirection * 10f;
+
+        // שינוי משך הזמן ל-0.5 שניות כדי להאט את הדאש
+        float dashDuration = 0.5f;
         float elapsed = 0f;
 
         while (elapsed < dashDuration)
         {
-            transform.position = Vector3.Lerp(startPosition, dashTarget, elapsed / dashDuration);
+            float t = elapsed / dashDuration;
+            // שימוש ב-Mathf.SmoothStep לאינטרפולציה חלקה יותר
+            float smoothT = Mathf.SmoothStep(0f, 1f, t);
+            transform.position = Vector3.Lerp(startPosition, dashTarget, smoothT);
             elapsed += Time.deltaTime;
             yield return null;
         }
