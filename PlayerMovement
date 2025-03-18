@@ -97,6 +97,7 @@ public class PlayerMovement : MonoBehaviour
     private float lateralVelocity = 0f;
     private bool leftControlDisabled = false;
 
+    // משתנה למעקב אחרי מצב תלייה על ledge
     private bool isLedgeGrabbing = false;
 
     private bool isWallRunning = false;
@@ -200,6 +201,14 @@ public class PlayerMovement : MonoBehaviour
     }
     // --- סוף ניהול סאונד Slide ---
 
+    // ------------------
+    // הוספת משתנים עבור תאוצת תנועה קדימה:
+    [Header("Forward Acceleration Settings")]
+    public float forwardAccelerationMultiplier = 1.5f; // מקדם ההתחלתי – לדוגמה, 1.5
+    public float forwardAccelerationDuration = 0.5f;   // משך הזמן (בשניות) שבו ההאצה מתמתנת
+    private float forwardAccelerationTimer = 0f;
+    // ------------------
+
     void Start()
     {
         characterController = GetComponent<CharacterController>();
@@ -296,12 +305,26 @@ public class PlayerMovement : MonoBehaviour
         if (isDashing)
             return;
 
+        // ניהול מצב תלייה על Ledge – כאן נבדוק האם מקש F מוחזק
         if (isLedgeGrabbing)
         {
+            // אם לא מחזיקים את F, שחררו את התלייה
+            if (!Input.GetKey(KeyCode.F))
+            {
+                isLedgeGrabbing = false;
+                characterController.enabled = true;
+                if (playerRigidbody != null)
+                    playerRigidbody.isKinematic = false;
+                Debug.Log("Released from Ledge because F was not held.");
+                return;
+            }
+
+            // אפשרות סיבוב המצלמה בעת תלייה
             rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
             playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
             transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
 
+            // אם לחצים על Space תוך כדי החזקת F – מתנתקים עם דחיפה
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 isLedgeGrabbing = false;
@@ -527,8 +550,26 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            // במצב תנועה רגיל – נבדוק האם המשתמש לוחץ על LeftShift לצורך crouch
-            float currentSpeed = (Input.GetKey(KeyCode.LeftShift) && !leftControlDisabled) ? crouchSpeed : walkSpeed;
+            // במצב תנועה רגילה – נבדוק האם המשתמש לוחץ על LeftShift לצורך crouch
+            // הוספת תאוצה קדימה:
+            // כאשר לוחצים קדימה (inputVertical > 0), נעשה העלאה מהירה במהירות (מכפילה את מהירות ההליכה)
+            // שמתמתנת בהדרגה עד למהירות הרגילה
+            if (inputVertical > 0)
+            {
+                forwardAccelerationTimer += Time.deltaTime;
+                if (forwardAccelerationTimer > forwardAccelerationDuration)
+                    forwardAccelerationTimer = forwardAccelerationDuration;
+            }
+            else
+            {
+                forwardAccelerationTimer = 0f;
+            }
+            float accelerationMultiplier = 1f;
+            if (inputVertical > 0)
+            {
+                accelerationMultiplier = Mathf.Lerp(forwardAccelerationMultiplier, 1f, forwardAccelerationTimer / forwardAccelerationDuration);
+            }
+            float currentSpeed = ((Input.GetKey(KeyCode.LeftShift) && !leftControlDisabled) ? crouchSpeed : walkSpeed) * accelerationMultiplier;
             float previousY = moveDirection.y;
             moveDirection = (forward * currentSpeed * inputVertical) + (right * currentSpeed * inputHorizontal);
             moveDirection.y = previousY;
@@ -633,6 +674,7 @@ public class PlayerMovement : MonoBehaviour
 
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
+        // טיפול ב-JumpPad
         if (hit.gameObject.CompareTag("JumpPad"))
         {
             moveDirection.y = jumpPadForce;
@@ -645,8 +687,9 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
+        // טיפול בתלייה על Ledge - נוסיף בדיקה שמחייבת החזקת F בעת ההתנגשות
         if (!isLedgeGrabbing && !characterController.isGrounded &&
-            hit.gameObject.layer == LayerMask.NameToLayer("Ledge"))
+            hit.gameObject.layer == LayerMask.NameToLayer("Ledge") && Input.GetKey(KeyCode.F))
         {
             if (ledgeAudioSource != null && ledgeSound != null)
             {
