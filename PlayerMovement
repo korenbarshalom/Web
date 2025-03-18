@@ -99,6 +99,8 @@ public class PlayerMovement : MonoBehaviour
 
     // משתנה למעקב אחרי מצב תלייה על ledge
     private bool isLedgeGrabbing = false;
+    // משתנה חדש למעקב אחרי שחרור מקש F לאחר תלייה, כך שלא ניתן להתחבר שוב ללא שחרור
+    private bool ledgeGrabReleased = true;
 
     private bool isWallRunning = false;
     private float wallRunTimer = 0f;
@@ -305,13 +307,14 @@ public class PlayerMovement : MonoBehaviour
         if (isDashing)
             return;
 
-        // ניהול מצב תלייה על Ledge – כאן נבדוק האם מקש F מוחזק
+        // ניהול מצב תלייה על Ledge
         if (isLedgeGrabbing)
         {
-            // אם לא מחזיקים את F, שחררו את התלייה
+            // אם לא מחזיקים את F, שחררו את התלייה והחל איפוס משתנה ה־ledgeGrabReleased
             if (!Input.GetKey(KeyCode.F))
             {
                 isLedgeGrabbing = false;
+                ledgeGrabReleased = false;
                 characterController.enabled = true;
                 if (playerRigidbody != null)
                     playerRigidbody.isKinematic = false;
@@ -328,6 +331,7 @@ public class PlayerMovement : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 isLedgeGrabbing = false;
+                ledgeGrabReleased = false;
                 characterController.enabled = true;
                 if (playerRigidbody != null)
                     playerRigidbody.isKinematic = false;
@@ -335,6 +339,14 @@ public class PlayerMovement : MonoBehaviour
                 Debug.Log("Released from Ledge with impulse");
             }
             return;
+        }
+        else
+        {
+            // במצב בו לא תלויים, נבדוק אם שוחרר מקש F כדי לאפשר תלייה חדשה
+            if (Input.GetKeyUp(KeyCode.F))
+            {
+                ledgeGrabReleased = true;
+            }
         }
 
         if (!dashWindowOpen && dashCooldownTimer <= 0f && Input.GetKeyDown(KeyCode.Space))
@@ -552,8 +564,6 @@ public class PlayerMovement : MonoBehaviour
         {
             // במצב תנועה רגילה – נבדוק האם המשתמש לוחץ על LeftShift לצורך crouch
             // הוספת תאוצה קדימה:
-            // כאשר לוחצים קדימה (inputVertical > 0), נעשה העלאה מהירה במהירות (מכפילה את מהירות ההליכה)
-            // שמתמתנת בהדרגה עד למהירות הרגילה
             if (inputVertical > 0)
             {
                 forwardAccelerationTimer += Time.deltaTime;
@@ -687,9 +697,9 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        // טיפול בתלייה על Ledge - נוסיף בדיקה שמחייבת החזקת F בעת ההתנגשות
+        // טיפול בתלייה על Ledge - נוסיף בדיקה שמחייבת החזקת F וגם שחרור מקש F מאז הפעם הקודמת
         if (!isLedgeGrabbing && !characterController.isGrounded &&
-            hit.gameObject.layer == LayerMask.NameToLayer("Ledge") && Input.GetKey(KeyCode.F))
+            hit.gameObject.layer == LayerMask.NameToLayer("Ledge") && Input.GetKey(KeyCode.F) && ledgeGrabReleased)
         {
             if (ledgeAudioSource != null && ledgeSound != null)
             {
@@ -702,6 +712,7 @@ public class PlayerMovement : MonoBehaviour
             transform.position = contactPoint;
             moveDirection = Vector3.zero;
             isLedgeGrabbing = true;
+            ledgeGrabReleased = false; // איפוס המשתנה כך שלא ניתן להתחבר שוב ללא שחרור F
             characterController.enabled = false;
             if (playerRigidbody != null)
                 playerRigidbody.isKinematic = true;
