@@ -479,30 +479,43 @@ public class PlayerMovement : MonoBehaviour
             isOnSlideSurface = false;
         }
 
-        // התחלת Slide - כאשר לוחצים על LeftControl
-        if (!isSliding && characterController.isGrounded && Input.GetKeyDown(KeyCode.LeftControl) && !leftControlDisabled)
+        // התחלת Slide:
+        // עבור אובייקטים עם תגית "slide": אם מחזיקים LeftControl, מיד עם נגיעה ברצפה (characterController.isGrounded)
+        // מתחיל ה-slide אוטומטי.
+        // עבור שאר האובייקטים: נדרש Input.GetKeyDown בעת נגיעה בקוליידר.
+        if (!isSliding && characterController.isGrounded && !leftControlDisabled)
         {
-            if (!isOnSlideSurface)
+            if (isOnSlideSurface && Input.GetKey(KeyCode.LeftControl))
             {
                 if (slideAudioSource != null && slideSound != null)
                     slideAudioSource.PlayOneShot(slideSound, slideSoundVolume);
-            }
 
-            if (isOnSlideSurface && onSlope)
-            {
-                isSliding = true;
-                slideTimer = Mathf.Infinity;
-                float baseSpeed = walkSpeed;
-                slideVelocity = slopeDirection * baseSpeed * slideSpeedMultiplier;
-                if (playerCollider != null && slideMaterial != null)
-                    playerCollider.material = slideMaterial;
+                if (onSlope)
+                {
+                    isSliding = true;
+                    slideTimer = Mathf.Infinity;
+                    float baseSpeed = walkSpeed;
+                    slideVelocity = slopeDirection * baseSpeed * slideSpeedMultiplier;
+                    if (playerCollider != null && slideMaterial != null)
+                        playerCollider.material = slideMaterial;
+                }
+                else
+                {
+                    isSliding = true;
+                    slideTimer = slideDuration;
+                    slideVelocity = (forward * walkSpeed * inputVertical) + (right * walkSpeed * inputHorizontal);
+                    if (playerCollider != null && slideMaterial != null)
+                        playerCollider.material = slideMaterial;
+                }
             }
-            else
+            else if (!isOnSlideSurface && Input.GetKeyDown(KeyCode.LeftControl))
             {
+                if (slideAudioSource != null && slideSound != null)
+                    slideAudioSource.PlayOneShot(slideSound, slideSoundVolume);
+
                 isSliding = true;
                 slideTimer = slideDuration;
-                slideVelocity = (forward * walkSpeed * inputVertical) +
-                                (right * walkSpeed * inputHorizontal);
+                slideVelocity = (forward * walkSpeed * inputVertical) + (right * walkSpeed * inputHorizontal);
                 if (playerCollider != null && slideMaterial != null)
                     playerCollider.material = slideMaterial;
             }
