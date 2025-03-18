@@ -388,6 +388,19 @@ public class WeaponSwitcher : MonoBehaviour
             }
         }
 
+        // --- אפשרות לבצע רילוד ידני על ידי לחיצה על מקש R ---
+        if ((gun.activeSelf || ak47.activeSelf) && Input.GetKeyDown(KeyCode.R) && !isReloading)
+        {
+            if (gun.activeSelf && gunCurrentAmmo < clipSize && gunReserveAmmo > 0)
+            {
+                StartCoroutine(Reload());
+            }
+            else if (ak47.activeSelf && ak47CurrentAmmo < clipSize && ak47ReserveAmmo > 0)
+            {
+                StartCoroutine(Reload());
+            }
+        }
+
         // --- בוסט במקשי C לנשק הגאן ---
         if (gun.activeSelf && Input.GetKeyDown(KeyCode.C))
         {
