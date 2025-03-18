@@ -45,6 +45,10 @@ public class WeaponSwitcher : MonoBehaviour
     public float reloadVolume = 1f;
     public AudioSource reloadAudioSource;
 
+    // **שדות סאונד רילוד עבור ה-AK47**
+    public AudioClip akReloadSound;
+    public AudioSource akReloadAudioSource;
+
     // שדות סאונד לקיחת הנשק (Pickup)
     public AudioClip gunPickupSound;
     public AudioSource gunPickupAudioSource;
@@ -534,6 +538,15 @@ public class WeaponSwitcher : MonoBehaviour
         isReloading = true;
         Debug.Log("Reloading...");
 
+        // חשב את משך זמן הרילוד הכולל (בהנחה שיש אנימציית slides)
+        float totalReloadTime = (slides != null && slides.Length > 0) ? (2 * slideAnimDuration + 0.05f) : 0.5f;
+        // במידה והנשק הפעיל הוא AK47 – מפעילים את אנימציית הסיבוב
+        if (ak47.activeSelf)
+        {
+            StartCoroutine(RotateAK(totalReloadTime));
+        }
+
+        // ניגון סאונד רילוד בהתאם לנשק הפעיל
         if (gun.activeSelf)
         {
             if (reloadSound == null)
@@ -547,6 +560,21 @@ public class WeaponSwitcher : MonoBehaviour
             else if (reloadSound != null)
             {
                 reloadAudioSource.PlayOneShot(reloadSound, reloadVolume);
+            }
+        }
+        else if (ak47.activeSelf)
+        {
+            if (akReloadSound == null)
+            {
+                Debug.LogWarning("AK reload sound clip is not assigned!");
+            }
+            if (akReloadAudioSource == null)
+            {
+                Debug.LogWarning("AK reload AudioSource is not assigned!");
+            }
+            else if (akReloadSound != null)
+            {
+                akReloadAudioSource.PlayOneShot(akReloadSound, reloadVolume);
             }
         }
 
@@ -629,6 +657,23 @@ public class WeaponSwitcher : MonoBehaviour
 
         nextFireTime = Time.time;
         isReloading = false;
+    }
+
+    // קורוטינה חדשה לסיבוב 360 מעלות של ה-AK47 במהלך הרילוד
+    private IEnumerator RotateAK(float duration)
+    {
+        // שמירת הסיבוב ההתחלתי
+        Quaternion originalRotation = ak47.transform.localRotation;
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float angle = Mathf.Lerp(0f, 360f, elapsed / duration);
+            ak47.transform.localRotation = originalRotation * Quaternion.Euler(angle, 0, 0);
+            yield return null;
+        }
+        // חזרה לסיבוב ההתחלתי בדיוק בסיום הרילוד
+        ak47.transform.localRotation = originalRotation;
     }
 
     // מעבר מיידי ללא אנימציה (למשל בהתחלה)
