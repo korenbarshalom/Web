@@ -645,7 +645,19 @@ public class PlayerMovement : MonoBehaviour
         isDashing = true;
         dashCooldownTimer = dashCooldown;
         savedVerticalVelocity = moveDirection.y;
-        Vector3 dashDirection = transform.forward.normalized;
+
+        // שימוש בקלט לתנועה כדי לקבוע את כיוון ה-Dash. במידה ויש קלט, משתמשים בו, אחרת מתקדם בכיוון המבט.
+        Vector3 dashInput = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+        Vector3 dashDirection;
+        if (dashInput.sqrMagnitude > 0.1f)
+        {
+            dashDirection = (transform.right * dashInput.x + transform.forward * dashInput.z).normalized;
+        }
+        else
+        {
+            dashDirection = transform.forward.normalized;
+        }
+
         float dashSpeed = dashDistance / dashDuration;
         float timer = 0f;
 
