@@ -506,17 +506,21 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
+        // הקוד הקודם היה מסיים את ההחלקה ברגע שמשחררים את LeftControl כאשר על משטח slide.
+        // עכשיו – אם מחליקים על אובייקט עם תגית "slide" ומשחררים את LeftControl – נתחיל תהליך האטה:
         if (isSliding && slideStartedOnSlideSurface && isOnSlideSurface && !Input.GetKey(KeyCode.LeftControl))
         {
-            isSliding = false;
-            slideStartedOnSlideSurface = false;
-            if (playerCollider != null && normalMaterial != null)
-                playerCollider.material = normalMaterial;
+            // אם הטיימר עדיין אינסופי, נאתחל אותו לזמן האטה (בדוגמה 0.5 שניות)
+            if (float.IsInfinity(slideTimer))
+            {
+                slideTimer = 0.5f;
+            }
         }
 
         if (isSliding)
         {
-            if (!isOnSlideSurface)
+            // אם יש טיימר סופי – נעדכן אותו ונבדוק אם יש צורך לסיים את ההחלקה
+            if (!float.IsInfinity(slideTimer))
             {
                 slideTimer -= Time.deltaTime;
                 if (slideTimer <= 0f)
@@ -534,14 +538,15 @@ public class PlayerMovement : MonoBehaviour
                     slideVelocity.z = horizontalVelocity.z;
                 }
             }
-            slideVelocity.y -= gravity * Time.deltaTime;
 
-            // *** הוספת צבירת מהירות בזמן החלקה על אובייקטים עם תגית "slide" ***
-            if (isOnSlideSurface && slideStartedOnSlideSurface)
+            // במידה והמשתמש ממשיך להחזיק את מקש LeftControl על משטח slide – נאפס את הטיימר לאינסוף ונמשיך להאיץ
+            if (isOnSlideSurface && slideStartedOnSlideSurface && Input.GetKey(KeyCode.LeftControl))
             {
-                // מצרף מהירות בכיוון forward, תלוי בזמן
+                slideTimer = Mathf.Infinity;
                 slideVelocity += transform.forward * slideAccelerationRate * Time.deltaTime;
             }
+
+            slideVelocity.y -= gravity * Time.deltaTime;
 
             float horizontalInput = Input.GetAxis("Horizontal");
             float targetLateralSpeed = isOnSlideSurface ? slideObjectLateralSpeed : slideLateralSpeed;
