@@ -52,6 +52,9 @@ public class GrapplingGun : MonoBehaviour
     private Vector3 lastCameraPosition;
     private Vector3 lastGunForward;
 
+    // משתנה למעקב האם החבל מחובר
+    public bool isAttached = false;
+    private Coroutine movementCoroutine;
 
     void Update()
     {
@@ -115,10 +118,6 @@ public class GrapplingGun : MonoBehaviour
         }
     }
 
-    // משתנה למעקב האם החבל מחובר
-    public bool isAttached = false;
-    private Coroutine movementCoroutine;
-
     void ShootRope()
     {
         if (mainCamera == null)
@@ -128,13 +127,24 @@ public class GrapplingGun : MonoBehaviour
         }
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
-        // כעת המשת масק משלב רק קירות (wallLayer)
+        // כעת המשתמש בוחר רק קירות (wallLayer)
         if (Physics.Raycast(ray, out hit, 100f, wallLayer))
         {
             Debug.Log("Raycast hit at: " + hit.point);
             targetPoint = hit.point;
 
-            // יצירת הנקודה האדומה במיקום הפגיעה, אך מוזחת מטר 1 בכיוון הפוך לקרן
+            // בדיקה אם יש מחסום בין gunTip לנקודת הפגיעה
+            RaycastHit obstruction;
+            if (Physics.Linecast(gunTip.position, hit.point, out obstruction))
+            {
+                if (obstruction.collider != hit.collider)
+                {
+                    Debug.Log("Obstruction detected: " + obstruction.collider.name + " is blocking the view to the wall. Cannot shoot rope.");
+                    return;
+                }
+            }
+
+            // יצירת הנקודה האדומה במיקום הפגיעה, מוזחת מטר 1 בכיוון הפוך לקרן
             if (redDotPrefab != null)
             {
                 Vector3 redDotPosition = hit.point - ray.direction.normalized * 1f;
@@ -154,12 +164,7 @@ public class GrapplingGun : MonoBehaviour
                 isSwinging = false;
             }
 
-            //currentRope = Instantiate(ropePrefab, gunTip.position, Quaternion.identity);
-            //LineRenderer line = currentRope.GetComponent<LineRenderer>();
-            //line.SetPosition(0, gunTip.position);
-            //line.SetPosition(1, targetPoint);
-            //if (ropeMaterial != null)
-            //line.material = ropeMaterial;
+            // ניתן להוסיף כאן את יצירת החבל אם נדרש, אך כרגע הקוד רק מציין שהחבל "מחובר"
             isAttached = true;
         }
         else
@@ -201,7 +206,7 @@ public class GrapplingGun : MonoBehaviour
             targetPoint = targetRigidbody.transform.position + direction * hitOffset;
             Debug.Log("Using target Rigidbody center with offset, targetPoint: " + targetPoint);
 
-            // יצירת הנקודה האדומה גם במצב לחיצה שמאלית, כשהיא מוזחת מטר 1 בכיוון הפוך לחץ
+            // יצירת הנקודה האדומה גם במצב לחיצה שמאלית, כשהיא מוזחת מטר 1 בכיוון הפוך לקרן
             if (redDotPrefab != null)
             {
                 Vector3 redDotPosition = targetPoint - direction * 1f;
