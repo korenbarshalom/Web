@@ -137,7 +137,21 @@ public class ZiplineGun : MonoBehaviour
             Debug.Log("Raycast hit at: " + hit.point);
             targetPoint = hit.point;
 
-            // יצירת הנקודה האדומה במיקום הפגיעה, אך מוזחת מטר 1 בכיוון הפוך לקרן
+            // אם המטרה היא אובייקט מהשכבה Wall – בדוק שאין חסימה בין gunTip למטרה
+            if (((1 << hit.collider.gameObject.layer) & wallLayer) != 0)
+            {
+                RaycastHit obstruction;
+                if (Physics.Linecast(gunTip.position, hit.point, out obstruction))
+                {
+                    if (obstruction.collider != hit.collider)
+                    {
+                        Debug.Log("Obstruction detected: " + obstruction.collider.name + " is blocking the view to the wall. Cannot shoot rope.");
+                        return;
+                    }
+                }
+            }
+
+            // יצירת הנקודה האדומה במיקום הפגיעה, מוזחת מטר 1 בכיוון הפוך לקרן
             if (redDotPrefab != null)
             {
                 Vector3 redDotPosition = hit.point - ray.direction.normalized * 1f;
@@ -209,7 +223,7 @@ public class ZiplineGun : MonoBehaviour
             targetPoint = targetRigidbody.transform.position + direction * hitOffset;
             Debug.Log("Using target Rigidbody center with offset, targetPoint: " + targetPoint);
 
-            // יצירת הנקודה האדומה גם במצב לחיצה שמאלית, כשהיא מוזחת מטר 1 בכיוון הפוך לחץ
+            // יצירת הנקודה האדומה גם במצב לחיצה שמאלית, מוזחת מטר 1 בכיוון הפוך לקרן
             if (redDotPrefab != null)
             {
                 Vector3 redDotPosition = targetPoint - direction * 1f;
@@ -301,31 +315,10 @@ public class ZiplineGun : MonoBehaviour
         {
             Destroy(currentRope);
         }
-        // מחיקת הנקודה האדומה רק בשחרור החבל
         if (currentRedDot != null)
         {
             Destroy(currentRedDot);
             currentRedDot = null;
-        }
-    }
-
-    void OnTriggerEnter(Collider other)
-    {
-        if (ropeHitEnemy && other.CompareTag("enemy"))
-        {
-            SimpleEnemyHealth enemyHealth = other.GetComponent<SimpleEnemyHealth>();
-            if (enemyHealth != null)
-            {
-                enemyHealth.TakeDamage(100);
-                Debug.Log("Rope hit the enemy and it took 100 damage!");
-                ropeHitEnemy = false;
-            }
-            SimpleEnemyHealth1 enemyHealth1 = other.GetComponent<SimpleEnemyHealth1>();
-            if (enemyHealth1 != null)
-            {
-                enemyHealth1.TakeDamage(100);
-                Debug.Log("Rope hit the enemy and it took 100 damage (SimpleEnemyHealth1)!");
-            }
         }
     }
 }
