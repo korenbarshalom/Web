@@ -207,6 +207,9 @@ public class PlayerMovement : MonoBehaviour
     // משתנה חדש למעקב האם Slide התחיל על משטח עם תגית "slide"
     private bool slideStartedOnSlideSurface = false;
 
+    // משתנה חדש לשמירת מומנטום אופקי לאחר סיום ההחלקה
+    private Vector3 slideMomentum = Vector3.zero;
+
     [Header("Forward Acceleration Settings")]
     public float forwardAccelerationMultiplier = 1.5f; // מקדם ההתחלתי – לדוגמה, 1.5
     public float forwardAccelerationDuration = 0.5f;   // משך הזמן (בשניות) שבו ההאצה מתמתנת
@@ -287,6 +290,10 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        // אם הדמות על הקרקע – מאפסים את מומנטום ההחלקה
+        if (characterController.isGrounded)
+            slideMomentum = Vector3.zero;
+
         if (mouseSensitivitySlider != null)
         {
             lookSpeed = mouseSensitivitySlider.value;
@@ -534,13 +541,17 @@ public class PlayerMovement : MonoBehaviour
                     slideVelocity.x = horizontalVelocity.x;
                     slideVelocity.z = horizontalVelocity.z;
 
-                    // לאחר חצי שניה מסיימים את ה-slide, גם אם המהירות לא הגיעה ל-0
                     if (slideTimer <= 0f)
                     {
                         isSliding = false;
                         slideStartedOnSlideSurface = false;
                         if (playerCollider != null && normalMaterial != null)
                             playerCollider.material = normalMaterial;
+                        // שמירת מומנטום אופקי במידה והדמות כבר לא על הקרקע
+                        if (!characterController.isGrounded)
+                            slideMomentum = new Vector3(slideVelocity.x, 0, slideVelocity.z);
+                        else
+                            slideMomentum = Vector3.zero;
                         slideVelocity = Vector3.zero;
                     }
                 }
@@ -600,6 +611,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
+            // טיפול בתנועה רגילה – במידה והדמות אינה על הקרקע, נוסיף את מומנטום ההחלקה אם קיים
             if (inputVertical > 0)
             {
                 forwardAccelerationTimer += Time.deltaTime;
@@ -617,7 +629,15 @@ public class PlayerMovement : MonoBehaviour
             }
             float currentSpeed = ((Input.GetKey(KeyCode.LeftShift) && !leftControlDisabled) ? crouchSpeed : walkSpeed) * accelerationMultiplier;
             float previousY = moveDirection.y;
-            moveDirection = (forward * currentSpeed * inputVertical) + (right * currentSpeed * inputHorizontal);
+            Vector3 inputMovement = (forward * currentSpeed * inputVertical) + (right * currentSpeed * inputHorizontal);
+            if (!characterController.isGrounded)
+            {
+                // הוספת מומנטום שהצטבר ממצב ההחלקה במידה וקיים
+                inputMovement += slideMomentum;
+                // דעיכה הדרגתית של מומנטום ההחלקה
+                slideMomentum = Vector3.Lerp(slideMomentum, Vector3.zero, Time.deltaTime * 1f);
+            }
+            moveDirection = inputMovement;
             moveDirection.y = previousY;
 
             if (!characterController.isGrounded)
