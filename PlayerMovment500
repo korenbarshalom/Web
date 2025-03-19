@@ -12,7 +12,6 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Movement Settings")]
     public float walkSpeed = 10f;
-    public float runSpeed = 15f;
     public float jumpPower = 7f;
     public float gravity = 10f;
     public float lookSpeed = 2f;   // רגישות עכבר (ניתן לעדכן באמצעות הסליידר)
@@ -34,7 +33,10 @@ public class PlayerMovement : MonoBehaviour
     public float lateralControlSmooth = 5f;
     public float slideJumpForwardMultiplier = 0.5f;
     public float slideLateralMultiplier = 0.5f;
+    // מהירות הזזה צדדית במצב Slide הרגיל
     public float slideLateralSpeed = 5f;
+    // מהירות הזזה צדדית כאשר מחליקים על אובייקטים עם תגית "slide"
+    public float slideObjectLateralSpeed = 3f;
 
     [Header("Dash Settings")]
     public float dashWindowDuration = 1.5f;
@@ -95,7 +97,10 @@ public class PlayerMovement : MonoBehaviour
     private float lateralVelocity = 0f;
     private bool leftControlDisabled = false;
 
+    // משתנה למעקב אחרי מצב תלייה על ledge
     private bool isLedgeGrabbing = false;
+    // משתנה חדש למעקב אחרי שחרור מקש F לאחר תלייה, כך שלא ניתן להתחבר שוב ללא שחרור
+    private bool ledgeGrabReleased = true;
 
     private bool isWallRunning = false;
     private float wallRunTimer = 0f;
@@ -198,6 +203,17 @@ public class PlayerMovement : MonoBehaviour
     }
     // --- סוף ניהול סאונד Slide ---
 
+    // משתנה חדש למעקב האם Slide התחיל על משטח עם תגית "slide"
+    private bool slideStartedOnSlideSurface = false;
+
+    // ------------------
+    // הוספת משתנים עבור תאוצת תנועה קדימה:
+    [Header("Forward Acceleration Settings")]
+    public float forwardAccelerationMultiplier = 1.5f; // מקדם ההתחלתי – לדוגמה, 1.5
+    public float forwardAccelerationDuration = 0.5f;   // משך הזמן (בשניות) שבו ההאצה מתמתנת
+    private float forwardAccelerationTimer = 0f;
+    // ------------------
+
     void Start()
     {
         characterController = GetComponent<CharacterController>();
@@ -294,15 +310,31 @@ public class PlayerMovement : MonoBehaviour
         if (isDashing)
             return;
 
+        // ניהול מצב תלייה על Ledge
         if (isLedgeGrabbing)
         {
+            // אם לא מחזיקים את F, שחררו את התלייה והחל איפוס משתנה ה־ledgeGrabReleased
+            if (!Input.GetKey(KeyCode.F))
+            {
+                isLedgeGrabbing = false;
+                ledgeGrabReleased = false;
+                characterController.enabled = true;
+                if (playerRigidbody != null)
+                    playerRigidbody.isKinematic = false;
+                Debug.Log("Released from Ledge because F was not held.");
+                return;
+            }
+
+            // אפשרות סיבוב המצלמה בעת תלייה
             rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
             playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
             transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
 
+            // אם לחצים על Space תוך כדי החזקת F – מתנתקים עם דחיפה
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 isLedgeGrabbing = false;
+                ledgeGrabReleased = false;
                 characterController.enabled = true;
                 if (playerRigidbody != null)
                     playerRigidbody.isKinematic = false;
@@ -311,12 +343,20 @@ public class PlayerMovement : MonoBehaviour
             }
             return;
         }
+        else
+        {
+            // במצב בו לא תלויים, נבדוק אם שוחרר מקש F כדי לאפשר תלייה חדשה
+            if (Input.GetKeyUp(KeyCode.F))
+            {
+                ledgeGrabReleased = true;
+            }
+        }
 
         if (!dashWindowOpen && dashCooldownTimer <= 0f && Input.GetKeyDown(KeyCode.Space))
         {
             StartCoroutine(DashWindow());
         }
-        if (dashWindowOpen && Input.GetKeyDown(KeyCode.F))
+        if (dashWindowOpen && Input.GetKeyDown(KeyCode.E))
         {
             StartCoroutine(PerformDash());
         }
@@ -413,7 +453,6 @@ public class PlayerMovement : MonoBehaviour
         Vector3 forward = transform.TransformDirection(Vector3.forward);
         Vector3 right = transform.TransformDirection(Vector3.right);
 
-        bool isRunning = Input.GetKey(KeyCode.LeftShift);
         float inputVertical = Input.GetAxis("Vertical");
         float inputHorizontal = Input.GetAxis("Horizontal");
 
@@ -443,41 +482,61 @@ public class PlayerMovement : MonoBehaviour
             isOnSlideSurface = false;
         }
 
-        // התחלת Slide - כאשר לוחצים על LeftControl
-        if (!isSliding && characterController.isGrounded && Input.GetKeyDown(KeyCode.LeftControl) && !leftControlDisabled)
+        // אם Slide לא התחיל על אובייקט עם תגית "slide" - נאפס את isOnSlideSurface גם אם הרייסקסט מזהה אחד
+        if (isSliding && !slideStartedOnSlideSurface)
         {
-            // במידה ומתחילים החלקה על משטח עם תגית "slide" – לא מנגנים כאן סאונד חד פעמי,
-            // אלא הסאונד ינוהל דרך מערכת הסאונד שהוספנו (objectSlidingSoundActive).
-            if (!isOnSlideSurface)
+            isOnSlideSurface = false;
+        }
+
+        // התחלת Slide:
+        // עבור אובייקטים עם תגית "slide": אם מחזיקים LeftControl, מיד עם נגיעה ברצפה (characterController.isGrounded)
+        // מתחיל ה-slide אוטומטי.
+        // עבור שאר האובייקטים: נדרש Input.GetKeyDown בעת נגיעה בקוליידר.
+        if (!isSliding && characterController.isGrounded && !leftControlDisabled)
+        {
+            if (isOnSlideSurface && Input.GetKey(KeyCode.LeftControl))
             {
-                // במידה והמשטח אינו "slide" – מנגנים את הסאונד הרגיל ל-Slide
+                slideStartedOnSlideSurface = true;
                 if (slideAudioSource != null && slideSound != null)
                     slideAudioSource.PlayOneShot(slideSound, slideSoundVolume);
-            }
 
-            if (isOnSlideSurface && onSlope)
-            {
-                isSliding = true;
-                slideTimer = Mathf.Infinity;
-                float baseSpeed = isRunning ? runSpeed : walkSpeed;
-                slideVelocity = slopeDirection * baseSpeed * slideSpeedMultiplier;
-                if (playerCollider != null && slideMaterial != null)
-                    playerCollider.material = slideMaterial;
+                if (onSlope)
+                {
+                    isSliding = true;
+                    slideTimer = Mathf.Infinity;
+                    float baseSpeed = walkSpeed;
+                    slideVelocity = slopeDirection * baseSpeed * slideSpeedMultiplier;
+                    if (playerCollider != null && slideMaterial != null)
+                        playerCollider.material = slideMaterial;
+                }
+                else
+                {
+                    isSliding = true;
+                    slideTimer = slideDuration;
+                    slideVelocity = (forward * walkSpeed * inputVertical) + (right * walkSpeed * inputHorizontal);
+                    if (playerCollider != null && slideMaterial != null)
+                        playerCollider.material = slideMaterial;
+                }
             }
-            else
+            else if (!isOnSlideSurface && Input.GetKeyDown(KeyCode.LeftControl))
             {
+                slideStartedOnSlideSurface = false;
+                if (slideAudioSource != null && slideSound != null)
+                    slideAudioSource.PlayOneShot(slideSound, slideSoundVolume);
+
                 isSliding = true;
                 slideTimer = slideDuration;
-                slideVelocity = (forward * (isRunning ? runSpeed : walkSpeed) * inputVertical) +
-                                (right * (isRunning ? runSpeed : walkSpeed) * inputHorizontal);
+                slideVelocity = (forward * walkSpeed * inputVertical) + (right * walkSpeed * inputHorizontal);
                 if (playerCollider != null && slideMaterial != null)
                     playerCollider.material = slideMaterial;
             }
         }
 
-        if (isSliding && isOnSlideSurface && !Input.GetKey(KeyCode.LeftControl))
+        // אם בשלב ההחלקה אנו נמצאים על אובייקט עם תגית "slide" אך Slide לא התחיל על משטח כזה, אז ביטול Slide
+        if (isSliding && slideStartedOnSlideSurface && isOnSlideSurface && !Input.GetKey(KeyCode.LeftControl))
         {
             isSliding = false;
+            slideStartedOnSlideSurface = false;
             if (playerCollider != null && normalMaterial != null)
                 playerCollider.material = normalMaterial;
         }
@@ -490,6 +549,7 @@ public class PlayerMovement : MonoBehaviour
                 if (slideTimer <= 0f)
                 {
                     isSliding = false;
+                    slideStartedOnSlideSurface = false;
                     if (playerCollider != null && normalMaterial != null)
                         playerCollider.material = normalMaterial;
                 }
@@ -504,10 +564,8 @@ public class PlayerMovement : MonoBehaviour
             slideVelocity.y -= gravity * Time.deltaTime;
 
             float horizontalInput = Input.GetAxis("Horizontal");
-            if (isOnSlideSurface)
-                lateralVelocity = Mathf.Lerp(lateralVelocity, horizontalInput * slideLateralSpeed, lateralControlSmooth * Time.deltaTime);
-            else
-                lateralVelocity = 0f;
+            float targetLateralSpeed = isOnSlideSurface ? slideObjectLateralSpeed : slideLateralSpeed;
+            lateralVelocity = Mathf.Lerp(lateralVelocity, horizontalInput * targetLateralSpeed, lateralControlSmooth * Time.deltaTime);
             Vector3 lateralMove = transform.right * lateralVelocity;
 
             moveDirection = slideVelocity + lateralMove;
@@ -518,53 +576,70 @@ public class PlayerMovement : MonoBehaviour
                 moveDirection.y = jumpPower;
                 moveDirection += horizontalMomentum * slideJumpForwardMultiplier;
                 isSliding = false;
+                slideStartedOnSlideSurface = false;
                 slideTimer = 0f;
                 if (playerCollider != null && normalMaterial != null)
                     playerCollider.material = normalMaterial;
             }
         }
+        else if (isWallRunning)
+        {
+            // במצב Wall Run, נשתמש במהירות שהוגדרה ב-wallRunForwardSpeed (הוגדרה כבר באירוע OnControllerColliderHit)
+            // נעדכן רק את השפעת הכבידה
+            moveDirection.y -= gravity * Time.deltaTime;
+        }
         else
         {
-            if (Input.GetKey(KeyCode.LeftControl) && !leftControlDisabled)
+            // במצב תנועה רגילה – נבדוק האם המשתמש לוחץ על LeftShift לצורך crouch
+            // הוספת תאוצה קדימה:
+            if (inputVertical > 0)
             {
-                moveDirection.x = 0f;
-                moveDirection.z = 0f;
+                forwardAccelerationTimer += Time.deltaTime;
+                if (forwardAccelerationTimer > forwardAccelerationDuration)
+                    forwardAccelerationTimer = forwardAccelerationDuration;
             }
             else
             {
-                float currentSpeed = isRunning ? runSpeed : walkSpeed;
-                float previousY = moveDirection.y;
-                moveDirection = (forward * currentSpeed * inputVertical) + (right * currentSpeed * inputHorizontal);
-                moveDirection.y = previousY;
+                forwardAccelerationTimer = 0f;
             }
-
-            if (Input.GetButton("Jump") && canMove)
+            float accelerationMultiplier = 1f;
+            if (inputVertical > 0)
             {
-                if (isWallRunning)
-                {
-                    moveDirection.y = jumpPower;
-                    moveDirection += transform.forward * wallRunJumpBoost;
-                    isWallRunning = false;
-                    wallRunTimer = 0f;
-                    Debug.Log("Wall run jump with forward boost.");
-                }
-                else if (characterController.isGrounded)
-                {
-                    moveDirection.y = jumpPower;
-                }
-                else if (canJumpOnWall)
-                {
-                    moveDirection.y = jumpPower;
-                    canJumpOnWall = false;
-                }
+                accelerationMultiplier = Mathf.Lerp(forwardAccelerationMultiplier, 1f, forwardAccelerationTimer / forwardAccelerationDuration);
             }
+            float currentSpeed = ((Input.GetKey(KeyCode.LeftShift) && !leftControlDisabled) ? crouchSpeed : walkSpeed) * accelerationMultiplier;
+            float previousY = moveDirection.y;
+            moveDirection = (forward * currentSpeed * inputVertical) + (right * currentSpeed * inputHorizontal);
+            moveDirection.y = previousY;
 
             if (!characterController.isGrounded)
                 moveDirection.y -= gravity * Time.deltaTime;
         }
 
-        // שינוי מהירות בהתאם למצב – אם השחקן נמצא על Speed Pad, המהירות תהיה 40f, אחרת 22f.
-        if (Input.GetKey(KeyCode.LeftControl) && !leftControlDisabled)
+        // טיפול בקפיצה
+        if (Input.GetButton("Jump") && canMove)
+        {
+            if (isWallRunning)
+            {
+                moveDirection.y = jumpPower;
+                moveDirection += transform.forward * wallRunJumpBoost;
+                isWallRunning = false;
+                wallRunTimer = 0f;
+                Debug.Log("Wall run jump with forward boost.");
+            }
+            else if (characterController.isGrounded)
+            {
+                moveDirection.y = jumpPower;
+            }
+            else if (canJumpOnWall)
+            {
+                moveDirection.y = jumpPower;
+                canJumpOnWall = false;
+            }
+        }
+
+        // שינוי גובה הקוליידר: במצב crouch (LeftShift) או במצב Sliding – נשתמש ב-crouchHeight
+        if ((Input.GetKey(KeyCode.LeftShift) && !leftControlDisabled) || isSliding)
             characterController.height = crouchHeight;
         else
         {
@@ -572,12 +647,10 @@ public class PlayerMovement : MonoBehaviour
             if (onSpeedPad)
             {
                 walkSpeed = 60f;
-                runSpeed = 40f;
             }
             else
             {
                 walkSpeed = 22f;
-                runSpeed = 22f;
             }
         }
 
@@ -600,17 +673,27 @@ public class PlayerMovement : MonoBehaviour
         isDashing = true;
         dashCooldownTimer = dashCooldown;
         savedVerticalVelocity = moveDirection.y;
-        Vector3 dashDirection = transform.forward.normalized;
+
+        // שימוש בקלט לתנועה כדי לקבוע את כיוון ה-Dash. במידה ויש קלט, משתמשים בו, אחרת מתקדם בכיוון המבט.
+        Vector3 dashInput = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+        Vector3 dashDirection;
+        if (dashInput.sqrMagnitude > 0.1f)
+        {
+            dashDirection = (transform.right * dashInput.x + transform.forward * dashInput.z).normalized;
+        }
+        else
+        {
+            dashDirection = transform.forward.normalized;
+        }
+
         float dashSpeed = dashDistance / dashDuration;
         float timer = 0f;
 
-        // הפעלת הסאונד עבור Dash פעם אחת
         if (dashAudioSource != null && dashSound != null)
         {
             dashAudioSource.PlayOneShot(dashSound, dashSoundVolume);
         }
 
-        // הפעלת ה־Particle System עם SetActive(true) והפעלת האפקט
         if (dashParticleSystem != null)
         {
             dashParticleSystem.gameObject.SetActive(true);
@@ -624,7 +707,6 @@ public class PlayerMovement : MonoBehaviour
             yield return null;
         }
 
-        // עצירת ה־Particle System וסגירתו
         if (dashParticleSystem != null)
         {
             dashParticleSystem.Stop();
@@ -642,10 +724,10 @@ public class PlayerMovement : MonoBehaviour
 
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
+        // טיפול ב-JumpPad
         if (hit.gameObject.CompareTag("JumpPad"))
         {
             moveDirection.y = jumpPadForce;
-            // הפעלת הצליל עבור JumpPad פעם אחת
             if (jumpPadAudioSource != null && jumpPadSound != null)
             {
                 jumpPadAudioSource.volume = jumpPadSoundVolume;
@@ -655,10 +737,10 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
+        // טיפול בתלייה על Ledge - נוסיף בדיקה שמחייבת החזקת F וגם שחרור מקש F מאז הפעם הקודמת
         if (!isLedgeGrabbing && !characterController.isGrounded &&
-            hit.gameObject.layer == LayerMask.NameToLayer("Ledge"))
+            hit.gameObject.layer == LayerMask.NameToLayer("Ledge") && Input.GetKey(KeyCode.F) && ledgeGrabReleased)
         {
-            // הפעלת הצליל עבור Ledge פעם אחת
             if (ledgeAudioSource != null && ledgeSound != null)
             {
                 ledgeAudioSource.volume = ledgeSoundVolume;
@@ -670,6 +752,7 @@ public class PlayerMovement : MonoBehaviour
             transform.position = contactPoint;
             moveDirection = Vector3.zero;
             isLedgeGrabbing = true;
+            ledgeGrabReleased = false; // איפוס המשתנה כך שלא ניתן להתחבר שוב ללא שחרור F
             characterController.enabled = false;
             if (playerRigidbody != null)
                 playerRigidbody.isKinematic = true;
@@ -704,7 +787,6 @@ public class PlayerMovement : MonoBehaviour
                 {
                     wallRunSide = 0;
                 }
-                // הפעלת אפקט ה־Particle System עבור Wall Run
                 if (wallRunParticleSystem != null && !wallRunParticleSystem.isPlaying)
                 {
                     wallRunParticleSystem.gameObject.SetActive(true);
@@ -713,7 +795,6 @@ public class PlayerMovement : MonoBehaviour
                 Debug.Log("Wall running activated.");
             }
         }
-        // הפעלת ה־Particle System כאשר נוגעים באובייקט עם תגית "slide"
         if (hit.gameObject.CompareTag("slide"))
         {
             if (dashParticleSystem != null && !dashParticleSystem.isPlaying)
@@ -729,7 +810,6 @@ public class PlayerMovement : MonoBehaviour
         if (collision.gameObject.CompareTag("slide"))
         {
             isOnSlideSurface = true;
-            // כאן נמנע הפעלת ה־Particle System על ידי התנגשות עם "slide"
         }
     }
 
@@ -776,7 +856,6 @@ public class PlayerMovement : MonoBehaviour
         {
             onSpeedPad = true;
             Debug.Log("Entered Speed Pad: Speed set to 40f.");
-            // לא מפעילים כאן את האפקט או הסאונד – ההפעלה מתבצעת ב־Update רק במידה וקיים תנועה
         }
     }
 
