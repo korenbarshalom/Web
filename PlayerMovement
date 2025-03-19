@@ -506,44 +506,71 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        // הקוד הקודם היה מסיים את ההחלקה ברגע שמשחררים את LeftControl כאשר על משטח slide.
-        // עכשיו – אם מחליקים על אובייקט עם תגית "slide" ומשחררים את LeftControl – נתחיל תהליך האטה:
-        if (isSliding && slideStartedOnSlideSurface && isOnSlideSurface && !Input.GetKey(KeyCode.LeftControl))
-        {
-            // אם הטיימר עדיין אינסופי, נאתחל אותו לזמן האטה (בדוגמה 0.5 שניות)
-            if (float.IsInfinity(slideTimer))
-            {
-                slideTimer = 0.5f;
-            }
-        }
-
+        // טיפול בהחלקה:
         if (isSliding)
         {
-            // אם יש טיימר סופי – נעדכן אותו ונבדוק אם יש צורך לסיים את ההחלקה
-            if (!float.IsInfinity(slideTimer))
+            // עבור אובייקטים עם תגית "slide":
+            if (slideStartedOnSlideSurface && isOnSlideSurface)
             {
-                slideTimer -= Time.deltaTime;
-                if (slideTimer <= 0f)
+                if (Input.GetKey(KeyCode.LeftControl))
                 {
-                    isSliding = false;
-                    slideStartedOnSlideSurface = false;
-                    if (playerCollider != null && normalMaterial != null)
-                        playerCollider.material = normalMaterial;
+                    // ממשיכים להאיץ כאשר מקש לחוץ
+                    slideVelocity += transform.forward * slideAccelerationRate * Time.deltaTime;
                 }
-                else if (slideTimer < slideDecelerationThreshold)
+                else
                 {
+                    // בעת שחרור מקש LeftControl - מתחילים ספירה של 0.5 שניות
+                    if (float.IsInfinity(slideTimer))
+                    {
+                        slideTimer = 0.5f;
+                    }
+                    else
+                    {
+                        slideTimer -= Time.deltaTime;
+                    }
+                    // מאטים בהדרגה את המהירות
                     Vector3 horizontalVelocity = new Vector3(slideVelocity.x, 0, slideVelocity.z);
                     horizontalVelocity = Vector3.Lerp(horizontalVelocity, Vector3.zero, slideDeceleration * Time.deltaTime);
                     slideVelocity.x = horizontalVelocity.x;
                     slideVelocity.z = horizontalVelocity.z;
+
+                    // לאחר חצי שניה מסיימים את ה-slide, גם אם המהירות לא הגיעה ל-0
+                    if (slideTimer <= 0f)
+                    {
+                        isSliding = false;
+                        slideStartedOnSlideSurface = false;
+                        if (playerCollider != null && normalMaterial != null)
+                            playerCollider.material = normalMaterial;
+                        slideVelocity = Vector3.zero;
+                    }
                 }
             }
-
-            // במידה והמשתמש ממשיך להחזיק את מקש LeftControl על משטח slide – נאפס את הטיימר לאינסוף ונמשיך להאיץ
-            if (isOnSlideSurface && slideStartedOnSlideSurface && Input.GetKey(KeyCode.LeftControl))
+            else
             {
-                slideTimer = Mathf.Infinity;
-                slideVelocity += transform.forward * slideAccelerationRate * Time.deltaTime;
+                // לוגיקה עבור החלקה על משטחים שאינם עם תגית "slide"
+                if (!float.IsInfinity(slideTimer))
+                {
+                    slideTimer -= Time.deltaTime;
+                    if (slideTimer <= 0f)
+                    {
+                        isSliding = false;
+                        if (playerCollider != null && normalMaterial != null)
+                            playerCollider.material = normalMaterial;
+                    }
+                    else if (slideTimer < slideDecelerationThreshold)
+                    {
+                        Vector3 horizontalVelocity = new Vector3(slideVelocity.x, 0, slideVelocity.z);
+                        horizontalVelocity = Vector3.Lerp(horizontalVelocity, Vector3.zero, slideDeceleration * Time.deltaTime);
+                        slideVelocity.x = horizontalVelocity.x;
+                        slideVelocity.z = horizontalVelocity.z;
+                    }
+                }
+
+                if (isOnSlideSurface && Input.GetKey(KeyCode.LeftControl))
+                {
+                    slideTimer = Mathf.Infinity;
+                    slideVelocity += transform.forward * slideAccelerationRate * Time.deltaTime;
+                }
             }
 
             slideVelocity.y -= gravity * Time.deltaTime;
