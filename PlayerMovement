@@ -206,9 +206,10 @@ public class PlayerMovement : MonoBehaviour
 
     // משתנה חדש למעקב האם Slide התחיל על משטח עם תגית "slide"
     private bool slideStartedOnSlideSurface = false;
-
     // משתנה חדש לשמירת מומנטום אופקי לאחר סיום ההחלקה
     private Vector3 slideMomentum = Vector3.zero;
+    // משתנה חדש לשמירת כיוון החלקה קבוע (למניעת תלות בכיוון המצלמה)
+    private Vector3 fixedSlideDirection = Vector3.zero;
 
     [Header("Forward Acceleration Settings")]
     public float forwardAccelerationMultiplier = 1.5f; // מקדם ההתחלתי – לדוגמה, 1.5
@@ -471,20 +472,19 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // התחלת Slide:
-        // - עבור אובייקטים עם תגית "slide": Slide מתחיל מיד עם החזקת LeftControl (והסאונד מנוהל על ידי הקורוטינה).
-        // - עבור אובייקטים ללא תגית "slide": Slide יתחיל רק אם יש תנועה (ומושמע slideSound).
+        // - עבור אובייקטים עם תגית "slide": Slide מתחיל מיד עם לחיצת LeftControl
         if (!isSliding && characterController.isGrounded && !leftControlDisabled)
         {
             if (isOnSlideSurface && Input.GetKey(KeyCode.LeftControl))
             {
                 slideStartedOnSlideSurface = true;
-                // לא משמיעים את slideSound – הסאונד יתבצע על ידי הקורוטינה.
                 if (onSlope)
                 {
                     isSliding = true;
                     slideTimer = Mathf.Infinity;
                     float baseSpeed = walkSpeed;
-                    slideVelocity = slopeDirection * baseSpeed * slideSpeedMultiplier;
+                    fixedSlideDirection = slopeDirection; // קובע את כיוון ההחלקה לפי השיפוע
+                    slideVelocity = fixedSlideDirection * baseSpeed * slideSpeedMultiplier;
                     if (playerCollider != null && slideMaterial != null)
                         playerCollider.material = slideMaterial;
                 }
@@ -492,7 +492,12 @@ public class PlayerMovement : MonoBehaviour
                 {
                     isSliding = true;
                     slideTimer = slideDuration;
-                    slideVelocity = (forward * walkSpeed * inputVertical) + (right * walkSpeed * inputHorizontal);
+                    // קביעת כיוון ההחלקה הקבוע לפי הכניסות (אך לא לפי כיוון המצלמה)
+                    Vector3 initialDir = (forward * inputVertical) + (right * inputHorizontal);
+                    if (initialDir.sqrMagnitude < 0.1f)
+                        initialDir = transform.forward; // מקרה של ערך אפס – שימוש כברירת מחדל
+                    fixedSlideDirection = new Vector3(initialDir.x, 0, initialDir.z).normalized;
+                    slideVelocity = fixedSlideDirection * walkSpeed * slideSpeedMultiplier;
                     if (playerCollider != null && slideMaterial != null)
                         playerCollider.material = slideMaterial;
                 }
@@ -521,12 +526,11 @@ public class PlayerMovement : MonoBehaviour
             {
                 if (Input.GetKey(KeyCode.LeftControl))
                 {
-                    // ממשיכים להאיץ כאשר מקש לחוץ
-                    slideVelocity += transform.forward * slideAccelerationRate * Time.deltaTime;
+                    // משתמשים בכיוון ההחלקה הקבוע במקום בכיוון המצלמה
+                    slideVelocity += fixedSlideDirection * slideAccelerationRate * Time.deltaTime;
                 }
                 else
                 {
-                    // בעת שחרור מקש LeftControl - מתחילים ספירה של 0.5 שניות
                     if (float.IsInfinity(slideTimer))
                     {
                         slideTimer = 0.5f;
@@ -535,7 +539,6 @@ public class PlayerMovement : MonoBehaviour
                     {
                         slideTimer -= Time.deltaTime;
                     }
-                    // מאטים בהדרגה את המהירות
                     Vector3 horizontalVelocity = new Vector3(slideVelocity.x, 0, slideVelocity.z);
                     horizontalVelocity = Vector3.Lerp(horizontalVelocity, Vector3.zero, slideDeceleration * Time.deltaTime);
                     slideVelocity.x = horizontalVelocity.x;
@@ -547,7 +550,6 @@ public class PlayerMovement : MonoBehaviour
                         slideStartedOnSlideSurface = false;
                         if (playerCollider != null && normalMaterial != null)
                             playerCollider.material = normalMaterial;
-                        // שמירת מומנטום אופקי במידה והדמות כבר לא על הקרקע
                         if (!characterController.isGrounded)
                             slideMomentum = new Vector3(slideVelocity.x, 0, slideVelocity.z);
                         else
@@ -611,7 +613,6 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            // טיפול בתנועה רגילה – במידה והדמות אינה על הקרקע, נוסיף את מומנטום ההחלקה אם קיים
             if (inputVertical > 0)
             {
                 forwardAccelerationTimer += Time.deltaTime;
@@ -632,9 +633,7 @@ public class PlayerMovement : MonoBehaviour
             Vector3 inputMovement = (forward * currentSpeed * inputVertical) + (right * currentSpeed * inputHorizontal);
             if (!characterController.isGrounded)
             {
-                // הוספת מומנטום שהצטבר ממצב ההחלקה במידה וקיים
                 inputMovement += slideMomentum;
-                // דעיכה הדרגתית של מומנטום ההחלקה
                 slideMomentum = Vector3.Lerp(slideMomentum, Vector3.zero, Time.deltaTime * 1f);
             }
             moveDirection = inputMovement;
