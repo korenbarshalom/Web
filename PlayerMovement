@@ -110,7 +110,7 @@ public class PlayerMovement : MonoBehaviour
     private int wallRunSide = 0;
 
     [Header("Slide Audio Settings")]
-    public AudioClip slideSound;              // הצליל שירוץ כאשר מתחילים Slide (למשטחים שאינם "slide")
+    public AudioClip slideSound;              // הצליל שירוץ כאשר מתחילים Slide על משטחים שאינם "slide"
     public AudioSource slideAudioSource;      // AudioSource לשינוי עוצמת הקול עבור Slide
     public float slideSoundVolume = 1f;       // עוצמת קול עבור Slide
 
@@ -202,6 +202,9 @@ public class PlayerMovement : MonoBehaviour
         slideObjectAudioSource.Play();
     }
     // --- סוף ניהול סאונד Slide ---
+
+    // משתנה חדש למעקב האם Slide התחיל על משטח עם תגית "slide"
+    private bool slideStartedOnSlideSurface = false;
 
     // ------------------
     // הוספת משתנים עבור תאוצת תנועה קדימה:
@@ -479,17 +482,21 @@ public class PlayerMovement : MonoBehaviour
             isOnSlideSurface = false;
         }
 
+        // אם Slide לא התחיל על אובייקט עם תגית "slide" - נאפס את isOnSlideSurface גם אם הרייסקסט מזהה אחד
+        if (isSliding && !slideStartedOnSlideSurface)
+        {
+            isOnSlideSurface = false;
+        }
+
         // התחלת Slide:
-        // עבור אובייקטים עם תגית "slide": אם מחזיקים LeftControl, מיד עם נגיעה ברצפה (characterController.isGrounded)
-        // מתחיל ה-slide אוטומטי.
-        // עבור שאר האובייקטים: נדרש Input.GetKeyDown בעת נגיעה בקוליידר.
+        // עבור אובייקטים עם תגית "slide": Slide מתחיל מיד עם החזקת LeftControl (ולא מושמע SlideSound כאן)
+        // עבור אובייקטים ללא תגית "slide": Slide יתחיל רק אם יש תנועה (ולא אם עומדים במקום) ויושמע הצליל הרגיל.
         if (!isSliding && characterController.isGrounded && !leftControlDisabled)
         {
             if (isOnSlideSurface && Input.GetKey(KeyCode.LeftControl))
             {
-                if (slideAudioSource != null && slideSound != null)
-                    slideAudioSource.PlayOneShot(slideSound, slideSoundVolume);
-
+                slideStartedOnSlideSurface = true;
+                // לא משמיעים את slideSound כאן – הסאונד יטופל ע"י הקורוטינה (Slide Start/Loop/End)
                 if (onSlope)
                 {
                     isSliding = true;
@@ -510,20 +517,26 @@ public class PlayerMovement : MonoBehaviour
             }
             else if (!isOnSlideSurface && Input.GetKeyDown(KeyCode.LeftControl))
             {
-                if (slideAudioSource != null && slideSound != null)
-                    slideAudioSource.PlayOneShot(slideSound, slideSoundVolume);
-
-                isSliding = true;
-                slideTimer = slideDuration;
-                slideVelocity = (forward * walkSpeed * inputVertical) + (right * walkSpeed * inputHorizontal);
-                if (playerCollider != null && slideMaterial != null)
-                    playerCollider.material = slideMaterial;
+                // הוספת בדיקה: אם אין תנועה (עומד במקום), לא תתבצע התחלת Slide
+                if (Mathf.Abs(inputVertical) > 0.1f || Mathf.Abs(inputHorizontal) > 0.1f)
+                {
+                    slideStartedOnSlideSurface = false;
+                    if (slideAudioSource != null && slideSound != null)
+                        slideAudioSource.PlayOneShot(slideSound, slideSoundVolume);
+                    isSliding = true;
+                    slideTimer = slideDuration;
+                    slideVelocity = (forward * walkSpeed * inputVertical) + (right * walkSpeed * inputHorizontal);
+                    if (playerCollider != null && slideMaterial != null)
+                        playerCollider.material = slideMaterial;
+                }
             }
         }
 
-        if (isSliding && isOnSlideSurface && !Input.GetKey(KeyCode.LeftControl))
+        // אם בשלב ההחלקה אנו נמצאים על אובייקט עם תגית "slide" אך Slide לא התחיל על משטח כזה, אז ביטול Slide
+        if (isSliding && slideStartedOnSlideSurface && isOnSlideSurface && !Input.GetKey(KeyCode.LeftControl))
         {
             isSliding = false;
+            slideStartedOnSlideSurface = false;
             if (playerCollider != null && normalMaterial != null)
                 playerCollider.material = normalMaterial;
         }
@@ -536,6 +549,7 @@ public class PlayerMovement : MonoBehaviour
                 if (slideTimer <= 0f)
                 {
                     isSliding = false;
+                    slideStartedOnSlideSurface = false;
                     if (playerCollider != null && normalMaterial != null)
                         playerCollider.material = normalMaterial;
                 }
@@ -562,6 +576,7 @@ public class PlayerMovement : MonoBehaviour
                 moveDirection.y = jumpPower;
                 moveDirection += horizontalMomentum * slideJumpForwardMultiplier;
                 isSliding = false;
+                slideStartedOnSlideSurface = false;
                 slideTimer = 0f;
                 if (playerCollider != null && normalMaterial != null)
                     playerCollider.material = normalMaterial;
