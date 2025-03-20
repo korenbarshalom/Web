@@ -39,7 +39,6 @@ public class PlayerMovement : MonoBehaviour
     public float slideObjectLateralSpeed = 3f;
 
     [Header("Slide Acceleration Settings")]
-    // משתנה זה מגדיר את קצב ההאצה בזמן ההחלקה על משטח עם תגית "slide"
     public float slideAccelerationRate = 2f;
 
     [Header("Dash Settings")]
@@ -47,13 +46,12 @@ public class PlayerMovement : MonoBehaviour
     public float dashCooldown = 10f;
     public float dashDistance = 9f;
     public float dashDuration = 0.2f;
-    // Particle System עבור Dash וגם עבור Side – אותו אובייקט, ומכובה כברירת מחדל
     public ParticleSystem dashParticleSystem;
 
     [Header("Dash Audio Settings")]
-    public AudioClip dashSound;             // הצליל שירוץ פעם אחת בעת ביצוע Dash
-    public AudioSource dashAudioSource;     // AudioSource לשינוי עוצמת הקול עבור Dash
-    public float dashSoundVolume = 1f;        // עוצמת קול עבור Dash
+    public AudioClip dashSound;
+    public AudioSource dashAudioSource;
+    public float dashSoundVolume = 1f;
 
     [Header("Wall Run Settings")]
     public float wallRunForwardSpeed = 20f;
@@ -65,7 +63,7 @@ public class PlayerMovement : MonoBehaviour
     private float currentTilt = 0f;
 
     [Header("Wall Run Particle System Settings")]
-    public ParticleSystem wallRunParticleSystem; // Particle System להפעלת אפקט Wall Run
+    public ParticleSystem wallRunParticleSystem;
 
     [Header("Rigidbody Settings")]
     public Rigidbody playerRigidbody;
@@ -103,7 +101,6 @@ public class PlayerMovement : MonoBehaviour
 
     // משתנה למעקב אחרי מצב תלייה על ledge
     private bool isLedgeGrabbing = false;
-    // משתנה חדש למעקב אחרי שחרור מקש F לאחר תלייה, כך שלא ניתן להתחבר שוב ללא שחרור
     private bool ledgeGrabReleased = true;
 
     private bool isWallRunning = false;
@@ -114,36 +111,33 @@ public class PlayerMovement : MonoBehaviour
     private int wallRunSide = 0;
 
     [Header("Slide Audio Settings")]
-    public AudioClip slideSound;              // הצליל שירוץ כאשר מתחילים Slide על משטחים שאינם "slide"
-    public AudioSource slideAudioSource;      // AudioSource לשינוי עוצמת הקול עבור Slide
-    public float slideSoundVolume = 1f;       // עוצמת קול עבור Slide
+    public AudioClip slideSound;
+    public AudioSource slideAudioSource;
+    public float slideSoundVolume = 1f;
 
     [Header("Slide Object Audio Settings")]
-    // הצלילים עבור מצב החלקה על אובייקטים עם תגית "slide"
-    public AudioClip slideStartSound;         // סאונד התחלה
-    public AudioClip slideLoopSound;          // סאונד לופ
-    public AudioClip slideEndSound;           // סאונד סיום
-    public AudioSource slideObjectAudioSource;// AudioSource עבור Slide על אובייקטים עם תגית "slide"
-    public float slideObjectSoundVolume = 1f; // עוצמת קול עבור Slide על אובייקטים עם תגית "slide"
+    public AudioClip slideStartSound;
+    public AudioClip slideLoopSound;
+    public AudioClip slideEndSound;
+    public AudioSource slideObjectAudioSource;
+    public float slideObjectSoundVolume = 1f;
 
     [Header("Jump Pad Audio Settings")]
-    public AudioClip jumpPadSound;            // הצליל שירוץ כאשר נוגעים ב-JumpPad
-    public AudioSource jumpPadAudioSource;    // AudioSource לשינוי עוצמת הקול עבור JumpPad
-    public float jumpPadSoundVolume = 1f;       // עוצמת קול עבור JumpPad
+    public AudioClip jumpPadSound;
+    public AudioSource jumpPadAudioSource;
+    public float jumpPadSoundVolume = 1f;
 
     [Header("Ledge Audio Settings")]
-    public AudioClip ledgeSound;              // הצליל שירוץ כאשר נוגעים ב-Ledge
-    public AudioSource ledgeAudioSource;      // AudioSource לשינוי עוצמת הקול עבור Ledge
-    public float ledgeSoundVolume = 1f;         // עוצמת קול עבור Ledge
+    public AudioClip ledgeSound;
+    public AudioSource ledgeAudioSource;
+    public float ledgeSoundVolume = 1f;
 
     [Header("Speed Pad Sound Settings")]
-    public AudioClip speedPadSound;           // הצליל שירוץ פעם אחת כאשר נוגעים באובייקט עם תגית "speed"
-    public AudioSource speedPadAudioSource;   // AudioSource לשינוי עוצמת הקול עבור Speed Pad
-    public float speedPadSoundVolume = 1f;      // עוצמת קול עבור Speed Pad
+    public AudioClip speedPadSound;
+    public AudioSource speedPadAudioSource;
+    public float speedPadSoundVolume = 1f;
 
-    // משתנה לזיהוי אזור מהירות (Speed Pad)
     private bool onSpeedPad = false;
-    // משתנה בוליאני למעקב האם אפקט ה-Speed Pad כבר הופעל (למניעת הפעלה חוזרת)
     private bool speedPadEffectStarted = false;
 
     [Header("Speed Pad Particle System Settings")]
@@ -152,7 +146,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("UI Settings")]
     public Slider mouseSensitivitySlider;
 
-    // --- משתנים עבור ניהול סאונד Slide על אובייקטים עם תגית "slide" ---
+    // --- משתנים עבור ניהול סאונד Slide ---
     private Coroutine slideObjectSoundCoroutineRef = null;
     private bool _objectSlidingSoundActive = false;
     private bool objectSlidingSoundActive
@@ -164,14 +158,12 @@ public class PlayerMovement : MonoBehaviour
             {
                 if (value)
                 {
-                    // התחלת מצב החלקה – מנגן את סאונד ההתחלה ואחריו הלופ
                     if (slideObjectSoundCoroutineRef != null)
                         StopCoroutine(slideObjectSoundCoroutineRef);
                     slideObjectSoundCoroutineRef = StartCoroutine(SlideObjectSoundCoroutine());
                 }
                 else
                 {
-                    // סיום מצב החלקה – עוצר את הקורוטינה ומנגן את סאונד הסיום
                     if (slideObjectSoundCoroutineRef != null)
                     {
                         StopCoroutine(slideObjectSoundCoroutineRef);
@@ -192,28 +184,23 @@ public class PlayerMovement : MonoBehaviour
         slideObjectAudioSource.loop = false;
         slideObjectAudioSource.clip = slideStartSound;
         slideObjectAudioSource.Play();
-        // ממתינים לסיום סאונד ההתחלה
         while (slideObjectAudioSource.isPlaying)
         {
             yield return null;
         }
-        // לאחר מכן, מעבירים ללופ
         slideObjectAudioSource.clip = slideLoopSound;
         slideObjectAudioSource.loop = true;
         slideObjectAudioSource.Play();
     }
     // --- סוף ניהול סאונד Slide ---
 
-    // משתנה חדש למעקב האם Slide התחיל על משטח עם תגית "slide"
     private bool slideStartedOnSlideSurface = false;
-    // משתנה חדש לשמירת מומנטום אופקי לאחר סיום ההחלקה
     private Vector3 slideMomentum = Vector3.zero;
-    // משתנה חדש לשמירת כיוון החלקה קבוע (למניעת תלות בכיוון המצלמה)
     private Vector3 fixedSlideDirection = Vector3.zero;
 
     [Header("Forward Acceleration Settings")]
-    public float forwardAccelerationMultiplier = 1.5f; // מקדם ההתחלתי – לדוגמה, 1.5
-    public float forwardAccelerationDuration = 0.5f;   // משך הזמן (בשניות) שבו ההאצה מתמתנת
+    public float forwardAccelerationMultiplier = 1.5f;
+    public float forwardAccelerationDuration = 0.5f;
     private float forwardAccelerationTimer = 0f;
 
     void Start()
@@ -291,7 +278,6 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        // אם הדמות על הקרקע – מאפסים את מומנטום ההחלקה
         if (characterController.isGrounded)
             slideMomentum = Vector3.zero;
 
@@ -320,6 +306,8 @@ public class PlayerMovement : MonoBehaviour
             }
 
             rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
+            // הוספת הגבלה על סיבוב ציר ה-X
+            rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
             playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
             transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
 
@@ -374,6 +362,8 @@ public class PlayerMovement : MonoBehaviour
             isWallRunning = false;
 
         rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
+        // הגבלת הסיבוב האנכי לפי lookXLimit
+        rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
         float targetTilt = isWallRunning ? wallRunSide * wallRunTiltAngle : 0f;
         currentTilt = Mathf.Lerp(currentTilt, targetTilt, tiltSmooth * Time.deltaTime);
         playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, currentTilt);
@@ -471,8 +461,6 @@ public class PlayerMovement : MonoBehaviour
             isOnSlideSurface = false;
         }
 
-        // התחלת Slide:
-        // - עבור אובייקטים עם תגית "slide": Slide מתחיל מיד עם לחיצת LeftControl
         if (!isSliding && characterController.isGrounded && !leftControlDisabled)
         {
             if (isOnSlideSurface && Input.GetKey(KeyCode.LeftControl))
@@ -483,7 +471,7 @@ public class PlayerMovement : MonoBehaviour
                     isSliding = true;
                     slideTimer = Mathf.Infinity;
                     float baseSpeed = walkSpeed;
-                    fixedSlideDirection = slopeDirection; // קובע את כיוון ההחלקה לפי השיפוע
+                    fixedSlideDirection = slopeDirection;
                     slideVelocity = fixedSlideDirection * baseSpeed * slideSpeedMultiplier;
                     if (playerCollider != null && slideMaterial != null)
                         playerCollider.material = slideMaterial;
@@ -492,10 +480,9 @@ public class PlayerMovement : MonoBehaviour
                 {
                     isSliding = true;
                     slideTimer = slideDuration;
-                    // קביעת כיוון ההחלקה הקבוע לפי הכניסות (אך לא לפי כיוון המצלמה)
                     Vector3 initialDir = (forward * inputVertical) + (right * inputHorizontal);
                     if (initialDir.sqrMagnitude < 0.1f)
-                        initialDir = transform.forward; // מקרה של ערך אפס – שימוש כברירת מחדל
+                        initialDir = transform.forward;
                     fixedSlideDirection = new Vector3(initialDir.x, 0, initialDir.z).normalized;
                     slideVelocity = fixedSlideDirection * walkSpeed * slideSpeedMultiplier;
                     if (playerCollider != null && slideMaterial != null)
@@ -518,15 +505,12 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        // טיפול בהחלקה:
         if (isSliding)
         {
-            // עבור אובייקטים עם תגית "slide":
             if (slideStartedOnSlideSurface && isOnSlideSurface)
             {
                 if (Input.GetKey(KeyCode.LeftControl))
                 {
-                    // משתמשים בכיוון ההחלקה הקבוע במקום בכיוון המצלמה
                     slideVelocity += fixedSlideDirection * slideAccelerationRate * Time.deltaTime;
                 }
                 else
@@ -560,7 +544,6 @@ public class PlayerMovement : MonoBehaviour
             }
             else
             {
-                // לוגיקה עבור החלקה על משטחים שאינם עם תגית "slide"
                 if (!float.IsInfinity(slideTimer))
                 {
                     slideTimer -= Time.deltaTime;
