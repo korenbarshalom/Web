@@ -6,18 +6,18 @@ using System.Collections.Generic;
 public class WeaponSwitcher : MonoBehaviour
 {
     // --- הגדרות החלפת וניהול נשקים ---
-    public GameObject gun;         // נשק 1 (למשל רובה)
+    public GameObject gun;         // נשק 1 (למשל רובה, אך כאן מייצג את האקדח)
     public GameObject ak47;        // AK47
     public GameObject knife;       // סכין
-    public GameObject pistol;      // אקדח
+    public GameObject pistol;      // אקדח (משמש לנשק נוסף, במקרה זה לא בשימוש)
     public GameObject extraWeapon; // נשק נוסף – יוצג בגלגלת רק לאחר פתיחה
     public GameObject extraWeapon2; // נשק נוסף 2 – מוצג בגלגלת רק לאחר פתיחה
     public GameObject extraWeapon3; // נשק נוסף 3 – pickup חדש
 
     // Pickup objects for weapon pickups
     public Transform gunPickupObject; // Pickup עבור ה-Gun
-    public Transform akPickupObject; // Pickup עבור ה-AK47
-    public Transform extraWeaponPickupObject; // Pickup עבור extraWeapon
+    public Transform akPickupObject;  // Pickup עבור ה-AK47
+    public Transform extraWeaponPickupObject;  // Pickup עבור extraWeapon
     public Transform extraWeaponPickupObject2; // Pickup עבור extraWeapon2
     public Transform extraWeaponPickupObject3; // Pickup עבור extraWeapon3
 
@@ -28,12 +28,12 @@ public class WeaponSwitcher : MonoBehaviour
     private bool extraWeapon2Unlocked = false;
     private bool extraWeapon3Unlocked = false;
 
-    // הגדרות ירי עבור הרובה
+    // הגדרות ירי עבור הרובה (במקרה זה האקדח הוא gun)
     public GameObject bulletPrefab; // פרפאב כדור
-    public Transform firePoint;     // נקודת ירי לרובה
+    public Transform firePoint;     // נקודת ירי ל־gun
     public float bulletSpeed = 20f; // מהירות כדור
-    public float fireRate = 0.5f;   // קצב ירי לרובה
-    public ParticleSystem muzzleFlash; // אפקט פירור עבור הרובה
+    public float fireRate = 0.5f;   // קצב ירי ל־gun
+    public ParticleSystem muzzleFlash; // אפקט פירור עבור ה־gun
 
     // שדות סאונד הירי
     public AudioClip gunShootSound;
@@ -67,8 +67,8 @@ public class WeaponSwitcher : MonoBehaviour
     // ניהול כדורים – הגדרות של מאגר וקליפ
     public int maxAmmo = 90;    // סך כל הכדורים (כולל קליפ + מאגר)
     public int clipSize = 30;   // מספר כדורים בכל קליפ
-    private int gunCurrentAmmo; // כדורים בקליפ של הגאן
-    private int gunReserveAmmo; // כדורים במאגר של הגאן
+    private int gunCurrentAmmo; // כדורים בקליפ של gun
+    private int gunReserveAmmo; // כדורים במאגר של gun
     private int ak47CurrentAmmo; // כדורים בקליפ של ה-AK47
     private int ak47ReserveAmmo; // כדורים במאגר של ה-AK47
 
@@ -203,9 +203,8 @@ public class WeaponSwitcher : MonoBehaviour
                     gunPickupAudioSource.PlayOneShot(gunPickupSound);
                 }
 
+                // כעת אין לקרוא לקריאת Respawn – תתבצע בהמשך כאשר תחליף לנשק אחר
                 gunPickupObject.gameObject.SetActive(false);
-                StartCoroutine(RespawnPickupCoroutine(gunPickupObject));
-
                 if (currentWeaponIndex != 0)
                 {
                     StartCoroutine(SmoothSwitchWeapon(0));
@@ -233,8 +232,6 @@ public class WeaponSwitcher : MonoBehaviour
                 }
 
                 akPickupObject.gameObject.SetActive(false);
-                StartCoroutine(RespawnPickupCoroutine(akPickupObject));
-
                 if (currentWeaponIndex != 1)
                 {
                     StartCoroutine(SmoothSwitchWeapon(1));
@@ -258,7 +255,6 @@ public class WeaponSwitcher : MonoBehaviour
                 StartCoroutine(SmoothSwitchWeapon(4)); // index 4
 
                 extraWeaponPickupObject.gameObject.SetActive(false);
-                StartCoroutine(RespawnPickupCoroutine(extraWeaponPickupObject));
             }
         }
 
@@ -278,7 +274,6 @@ public class WeaponSwitcher : MonoBehaviour
                 StartCoroutine(SmoothSwitchWeapon(5)); // index 5
 
                 extraWeaponPickupObject2.gameObject.SetActive(false);
-                StartCoroutine(RespawnPickupCoroutine(extraWeaponPickupObject2));
             }
         }
 
@@ -298,7 +293,6 @@ public class WeaponSwitcher : MonoBehaviour
                 StartCoroutine(SmoothSwitchWeapon(6)); // index 6
 
                 extraWeaponPickupObject3.gameObject.SetActive(false);
-                StartCoroutine(RespawnPickupCoroutine(extraWeaponPickupObject3));
             }
         }
 
@@ -315,7 +309,6 @@ public class WeaponSwitcher : MonoBehaviour
                 attempts++;
                 if (attempts > weapons.Length) break;
             }
-            // דילוג על נשקים שלא נפתחו (למשל: Gun, AK47, extraWeapon, extraWeapon2, extraWeapon3)
             while ((weapons[nextIndex] == gun && !gunUnlocked) ||
                    (weapons[nextIndex] == ak47 && !akUnlocked) ||
                    (weapons[nextIndex] == extraWeapon && !extraWeaponUnlocked) ||
@@ -339,7 +332,7 @@ public class WeaponSwitcher : MonoBehaviour
             }
         }
 
-        // --- ירי בגאן ---
+        // --- ירי ב־gun (האקדח) ---
         if (gun.activeSelf && Input.GetButton("Fire1") && !isReloading && canShoot)
         {
             if (gunCurrentAmmo > 0)
@@ -352,6 +345,8 @@ public class WeaponSwitcher : MonoBehaviour
                         gunAudioSource.volume = gunShootVolume;
                         gunAudioSource.PlayOneShot(gunShootSound, gunShootVolume);
                     }
+                    // הפעלת אנימציית ה-recoil (סיבוב חלק של 6 מעלות סביב ציר ה-Z)
+                    StartCoroutine(AnimateGunRecoilRotation());
                     nextFireTime = Time.time + fireRate;
                     gunCurrentAmmo--;
                     if (gunCurrentAmmo == 0 && gunReserveAmmo > 0)
@@ -405,7 +400,7 @@ public class WeaponSwitcher : MonoBehaviour
             }
         }
 
-        // --- בוסט במקשי C לנשק הגאן ---
+        // --- בוסט במקשי C לנשק ה־gun ---
         if (gun.activeSelf && Input.GetKeyDown(KeyCode.C))
         {
             if (Time.time >= lastBoostTime + boostCooldown)
@@ -513,7 +508,6 @@ public class WeaponSwitcher : MonoBehaviour
 
     private void Shoot(Transform point, ParticleSystem flash)
     {
-        // שימוש ב-Quaternion.LookRotation כדי ליצור סיבוב בהתאם ל-firePoint.forward
         Quaternion adjustedRotation = Quaternion.LookRotation(point.forward);
         GameObject bullet = Instantiate(bulletPrefab, point.position, adjustedRotation);
 
@@ -538,15 +532,12 @@ public class WeaponSwitcher : MonoBehaviour
         isReloading = true;
         Debug.Log("Reloading...");
 
-        // חשב את משך זמן הרילוד הכולל (בהנחה שיש אנימציית slides)
         float totalReloadTime = (slides != null && slides.Length > 0) ? (2 * slideAnimDuration + 0.05f) : 0.5f;
-        // במידה והנשק הפעיל הוא AK47 – מפעילים את אנימציית הסיבוב
         if (ak47.activeSelf)
         {
             StartCoroutine(RotateAK(totalReloadTime));
         }
 
-        // ניגון סאונד רילוד בהתאם לנשק הפעיל
         if (gun.activeSelf)
         {
             if (reloadSound == null)
@@ -659,10 +650,9 @@ public class WeaponSwitcher : MonoBehaviour
         isReloading = false;
     }
 
-    // קורוטינה חדשה לסיבוב 360 מעלות של ה-AK47 במהלך הרילוד
+    // קורוטינה לסיבוב 360 מעלות של ה-AK47 במהלך הרילוד
     private IEnumerator RotateAK(float duration)
     {
-        // שמירת הסיבוב ההתחלתי
         Quaternion originalRotation = ak47.transform.localRotation;
         float elapsed = 0f;
         while (elapsed < duration)
@@ -672,7 +662,6 @@ public class WeaponSwitcher : MonoBehaviour
             ak47.transform.localRotation = originalRotation * Quaternion.Euler(angle, 0, 0);
             yield return null;
         }
-        // חזרה לסיבוב ההתחלתי בדיוק בסיום הרילוד
         ak47.transform.localRotation = originalRotation;
     }
 
@@ -700,7 +689,6 @@ public class WeaponSwitcher : MonoBehaviour
             yield break;
         }
 
-        // אנימציית הוצאת הנשק הנוכחי
         GameObject currentWeapon = weapons[currentWeaponIndex];
         Vector3 startPos = currentWeapon.transform.localPosition;
         Quaternion startRot = currentWeapon.transform.localRotation;
@@ -719,7 +707,28 @@ public class WeaponSwitcher : MonoBehaviour
         currentWeapon.transform.localRotation = exitRot;
         currentWeapon.SetActive(false);
 
-        // מעבר לנשק החדש
+        // כאשר נשק שהופסק הופך ללא פעיל, אם הוא היה pickup – מתחילים ספירה להחזרתו
+        if (currentWeapon == gun && gunPickupObject != null)
+        {
+            StartCoroutine(RespawnPickupCoroutine(gunPickupObject));
+        }
+        else if (currentWeapon == ak47 && akPickupObject != null)
+        {
+            StartCoroutine(RespawnPickupCoroutine(akPickupObject));
+        }
+        else if (currentWeapon == extraWeapon && extraWeaponPickupObject != null)
+        {
+            StartCoroutine(RespawnPickupCoroutine(extraWeaponPickupObject));
+        }
+        else if (currentWeapon == extraWeapon2 && extraWeaponPickupObject2 != null)
+        {
+            StartCoroutine(RespawnPickupCoroutine(extraWeaponPickupObject2));
+        }
+        else if (currentWeapon == extraWeapon3 && extraWeaponPickupObject3 != null)
+        {
+            StartCoroutine(RespawnPickupCoroutine(extraWeaponPickupObject3));
+        }
+
         currentWeaponIndex = newIndex;
         GameObject newWeapon = weapons[newIndex];
         newWeapon.SetActive(true);
@@ -745,7 +754,7 @@ public class WeaponSwitcher : MonoBehaviour
         isSwitching = false;
     }
 
-    // מטודה המשחררת (מטילה) נשק pickup קודם, מסמנת אותו כלא פעיל
+    // מטודה המשחררת (מטילה) נשק pickup קודם, מסמנת אותו כלא פעיל, ומפעילה ספירה להחזרתו
     private void DropWeapon(int index)
     {
         if (index == 0)
@@ -777,34 +786,38 @@ public class WeaponSwitcher : MonoBehaviour
         Debug.Log("Used Knife");
     }
 
-    // קורוטינה להחזרת חיי Pickup (להפעלת האובייקט מחדש לאחר זמן מסוים)
+    // קורוטינה להחזרת חיי Pickup – פשוט ממתינה למשך pickupRespawnDelay ואז מחזירה את האובייקט לפעילות
     private IEnumerator RespawnPickupCoroutine(Transform pickupObject)
     {
         yield return new WaitForSeconds(pickupRespawnDelay);
         if (pickupObject != null)
         {
             pickupObject.gameObject.SetActive(true);
-            // איפוס הדגלים בהתאם לסוג ה-Pickup
-            if (pickupObject == gunPickupObject)
-            {
-                gunUnlocked = false;
-            }
-            else if (pickupObject == akPickupObject)
-            {
-                akUnlocked = false;
-            }
-            else if (pickupObject == extraWeaponPickupObject)
-            {
-                extraWeaponUnlocked = false;
-            }
-            else if (pickupObject == extraWeaponPickupObject2)
-            {
-                extraWeapon2Unlocked = false;
-            }
-            else if (pickupObject == extraWeaponPickupObject3)
-            {
-                extraWeapon3Unlocked = false;
-            }
         }
+    }
+
+    // קורוטינה לאנימציית recoil ל־gun:
+    // מבצעת מעבר חלק של 6 מעלות סביב ציר ה-Z ביחס לסיבוב הנוכחי, ואז מחזירה את האקדח למצבו.
+    private IEnumerator AnimateGunRecoilRotation()
+    {
+        Quaternion originalRotation = gun.transform.localRotation;
+        Quaternion targetRotation = originalRotation * Quaternion.Euler(0, 0, 6f);
+        float localDuration = 0.1f; // משך כל שלב (לסיבוב ולחזרה)
+        float t = 0f;
+        while (t < localDuration)
+        {
+            t += Time.deltaTime;
+            gun.transform.localRotation = Quaternion.Slerp(originalRotation, targetRotation, t / localDuration);
+            yield return null;
+        }
+        gun.transform.localRotation = targetRotation;
+        t = 0f;
+        while (t < localDuration)
+        {
+            t += Time.deltaTime;
+            gun.transform.localRotation = Quaternion.Slerp(targetRotation, originalRotation, t / localDuration);
+            yield return null;
+        }
+        gun.transform.localRotation = originalRotation;
     }
 }
