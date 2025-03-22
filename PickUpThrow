@@ -1,0 +1,93 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class TeleportAndThrowManager : MonoBehaviour
+{
+    [Header("הגדרות טלפורט והחזקה")]
+    public Transform teleportPoint; // נקודת היעד (למשל – מיקום ביד השחקן)
+    public Transform player;        // טרנספורם של השחקן
+    public float throwForce = 10f;  // עוצמת הזריקה
+    public float pickupRadius = 5f; // מרחק מרבי להעלאה
+
+    private GameObject heldObject;
+    private Rigidbody heldRb;
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            if (heldObject != null)
+            {
+                // אם האובייקט כבר מוחזק – זרוק אותו
+                ThrowObject();
+            }
+            else
+            {
+                // אם אין אובייקט מוחזק – נסה לאתר ולהרים אחד עם הטאג "throw"
+                PickUpObject();
+            }
+        }
+    }
+
+    void PickUpObject()
+    {
+        // סריקה במרחב סביב השחקן
+        Collider[] colliders = Physics.OverlapSphere(player.position, pickupRadius);
+        GameObject objectToPick = null;
+        float closestDistance = Mathf.Infinity;
+
+        foreach (Collider col in colliders)
+        {
+            if (col.CompareTag("throw"))
+            {
+                float distance = Vector3.Distance(player.position, col.transform.position);
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    objectToPick = col.gameObject;
+                }
+            }
+        }
+
+        if (objectToPick != null)
+        {
+            heldObject = objectToPick;
+            heldRb = heldObject.GetComponent<Rigidbody>();
+            if (heldRb == null)
+            {
+                heldRb = heldObject.AddComponent<Rigidbody>();
+                Debug.Log("Rigidbody נוסף אוטומטית לאובייקט: " + heldObject.name);
+            }
+
+            // העברת האובייקט לנקודת הטלפורט והצמדתו לשחקן
+            heldObject.transform.position = teleportPoint.position;
+            heldObject.transform.parent = player;
+            heldRb.isKinematic = true;
+        }
+        else
+        {
+            Debug.Log("לא נמצא אובייקט עם הטאג 'throw' בסביבת השחקן.");
+        }
+    }
+
+    void ThrowObject()
+    {
+        // ניתוק האובייקט מהשחקן והפעלת פיזיקה לזריקה
+        heldObject.transform.parent = null;
+        heldRb.isKinematic = false;
+        heldRb.AddForce(player.forward * throwForce, ForceMode.Impulse);
+        heldObject = null;
+        heldRb = null;
+    }
+
+    // לציור Gizmos בעורך (להמחשת טווח ההרמה)
+    private void OnDrawGizmosSelected()
+    {
+        if (player != null)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(player.position, pickupRadius);
+        }
+    }
+}
