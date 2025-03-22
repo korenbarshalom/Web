@@ -1,5 +1,6 @@
-using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
+using System.Collections;
 using UnityEngine.VFX;  // חובה לייבא את המודול של VFX
 
 public class PlayerController : MonoBehaviour
@@ -107,7 +108,6 @@ public class PlayerController : MonoBehaviour
         if (attack4Particle != null)
         {
             GameObject effect = Instantiate(attack4Particle, transform.position, Quaternion.identity);
-            // הפעלת האפקט - ודא שהאובייקט פעיל
             effect.SetActive(true);
 
             // נסיון לקבל את רכיב ה-VisualEffect ולהפעילו
@@ -144,8 +144,10 @@ public class PlayerController : MonoBehaviour
             {
                 StartCoroutine(DelayedHitTarget(hit.point, hit.normal));
 
-                SimpleEnemyHealth enemyHealth = hit.collider.GetComponent<SimpleEnemyHealth>();
-                if (enemyHealth != null && !enemyHealth.isDead)
+                // שימוש ב-SimpleEnemyHealth1
+                SimpleEnemyHealth1 enemyHealth = hit.collider.GetComponent<SimpleEnemyHealth1>();
+                // נבדוק אם הבריאות גדולה מ-0
+                if (enemyHealth != null && enemyHealth.health > 0)
                 {
                     StartCoroutine(DamageEnemy(hit.collider.gameObject, hit.point, damage));
                     if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Enemy"))
@@ -176,7 +178,7 @@ public class PlayerController : MonoBehaviour
         HitTarget(pos, normal);
     }
 
-    // הפעלת אפקט ה־hitEffect במיקום הפגיעה
+    // הפעלת אפקט ה־hitEffect במיקום הפגיעה, והשמדתו 5 שניות לאחר הופעתו
     void HitTarget(Vector3 pos, Vector3 normal)
     {
         audioSource.pitch = 1f;
@@ -189,7 +191,8 @@ public class PlayerController : MonoBehaviour
         }
 
         GameObject effect = Instantiate(hitEffect, pos, rotation);
-        Destroy(effect, 20f);
+        // שינוי: השמדת האפקט 5 שניות לאחר יצירתו
+        Destroy(effect, 5f);
 
         flipHitEffectRotation = !flipHitEffectRotation;
     }
@@ -219,8 +222,9 @@ public class PlayerController : MonoBehaviour
     private IEnumerator DamageEnemy(GameObject enemyObj, Vector3 hitPoint, int damage)
     {
         yield return new WaitForSeconds(0.1f);
-        SimpleEnemyHealth enemyHealth = enemyObj.GetComponent<SimpleEnemyHealth>();
-        if (enemyHealth != null && !enemyHealth.isDead)
+        SimpleEnemyHealth1 enemyHealth = enemyObj.GetComponent<SimpleEnemyHealth1>();
+        // נבדוק אם הבריאות גדולה מ-0
+        if (enemyHealth != null && enemyHealth.health > 0)
         {
             enemyHealth.TakeDamage(damage);
             if (enemyDamageParticle != null)
@@ -229,6 +233,19 @@ public class PlayerController : MonoBehaviour
                 Destroy(dmgEffect, 5f);
             }
         }
+    }
+
+    // --- מתודה זו מתבצעת כאשר הנשק מופעל מחדש (למשל בעת מעבר נשקים) --- 
+    private void OnEnable()
+    {
+        // איפוס מצבי הקולדאון
+        canAttackLeftRight = true;
+        canAttack3 = true;
+        canAttack4 = true;
+        // איפוס מצב האנימציה ל-IDLE והבטחה שהאנימטור מאופס
+        ChangeAnimationState(IDLE);
+        animator.Rebind();
+        animator.Update(0f);
     }
 
     void Update()
