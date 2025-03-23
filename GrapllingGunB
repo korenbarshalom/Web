@@ -29,10 +29,9 @@ public class GrapplingGun : MonoBehaviour
     [Header("Zipline Hit Indicator")]
     public GameObject redDotPrefab; // prefab של הנקודה האדומה
 
+    // משתנים פנימיים לניהול החבל והגרבינג
     private GameObject currentRope;
     private Vector3 targetPoint;
-
-    // משתנה לשמירת הנקודה האדומה
     private GameObject currentRedDot;
 
     // משתנים לסווינג
@@ -40,7 +39,7 @@ public class GrapplingGun : MonoBehaviour
     public bool justLanded = false;
     private float currentSwingSpeed = 0f;
 
-    // משתנים עבור לחיצה שמאלית
+    // משתנים עבור לחיצה שמאלית (גרבינג על עצם)
     private bool isLeftRope = false;
     private Rigidbody targetRigidbody;
     private Vector3 lastMousePositionLeftFling;
@@ -65,19 +64,36 @@ public class GrapplingGun : MonoBehaviour
     public float upwardBoostOnStop = 0.5f;   // בוסט קטן כלפי מעלה
     public float forwardBoostOnStop = 1f;    // בוסט קטן כלפי קדימה
 
+    // משתנים לצבירת מומנטום בסווינג
+    [Header("Momentum Accumulation Settings")]
+    public float momentumIncreaseRate = 1f;  // קצב עליית המומנטום
+    public float maxMomentumBoost = 10f;     // מומנטום מקסימלי
+    private float accumulatedMomentumBoost = 0f; // משתנה פנימי לצבירת מומנטום
+
+    // משתנים להוספת כוח כבידה נוסף במצב סווינג
+    [Header("Extra Gravity Settings")]
+    public float extraGravity = 5f; // כוח כבידה נוסף במהלך הסווינג
+
+    // משתנים להאצת נפילה גם לאחר סיום הסווינג
+    [Header("Post-Swing Extra Gravity")]
+    public float extraDownwardBoost = 5f; // בוסט נוסף כלפי מטה לאחר סיום הסווינג
+
     // הפניות לרכיבים
     private PlayerMovement playerMovement;
     private CharacterController controller;
     private Rigidbody rb;
 
-    // משתנה לשמירת ערך הגרביטציה המקורי
+    // משתנה לשמירת מצב הגרביטציה המקורי
     private bool originalUseGravity;
 
-    // משתנה לניהול קורוטינת הניתוק האוטומטי
+    // ניהול קורוטינות לניתוק אוטומטי
     private Coroutine autoDetachCoroutine;
     private Coroutine movementCoroutine;
 
     public bool isAttached = false;
+
+    // משתנה חדש לשמירת זמן ההתחברות של החבל
+    private float ropeAttachTime = 0f;
 
     private void Awake()
     {
@@ -86,7 +102,7 @@ public class GrapplingGun : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.isKinematic = false;
 
-        // שמירת ערך הגרביטציה המקורי
+        // שמירת הגרביטציה המקורית
         originalUseGravity = rb.useGravity;
     }
 
@@ -151,11 +167,25 @@ public class GrapplingGun : MonoBehaviour
         }
     }
 
+    // ב-FixedUpdate מצטבר המומנטום ומתווסף כוח כבידה נוסף במהלך הסווינג
+    private void FixedUpdate()
+    {
+        if (isSwinging && isAttached)
+        {
+            // צבירת מומנטום באופן הדרגתי
+            accumulatedMomentumBoost += momentumIncreaseRate * Time.fixedDeltaTime;
+            accumulatedMomentumBoost = Mathf.Clamp(accumulatedMomentumBoost, 0f, maxMomentumBoost);
+
+            // הוספת כוח כבידה נוסף כלפי מטה במצב הסווינג
+            rb.AddForce(Vector3.down * extraGravity, ForceMode.Acceleration);
+        }
+    }
+
     private void StartGrapple()
     {
         if (redDotPrefab != null)
         {
-            // מעבירים את המהירות הקיימת ל־Rigidbody וכיבוי ה־CharacterController כדי להעביר את השליטה לפיזיקה:
+            // העברת המהירות הקיימת ל-Rigidbody וכיבוי ה-CharacterController להעברת השליטה לפיזיקה
             rb.linearVelocity = playerMovement.moveDirection;
             controller.enabled = false;
 
@@ -163,7 +193,7 @@ public class GrapplingGun : MonoBehaviour
             justLanded = true;
             isSwinging = true;
 
-            // במצב swing ניתן לכבות את הגרביטציה
+            // כבוי גרביטציה רגילה במצב סווינג
             rb.useGravity = false;
 
             joint = gameObject.AddComponent<SpringJoint>();
@@ -178,6 +208,12 @@ public class GrapplingGun : MonoBehaviour
             joint.spring = swing;
             joint.damper = damper;
             joint.massScale = massScale;
+
+            // אתחול מומנטום מצטבר
+            accumulatedMomentumBoost = 0f;
+
+            // שמירת זמן ההתחברות של החבל
+            ropeAttachTime = Time.time;
         }
     }
 
@@ -193,6 +229,21 @@ public class GrapplingGun : MonoBehaviour
         if (Physics.Raycast(ray, out hit, 100f, wallLayer))
         {
             Debug.Log("Raycast hit at: " + hit.point);
+
+            // בדיקה האם יש חסימה בין gunTip לנקודת הפגיעה
+            if (((1 << hit.collider.gameObject.layer) & wallLayer) != 0)
+            {
+                RaycastHit obstruction;
+                if (Physics.Linecast(gunTip.position, hit.point, out obstruction))
+                {
+                    if (obstruction.collider != hit.collider)
+                    {
+                        Debug.Log("Obstruction detected: " + obstruction.collider.name + " is blocking the view to the wall. Cannot shoot rope.");
+                        return;
+                    }
+                }
+            }
+
             targetPoint = hit.point;
             grapplePoint = hit.point;
 
@@ -210,7 +261,7 @@ public class GrapplingGun : MonoBehaviour
             }
 
             isAttached = true;
-            // הפעלת קורוטינה לניתוק אוטומטי לאחר 7 שניות
+            // הפעלת קורוטינה לניתוק אוטומטי לאחר 3 שניות
             autoDetachCoroutine = StartCoroutine(AutoDetachRoutine());
         }
         else
@@ -274,7 +325,7 @@ public class GrapplingGun : MonoBehaviour
             if (ropeMaterial != null)
                 line.material = ropeMaterial;
             isAttached = true;
-            // הפעלת קורוטינה לניתוק אוטומטי לאחר 7 שניות
+            // הפעלת קורוטינה לניתוק אוטומטי לאחר 3 שניות
             autoDetachCoroutine = StartCoroutine(AutoDetachRoutine());
         }
         else
@@ -290,7 +341,7 @@ public class GrapplingGun : MonoBehaviour
 
     void DetachRope()
     {
-        // עצירת קורוטינת הניתוק האוטומטי במידה והיא פועלת
+        // עצירת קורוטינת הניתוק האוטומטי אם פועלת
         if (autoDetachCoroutine != null)
         {
             StopCoroutine(autoDetachCoroutine);
@@ -312,14 +363,30 @@ public class GrapplingGun : MonoBehaviour
         {
             Destroy(joint);
             justLanded = false;
-            // קבלת המומנטום הקיים, אך הסרת הרכיב האנכי כדי שלא תצבר מהירות מוגזמת למעלה:
+            // שמירת המומנטום הקיים ללא רכיב אנכי
             Vector3 currentMomentum = rb.linearVelocity;
-            currentMomentum.y = 0; // הסרת כל מומנטום אנכי
-            rb.linearVelocity = Vector3.zero; // איפוס מהירות ה־Rigidbody
+            currentMomentum.y = 0;
+            rb.linearVelocity = Vector3.zero;
             controller.enabled = true;
-            Vector3 boostVelocity = currentMomentum + transform.forward * forwardBoostOnStop + Vector3.up * upwardBoostOnStop;
-            playerMovement.moveDirection = boostVelocity;
-            Debug.Log("Detaching with boost: " + boostVelocity);
+
+            // בדיקה אם החבל הוחזק יותר מ-1 שנייה
+            float holdDuration = Time.time - ropeAttachTime;
+            if (holdDuration >= 1f)
+            {
+                // חישוב בוסט נוסף בהתבסס על המומנטום המצטבר והכוונה של השחקן
+                Vector3 boostVelocity = currentMomentum + transform.forward * forwardBoostOnStop + Vector3.up * upwardBoostOnStop;
+                boostVelocity += transform.forward * accumulatedMomentumBoost;
+                // הוספת בוסט כלפי מטה כדי להאיץ את הנפילה לאחר סיום הסווינג
+                boostVelocity += Vector3.down * extraDownwardBoost;
+                playerMovement.moveDirection = boostVelocity;
+                Debug.Log("Detaching with boost (held for " + holdDuration + "s): " + boostVelocity);
+            }
+            else
+            {
+                Debug.Log("Rope was not held long enough for boost (" + holdDuration + "s). No boost applied.");
+            }
+            // איפוס המומנטום המצטבר
+            accumulatedMomentumBoost = 0f;
         }
 
         // החזרת הגרביטציה למצב המקורי וסיום מצב הסווינג
@@ -355,13 +422,13 @@ public class GrapplingGun : MonoBehaviour
         Gizmos.DrawRay(transform.position - new Vector3(0, 1, 0), Vector3.down * 0.5f);
     }
 
-    // קורוטינה לניתוק אוטומטי של החבל לאחר 7 שניות אם לא שוחרר
+    // קורוטינה לניתוק אוטומטי של החבל לאחר 3 שניות אם לא שוחרר
     private IEnumerator AutoDetachRoutine()
     {
         yield return new WaitForSeconds(3f);
         if (isAttached)
         {
-            Debug.Log("Auto detaching rope after 7 seconds.");
+            Debug.Log("Auto detaching rope after 3 seconds.");
             DetachRope();
         }
     }
