@@ -12,14 +12,13 @@ public class GrapplingGun : MonoBehaviour
 
     [Header("Layers & Tags")]
     public LayerMask wallLayer;
-    // הוסר: public LayerMask enemyLayer;
 
     [Header("Player & Camera")]
     public GameObject playerGun;
     public Camera mainCamera;
 
     [Header("Swing Settings")]
-    public float swingAcceleration = 2f;
+    public float swingAcceleration = 2f; // שמורה לשימוש עתידי, אך לא בשימוש במצב הסווינג הפיזיקלי
 
     [Header("Fling Settings")]
     public float flingForce = 10f;
@@ -32,8 +31,6 @@ public class GrapplingGun : MonoBehaviour
 
     private GameObject currentRope;
     private Vector3 targetPoint;
-    // הוסר: private bool ropeHitEnemy = false;
-    // הוסר: private GameObject targetEnemy;
 
     // משתנה לשמירת הנקודה האדומה
     private GameObject currentRedDot;
@@ -56,20 +53,29 @@ public class GrapplingGun : MonoBehaviour
     private Vector3 grapplePoint;
 
     private SpringJoint joint;
+
     [Header("Swing Options")]
-    public float damper;
-    public float swing;
-    public float massScale;
-    public float swingMaxDistance;
-    public float swingMinDistance;
-    public float swingBoostOnStop;
-    public float gravityBoost;
-    PlayerMovement1 playerMovement;
-    //public float force;
+    public float damper = 0.5f;              // דמפר נמוך לקבלת תנועה חלקה
+    public float swing = 70f;                // כוח קפיץ גבוה לסווינג מהיר
+    public float massScale = 1f;
+    public float swingMaxDistance = 1f;
+    public float swingMinDistance = 0.5f;
+    
+    [Header("Boost Settings On Stop")]
+    public float upwardBoostOnStop = 0.5f;   // בוסט קטן כלפי מעלה
+    public float forwardBoostOnStop = 1f;    // בוסט קטן כלפי קדימה
+
+    // הפניות לרכיבים
+    private PlayerMovement1 playerMovement;
+    private CharacterController controller;
+    private Rigidbody rb;
 
     private void Awake()
     {
         playerMovement = GetComponent<PlayerMovement1>();
+        controller = GetComponent<CharacterController>();
+        rb = GetComponent<Rigidbody>();
+        rb.isKinematic = false;
     }
 
     void Update()
@@ -81,13 +87,6 @@ public class GrapplingGun : MonoBehaviour
             return;
         }
 
-
-        if (IsGrounded() && isSwinging && justLanded == false)
-        {
-            isSwinging = false;
-            playerMovement.isSwinging = false;
-            playerMovement.GetComponent<CharacterController>().enabled = true;
-        }
         if (Input.GetMouseButtonDown(1) && !isAttached)
         {
             ShootRope();
@@ -96,9 +95,9 @@ public class GrapplingGun : MonoBehaviour
         {
             DetachRope();
         }
-        if (Input.GetMouseButton(1) && isAttached /*&& movementCoroutine == null*/)
+        if (Input.GetMouseButton(1) && isAttached)
         {
-            //movementCoroutine = StartCoroutine(MoveAlongRope());
+            // לוגיקה אפשרית לתנועה בזמן החיבור
         }
 
         if (Input.GetMouseButtonDown(0) && !isAttached)
@@ -134,7 +133,6 @@ public class GrapplingGun : MonoBehaviour
             }
         }
 
-        // עדכון מתמיד של סיבוב הנקודה האדומה כך שתפנה לעבר המצלמה (השחקן)
         if (currentRedDot != null)
         {
             currentRedDot.transform.LookAt(mainCamera.transform.position);
@@ -145,14 +143,15 @@ public class GrapplingGun : MonoBehaviour
     {
         if (redDotPrefab != null)
         {
-            GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
+            // מעבירים את המהירות הקיימת ל־Rigidbody וכיבוי ה־CharacterController כדי להעביר את השליטה לפיזיקה:
+            rb.velocity = playerMovement.moveDirection;
+            controller.enabled = false;
+
             playerMovement.isSwinging = true;
             justLanded = true;
             isSwinging = true;
-            GetComponent<CharacterController>().enabled = false;
-            //grapplePoint = redDotPrefab.transform.position;
-            joint = gameObject.AddComponent<SpringJoint>();
 
+            joint = gameObject.AddComponent<SpringJoint>();
             joint.autoConfigureConnectedAnchor = false;
             joint.connectedAnchor = grapplePoint;
             Debug.Log(grapplePoint + " grapple position");
@@ -167,7 +166,6 @@ public class GrapplingGun : MonoBehaviour
         }
     }
 
-    // משתנה למעקב האם החבל מחובר
     public bool isAttached = false;
     private Coroutine movementCoroutine;
 
@@ -180,15 +178,12 @@ public class GrapplingGun : MonoBehaviour
         }
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
-        // כעת המשת масק משלב רק קירות (wallLayer)
         if (Physics.Raycast(ray, out hit, 100f, wallLayer))
         {
             Debug.Log("Raycast hit at: " + hit.point);
             targetPoint = hit.point;
             grapplePoint = hit.point;
 
-
-            // יצירת הנקודה האדומה במיקום הפגיעה, אך מוזחת מטר 1 בכיוון הפוך לקרן
             if (redDotPrefab != null)
             {
                 Vector3 redDotPosition = hit.point - ray.direction.normalized * 1f;
@@ -196,26 +191,12 @@ public class GrapplingGun : MonoBehaviour
                 currentRedDot = Instantiate(redDotPrefab, redDotPosition, Quaternion.LookRotation(directionToCamera));
             }
 
-            // במקור היה קוד לבדוק אם נגע באויב, והפעיל לוגיקה להורדת חיים - הוסר לחלוטין
-            //isSwinging = hit.collider.CompareTag("box");
-
             StartGrapple();
             if (isSwinging)
             {
-                //currentSwingSpeed = ropeSpeed;
-                Debug.Log("Rope hit a box – swing mode activated!");
-            }
-            else
-            {
-                //isSwinging = false;
+                Debug.Log("Rope hit – swing mode activated!");
             }
 
-            //currentRope = Instantiate(ropePrefab, gunTip.position, Quaternion.identity);
-            //LineRenderer line = currentRope.GetComponent<LineRenderer>();
-            //line.SetPosition(0, gunTip.position);
-            //line.SetPosition(1, targetPoint);
-            //if (ropeMaterial != null)
-            //line.material = ropeMaterial;
             isAttached = true;
         }
         else
@@ -257,7 +238,6 @@ public class GrapplingGun : MonoBehaviour
             targetPoint = targetRigidbody.transform.position + direction * hitOffset;
             Debug.Log("Using target Rigidbody center with offset, targetPoint: " + targetPoint);
 
-            // יצירת הנקודה האדומה גם במצב לחיצה שמאלית, כשהיא מוזחת מטר 1 בכיוון הפוך לחץ
             if (redDotPrefab != null)
             {
                 Vector3 redDotPosition = targetPoint - direction * 1f;
@@ -287,43 +267,6 @@ public class GrapplingGun : MonoBehaviour
         }
     }
 
-    //IEnumerator MoveAlongRope()
-    //{
-    //    //while (isAttached && Input.GetMouseButton(1))
-    //    //{
-    //    //    if (isSwinging)
-    //    //    {
-    //    //        Vector3 offset = transform.position - targetPoint;
-    //    //        float radius = offset.magnitude;
-    //    //        currentSwingSpeed += swingAcceleration * Time.deltaTime;
-    //    //        float angularSpeed = currentSwingSpeed / radius;
-    //    //        Vector3 swingAxis = Vector3.Cross(offset, Vector3.up).normalized;
-    //    //        Quaternion swingRotation = Quaternion.AngleAxis(angularSpeed * Time.deltaTime * Mathf.Rad2Deg, swingAxis);
-    //    //        Vector3 newPos = targetPoint + swingRotation * offset;
-    //    //        transform.position = newPos;
-    //    //    }
-    //    //    else
-    //    //    {
-    //    //        //transform.position = Vector3.MoveTowards(transform.position, targetPoint, ropeSpeed * Time.deltaTime);
-    //    //        GetComponent<PlayerMovement1>().moveDirection += (transform.forward + (Vector3.forward / 5)) * force;
-    //    //        Debug.Log("APPLING FORCE TO PLAYER");
-    //    //    }
-    //    //    if (currentRope != null)
-    //    //    {
-    //    //        LineRenderer line = currentRope.GetComponent<LineRenderer>();
-    //    //        if (line != null)
-    //    //        {
-    //    //            line.SetPosition(0, gunTip.position);
-    //    //            line.SetPosition(1, targetPoint);
-    //    //        }
-    //    //    }
-    //    //    if (!isSwinging && Vector3.Distance(transform.position, targetPoint) < 0.1f)
-    //    //        break;
-    //    //    yield return null;
-    //    //}
-    //    //movementCoroutine = null;
-    //}
-
     public Vector3 GetGrapplePoint()
     {
         return targetPoint;
@@ -346,14 +289,17 @@ public class GrapplingGun : MonoBehaviour
         {
             Destroy(joint);
             justLanded = false;
-            //GetComponent<CharacterController>().enabled = true;
-            GetComponent<CharacterController>().enabled = true;
-            playerMovement.moveDirection = (/*GetComponent<Rigidbody>().linearVelocity*/transform.forward * swingBoostOnStop);
-
+            // קבלת המומנטום הקיים, אך הסרת הרכיב האנכי כדי שלא תצבר מהירות מוגזמת למעלה:
+            Vector3 currentMomentum = rb.velocity;
+            currentMomentum.y = 0; // הסרת כל מומנטום אנכי
+            rb.velocity = Vector3.zero; // איפוס מהירות ה־Rigidbody
+            controller.enabled = true;
+            Vector3 boostVelocity = currentMomentum + transform.forward * forwardBoostOnStop + Vector3.up * upwardBoostOnStop;
+            playerMovement.moveDirection = boostVelocity;
+            Debug.Log("Detaching with boost: " + boostVelocity);
         }
 
         isAttached = false;
-        //isSwinging = false;
         isLeftRope = false;
         targetRigidbody = null;
         if (movementCoroutine != null)
@@ -365,7 +311,6 @@ public class GrapplingGun : MonoBehaviour
         {
             Destroy(currentRope);
         }
-        // מחיקת הנקודה האדומה רק בשחרור החבל
         if (currentRedDot != null)
         {
             Destroy(currentRedDot);
@@ -373,18 +318,13 @@ public class GrapplingGun : MonoBehaviour
         }
     }
 
-    // הוסר: OnTriggerEnter שמקטין את חיי האויב
-
     public bool IsGrounded()
     {
-        if (Physics.Raycast(new Ray(transform.position - new Vector3(0, 1, 0), transform.up * -1), 2f))
-            return true;
-        else
-            return false;
+        return Physics.Raycast(new Ray(transform.position - new Vector3(0, 1, 0), Vector3.down), 2f);
     }
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawRay(transform.position - new Vector3(0, 1, 0), transform.up * -0.5f);
+        Gizmos.DrawRay(transform.position - new Vector3(0, 1, 0), Vector3.down * 0.5f);
     }
 }
