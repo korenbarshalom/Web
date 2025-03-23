@@ -1,0 +1,390 @@
+using System;
+using System.Collections;
+using UnityEngine;
+
+public class GrapplingGun : MonoBehaviour
+{
+    [Header("Rope Settings")]
+    public GameObject ropePrefab;
+    public Transform gunTip;
+    public float ropeSpeed = 10f;
+    public Material ropeMaterial;
+
+    [Header("Layers & Tags")]
+    public LayerMask wallLayer;
+    // הוסר: public LayerMask enemyLayer;
+
+    [Header("Player & Camera")]
+    public GameObject playerGun;
+    public Camera mainCamera;
+
+    [Header("Swing Settings")]
+    public float swingAcceleration = 2f;
+
+    [Header("Fling Settings")]
+    public float flingForce = 10f;
+    public float flingSensitivity = 0.1f;
+    public float hitOffset = 0.5f;
+    public float minDistance = 1f;
+
+    [Header("Zipline Hit Indicator")]
+    public GameObject redDotPrefab; // prefab של הנקודה האדומה
+
+    private GameObject currentRope;
+    private Vector3 targetPoint;
+    // הוסר: private bool ropeHitEnemy = false;
+    // הוסר: private GameObject targetEnemy;
+
+    // משתנה לשמירת הנקודה האדומה
+    private GameObject currentRedDot;
+
+    // משתנים לסווינג
+    public bool isSwinging = false;
+    public bool justLanded = false;
+    private float currentSwingSpeed = 0f;
+
+    // משתנים עבור לחיצה שמאלית
+    private bool isLeftRope = false;
+    private Rigidbody targetRigidbody;
+    private Vector3 lastMousePositionLeftFling;
+    private Vector3 targetLocalOffsetLeftRope;
+
+    // משתנים לשמירת הכוח האחרון ולעקוב אחרי תנועת המצלמה
+    private Vector3 lastFlingForce;
+    private Vector3 lastCameraPosition;
+    private Vector3 lastGunForward;
+    private Vector3 grapplePoint;
+
+    private SpringJoint joint;
+    [Header("Swing Options")]
+    public float damper;
+    public float swing;
+    public float massScale;
+    public float swingMaxDistance;
+    public float swingMinDistance;
+    public float swingBoostOnStop;
+    public float gravityBoost;
+    PlayerMovement1 playerMovement;
+    //public float force;
+
+    private void Awake()
+    {
+        playerMovement = GetComponent<PlayerMovement1>();
+    }
+
+    void Update()
+    {
+        if (playerGun == null || !playerGun.activeInHierarchy)
+        {
+            if (isAttached)
+                DetachRope();
+            return;
+        }
+
+
+        if (IsGrounded() && isSwinging && justLanded == false)
+        {
+            isSwinging = false;
+            playerMovement.isSwinging = false;
+            playerMovement.GetComponent<CharacterController>().enabled = true;
+        }
+        if (Input.GetMouseButtonDown(1) && !isAttached)
+        {
+            ShootRope();
+        }
+        if (Input.GetMouseButtonUp(1) && isAttached)
+        {
+            DetachRope();
+        }
+        if (Input.GetMouseButton(1) && isAttached /*&& movementCoroutine == null*/)
+        {
+            //movementCoroutine = StartCoroutine(MoveAlongRope());
+        }
+
+        if (Input.GetMouseButtonDown(0) && !isAttached)
+        {
+            ShootRopeLeft();
+        }
+        if (Input.GetMouseButtonUp(0) && isAttached && isLeftRope)
+        {
+            DetachRope();
+        }
+
+        if (isLeftRope && isAttached && targetRigidbody != null && currentRope != null)
+        {
+            targetPoint = targetRigidbody.transform.TransformPoint(targetLocalOffsetLeftRope);
+
+            Vector3 cameraMovement = mainCamera.transform.position - lastCameraPosition;
+            lastCameraPosition = mainCamera.transform.position;
+            if (cameraMovement.sqrMagnitude > 0.0001f)
+            {
+                Vector3 appliedCameraForce = cameraMovement * flingForce * flingSensitivity;
+                targetRigidbody.AddForce(appliedCameraForce, ForceMode.Impulse);
+                Debug.Log("Applying camera movement force: " + appliedCameraForce);
+            }
+            Vector3 mouseDelta = Input.mousePosition - lastMousePositionLeftFling;
+            lastMousePositionLeftFling = Input.mousePosition;
+            if (mouseDelta.sqrMagnitude > 1f)
+            {
+                Vector3 forceDir = (-mainCamera.transform.right * mouseDelta.x - mainCamera.transform.up * mouseDelta.y).normalized;
+                Vector3 appliedForce = forceDir * flingForce * flingSensitivity;
+                targetRigidbody.AddForce(appliedForce, ForceMode.Impulse);
+                lastFlingForce = appliedForce;
+                Debug.Log("Flinging object with mouse force: " + appliedForce);
+            }
+        }
+
+        // עדכון מתמיד של סיבוב הנקודה האדומה כך שתפנה לעבר המצלמה (השחקן)
+        if (currentRedDot != null)
+        {
+            currentRedDot.transform.LookAt(mainCamera.transform.position);
+        }
+    }
+
+    private void StartGrapple()
+    {
+        if (redDotPrefab != null)
+        {
+            GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
+            playerMovement.isSwinging = true;
+            justLanded = true;
+            isSwinging = true;
+            GetComponent<CharacterController>().enabled = false;
+            //grapplePoint = redDotPrefab.transform.position;
+            joint = gameObject.AddComponent<SpringJoint>();
+
+            joint.autoConfigureConnectedAnchor = false;
+            joint.connectedAnchor = grapplePoint;
+            Debug.Log(grapplePoint + " grapple position");
+            float distanceFromPoint = Vector3.Distance(transform.position, grapplePoint);
+
+            joint.maxDistance = distanceFromPoint * swingMaxDistance;
+            joint.minDistance = distanceFromPoint * swingMinDistance;
+
+            joint.spring = swing;
+            joint.damper = damper;
+            joint.massScale = massScale;
+        }
+    }
+
+    // משתנה למעקב האם החבל מחובר
+    public bool isAttached = false;
+    private Coroutine movementCoroutine;
+
+    void ShootRope()
+    {
+        if (mainCamera == null)
+        {
+            Debug.LogError("Main camera is not assigned!");
+            return;
+        }
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        // כעת המשת масק משלב רק קירות (wallLayer)
+        if (Physics.Raycast(ray, out hit, 100f, wallLayer))
+        {
+            Debug.Log("Raycast hit at: " + hit.point);
+            targetPoint = hit.point;
+            grapplePoint = hit.point;
+
+
+            // יצירת הנקודה האדומה במיקום הפגיעה, אך מוזחת מטר 1 בכיוון הפוך לקרן
+            if (redDotPrefab != null)
+            {
+                Vector3 redDotPosition = hit.point - ray.direction.normalized * 1f;
+                Vector3 directionToCamera = (mainCamera.transform.position - redDotPosition).normalized;
+                currentRedDot = Instantiate(redDotPrefab, redDotPosition, Quaternion.LookRotation(directionToCamera));
+            }
+
+            // במקור היה קוד לבדוק אם נגע באויב, והפעיל לוגיקה להורדת חיים - הוסר לחלוטין
+            //isSwinging = hit.collider.CompareTag("box");
+
+            StartGrapple();
+            if (isSwinging)
+            {
+                //currentSwingSpeed = ropeSpeed;
+                Debug.Log("Rope hit a box – swing mode activated!");
+            }
+            else
+            {
+                //isSwinging = false;
+            }
+
+            //currentRope = Instantiate(ropePrefab, gunTip.position, Quaternion.identity);
+            //LineRenderer line = currentRope.GetComponent<LineRenderer>();
+            //line.SetPosition(0, gunTip.position);
+            //line.SetPosition(1, targetPoint);
+            //if (ropeMaterial != null)
+            //line.material = ropeMaterial;
+            isAttached = true;
+        }
+        else
+        {
+            Debug.Log("No hit detected.");
+        }
+    }
+
+    void ShootRopeLeft()
+    {
+        if (mainCamera == null)
+        {
+            Debug.LogError("Main camera is not assigned!");
+            return;
+        }
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, 100f))
+        {
+            if (!hit.collider.CompareTag("cube"))
+            {
+                Debug.Log("Hit object is not tagged as 'cube'. Not instantiating rope for left click.");
+                return;
+            }
+            targetRigidbody = hit.collider.GetComponent<Rigidbody>();
+            if (targetRigidbody == null)
+            {
+                Debug.Log("Hit object tagged 'cube' does not have a Rigidbody. Not instantiating rope for left click.");
+                return;
+            }
+
+            Debug.Log("Left click hit: " + hit.collider.name + " at " + hit.point);
+            isLeftRope = true;
+            lastMousePositionLeftFling = Input.mousePosition;
+            lastCameraPosition = mainCamera.transform.position;
+            lastGunForward = gunTip.forward;
+
+            Vector3 direction = (targetRigidbody.transform.position - gunTip.position).normalized;
+            targetPoint = targetRigidbody.transform.position + direction * hitOffset;
+            Debug.Log("Using target Rigidbody center with offset, targetPoint: " + targetPoint);
+
+            // יצירת הנקודה האדומה גם במצב לחיצה שמאלית, כשהיא מוזחת מטר 1 בכיוון הפוך לחץ
+            if (redDotPrefab != null)
+            {
+                Vector3 redDotPosition = targetPoint - direction * 1f;
+                Vector3 directionToCamera = (mainCamera.transform.position - redDotPosition).normalized;
+                currentRedDot = Instantiate(redDotPrefab, redDotPosition, Quaternion.LookRotation(directionToCamera));
+            }
+
+            if (Vector3.Distance(gunTip.position, targetPoint) < minDistance)
+            {
+                Debug.Log("Calculated targetPoint is too close. Not instantiating rope.");
+                return;
+            }
+
+            targetLocalOffsetLeftRope = targetRigidbody.transform.InverseTransformPoint(targetPoint);
+
+            currentRope = Instantiate(ropePrefab, gunTip.position, Quaternion.identity);
+            LineRenderer line = currentRope.GetComponent<LineRenderer>();
+            line.SetPosition(0, gunTip.position);
+            line.SetPosition(1, targetPoint);
+            if (ropeMaterial != null)
+                line.material = ropeMaterial;
+            isAttached = true;
+        }
+        else
+        {
+            Debug.Log("No hit detected on left click.");
+        }
+    }
+
+    //IEnumerator MoveAlongRope()
+    //{
+    //    //while (isAttached && Input.GetMouseButton(1))
+    //    //{
+    //    //    if (isSwinging)
+    //    //    {
+    //    //        Vector3 offset = transform.position - targetPoint;
+    //    //        float radius = offset.magnitude;
+    //    //        currentSwingSpeed += swingAcceleration * Time.deltaTime;
+    //    //        float angularSpeed = currentSwingSpeed / radius;
+    //    //        Vector3 swingAxis = Vector3.Cross(offset, Vector3.up).normalized;
+    //    //        Quaternion swingRotation = Quaternion.AngleAxis(angularSpeed * Time.deltaTime * Mathf.Rad2Deg, swingAxis);
+    //    //        Vector3 newPos = targetPoint + swingRotation * offset;
+    //    //        transform.position = newPos;
+    //    //    }
+    //    //    else
+    //    //    {
+    //    //        //transform.position = Vector3.MoveTowards(transform.position, targetPoint, ropeSpeed * Time.deltaTime);
+    //    //        GetComponent<PlayerMovement1>().moveDirection += (transform.forward + (Vector3.forward / 5)) * force;
+    //    //        Debug.Log("APPLING FORCE TO PLAYER");
+    //    //    }
+    //    //    if (currentRope != null)
+    //    //    {
+    //    //        LineRenderer line = currentRope.GetComponent<LineRenderer>();
+    //    //        if (line != null)
+    //    //        {
+    //    //            line.SetPosition(0, gunTip.position);
+    //    //            line.SetPosition(1, targetPoint);
+    //    //        }
+    //    //    }
+    //    //    if (!isSwinging && Vector3.Distance(transform.position, targetPoint) < 0.1f)
+    //    //        break;
+    //    //    yield return null;
+    //    //}
+    //    //movementCoroutine = null;
+    //}
+
+    public Vector3 GetGrapplePoint()
+    {
+        return targetPoint;
+    }
+
+    void DetachRope()
+    {
+        if (isLeftRope && targetRigidbody != null)
+        {
+            Vector3 forceDirection = gunTip.forward;
+            if (forceDirection.y > 0)
+            {
+                forceDirection.y = 0;
+                forceDirection = forceDirection.normalized;
+            }
+            targetRigidbody.AddForce(forceDirection * flingForce, ForceMode.Impulse);
+            Debug.Log("Applying force in gun's forward direction: " + (forceDirection * flingForce));
+        }
+        else if (!isLeftRope)
+        {
+            Destroy(joint);
+            justLanded = false;
+            //GetComponent<CharacterController>().enabled = true;
+            GetComponent<CharacterController>().enabled = true;
+            playerMovement.moveDirection = (/*GetComponent<Rigidbody>().linearVelocity*/transform.forward * swingBoostOnStop);
+
+        }
+
+        isAttached = false;
+        //isSwinging = false;
+        isLeftRope = false;
+        targetRigidbody = null;
+        if (movementCoroutine != null)
+        {
+            StopCoroutine(movementCoroutine);
+            movementCoroutine = null;
+        }
+        if (currentRope != null)
+        {
+            Destroy(currentRope);
+        }
+        // מחיקת הנקודה האדומה רק בשחרור החבל
+        if (currentRedDot != null)
+        {
+            Destroy(currentRedDot);
+            currentRedDot = null;
+        }
+    }
+
+    // הוסר: OnTriggerEnter שמקטין את חיי האויב
+
+    public bool IsGrounded()
+    {
+        if (Physics.Raycast(new Ray(transform.position - new Vector3(0, 1, 0), transform.up * -1), 2f))
+            return true;
+        else
+            return false;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawRay(transform.position - new Vector3(0, 1, 0), transform.up * -0.5f);
+    }
+}
