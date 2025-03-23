@@ -60,22 +60,34 @@ public class GrapplingGun : MonoBehaviour
     public float massScale = 1f;
     public float swingMaxDistance = 1f;
     public float swingMinDistance = 0.5f;
-    
+
     [Header("Boost Settings On Stop")]
     public float upwardBoostOnStop = 0.5f;   // בוסט קטן כלפי מעלה
     public float forwardBoostOnStop = 1f;    // בוסט קטן כלפי קדימה
 
     // הפניות לרכיבים
-    private PlayerMovement1 playerMovement;
+    private PlayerMovement playerMovement;
     private CharacterController controller;
     private Rigidbody rb;
 
+    // משתנה לשמירת ערך הגרביטציה המקורי
+    private bool originalUseGravity;
+
+    // משתנה לניהול קורוטינת הניתוק האוטומטי
+    private Coroutine autoDetachCoroutine;
+    private Coroutine movementCoroutine;
+
+    public bool isAttached = false;
+
     private void Awake()
     {
-        playerMovement = GetComponent<PlayerMovement1>();
+        playerMovement = GetComponent<PlayerMovement>();
         controller = GetComponent<CharacterController>();
         rb = GetComponent<Rigidbody>();
         rb.isKinematic = false;
+
+        // שמירת ערך הגרביטציה המקורי
+        originalUseGravity = rb.useGravity;
     }
 
     void Update()
@@ -144,12 +156,15 @@ public class GrapplingGun : MonoBehaviour
         if (redDotPrefab != null)
         {
             // מעבירים את המהירות הקיימת ל־Rigidbody וכיבוי ה־CharacterController כדי להעביר את השליטה לפיזיקה:
-            rb.velocity = playerMovement.moveDirection;
+            rb.linearVelocity = playerMovement.moveDirection;
             controller.enabled = false;
 
             playerMovement.isSwinging = true;
             justLanded = true;
             isSwinging = true;
+
+            // במצב swing ניתן לכבות את הגרביטציה
+            rb.useGravity = false;
 
             joint = gameObject.AddComponent<SpringJoint>();
             joint.autoConfigureConnectedAnchor = false;
@@ -166,9 +181,6 @@ public class GrapplingGun : MonoBehaviour
         }
     }
 
-    public bool isAttached = false;
-    private Coroutine movementCoroutine;
-
     void ShootRope()
     {
         if (mainCamera == null)
@@ -181,6 +193,21 @@ public class GrapplingGun : MonoBehaviour
         if (Physics.Raycast(ray, out hit, 100f, wallLayer))
         {
             Debug.Log("Raycast hit at: " + hit.point);
+
+            // בדיקת חסימה: אם יש אובייקט בין ה-gunTip לנקודת הפגיעה, לא נמשיך
+            if (((1 << hit.collider.gameObject.layer) & wallLayer) != 0)
+            {
+                RaycastHit obstruction;
+                if (Physics.Linecast(gunTip.position, hit.point, out obstruction))
+                {
+                    if (obstruction.collider != hit.collider)
+                    {
+                        Debug.Log("Obstruction detected: " + obstruction.collider.name + " is blocking the view to the wall. Cannot shoot rope.");
+                        return;
+                    }
+                }
+            }
+
             targetPoint = hit.point;
             grapplePoint = hit.point;
 
@@ -198,6 +225,8 @@ public class GrapplingGun : MonoBehaviour
             }
 
             isAttached = true;
+            // הפעלת קורוטינה לניתוק אוטומטי לאחר 7 שניות
+            autoDetachCoroutine = StartCoroutine(AutoDetachRoutine());
         }
         else
         {
@@ -260,6 +289,8 @@ public class GrapplingGun : MonoBehaviour
             if (ropeMaterial != null)
                 line.material = ropeMaterial;
             isAttached = true;
+            // הפעלת קורוטינה לניתוק אוטומטי לאחר 7 שניות
+            autoDetachCoroutine = StartCoroutine(AutoDetachRoutine());
         }
         else
         {
@@ -274,6 +305,13 @@ public class GrapplingGun : MonoBehaviour
 
     void DetachRope()
     {
+        // עצירת קורוטינת הניתוק האוטומטי במידה והיא פועלת
+        if (autoDetachCoroutine != null)
+        {
+            StopCoroutine(autoDetachCoroutine);
+            autoDetachCoroutine = null;
+        }
+
         if (isLeftRope && targetRigidbody != null)
         {
             Vector3 forceDirection = gunTip.forward;
@@ -290,14 +328,18 @@ public class GrapplingGun : MonoBehaviour
             Destroy(joint);
             justLanded = false;
             // קבלת המומנטום הקיים, אך הסרת הרכיב האנכי כדי שלא תצבר מהירות מוגזמת למעלה:
-            Vector3 currentMomentum = rb.velocity;
+            Vector3 currentMomentum = rb.linearVelocity;
             currentMomentum.y = 0; // הסרת כל מומנטום אנכי
-            rb.velocity = Vector3.zero; // איפוס מהירות ה־Rigidbody
+            rb.linearVelocity = Vector3.zero; // איפוס מהירות ה־Rigidbody
             controller.enabled = true;
             Vector3 boostVelocity = currentMomentum + transform.forward * forwardBoostOnStop + Vector3.up * upwardBoostOnStop;
             playerMovement.moveDirection = boostVelocity;
             Debug.Log("Detaching with boost: " + boostVelocity);
         }
+
+        // החזרת הגרביטציה למצב המקורי וסיום מצב הסווינג
+        rb.useGravity = originalUseGravity;
+        playerMovement.isSwinging = false;
 
         isAttached = false;
         isLeftRope = false;
@@ -326,5 +368,16 @@ public class GrapplingGun : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.DrawRay(transform.position - new Vector3(0, 1, 0), Vector3.down * 0.5f);
+    }
+
+    // קורוטינה לניתוק אוטומטי של החבל לאחר 7 שניות אם לא שוחרר
+    private IEnumerator AutoDetachRoutine()
+    {
+        yield return new WaitForSeconds(3f);
+        if (isAttached)
+        {
+            Debug.Log("Auto detaching rope after 7 seconds.");
+            DetachRope();
+        }
     }
 }
