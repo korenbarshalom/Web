@@ -183,6 +183,13 @@ public class GrapplingGun : MonoBehaviour
 
     private void StartGrapple()
     {
+        // בדיקה האם השחקן נוגע במשטח - כלומר, לא נמצא באוויר
+        if (IsGrounded())
+        {
+            Debug.Log("לא ניתן להתחיל סווינג כאשר נוגעים במשטח.");
+            return;
+        }
+
         if (redDotPrefab != null)
         {
             // העברת המהירות הקיימת ל-Rigidbody וכיבוי ה-CharacterController להעברת השליטה לפיזיקה
@@ -369,21 +376,20 @@ public class GrapplingGun : MonoBehaviour
             rb.linearVelocity = Vector3.zero;
             controller.enabled = true;
 
-            // בדיקה אם החבל הוחזק יותר מ-1 שנייה
+            // חישוב משך הזמן בו החבל היה מחובר
             float holdDuration = Time.time - ropeAttachTime;
-            if (holdDuration >= 1f)
+            // נוודא שהחבל הוחזק לפחות 1 שנייה ושאין מגע עם הקרקע
+            if (holdDuration >= 1f && !IsGrounded())
             {
-                // חישוב בוסט נוסף בהתבסס על המומנטום המצטבר והכוונה של השחקן
                 Vector3 boostVelocity = currentMomentum + transform.forward * forwardBoostOnStop + Vector3.up * upwardBoostOnStop;
                 boostVelocity += transform.forward * accumulatedMomentumBoost;
-                // הוספת בוסט כלפי מטה כדי להאיץ את הנפילה לאחר סיום הסווינג
                 boostVelocity += Vector3.down * extraDownwardBoost;
                 playerMovement.moveDirection = boostVelocity;
                 Debug.Log("Detaching with boost (held for " + holdDuration + "s): " + boostVelocity);
             }
             else
             {
-                Debug.Log("Rope was not held long enough for boost (" + holdDuration + "s). No boost applied.");
+                Debug.Log("Rope was not held long enough for boost (" + holdDuration + "s) or player is grounded. No boost applied.");
             }
             // איפוס המומנטום המצטבר
             accumulatedMomentumBoost = 0f;
