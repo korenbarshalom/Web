@@ -379,7 +379,7 @@ public class GrapplingGun : MonoBehaviour
             // חישוב משך הזמן בו החבל היה מחובר
             float holdDuration = Time.time - ropeAttachTime;
             // נוודא שהחבל הוחזק לפחות 1 שנייה ושאין מגע עם הקרקע
-            if (holdDuration >= 1f && !IsGrounded())
+            if (holdDuration >= 0.65f && !IsGrounded())
             {
                 Vector3 boostVelocity = currentMomentum + transform.forward * forwardBoostOnStop + Vector3.up * upwardBoostOnStop;
                 boostVelocity += transform.forward * accumulatedMomentumBoost;
@@ -431,7 +431,7 @@ public class GrapplingGun : MonoBehaviour
     // קורוטינה לניתוק אוטומטי של החבל לאחר 3 שניות אם לא שוחרר
     private IEnumerator AutoDetachRoutine()
     {
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(1.3f);
         if (isAttached)
         {
             Debug.Log("Auto detaching rope after 3 seconds.");
