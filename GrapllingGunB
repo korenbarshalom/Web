@@ -268,7 +268,7 @@ public class GrapplingGun : MonoBehaviour
             }
 
             isAttached = true;
-            // הפעלת קורוטינה לניתוק אוטומטי לאחר 3 שניות
+            // הפעלת קורוטינה לניתוק אוטומטי עבור לחיצה ימנית בלבד
             autoDetachCoroutine = StartCoroutine(AutoDetachRoutine());
         }
         else
@@ -332,8 +332,8 @@ public class GrapplingGun : MonoBehaviour
             if (ropeMaterial != null)
                 line.material = ropeMaterial;
             isAttached = true;
-            // הפעלת קורוטינה לניתוק אוטומטי לאחר 3 שניות
-            autoDetachCoroutine = StartCoroutine(AutoDetachRoutine());
+            // כאן לא מפעילים קורוטינה לניתוק אוטומטי עבור לחיצה שמאלית,
+            // החבל ישוחרר רק כאשר המשתמש ישחרר את המקש.
         }
         else
         {
@@ -378,7 +378,7 @@ public class GrapplingGun : MonoBehaviour
 
             // חישוב משך הזמן בו החבל היה מחובר
             float holdDuration = Time.time - ropeAttachTime;
-            // נוודא שהחבל הוחזק לפחות 1 שנייה ושאין מגע עם הקרקע
+            // נוודא שהחבל הוחזק לפחות 0.65 שניות ושאין מגע עם הקרקע
             if (holdDuration >= 0.65f && !IsGrounded())
             {
                 Vector3 boostVelocity = currentMomentum + transform.forward * forwardBoostOnStop + Vector3.up * upwardBoostOnStop;
@@ -428,13 +428,13 @@ public class GrapplingGun : MonoBehaviour
         Gizmos.DrawRay(transform.position - new Vector3(0, 1, 0), Vector3.down * 0.5f);
     }
 
-    // קורוטינה לניתוק אוטומטי של החבל לאחר 3 שניות אם לא שוחרר
+    // קורוטינה לניתוק אוטומטי של החבל לאחר 1.3 שניות אם לא שוחרר (משמשת לחיצה ימנית בלבד)
     private IEnumerator AutoDetachRoutine()
     {
         yield return new WaitForSeconds(1.3f);
         if (isAttached)
         {
-            Debug.Log("Auto detaching rope after 3 seconds.");
+            Debug.Log("Auto detaching rope after 1.3 seconds.");
             DetachRope();
         }
     }
