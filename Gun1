@@ -567,10 +567,13 @@ public class WeaponSwitcher : MonoBehaviour
         isReloading = true;
         Debug.Log("Reloading...");
 
-        float totalReloadTime = (slides != null && slides.Length > 0) ? (2 * slideAnimDuration + 0.05f) : 0.5f;
+        float totalReloadTime = (slides != null && slides.Length > 0) ? (3 * slideAnimDuration + 0.05f) : 0.5f;
         if (ak47.activeSelf)
         {
+            // במקום סיבוב 360, מבצעים סיבוב 50 מעלות על ציר ה-Z ואז חזרה
             StartCoroutine(RotateAK(totalReloadTime));
+            // בנוסף – הזזת האובייקט של AK47 על ציר ה-Z 2 מטר למטה ואז חזרה למקומו ההתחלתי
+            StartCoroutine(TranslateAK(totalReloadTime));
         }
 
         if (gun.activeSelf)
@@ -685,19 +688,56 @@ public class WeaponSwitcher : MonoBehaviour
         isReloading = false;
     }
 
-    // קורוטינה לסיבוב 360 מעלות של ה-AK47 במהלך הרילוד
+    // קורוטינה לסיבוב 50 מעלות על ציר ה-Z עבור ה-AK47 בזמן הרילוד, ואז חזרה למצב המקורי
     private IEnumerator RotateAK(float duration)
     {
         Quaternion originalRotation = ak47.transform.localRotation;
+        Quaternion targetRotation = originalRotation * Quaternion.Euler(0, 0, -50f);
+        float halfDuration = duration / 2f;
         float elapsed = 0f;
-        while (elapsed < duration)
+        while (elapsed < halfDuration)
         {
             elapsed += Time.deltaTime;
-            float angle = Mathf.Lerp(0f, 360f, elapsed / duration);
-            ak47.transform.localRotation = originalRotation * Quaternion.Euler(angle, 0, 0);
+            float t = Mathf.Clamp01(elapsed / halfDuration);
+            ak47.transform.localRotation = Quaternion.Lerp(originalRotation, targetRotation, t);
+            yield return null;
+        }
+        ak47.transform.localRotation = targetRotation;
+        elapsed = 0f;
+        while (elapsed < halfDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / halfDuration);
+            ak47.transform.localRotation = Quaternion.Lerp(targetRotation, originalRotation, t);
             yield return null;
         }
         ak47.transform.localRotation = originalRotation;
+    }
+
+    // קורוטינה להזזת ה-AK47 על ציר ה-Z 2 מטר למטה ואז חזרה למקומו ההתחלתי בזמן הרילוד
+    private IEnumerator TranslateAK(float duration)
+    {
+        Vector3 originalPosition = initialAK47Position;
+        Vector3 targetPosition = originalPosition + new Vector3(0f, -0.5f, 0f);
+        float halfDuration = duration / 2f;
+        float elapsed = 0f;
+        while (elapsed < halfDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / halfDuration);
+            ak47.transform.localPosition = Vector3.Lerp(originalPosition, targetPosition, t);
+            yield return null;
+        }
+        ak47.transform.localPosition = targetPosition;
+        elapsed = 0f;
+        while (elapsed < halfDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / halfDuration);
+            ak47.transform.localPosition = Vector3.Lerp(targetPosition, originalPosition, t);
+            yield return null;
+        }
+        ak47.transform.localPosition = originalPosition;
     }
 
     // מעבר מיידי ללא אנימציה (למשל בהתחלה)
