@@ -36,6 +36,8 @@ public class S : MonoBehaviour
     private bool isReloading = false;
     // דגל לבדיקת מצב אנימציית הירייה (למשל סיבוב האקדח)
     private bool isShootingAnimationRunning = false;
+    // משתנה לשמירת הפניה לקורוטינה של ה-reload – מאפשר לעצור את התהליך במקרה שהנשק נכבה
+    private Coroutine reloadCoroutineRef = null;
 
     void Start()
     {
@@ -47,6 +49,40 @@ public class S : MonoBehaviour
     {
         if (ammoText != null)
             ammoText.text = currentMagazineBullets.ToString() + " / " + magazinesCount.ToString();
+    }
+
+    // כאשר הנשק נדלק מחדש – אם המחסנית ריקה ויש מחסניות נוספות, מחכים 0.3 שניות לפני תחילת ה-reload
+    void OnEnable()
+    {
+        if (currentMagazineBullets == 0 && magazinesCount > 0 && reloadCoroutineRef == null)
+        {
+            reloadCoroutineRef = StartCoroutine(WaitAndStartReload());
+        }
+    }
+
+    // קורוטינה שממתינה 0.3 שניות לפני תחילת ה-reload
+    private IEnumerator WaitAndStartReload()
+    {
+        yield return new WaitForSeconds(0.3f);
+        if (currentMagazineBullets == 0 && magazinesCount > 0)
+        {
+            reloadCoroutineRef = StartCoroutine(ReloadCoroutine());
+        }
+        else
+        {
+            reloadCoroutineRef = null;
+        }
+    }
+
+    // כאשר הנשק נכבה – אם תהליך ה-reload פעיל, עוצרים אותו
+    void OnDisable()
+    {
+        if (reloadCoroutineRef != null)
+        {
+            StopCoroutine(reloadCoroutineRef);
+            reloadCoroutineRef = null;
+            isReloading = false;
+        }
     }
 
     void Update()
@@ -88,7 +124,7 @@ public class S : MonoBehaviour
                 UpdateAmmoText();
 
                 // אם המחסנית נתרוקנה אך קיימת מחסנית נוספת – נבדוק שהאנימציה הסתיימה לפני תחילת ה-reload
-                if (currentMagazineBullets == 0 && magazinesCount > 0)
+                if (currentMagazineBullets == 0 && magazinesCount > 0 && reloadCoroutineRef == null)
                 {
                     if (isShootingAnimationRunning)
                     {
@@ -96,7 +132,7 @@ public class S : MonoBehaviour
                     }
                     else
                     {
-                        StartCoroutine(ReloadCoroutine());
+                        reloadCoroutineRef = StartCoroutine(ReloadCoroutine());
                     }
                 }
             }
@@ -107,9 +143,9 @@ public class S : MonoBehaviour
     private IEnumerator WaitForShootingAnimationAndReload()
     {
         yield return new WaitUntil(() => !isShootingAnimationRunning);
-        if (!isReloading && currentMagazineBullets == 0 && magazinesCount > 0)
+        if (!isReloading && currentMagazineBullets == 0 && magazinesCount > 0 && reloadCoroutineRef == null)
         {
-            StartCoroutine(ReloadCoroutine());
+            reloadCoroutineRef = StartCoroutine(ReloadCoroutine());
         }
     }
 
@@ -221,5 +257,6 @@ public class S : MonoBehaviour
         UpdateAmmoText();
 
         isReloading = false;
+        reloadCoroutineRef = null;
     }
 }
