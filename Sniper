@@ -1,0 +1,104 @@
+using UnityEngine;
+using System.Collections;
+using TMPro; // חשוב לייבא את TextMeshPro
+
+public class S : MonoBehaviour
+{
+    // נקודת ה-FirePoint שממנה יוצא הכדור
+    public Transform firePoint;
+    // הפריפאב של הכדור – יש לוודא שבפריפאב אין הגבלת מרחק לכדור
+    public GameObject bulletPrefab;
+    // מהירות הכדור (ניתן לשנות בהתאם לצורך)
+    public float bulletSpeed = 20f;
+
+    // רכיב AudioSource ל-shoot והצליל שישמע בכל ירייה
+    public AudioSource shootAudioSource;
+    public AudioClip shootSound;
+
+    // Particle System שיפעל פעם אחת בכל ירייה
+    public ParticleSystem shootParticle;
+
+    // TextMeshPro להצגת האממו – מוצג כ: "קליעים במחסנית / מחסניות"
+    public TMP_Text ammoText;
+
+    // מערכת המחסניות:
+    // currentMagazineBullets – מספר הקליעים במחסנית הנוכחית (מתחיל ב-1)
+    // magazinesCount – מספר המחסניות הכולל (מתחיל ב-12)
+    private int currentMagazineBullets = 1;
+    private int magazinesCount = 12;
+
+    // משתנה לבדיקת מצב reload
+    private bool isReloading = false;
+
+    void Start()
+    {
+        UpdateAmmoText();
+    }
+
+    // עדכון הטקסט להצגת המצב הנוכחי של האממו
+    void UpdateAmmoText()
+    {
+        if (ammoText != null)
+            ammoText.text = currentMagazineBullets.ToString() + " / " + magazinesCount.ToString();
+    }
+
+    void Update()
+    {
+        // בזמן reload אין אפשרות לירות
+        if (isReloading)
+            return;
+
+        // אם אין קליעים במחסנית וגם אין מחסניות נוספות – לא ניתן לירות
+        if (currentMagazineBullets <= 0 && magazinesCount <= 0)
+            return;
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            // ניתן לירות רק אם במחסנית הנוכחית יש לפחות כדור אחד
+            if (currentMagazineBullets > 0)
+            {
+                // יורים כדור עם הסיבוב כפי שהוגדר ב-firePoint
+                GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+
+                // אם הכדור מכיל Rigidbody, נותנים לו מהירות בכיוון ההפוך של firePoint.forward
+                Rigidbody rb = bullet.GetComponent<Rigidbody>();
+                if (rb != null)
+                {
+                    rb.linearVelocity = -firePoint.forward * bulletSpeed;
+                }
+
+                if (shootParticle != null)
+                    shootParticle.Play();
+
+                if (shootAudioSource != null && shootSound != null)
+                    shootAudioSource.PlayOneShot(shootSound);
+
+                // הפחתת כדור במחסנית הנוכחית ועדכון הטקסט
+                currentMagazineBullets--;
+                UpdateAmmoText();
+
+                // אם המחסנית נתרוקנה אך קיימת מחסנית נוספת – מתחילים reload
+                if (currentMagazineBullets == 0 && magazinesCount > 0)
+                {
+                    StartCoroutine(ReloadCoroutine());
+                }
+            }
+        }
+    }
+
+    private IEnumerator ReloadCoroutine()
+    {
+        isReloading = true;
+
+        // השהייה של reload (ניתן לשנות את הזמן לפי הצורך)
+        yield return new WaitForSeconds(1f);
+
+        // החלפת מחסנית:
+        // נצרכת מחסנית אחת, והקליעים במחסנית החדשה מתאפסים ל-1
+        magazinesCount--;
+        currentMagazineBullets = 1;
+        UpdateAmmoText();
+
+        isReloading = false;
+    }
+}
