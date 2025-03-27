@@ -12,6 +12,9 @@ public class Gun11 : MonoBehaviour
     // מערך של אובייקטים נוספים שיסובבו (וגם יזוזו) בזמן ה־reload
     public Transform[] additionalReloadRotateObjects;
 
+    // מערך של האובייקטים שצריך להתנתק (למשל מגזינים)
+    public GameObject[] detachableObjects;
+
     // רכיבי AudioSource נפרדים לכל אחד מהצלילים
     public AudioSource shootAudioSource;
     public AudioSource reloadAudioSource;
@@ -27,39 +30,78 @@ public class Gun11 : MonoBehaviour
     private int shotCounter = 0;
     // משתנה לבדיקת מצב reload
     private bool isReloading = false;
+    // משתנה שיאחסן את הקרוטינה הפעילה של ה־reload
+    private Coroutine currentReloadCoroutine;
+    // דגל המציין שיש reload לא הושלם (עקב כיבוי באמצע)
+    private bool needsReload = false;
+
+    // משתנים לאחסון המצב ההתחלתי של האובייקטים
+    private Quaternion _originalReloadRotation;
+    private Quaternion[] _additionalOriginalRotations;
+    private Vector3[] _additionalOriginalPositions;
 
     void Update()
     {
-        // בזמן reload אין אפשרות לירות
+        // אם ה־reload לא הושלם, לא ניתן לירות
         if (isReloading)
             return;
 
-        // כאשר לוחצים על המקש השמאלי בעכבר
         if (Input.GetMouseButtonDown(0))
         {
             // יורים כדור
             Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
 
-            // הפעלת Particle System במקרה שהוא מוגדר
             if (shootParticle != null)
-            {
                 shootParticle.Play();
-            }
 
-            // ניגון צליל יריה דרך רכיב ה-shootAudioSource
             if (shootAudioSource != null && shootSound != null)
-            {
                 shootAudioSource.PlayOneShot(shootSound);
-            }
 
             shotCounter++;
 
-            // כאשר נורים 2 פעמים, מתחילים את תהליך ה-reload
             if (shotCounter >= 2)
             {
                 shotCounter = 0;
-                StartCoroutine(ReloadCoroutine());
+                currentReloadCoroutine = StartCoroutine(ReloadCoroutine());
             }
+        }
+    }
+
+    // במקרה שהנשק נכבה באמצע תהליך ה־reload, נסמן שיש צורך להשלים את ה־reload
+    void OnDisable()
+    {
+        if (isReloading)
+        {
+            // איפוס הסיבוב למצב ההתחלתי
+            if (reloadRotateObject != null)
+                reloadRotateObject.localRotation = _originalReloadRotation;
+
+            if (additionalReloadRotateObjects != null && _additionalOriginalRotations != null && _additionalOriginalPositions != null)
+            {
+                for (int i = 0; i < additionalReloadRotateObjects.Length; i++)
+                {
+                    additionalReloadRotateObjects[i].localRotation = _additionalOriginalRotations[i];
+                    additionalReloadRotateObjects[i].localPosition = _additionalOriginalPositions[i];
+                }
+            }
+            // סימון שיש צורך בהשלמת ה־reload
+            needsReload = true;
+            if (currentReloadCoroutine != null)
+            {
+                StopCoroutine(currentReloadCoroutine);
+                currentReloadCoroutine = null;
+            }
+            isReloading = false;
+        }
+    }
+
+    // בעת הפעלה מחדש, אם ה־reload לא הושלם, מתחילים אותו מחדש
+    void OnEnable()
+    {
+        if (needsReload)
+        {
+            currentReloadCoroutine = StartCoroutine(ReloadCoroutine());
+            needsReload = false;
         }
     }
 
@@ -67,87 +109,135 @@ public class Gun11 : MonoBehaviour
     {
         isReloading = true;
 
-        // ניגון צליל reload פעם אחת בתחילת תהליך ה-reload דרך רכיב ה-reloadAudioSource
         if (reloadAudioSource != null && reloadSound != null)
-        {
             reloadAudioSource.PlayOneShot(reloadSound);
+
+        // טיפול באובייקטים שיש להתנתק (למשל מגזינים)
+        if (detachableObjects != null)
+        {
+            foreach (GameObject obj in detachableObjects)
+            {
+                if (obj != null)
+                {
+                    // שמירת ה-parent, המיקום והסיבוב המקומיים המקוריים
+                    Transform originalParent = obj.transform.parent;
+                    Vector3 originalLocalPos = obj.transform.localPosition;
+                    Quaternion originalLocalRot = obj.transform.localRotation;
+
+                    // ניתוק מה-parent – הפיכה לעצמאי
+                    obj.transform.SetParent(null);
+
+                    // חישוב מהירות התחלתית: זריקה בכיוון ההפוך של firePoint.forward עם תוספת למעלה
+                    Vector3 initialVelocity = (-firePoint.forward + Vector3.up).normalized * 10f;
+
+                    // זריקה ידנית למשך 0.3 שניות
+                    StartCoroutine(ThrowObjectWithoutRigidbody(obj, initialVelocity, 0.3f));
+                    // לאחר 0.3 שניות, החזרת האובייקט למיקומו המקורי
+                    StartCoroutine(ReparentAfterDelay(obj, originalParent, originalLocalPos, originalLocalRot, 0.3f));
+                }
+            }
         }
 
-        // משך זמן ה-reload
-        float reloadDuration = 1f;
-        float halfDuration = reloadDuration / 2f;  // 0.5 שניות לכל כיוון
+        // שמירת מצב התחלתי של האובייקטים לפני האנימציה
+        _originalReloadRotation = reloadRotateObject.localRotation;
+        _additionalOriginalRotations = new Quaternion[additionalReloadRotateObjects.Length];
+        _additionalOriginalPositions = new Vector3[additionalReloadRotateObjects.Length];
 
-        // --- סיבוב האובייקט הראשי ---
-        // שמירת הסיבוב המקומי המקורי של האובייקט הראשי
+        for (int i = 0; i < additionalReloadRotateObjects.Length; i++)
+        {
+            _additionalOriginalRotations[i] = additionalReloadRotateObjects[i].localRotation;
+            _additionalOriginalPositions[i] = additionalReloadRotateObjects[i].localPosition;
+        }
+
+        // אנימציית ה־reload: סיבוב האובייקטים
+        float reloadDuration = 1f;
+        float halfDuration = reloadDuration / 2f;
+
         Quaternion originalLocalRotation = reloadRotateObject.localRotation;
-        // הגדרת הסיבוב המטרה: +40 מעלות סביב ציר ה-X
         Quaternion targetLocalRotation = originalLocalRotation * Quaternion.Euler(40, 0, 0);
 
-        // --- סיבוב ואנימציית תזוזת האובייקטים הנוספים ---
-        // שמירת הסיבובים המקוריים לאובייקטים הנוספים
-        Quaternion[] additionalOriginalRotations = new Quaternion[additionalReloadRotateObjects.Length];
         Quaternion[] additionalTargetRotations = new Quaternion[additionalReloadRotateObjects.Length];
-        // שמירת המיקומים המקוריים והגדרת המיקומים המטרה (הסטה של 3 יחידות לאורך ציר ה-Y)
-        Vector3[] additionalOriginalPositions = new Vector3[additionalReloadRotateObjects.Length];
         Vector3[] additionalTargetPositions = new Vector3[additionalReloadRotateObjects.Length];
 
         for (int i = 0; i < additionalReloadRotateObjects.Length; i++)
         {
-            additionalOriginalRotations[i] = additionalReloadRotateObjects[i].localRotation;
-            additionalTargetRotations[i] = additionalOriginalRotations[i] * Quaternion.Euler(40, 0, 0);
-
-            additionalOriginalPositions[i] = additionalReloadRotateObjects[i].localPosition;
-            additionalTargetPositions[i] = additionalOriginalPositions[i] + new Vector3(0f, -0.2f, 0f);
+            additionalTargetRotations[i] = _additionalOriginalRotations[i] * Quaternion.Euler(40, 0, 0);
+            additionalTargetPositions[i] = _additionalOriginalPositions[i] + new Vector3(0f, -0.2f, 0f);
         }
 
-        // --- חצי ראשון של אנימציית ה-reload ---
-        // סיבוב בהדרגה מהמצב המקורי למצב המטרה במשך 0.5 שניות
         float elapsed = 0f;
         while (elapsed < halfDuration)
         {
             elapsed += Time.deltaTime;
             float t = Mathf.Clamp01(elapsed / halfDuration);
 
-            // עדכון סיבוב האובייקט הראשי
             reloadRotateObject.localRotation = Quaternion.Lerp(originalLocalRotation, targetLocalRotation, t);
 
-            // עדכון סיבוב ומיקום האובייקטים הנוספים
             for (int i = 0; i < additionalReloadRotateObjects.Length; i++)
             {
-                additionalReloadRotateObjects[i].localRotation = Quaternion.Lerp(additionalOriginalRotations[i], additionalTargetRotations[i], t);
-                additionalReloadRotateObjects[i].localPosition = Vector3.Lerp(additionalOriginalPositions[i], additionalTargetPositions[i], t);
+                additionalReloadRotateObjects[i].localRotation = Quaternion.Lerp(_additionalOriginalRotations[i], additionalTargetRotations[i], t);
+                additionalReloadRotateObjects[i].localPosition = Vector3.Lerp(_additionalOriginalPositions[i], additionalTargetPositions[i], t);
             }
             yield return null;
         }
 
-        // --- חצי שני של אנימציית ה-reload ---
-        // חזרה בהדרגה למצב המקורי במשך 0.5 שניות
         elapsed = 0f;
         while (elapsed < halfDuration)
         {
             elapsed += Time.deltaTime;
             float t = Mathf.Clamp01(elapsed / halfDuration);
 
-            // עדכון סיבוב האובייקט הראשי
             reloadRotateObject.localRotation = Quaternion.Lerp(targetLocalRotation, originalLocalRotation, t);
 
-            // עדכון סיבוב ומיקום האובייקטים הנוספים
             for (int i = 0; i < additionalReloadRotateObjects.Length; i++)
             {
-                additionalReloadRotateObjects[i].localRotation = Quaternion.Lerp(additionalTargetRotations[i], additionalOriginalRotations[i], t);
-                additionalReloadRotateObjects[i].localPosition = Vector3.Lerp(additionalTargetPositions[i], additionalOriginalPositions[i], t);
+                additionalReloadRotateObjects[i].localRotation = Quaternion.Lerp(additionalTargetRotations[i], _additionalOriginalRotations[i], t);
+                additionalReloadRotateObjects[i].localPosition = Vector3.Lerp(additionalTargetPositions[i], _additionalOriginalPositions[i], t);
             }
             yield return null;
         }
 
-        // ווידוא שהאובייקטים חוזרים בדיוק למצב המקורי
+        // הבטחה שהאובייקטים יחזרו בדיוק למצב ההתחלתי
         reloadRotateObject.localRotation = originalLocalRotation;
         for (int i = 0; i < additionalReloadRotateObjects.Length; i++)
         {
-            additionalReloadRotateObjects[i].localRotation = additionalOriginalRotations[i];
-            additionalReloadRotateObjects[i].localPosition = additionalOriginalPositions[i];
+            additionalReloadRotateObjects[i].localRotation = _additionalOriginalRotations[i];
+            additionalReloadRotateObjects[i].localPosition = _additionalOriginalPositions[i];
         }
 
         isReloading = false;
+        currentReloadCoroutine = null;
+    }
+
+    // קורוטינה המדמה זריקה ידנית ללא Rigidbody על ידי שינוי transform
+    private IEnumerator ThrowObjectWithoutRigidbody(GameObject obj, Vector3 initialVelocity, float duration)
+    {
+        float elapsed = 0f;
+        Vector3 velocity = initialVelocity;
+        while (elapsed < duration)
+        {
+            if (obj == null)
+                yield break;
+            // אם האובייקט כבר קיבל parent (הוחזר למקומו), יציאה מהלולאה
+            if (obj.transform.parent != null)
+                break;
+
+            velocity += Physics.gravity * Time.deltaTime;
+            obj.transform.position += velocity * Time.deltaTime;
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+    }
+
+    // קורוטינה שממתינה delay נתון ואז מחזירה את האובייקט למיקום, רוטציה ו-parent המקוריים
+    private IEnumerator ReparentAfterDelay(GameObject obj, Transform originalParent, Vector3 originalLocalPos, Quaternion originalLocalRot, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (obj != null && originalParent != null)
+        {
+            obj.transform.SetParent(originalParent);
+            obj.transform.localPosition = originalLocalPos;
+            obj.transform.localRotation = originalLocalRot;
+        }
     }
 }
