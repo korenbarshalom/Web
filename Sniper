@@ -21,6 +21,11 @@ public class S : MonoBehaviour
     // TextMeshPro להצגת האממו – מוצג כ: "קליעים במחסנית / מחסניות"
     public TMP_Text ammoText;
 
+    // האובייקט שיסובב בזמן ה-reload (למשל אנימציית טעינה)
+    public Transform reloadRotateObject;
+    // האובייקט הנוסף שיזוז על ציר ה-Z בזמן ה-reload (יזוז 0.15 מטר וחזרה)
+    public Transform reloadMoveObject;
+
     // מערכת המחסניות:
     // currentMagazineBullets – מספר הקליעים במחסנית הנוכחית (מתחיל ב-1)
     // magazinesCount – מספר המחסניות הכולל (מתחיל ב-12)
@@ -29,6 +34,8 @@ public class S : MonoBehaviour
 
     // משתנה לבדיקת מצב reload
     private bool isReloading = false;
+    // דגל לבדיקת מצב אנימציית הירייה (למשל סיבוב האקדח)
+    private bool isShootingAnimationRunning = false;
 
     void Start()
     {
@@ -73,28 +80,142 @@ public class S : MonoBehaviour
                 if (shootAudioSource != null && shootSound != null)
                     shootAudioSource.PlayOneShot(shootSound);
 
+                // הפעלת אנימציית ירייה – הסיבוב של האקדח
+                StartCoroutine(RotateGunOnShot());
+
                 // הפחתת כדור במחסנית הנוכחית ועדכון הטקסט
                 currentMagazineBullets--;
                 UpdateAmmoText();
 
-                // אם המחסנית נתרוקנה אך קיימת מחסנית נוספת – מתחילים reload
+                // אם המחסנית נתרוקנה אך קיימת מחסנית נוספת – נבדוק שהאנימציה הסתיימה לפני תחילת ה-reload
                 if (currentMagazineBullets == 0 && magazinesCount > 0)
                 {
-                    StartCoroutine(ReloadCoroutine());
+                    if (isShootingAnimationRunning)
+                    {
+                        StartCoroutine(WaitForShootingAnimationAndReload());
+                    }
+                    else
+                    {
+                        StartCoroutine(ReloadCoroutine());
+                    }
                 }
             }
         }
+    }
+
+    // קורוטינה שממתינה לסיום אנימציית הירייה ואז מתחילה את ה-reload
+    private IEnumerator WaitForShootingAnimationAndReload()
+    {
+        yield return new WaitUntil(() => !isShootingAnimationRunning);
+        if (!isReloading && currentMagazineBullets == 0 && magazinesCount > 0)
+        {
+            StartCoroutine(ReloadCoroutine());
+        }
+    }
+
+    // קורוטינה שמבצעת את אנימציית הירייה – סיבוב קטן של האקדח על ציר X וחזרה למצב המקורי
+    private IEnumerator RotateGunOnShot()
+    {
+        isShootingAnimationRunning = true;
+        Quaternion originalRotation = transform.localRotation;
+        Quaternion targetRotation = originalRotation * Quaternion.Euler(13f, 0f, 0f);
+        float rotationDuration = 0.1f; // משך הזמן לכל שלב
+
+        float elapsed = 0f;
+        // סיבוב לכיוון היעד
+        while (elapsed < rotationDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / rotationDuration;
+            transform.localRotation = Quaternion.Lerp(originalRotation, targetRotation, t);
+            yield return null;
+        }
+        transform.localRotation = targetRotation;
+
+        elapsed = 0f;
+        // חזרה למצב המקורי
+        while (elapsed < rotationDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / rotationDuration;
+            transform.localRotation = Quaternion.Lerp(targetRotation, originalRotation, t);
+            yield return null;
+        }
+        transform.localRotation = originalRotation;
+        isShootingAnimationRunning = false;
     }
 
     private IEnumerator ReloadCoroutine()
     {
         isReloading = true;
 
-        // השהייה של reload (ניתן לשנות את הזמן לפי הצורך)
-        yield return new WaitForSeconds(1f);
+        // שמירת מצבים התחלתיים:
+        Quaternion originalRotation = (reloadRotateObject != null ? reloadRotateObject.localRotation : Quaternion.identity);
+        Quaternion targetRotation = originalRotation * Quaternion.Euler(0, 0, -80);
 
-        // החלפת מחסנית:
-        // נצרכת מחסנית אחת, והקליעים במחסנית החדשה מתאפסים ל-1
+        Vector3 originalMovePosition = (reloadMoveObject != null ? reloadMoveObject.localPosition : Vector3.zero);
+        Vector3 targetMovePosition = originalMovePosition + new Vector3(0f, 0f, 0.15f);
+
+        // נגדיר משכי זמן לכל חלק באנימציה:
+        float rotationDuration = 0.3f;      // סיבוב עד -80 מעלות
+        float movementDuration = 0.3f;      // תנועת האובייקט הנוסף (תזוזה קדימה וחזרה)
+        float rotationBackDuration = 0.3f;  // החזרת הסיבוב למצב ההתחלתי
+
+        float elapsed = 0f;
+        // שלב 1: סיבוב האובייקט הראשון עד -80 מעלות
+        if (reloadRotateObject != null)
+        {
+            while (elapsed < rotationDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / rotationDuration);
+                reloadRotateObject.localRotation = Quaternion.Lerp(originalRotation, targetRotation, t);
+                yield return null;
+            }
+            reloadRotateObject.localRotation = targetRotation;
+        }
+
+        // שלב 2: תנועת האובייקט השני - תזוזה קדימה וחזרה
+        if (reloadMoveObject != null)
+        {
+            // תנועה קדימה (חצי מהזמן)
+            float halfMoveDuration = movementDuration / 2f;
+            elapsed = 0f;
+            while (elapsed < halfMoveDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / halfMoveDuration);
+                reloadMoveObject.localPosition = Vector3.Lerp(originalMovePosition, targetMovePosition, t);
+                yield return null;
+            }
+            reloadMoveObject.localPosition = targetMovePosition;
+            // תנועה חזרה (חצי מהזמן)
+            elapsed = 0f;
+            while (elapsed < halfMoveDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / halfMoveDuration);
+                reloadMoveObject.localPosition = Vector3.Lerp(targetMovePosition, originalMovePosition, t);
+                yield return null;
+            }
+            reloadMoveObject.localPosition = originalMovePosition;
+        }
+
+        // שלב 3: החזרת הסיבוב של האובייקט הראשון למצבו ההתחלתי
+        if (reloadRotateObject != null)
+        {
+            elapsed = 0f;
+            while (elapsed < rotationBackDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / rotationBackDuration);
+                reloadRotateObject.localRotation = Quaternion.Lerp(targetRotation, originalRotation, t);
+                yield return null;
+            }
+            reloadRotateObject.localRotation = originalRotation;
+        }
+
+        // החלפת מחסנית: נצרכת מחסנית אחת והקליעים במחסנית החדשה מתאפסים ל-1
         magazinesCount--;
         currentMagazineBullets = 1;
         UpdateAmmoText();
