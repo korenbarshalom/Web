@@ -1,9 +1,12 @@
 using UnityEngine;
 using System.Collections;
-using TMPro; // חשוב לייבא את הספרייה של TextMeshPro
+using TMPro; // חשוב לייבא את TextMeshPro
 
-public class Gun11 : MonoBehaviour
+public class ShotGun : MonoBehaviour
 {
+    // הוספת משתנה מהירות הקליע
+    public float bulletSpeed = 20f;
+
     // נקודת ה-FirePoint שממנה יוצא הקליע
     public Transform firePoint;
     // הפריפאב של הקליע
@@ -34,7 +37,7 @@ public class Gun11 : MonoBehaviour
     private bool isReloading = false;
     // משתנה לאחסון הקרוטינה הפעילה של ה-reload
     private Coroutine currentReloadCoroutine;
-    // דגל שמסמן כי תהליך reload נקטע (למשל עקב כיבוי) ויש להשלים אותו בעת הדלקה מחדש
+    // דגל שמסמן כי תהליך reload נקטע ויש להשלים אותו בעת הדלקה מחדש
     private bool needsReload = false;
 
     // מערכת המחסניות:
@@ -70,6 +73,16 @@ public class Gun11 : MonoBehaviour
         if (currentMagazineBullets <= 0 && magazinesCount <= 0)
             return;
 
+        // בדיקה ל־reload ידני על ידי מקש R (רק אם המחסנית אינה מלאה ויש מחסניות נוספות)
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            if (magazinesCount > 0 && currentMagazineBullets < 2)
+            {
+                currentReloadCoroutine = StartCoroutine(ReloadCoroutine());
+                return;
+            }
+        }
+
         if (Input.GetMouseButtonDown(0))
         {
             // ניתן לירות רק אם במחסנית הנוכחית יש לפחות קליע אחד
@@ -84,11 +97,11 @@ public class Gun11 : MonoBehaviour
                 if (shootAudioSource != null && shootSound != null)
                     shootAudioSource.PlayOneShot(shootSound);
 
-                // הפחתת קליע במחסנית הנוכחית ועדכון הטקסט
+                // הפחתת קליע במחסנית ועדכון הטקסט
                 currentMagazineBullets--;
                 UpdateAmmoText();
 
-                // אם המחסנית נתרוקנה אך קיימת מחסנית במלאי – מתחילים reload
+                // אם המחסנית נתרוקנה אך קיימת מחסנית במלאי – מתחילים reload אוטומטי
                 if (currentMagazineBullets == 0 && magazinesCount > 0)
                 {
                     currentReloadCoroutine = StartCoroutine(ReloadCoroutine());
@@ -97,7 +110,7 @@ public class Gun11 : MonoBehaviour
         }
     }
 
-    // כאשר האובייקט נכבה (למשל בגלל כיבוי הנשק) – אם מתבצע reload, מאפסים את האנימציה וסומנים שיש להשלים reload בעת הפעלה מחדש
+    // כאשר האובייקט נכבה – אם מתבצע reload, מאפסים את האנימציה וסומנים שיש להשלים reload בעת הדלקה מחדש
     void OnDisable()
     {
         if (isReloading)
@@ -133,7 +146,7 @@ public class Gun11 : MonoBehaviour
         }
     }
 
-    // קרוטינה לאנימציית reload, הכוללת טיפול באובייקטים להתנתקות (למשל מגזינים) ואנימציה של סיבוב
+    // קרוטינה לאנימציית reload, הכוללת טיפול באובייקטים להתנתקות ואנימציית סיבוב
     private IEnumerator ReloadCoroutine()
     {
         isReloading = true;
@@ -141,7 +154,7 @@ public class Gun11 : MonoBehaviour
         if (reloadAudioSource != null && reloadSound != null)
             reloadAudioSource.PlayOneShot(reloadSound);
 
-        // טיפול באובייקטים שיש להתנתק (למשל מגזינים)
+        // טיפול באובייקטים שיש להתנתק (כמו מגזינים)
         if (detachableObjects != null)
         {
             foreach (GameObject obj in detachableObjects)
@@ -167,7 +180,7 @@ public class Gun11 : MonoBehaviour
             }
         }
 
-        // שמירת המצב ההתחלתי של האובייקטים לפני האנימציה
+        // שמירת המצב ההתחלתי של האובייקטים לאנימציית reload
         _originalReloadRotation = reloadRotateObject.localRotation;
         _additionalOriginalRotations = new Quaternion[additionalReloadRotateObjects.Length];
         _additionalOriginalPositions = new Vector3[additionalReloadRotateObjects.Length];
@@ -233,10 +246,9 @@ public class Gun11 : MonoBehaviour
             additionalReloadRotateObjects[i].localPosition = _additionalOriginalPositions[i];
         }
 
-        // בשלב זה מתבצע "החלפת מחסנית":
+        // בשלב זה מתבצעת "החלפת מחסנית":
         // מחסנית אחת נצרכת, והקליעים במחסנית החדשה מתאפסים ל-2
         magazinesCount--;
-        // במידה והמחסניות נגמרו – לא ניתן לטעון מחדש (אפשר להוסיף טיפול מיוחד במקרה זה)
         if (magazinesCount < 0)
             magazinesCount = 0;
 
