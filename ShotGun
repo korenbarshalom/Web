@@ -51,6 +51,13 @@ public class ShotGun : MonoBehaviour
     private Quaternion[] _additionalOriginalRotations;
     private Vector3[] _additionalOriginalPositions;
 
+    // דגל לבדיקת מצב אנימציית הירי
+    private bool isShootingAnimationRunning = false;
+
+    // משתנים לקוד-דאון בין יריות
+    private float attackCooldown = 0.2f;
+    private float nextTimeToFire = 0f;
+
     void Start()
     {
         UpdateAmmoText();
@@ -78,13 +85,26 @@ public class ShotGun : MonoBehaviour
         {
             if (magazinesCount > 0 && currentMagazineBullets < 2)
             {
-                currentReloadCoroutine = StartCoroutine(ReloadCoroutine());
+                if (isShootingAnimationRunning)
+                {
+                    StartCoroutine(WaitForShootingAnimationAndReload());
+                }
+                else
+                {
+                    currentReloadCoroutine = StartCoroutine(ReloadCoroutine());
+                }
                 return;
             }
         }
 
+        // בדיקת ירייה עם לחיצה על עכבר (Attack cooldown מתבצע כאן)
         if (Input.GetMouseButtonDown(0))
         {
+            // בדיקה אם עבר מספיק זמן מהירי האחרון
+            if (Time.time < nextTimeToFire)
+                return;
+            nextTimeToFire = Time.time + attackCooldown;
+
             // ניתן לירות רק אם במחסנית הנוכחית יש לפחות קליע אחד
             if (currentMagazineBullets > 0)
             {
@@ -97,14 +117,24 @@ public class ShotGun : MonoBehaviour
                 if (shootAudioSource != null && shootSound != null)
                     shootAudioSource.PlayOneShot(shootSound);
 
+                // הפעלת אנימציית הירי (סיבוב האקדח)
+                StartCoroutine(RotateGunOnShot());
+
                 // הפחתת קליע במחסנית ועדכון הטקסט
                 currentMagazineBullets--;
                 UpdateAmmoText();
 
-                // אם המחסנית נתרוקנה אך קיימת מחסנית במלאי – מתחילים reload אוטומטי
+                // אם המחסנית נתרוקנה אך קיימת מחסנית במלאי – מתחילים reload לאחר סיום אנימציית הירי
                 if (currentMagazineBullets == 0 && magazinesCount > 0)
                 {
-                    currentReloadCoroutine = StartCoroutine(ReloadCoroutine());
+                    if (isShootingAnimationRunning)
+                    {
+                        StartCoroutine(WaitForShootingAnimationAndReload());
+                    }
+                    else
+                    {
+                        currentReloadCoroutine = StartCoroutine(ReloadCoroutine());
+                    }
                 }
             }
         }
@@ -143,6 +173,16 @@ public class ShotGun : MonoBehaviour
         {
             currentReloadCoroutine = StartCoroutine(ReloadCoroutine());
             needsReload = false;
+        }
+    }
+
+    // קורוטינה שמחכה לסיום אנימציית הירי ואז מתחילה את ה-reload
+    private IEnumerator WaitForShootingAnimationAndReload()
+    {
+        yield return new WaitUntil(() => !isShootingAnimationRunning);
+        if (!isReloading && currentMagazineBullets == 0 && magazinesCount > 0)
+        {
+            currentReloadCoroutine = StartCoroutine(ReloadCoroutine());
         }
     }
 
@@ -287,5 +327,38 @@ public class ShotGun : MonoBehaviour
             obj.transform.localPosition = originalLocalPos;
             obj.transform.localRotation = originalLocalRot;
         }
+    }
+
+    // קורוטינה לסיבוב האקדח בעת ירייה:
+    // סיבוב -10 מעלות על ציר ה-X וחזרה מהירה למצב המקורי
+    private IEnumerator RotateGunOnShot()
+    {
+        isShootingAnimationRunning = true;
+        Quaternion originalRotation = transform.localRotation;
+        Quaternion targetRotation = originalRotation * Quaternion.Euler(-12f, 0f, 0f);
+        float rotationDuration = 0.08f; // משך הזמן לכל שלב
+
+        float elapsed = 0f;
+        // סיבוב לכיוון היעד
+        while (elapsed < rotationDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / rotationDuration;
+            transform.localRotation = Quaternion.Lerp(originalRotation, targetRotation, t);
+            yield return null;
+        }
+        transform.localRotation = targetRotation;
+
+        elapsed = 0f;
+        // חזרה למצב המקורי
+        while (elapsed < rotationDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / rotationDuration;
+            transform.localRotation = Quaternion.Lerp(targetRotation, originalRotation, t);
+            yield return null;
+        }
+        transform.localRotation = originalRotation;
+        isShootingAnimationRunning = false;
     }
 }
