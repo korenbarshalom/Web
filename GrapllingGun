@@ -32,6 +32,9 @@ public class GrapplingGun : MonoBehaviour
     [Header("Initial Rotation Reference")]
     public Transform initialRotationReference; // אובייקט ריק שמייצג את הרוטציה ההתחלתית (למשל, (0,180,0))
 
+    [Header("Gun Rotation Settings")]
+    public float gunRotationSpeed = 100f; // מהירות סיבוב האקדח בזמן הסווינג (במעלות לשנייה)
+
     // משתנים פנימיים לניהול החבל והגרבינג
     private GameObject currentRope;
     private Vector3 targetPoint;
@@ -166,8 +169,8 @@ public class GrapplingGun : MonoBehaviour
             currentRedDot.transform.LookAt(mainCamera.transform.position);
         }
 
-        // סיבוב האקדח בהתאם לכיוון הגרפל, אך לא לסובב לכיוון ההפוך.
-        if (isAttached)
+        // סיבוב האקדח בהתאם לכיוון הגרפל, אך רק כאשר מדובר בגרבינג באמצעות לחצן ימין
+        if (isAttached && !isLeftRope)
         {
             Vector3 direction = grapplePoint - playerGun.transform.position;
             if (direction != Vector3.zero)
@@ -176,9 +179,8 @@ public class GrapplingGun : MonoBehaviour
                 Quaternion rawRotation = Quaternion.LookRotation(direction);
                 // מכפילים ב-offset של 180 מעלות סביב ציר Y כדי לתקן את הכיוון (אם הדגם מוצג הפוך)
                 Quaternion correctedRotation = rawRotation * Quaternion.Euler(0, 180, 0);
-                float rotationSpeed = 1.6f;
-                // משתמשים ב-Slerp לקבלת סיבוב חלק
-                playerGun.transform.rotation = Quaternion.Slerp(playerGun.transform.rotation, correctedRotation, rotationSpeed * Time.deltaTime);
+                // משתמשים ב-Quaternion.RotateTowards לקבלת סיבוב חלק ומבוקרת
+                playerGun.transform.rotation = Quaternion.RotateTowards(playerGun.transform.rotation, correctedRotation, gunRotationSpeed * Time.deltaTime);
             }
         }
     }
