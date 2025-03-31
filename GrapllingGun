@@ -101,6 +101,9 @@ public class GrapplingGun : MonoBehaviour
     // משתנה לשמירת זמן ההתחברות של החבל
     private float ropeAttachTime = 0f;
 
+    // משתנה לציון האם אנימציית החזרת הסיבוב פעילה
+    private bool isAnimatingGunReturn = false;
+
     private void Awake()
     {
         playerMovement = GetComponent<PlayerMovement>();
@@ -169,17 +172,14 @@ public class GrapplingGun : MonoBehaviour
             currentRedDot.transform.LookAt(mainCamera.transform.position);
         }
 
-        // סיבוב האקדח בהתאם לכיוון הגרפל, אך רק כאשר מדובר בגרבינג באמצעות לחצן ימין
-        if (isAttached && !isLeftRope)
+        // עדכון סיבוב הנשק בזמן גרבינג עם לחצן ימין – רק אם לא מתבצעת אנימציית החזרה.
+        if (isAttached && !isLeftRope && !isAnimatingGunReturn)
         {
             Vector3 direction = grapplePoint - playerGun.transform.position;
             if (direction != Vector3.zero)
             {
-                // מחשבים את ה-Quaternion שמצביע לעבר הגרפל
                 Quaternion rawRotation = Quaternion.LookRotation(direction);
-                // מכפילים ב-offset של 180 מעלות סביב ציר Y כדי לתקן את הכיוון (אם הדגם מוצג הפוך)
                 Quaternion correctedRotation = rawRotation * Quaternion.Euler(0, 180, 0);
-                // משתמשים ב-Quaternion.RotateTowards לקבלת סיבוב חלק ומבוקרת
                 playerGun.transform.rotation = Quaternion.RotateTowards(playerGun.transform.rotation, correctedRotation, gunRotationSpeed * Time.deltaTime);
             }
         }
@@ -400,14 +400,30 @@ public class GrapplingGun : MonoBehaviour
             Destroy(currentRedDot);
             currentRedDot = null;
         }
-        // אם מדובר בגרבינג מסוג Swing (לחיצה ימנית), מאפסים את סיבוב האקדח לרוטציה של האובייקט הריק
+        // במקרה של גרבינג מסוג Swing, נפעיל אנימציית החזרת הסיבוב כך שהתנועה לא תושפע מתזוזות המשתמש.
         if (wasSwing)
         {
-            if (initialRotationReference != null)
-                playerGun.transform.rotation = initialRotationReference.rotation;
-            else
-                playerGun.transform.rotation = Quaternion.Euler(0, 180, 0);
+            StartCoroutine(AnimateGunReturn());
         }
+    }
+
+    // אנימציית החזרת הסיבוב - הפעם על ה־localRotation, כך שהאקדח יחזור בדיוק לערכים ההתחלתיים.
+    private IEnumerator AnimateGunReturn()
+    {
+        isAnimatingGunReturn = true;
+        // שימוש ב־localRotation כדי להבטיח שהסיבוב יחזור בדיוק כפי שהוגדר בהיררכיה המקומית
+        Quaternion startRotation = playerGun.transform.localRotation;
+        Quaternion targetRotation = initialRotationReference != null ? initialRotationReference.localRotation : Quaternion.Euler(0, 180, 0);
+        float duration = 0.2f; // משך האנימציה - 0.2 שניות
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            playerGun.transform.localRotation = Quaternion.Slerp(startRotation, targetRotation, elapsed / duration);
+            yield return null;
+        }
+        playerGun.transform.localRotation = targetRotation;
+        isAnimatingGunReturn = false;
     }
 
     public bool IsGrounded()
