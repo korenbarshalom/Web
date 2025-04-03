@@ -131,7 +131,7 @@ public class WeaponSwitcher : MonoBehaviour
     public float switchInDuration = 0.25f;
     private bool isSwitching = false;
 
-    // משתנה לניהול זמן Idle – אם אין תנועה למשך שניה, תתחיל אנימציית Idle
+    // משתנה לניהול זמן Idle – אם אין תנועה או ירי למשך 3 שניות, תתחיל אנימציית Idle
     private float idleTimer = 0f;
 
     private void Start()
@@ -190,10 +190,10 @@ public class WeaponSwitcher : MonoBehaviour
 
     private void Update()
     {
-        // בדיקה האם השחקן זז (על בסיס קלט אופקי ואנכי)
+        // בדיקה האם השחקן זז או יורה – אם יש תנועה או לחצן ירי פעיל, מאפסים את ה־idleTimer
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
-        if (Mathf.Abs(horizontalInput) > 0.1f || Mathf.Abs(verticalInput) > 0.1f)
+        if (Mathf.Abs(horizontalInput) > 0.1f || Mathf.Abs(verticalInput) > 0.1f || Input.GetButton("Fire1"))
         {
             idleTimer = 0f;
         }
@@ -468,7 +468,7 @@ public class WeaponSwitcher : MonoBehaviour
             }
         }
 
-        // הגדרות לתנועת Idle – תופעל אם השחקן עומד יותר משניה אחת
+        // הגדרת תנועת Idle – תופעל רק אם השחקן עומד ולא יורה למשך 3 שניות
         float idleFrequency = 2.0f;
         float idleAmplitude = 0.02f;
         float idleOffsetY = Mathf.Sin(Time.time * idleFrequency) * idleAmplitude;
@@ -479,7 +479,7 @@ public class WeaponSwitcher : MonoBehaviour
             Vector3 recoilTarget = initialGunPosition + (Input.GetButton("Fire1") ? -Vector3.forward * recoilAmount : Vector3.zero);
             Vector3 swayOffset = new Vector3(-Input.GetAxis("Mouse X") * swayAmount, -Input.GetAxis("Mouse Y") * swayAmount, 0);
             Vector3 combinedTarget = recoilTarget + swayOffset;
-            if (idleTimer > 1f)
+            if (idleTimer > 2f)
             {
                 combinedTarget += new Vector3(0, idleOffsetY, 0);
             }
@@ -490,7 +490,7 @@ public class WeaponSwitcher : MonoBehaviour
             Vector3 recoilTarget = initialAK47Position + (Input.GetButton("Fire1") ? -Vector3.forward * recoilAmount : Vector3.zero);
             Vector3 swayOffset = new Vector3(-Input.GetAxis("Mouse X") * swayAmount, -Input.GetAxis("Mouse Y") * swayAmount, 0);
             Vector3 combinedTarget = recoilTarget + swayOffset;
-            if (idleTimer > 1f)
+            if (idleTimer > 3f)
             {
                 combinedTarget += new Vector3(0, idleOffsetY, 0);
             }
@@ -507,7 +507,7 @@ public class WeaponSwitcher : MonoBehaviour
         {
             int index = System.Array.IndexOf(weapons, pistol);
             Vector3 target = initialPositions[index] + new Vector3(-Input.GetAxis("Mouse X") * swayAmount, -Input.GetAxis("Mouse Y") * swayAmount, 0);
-            if (idleTimer > 1f)
+            if (idleTimer > 3f)
             {
                 target += new Vector3(0, idleOffsetY, 0);
             }
@@ -517,7 +517,7 @@ public class WeaponSwitcher : MonoBehaviour
         {
             int index = System.Array.IndexOf(weapons, extraWeapon);
             Vector3 target = initialPositions[index] + new Vector3(-Input.GetAxis("Mouse X") * swayAmount, -Input.GetAxis("Mouse Y") * swayAmount, 0);
-            if (idleTimer > 1f)
+            if (idleTimer > 3f)
             {
                 target += new Vector3(0, idleOffsetY, 0);
             }
@@ -527,7 +527,7 @@ public class WeaponSwitcher : MonoBehaviour
         {
             int index = System.Array.IndexOf(weapons, extraWeapon2);
             Vector3 target = initialPositions[index] + new Vector3(-Input.GetAxis("Mouse X") * swayAmount, -Input.GetAxis("Mouse Y") * swayAmount, 0);
-            if (idleTimer > 1f)
+            if (idleTimer > 3f)
             {
                 target += new Vector3(0, idleOffsetY, 0);
             }
@@ -537,7 +537,7 @@ public class WeaponSwitcher : MonoBehaviour
         {
             int index = System.Array.IndexOf(weapons, extraWeapon3);
             Vector3 target = initialPositions[index] + new Vector3(-Input.GetAxis("Mouse X") * swayAmount, -Input.GetAxis("Mouse Y") * swayAmount, 0);
-            if (idleTimer > 1f)
+            if (idleTimer > 3f)
             {
                 target += new Vector3(0, idleOffsetY, 0);
             }
@@ -547,7 +547,7 @@ public class WeaponSwitcher : MonoBehaviour
         {
             int index = System.Array.IndexOf(weapons, extraWeapon4);
             Vector3 target = initialPositions[index] + new Vector3(-Input.GetAxis("Mouse X") * swayAmount, -Input.GetAxis("Mouse Y") * swayAmount, 0);
-            if (idleTimer > 1f)
+            if (idleTimer > 3f)
             {
                 target += new Vector3(0, idleOffsetY, 0);
             }
