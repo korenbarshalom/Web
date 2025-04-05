@@ -10,11 +10,18 @@ public class PlayerMovement : MonoBehaviour
     public Transform playerTransform;
     public Camera playerCamera;
 
+    [Header("Camera Modifier Settings")]
+    // שדה בו ניתן להכניס מצלמה, כך שכאשר היא פעילה, ה-lookSpeed יהיה 0.7, וכאשר לא – יחזור לערך המקורי.
+    public Camera specialCamera;
+    public float specialLookSpeed = 0.7f;
+    private float originalLookSpeed; // ישמש לאחסון ערך ה-lookSpeed הרגיל
+
     [Header("Movement Settings")]
+    // מומלץ להגדיר את ה-lookSpeed ברירת מחדל כ-1.5 אם זה מה שנדרש.
     public float walkSpeed = 10f;
     public float jumpPower = 7f;
     public float gravity = 10f;
-    public float lookSpeed = 2f;   // רגישות עכבר (ניתן לעדכן באמצעות הסליידר)
+    public float lookSpeed = 1.5f;   // רגישות עכבר (ניתן לעדכן באמצעות הסליידר)
     public float lookXLimit = 45f;
     public float defaultHeight = 2f;
     public float crouchHeight = 1f;
@@ -196,6 +203,25 @@ public class PlayerMovement : MonoBehaviour
     }
     // --- סוף ניהול סאונד Slide ---
 
+    // NEW: משתנים לניהול סאונד WallRun (באמצעות אותם קבצים כמו ל-slide)
+    private bool wallRunSoundActive = false;
+    private Coroutine wallRunSoundCoroutineRef = null;
+
+    private IEnumerator WallRunSoundCoroutine()
+    {
+        slideObjectAudioSource.loop = false;
+        slideObjectAudioSource.clip = slideStartSound;
+        slideObjectAudioSource.Play();
+        while (slideObjectAudioSource.isPlaying)
+        {
+            yield return null;
+        }
+        slideObjectAudioSource.clip = slideLoopSound;
+        slideObjectAudioSource.loop = true;
+        slideObjectAudioSource.Play();
+    }
+    // --- סוף ניהול סאונד WallRun ---
+
     private bool slideStartedOnSlideSurface = false;
     private Vector3 slideMomentum = Vector3.zero;
     private Vector3 fixedSlideDirection = Vector3.zero;
@@ -276,17 +302,31 @@ public class PlayerMovement : MonoBehaviour
         {
             wallRunParticleSystem.gameObject.SetActive(false);
         }
+
+        // אתחול הערך המקורי של lookSpeed – במידה ואין סליידר, נשתמש בערך המוגדר
+        originalLookSpeed = lookSpeed;
     }
 
     void Update()
     {
-        if (characterController.isGrounded)
-            slideMomentum = Vector3.zero;
-
+        // עדכון ה-lookSpeed לפי הסליידר (אם קיים) והמצלמה המיוחדת:
         if (mouseSensitivitySlider != null)
         {
-            lookSpeed = mouseSensitivitySlider.value;
+            originalLookSpeed = mouseSensitivitySlider.value;
         }
+        // אם המצלמה המיוחדת פעילה – נחליף ל-lookSpeed המוגדר כ-specialLookSpeed,
+        // אחרת נחזור לערך המקורי (מהסליידר או מהערך ההתחלתי)
+        if (specialCamera != null && specialCamera.gameObject.activeSelf)
+        {
+            lookSpeed = specialLookSpeed;
+        }
+        else
+        {
+            lookSpeed = originalLookSpeed;
+        }
+
+        if (characterController.isGrounded)
+            slideMomentum = Vector3.zero;
 
         if (dashCooldownTimer > 0f)
             dashCooldownTimer -= Time.deltaTime;
@@ -363,6 +403,14 @@ public class PlayerMovement : MonoBehaviour
         else
             isWallRunning = false;
 
+        // בדיקה: במצב WallRun יש לוודא שהשחקן מחזיק מקש W להמשך ההחליקה
+        if (isWallRunning && !Input.GetKey(KeyCode.W))
+        {
+            isWallRunning = false;
+            wallRunTimer = 0f;
+            Debug.Log("WallRun ended because forward key (W) is not pressed.");
+        }
+
         rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
         // הגבלת הסיבוב האנכי לפי lookXLimit
         rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
@@ -418,6 +466,31 @@ public class PlayerMovement : MonoBehaviour
         if (shouldPlaySlideObjectSound != objectSlidingSoundActive)
         {
             objectSlidingSoundActive = shouldPlaySlideObjectSound;
+        }
+
+        // NEW: לוגיקת סאונד עבור WallRun – מתחיל רק אם השחקן בתנועה ונוגע באובייקטים עם השכבה WallRun
+        bool shouldPlayWallRunSound = isWallRunning && (Mathf.Abs(Input.GetAxis("Horizontal")) > 0.1f || Mathf.Abs(Input.GetAxis("Vertical")) > 0.1f);
+        if (shouldPlayWallRunSound != wallRunSoundActive)
+        {
+            wallRunSoundActive = shouldPlayWallRunSound;
+            if (wallRunSoundActive)
+            {
+                if (wallRunSoundCoroutineRef != null)
+                    StopCoroutine(wallRunSoundCoroutineRef);
+                wallRunSoundCoroutineRef = StartCoroutine(WallRunSoundCoroutine());
+            }
+            else
+            {
+                if (wallRunSoundCoroutineRef != null)
+                {
+                    StopCoroutine(wallRunSoundCoroutineRef);
+                    wallRunSoundCoroutineRef = null;
+                }
+                if (slideObjectAudioSource.isPlaying)
+                    slideObjectAudioSource.Stop();
+                slideObjectAudioSource.loop = false;
+                slideObjectAudioSource.PlayOneShot(slideEndSound, slideObjectSoundVolume);
+            }
         }
     }
 
@@ -571,7 +644,6 @@ public class PlayerMovement : MonoBehaviour
                 }
             }
 
-
             slideVelocity.y -= gravity * Time.deltaTime;
 
             float horizontalInput = Input.GetAxis("Horizontal");
@@ -664,11 +736,11 @@ public class PlayerMovement : MonoBehaviour
             characterController.height = defaultHeight;
             if (onSpeedPad)
             {
-                walkSpeed = 60f;
+                walkSpeed = 120f;
             }
             else
             {
-                walkSpeed = 22f;
+                walkSpeed = 26f;
             }
         }
 
@@ -742,6 +814,24 @@ public class PlayerMovement : MonoBehaviour
 
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
+        // --- התחלה: עצירת Ground Slide במקרה של התנגשות עם מחסום ---
+        if (isSliding && !slideStartedOnSlideSurface)
+        {
+            // נבדוק את זווית ההתנגשות – אם היא גדולה מ-15 מעלות, מדובר בהתנגשות עם מחסום
+            float collisionAngle = Vector3.Angle(hit.normal, Vector3.up);
+            if (collisionAngle > 15f)
+            {
+                isSliding = false;
+                slideTimer = 0f;
+                slideVelocity = Vector3.zero;
+                if (playerCollider != null && normalMaterial != null)
+                    playerCollider.material = normalMaterial;
+                Debug.Log("Ground slide stopped due to collision with: " + hit.gameObject.name);
+                return;
+            }
+        }
+        // --- סוף השינוי ---
+
         if (hit.gameObject.CompareTag("JumpPad"))
         {
             moveDirection.y = jumpPadForce;
@@ -853,7 +943,7 @@ public class PlayerMovement : MonoBehaviour
     IEnumerator JumpPowerBoostCoroutine()
     {
         jumpPowerBoostActive = true;
-        jumpPower = 36f;
+        jumpPower = 100f;
         yield return new WaitForSeconds(60f);
         jumpPower = 18f;
     }
