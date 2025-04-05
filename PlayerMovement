@@ -231,6 +231,9 @@ public class PlayerMovement : MonoBehaviour
     public float forwardAccelerationDuration = 0.5f;
     private float forwardAccelerationTimer = 0f;
 
+    // משתנה למניעת התחלת השהייה כפולה
+    private bool slideStopScheduled = false;
+
     void Start()
     {
         characterController = GetComponent<CharacterController>();
@@ -812,25 +815,20 @@ public class PlayerMovement : MonoBehaviour
         externalForce = boost;
     }
 
+    // שינוי ב-OnControllerColliderHit:
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        // --- התחלה: עצירת Ground Slide במקרה של התנגשות עם מחסום ---
-        if (isSliding && !slideStartedOnSlideSurface)
+        // אם אנחנו מחליקים, אם לא התחלנו slide על משטח ייחודי, ואם האובייקט לא בעל תגית "slide"
+        if (isSliding && !slideStartedOnSlideSurface && !hit.gameObject.CompareTag("slide"))
         {
-            // נבדוק את זווית ההתנגשות – אם היא גדולה מ-15 מעלות, מדובר בהתנגשות עם מחסום
             float collisionAngle = Vector3.Angle(hit.normal, Vector3.up);
-            if (collisionAngle > 15f)
+            if (collisionAngle > 15f && !slideStopScheduled)
             {
-                isSliding = false;
-                slideTimer = 0f;
-                slideVelocity = Vector3.zero;
-                if (playerCollider != null && normalMaterial != null)
-                    playerCollider.material = normalMaterial;
-                Debug.Log("Ground slide stopped due to collision with: " + hit.gameObject.name);
+                slideStopScheduled = true;
+                StartCoroutine(StopSlideAfterDelay(hit.collider));
                 return;
             }
         }
-        // --- סוף השינוי ---
 
         if (hit.gameObject.CompareTag("JumpPad"))
         {
@@ -933,6 +931,21 @@ public class PlayerMovement : MonoBehaviour
                 dashParticleSystem.gameObject.SetActive(false);
             }
         }
+    }
+
+    IEnumerator StopSlideAfterDelay(Collider hitCollider)
+    {
+        yield return new WaitForSeconds(0.4f);
+        if (isSliding)
+        {
+            isSliding = false;
+            slideTimer = 0f;
+            slideVelocity = Vector3.zero;
+            if (playerCollider != null && normalMaterial != null)
+                playerCollider.material = normalMaterial;
+            Debug.Log("Ground slide stopped after collision with: " + hitCollider.gameObject.name);
+        }
+        slideStopScheduled = false;
     }
 
     IEnumerator DisableWallJumpAfterDelay()
