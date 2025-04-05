@@ -872,9 +872,10 @@ public class PlayerMovement : MonoBehaviour
             StartCoroutine(DisableWallJumpAfterDelay());
         }
 
+        // שינוי: במגע עם אובייקטים מהשכבה WallRun, נוודא שמקש W לחוץ כדי להפעיל WallRun.
         if (hit.gameObject.layer == LayerMask.NameToLayer("WallRun"))
         {
-            if (!characterController.isGrounded)
+            if (!characterController.isGrounded && Input.GetKey(KeyCode.W))
             {
                 isWallRunning = true;
                 wallRunTimer = wallRunDuration;
