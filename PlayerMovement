@@ -935,6 +935,13 @@ public class PlayerMovement : MonoBehaviour
 
     IEnumerator StopSlideAfterDelay(Collider hitCollider)
     {
+        // אם ה־collider שפוגע הוא בעל תגית "enemy", לא נעצור את ה־slide.
+        if (hitCollider.CompareTag("enemy"))
+        {
+            slideStopScheduled = false;
+            yield break;
+        }
+
         yield return new WaitForSeconds(0.4f);
         if (isSliding)
         {
