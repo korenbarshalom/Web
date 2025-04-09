@@ -12,8 +12,8 @@ public class CrossBow : MonoBehaviour
     public float maxArrowSpeed = 40f;
     public float chargeTime = 3f;
 
-    public LayerMask collisionMask;
-    public float collisionCheckRadius = 0.1f;
+    public LayerMask enemyLayer;     // שכבת אויבים
+    public LayerMask hitLayers;      // שכבות שיגרמו לחץ לחזור (חדש!)
 
     private Vector3 initialLocalPosition;
     private Vector3 stretchedPosition;
@@ -42,7 +42,6 @@ public class CrossBow : MonoBehaviour
 
     void Update()
     {
-        // התחלת טעינה
         if (Input.GetMouseButtonDown(1))
         {
             if (!isStretching && !isReturning)
@@ -53,7 +52,6 @@ public class CrossBow : MonoBehaviour
             }
         }
 
-        // טעינה מתמשכת
         if (Input.GetMouseButton(1) && isHolding)
         {
             holdTimer += Time.deltaTime;
@@ -67,7 +65,6 @@ public class CrossBow : MonoBehaviour
             }
         }
 
-        // שחרור טעינה ידני
         if (Input.GetMouseButtonUp(1))
         {
             if (isHolding)
@@ -86,16 +83,32 @@ public class CrossBow : MonoBehaviour
             }
         }
 
-        // תנועת חץ קדימה
         if (arrowFlying && arrow != null)
         {
-            arrow.transform.position += -arrow.transform.up * CalculateArrowSpeed() * Time.deltaTime;
+            float arrowSpeed = CalculateArrowSpeed();
+            Vector3 moveDirection = -arrow.transform.up;
+            Vector3 moveStep = moveDirection * arrowSpeed * Time.deltaTime;
 
-            // בדיקת פגיעה בקוליידר
-            Collider[] hits = Physics.OverlapSphere(arrow.transform.position, collisionCheckRadius, collisionMask);
-            if (hits.Length > 0)
+            // 🔁 בדיקה אם החץ פוגע בשכבת אויבים וגורם נזק (קיים)
+            if (Physics.Raycast(arrow.transform.position, moveDirection, out RaycastHit hit, moveStep.magnitude + 0.1f, enemyLayer))
+            {
+                SimpleEnemyHealth1 health = hit.collider.GetComponent<SimpleEnemyHealth1>();
+                if (health != null)
+                {
+                    health.TakeDamage(100);
+                }
+
+                ResetArrow();
+            }
+            // 🔁 חדש – פוגע בכל שכבת hitLayers → החזרת החץ
+            else if (Physics.Raycast(arrow.transform.position, moveDirection, out RaycastHit hit2, moveStep.magnitude + 0.1f, hitLayers))
             {
                 ResetArrow();
+            }
+            else
+            {
+                // לא פגע – ממשיך לזוז קדימה
+                arrow.transform.position += moveStep;
             }
         }
     }
@@ -110,7 +123,6 @@ public class CrossBow : MonoBehaviour
     {
         isStretching = true;
         float elapsed = 0f;
-
         Vector3 startPos = transform.localPosition;
         Vector3 targetPos = stretchedPosition;
 
@@ -170,7 +182,7 @@ public class CrossBow : MonoBehaviour
         if (arrow != null)
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(arrow.transform.position, collisionCheckRadius);
+            Gizmos.DrawLine(arrow.transform.position, arrow.transform.position + (-arrow.transform.up * 1f));
         }
     }
 }
