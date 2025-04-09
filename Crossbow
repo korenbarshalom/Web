@@ -1,0 +1,141 @@
+using System.Collections;
+using UnityEngine;
+
+public class CrossBow : MonoBehaviour
+{
+    public float bobDistance = 0.3f;
+    public float backwardDuration = 0.4f;
+    public float forwardDuration = 0.15f;
+
+    public GameObject arrow;
+    public float minArrowSpeed = 5f;
+    public float maxArrowSpeed = 35f;
+    public float chargeTime = 3f; // ⏱ טעינה מלאה אחרי 3 שניות
+
+    private Vector3 initialLocalPosition;
+    private Vector3 stretchedPosition;
+    private Coroutine moveCoroutine;
+    private bool isStretching = false;
+    private bool isReturning = false;
+    private bool arrowReleased = false;
+    private bool arrowFlying = false;
+    private float holdTimer = 0f;
+    private bool isHolding = false;
+
+    void Start()
+    {
+        initialLocalPosition = transform.localPosition;
+        stretchedPosition = initialLocalPosition - Vector3.up * bobDistance;
+    }
+
+    void Update()
+    {
+        // התחלת החזקה בלחצן שמאלי של העכבר (Mouse0)
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (!isStretching && !isReturning)
+            {
+                moveCoroutine = StartCoroutine(StretchRope());
+                isHolding = true;
+                holdTimer = 0f;
+            }
+        }
+
+        // ממשיך להחזיק את העכבר
+        if (Input.GetMouseButton(0) && isHolding)
+        {
+            holdTimer += Time.deltaTime;
+
+            // אם עברו 3 שניות → שחרר אוטומטית
+            if (holdTimer >= chargeTime && !arrowReleased)
+            {
+                isHolding = false;
+                StopCoroutine(moveCoroutine);
+                isStretching = false;
+                StartCoroutine(ReturnRope(transform.localPosition));
+            }
+        }
+
+        // שחרור לחיצה של העכבר
+        if (Input.GetMouseButtonUp(0))
+        {
+            if (isHolding)
+            {
+                isHolding = false;
+                if (isStretching)
+                {
+                    StopCoroutine(moveCoroutine);
+                    isStretching = false;
+                    StartCoroutine(ReturnRope(transform.localPosition));
+                }
+                else if (!isReturning && transform.localPosition != initialLocalPosition)
+                {
+                    StartCoroutine(ReturnRope(transform.localPosition));
+                }
+            }
+        }
+
+        // תזוזת החץ לפי -transform.up
+        if (arrowFlying && arrow != null)
+        {
+            arrow.transform.position += -arrow.transform.up * CalculateArrowSpeed() * Time.deltaTime;
+        }
+    }
+
+    float CalculateArrowSpeed()
+    {
+        float chargeRatio = Mathf.Clamp01(holdTimer / chargeTime);
+        return Mathf.Lerp(minArrowSpeed, maxArrowSpeed, chargeRatio);
+    }
+
+    IEnumerator StretchRope()
+    {
+        isStretching = true;
+        float elapsed = 0f;
+
+        Vector3 startPos = transform.localPosition;
+        Vector3 targetPos = stretchedPosition;
+
+        while (elapsed < backwardDuration)
+        {
+            float t = elapsed / backwardDuration;
+            transform.localPosition = Vector3.Lerp(startPos, targetPos, t);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        transform.localPosition = targetPos;
+        isStretching = false;
+    }
+
+    IEnumerator ReturnRope(Vector3 fromPosition)
+    {
+        isReturning = true;
+
+        if (arrow != null && !arrowReleased)
+        {
+            arrowReleased = true;
+            arrow.transform.parent = null;
+
+            Rigidbody rb = arrow.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.isKinematic = true;
+            }
+
+            arrowFlying = true;
+        }
+
+        float elapsed = 0f;
+        while (elapsed < forwardDuration)
+        {
+            float t = elapsed / forwardDuration;
+            transform.localPosition = Vector3.Lerp(fromPosition, initialLocalPosition, t);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        transform.localPosition = initialLocalPosition;
+        isReturning = false;
+    }
+}
