@@ -13,7 +13,7 @@ public class CrossBow : MonoBehaviour
     public float chargeTime = 3f;
 
     public LayerMask enemyLayer;     // שכבת אויבים
-    public LayerMask hitLayers;      // שכבות שיגרמו לחץ לחזור (חדש!)
+    public LayerMask hitLayers;      // שכבות כלליות שיגרמו להחזרת החץ
 
     private Vector3 initialLocalPosition;
     private Vector3 stretchedPosition;
@@ -89,25 +89,31 @@ public class CrossBow : MonoBehaviour
             Vector3 moveDirection = -arrow.transform.up;
             Vector3 moveStep = moveDirection * arrowSpeed * Time.deltaTime;
 
-            // 🔁 בדיקה אם החץ פוגע בשכבת אויבים וגורם נזק (קיים)
+            // בדיקה אם פוגע באויב
             if (Physics.Raycast(arrow.transform.position, moveDirection, out RaycastHit hit, moveStep.magnitude + 0.1f, enemyLayer))
             {
+                // חיפוש הסקריפט על האובייקט או ההורה
                 SimpleEnemyHealth1 health = hit.collider.GetComponent<SimpleEnemyHealth1>();
+                if (health == null && hit.collider.transform.parent != null)
+                    health = hit.collider.transform.parent.GetComponent<SimpleEnemyHealth1>();
+
                 if (health != null)
                 {
-                    health.TakeDamage(100);
+                    if (hit.collider.CompareTag("Head"))
+                        health.TakeDamage(150); // פגיעה בראש
+                    else
+                        health.TakeDamage(50); // פגיעה רגילה
                 }
 
                 ResetArrow();
             }
-            // 🔁 חדש – פוגע בכל שכבת hitLayers → החזרת החץ
+            // פגיעה בשכבות אחרות שמחזירות את החץ
             else if (Physics.Raycast(arrow.transform.position, moveDirection, out RaycastHit hit2, moveStep.magnitude + 0.1f, hitLayers))
             {
                 ResetArrow();
             }
             else
             {
-                // לא פגע – ממשיך לזוז קדימה
                 arrow.transform.position += moveStep;
             }
         }
