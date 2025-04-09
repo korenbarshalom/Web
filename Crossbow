@@ -8,9 +8,12 @@ public class CrossBow : MonoBehaviour
     public float forwardDuration = 0.15f;
 
     public GameObject arrow;
-    public float minArrowSpeed = 5f;
-    public float maxArrowSpeed = 35f;
-    public float chargeTime = 3f; // ⏱ טעינה מלאה אחרי 3 שניות
+    public float minArrowSpeed = 20f;
+    public float maxArrowSpeed = 40f;
+    public float chargeTime = 3f;
+
+    public LayerMask collisionMask;
+    public float collisionCheckRadius = 0.1f;
 
     private Vector3 initialLocalPosition;
     private Vector3 stretchedPosition;
@@ -22,16 +25,25 @@ public class CrossBow : MonoBehaviour
     private float holdTimer = 0f;
     private bool isHolding = false;
 
+    private Vector3 arrowInitialLocalPos;
+    private Quaternion arrowInitialLocalRot;
+
     void Start()
     {
         initialLocalPosition = transform.localPosition;
         stretchedPosition = initialLocalPosition - Vector3.up * bobDistance;
+
+        if (arrow != null)
+        {
+            arrowInitialLocalPos = arrow.transform.localPosition;
+            arrowInitialLocalRot = arrow.transform.localRotation;
+        }
     }
 
     void Update()
     {
-        // התחלת החזקה בלחצן שמאלי של העכבר (Mouse0)
-        if (Input.GetMouseButtonDown(0))
+        // התחלת טעינה
+        if (Input.GetMouseButtonDown(1))
         {
             if (!isStretching && !isReturning)
             {
@@ -41,12 +53,11 @@ public class CrossBow : MonoBehaviour
             }
         }
 
-        // ממשיך להחזיק את העכבר
-        if (Input.GetMouseButton(0) && isHolding)
+        // טעינה מתמשכת
+        if (Input.GetMouseButton(1) && isHolding)
         {
             holdTimer += Time.deltaTime;
 
-            // אם עברו 3 שניות → שחרר אוטומטית
             if (holdTimer >= chargeTime && !arrowReleased)
             {
                 isHolding = false;
@@ -56,8 +67,8 @@ public class CrossBow : MonoBehaviour
             }
         }
 
-        // שחרור לחיצה של העכבר
-        if (Input.GetMouseButtonUp(0))
+        // שחרור טעינה ידני
+        if (Input.GetMouseButtonUp(1))
         {
             if (isHolding)
             {
@@ -75,10 +86,17 @@ public class CrossBow : MonoBehaviour
             }
         }
 
-        // תזוזת החץ לפי -transform.up
+        // תנועת חץ קדימה
         if (arrowFlying && arrow != null)
         {
             arrow.transform.position += -arrow.transform.up * CalculateArrowSpeed() * Time.deltaTime;
+
+            // בדיקת פגיעה בקוליידר
+            Collider[] hits = Physics.OverlapSphere(arrow.transform.position, collisionCheckRadius, collisionMask);
+            if (hits.Length > 0)
+            {
+                ResetArrow();
+            }
         }
     }
 
@@ -119,9 +137,7 @@ public class CrossBow : MonoBehaviour
 
             Rigidbody rb = arrow.GetComponent<Rigidbody>();
             if (rb != null)
-            {
                 rb.isKinematic = true;
-            }
 
             arrowFlying = true;
         }
@@ -137,5 +153,24 @@ public class CrossBow : MonoBehaviour
 
         transform.localPosition = initialLocalPosition;
         isReturning = false;
+    }
+
+    void ResetArrow()
+    {
+        arrowFlying = false;
+        arrowReleased = false;
+
+        arrow.transform.parent = transform;
+        arrow.transform.localPosition = arrowInitialLocalPos;
+        arrow.transform.localRotation = arrowInitialLocalRot;
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        if (arrow != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(arrow.transform.position, collisionCheckRadius);
+        }
     }
 }
