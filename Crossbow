@@ -9,15 +9,16 @@ public class CrossBow : MonoBehaviour
 
     public GameObject arrow;
     public float minArrowSpeed = 20f;
-    public float maxArrowSpeed = 40f;
+    public float maxArrowSpeed = 60f;
     public float chargeTime = 3f;
 
-    public LayerMask enemyLayer;     // שכבת אויבים
-    public LayerMask hitLayers;      // שכבות כלליות שיגרמו להחזרת החץ
+    public LayerMask enemyLayer;
+    public LayerMask hitLayers;
 
     private Vector3 initialLocalPosition;
     private Vector3 stretchedPosition;
     private Coroutine moveCoroutine;
+    private Coroutine autoReturnCoroutine;
     private bool isStretching = false;
     private bool isReturning = false;
     private bool arrowReleased = false;
@@ -42,9 +43,16 @@ public class CrossBow : MonoBehaviour
 
     void Update()
     {
+        // ✅ מניעת התחלה אם החץ לא מוכן
+        bool arrowReady =
+            arrow != null &&
+            !arrowReleased &&
+            !arrowFlying &&
+            arrow.transform.parent == transform;
+
         if (Input.GetMouseButtonDown(1))
         {
-            if (!isStretching && !isReturning)
+            if (arrowReady && !isStretching && !isReturning)
             {
                 moveCoroutine = StartCoroutine(StretchRope());
                 isHolding = true;
@@ -89,10 +97,8 @@ public class CrossBow : MonoBehaviour
             Vector3 moveDirection = -arrow.transform.up;
             Vector3 moveStep = moveDirection * arrowSpeed * Time.deltaTime;
 
-            // בדיקה אם פוגע באויב
             if (Physics.Raycast(arrow.transform.position, moveDirection, out RaycastHit hit, moveStep.magnitude + 0.1f, enemyLayer))
             {
-                // חיפוש הסקריפט על האובייקט או ההורה
                 SimpleEnemyHealth1 health = hit.collider.GetComponent<SimpleEnemyHealth1>();
                 if (health == null && hit.collider.transform.parent != null)
                     health = hit.collider.transform.parent.GetComponent<SimpleEnemyHealth1>();
@@ -100,16 +106,17 @@ public class CrossBow : MonoBehaviour
                 if (health != null)
                 {
                     if (hit.collider.CompareTag("Head"))
-                        health.TakeDamage(150); // פגיעה בראש
+                        health.TakeDamage(150);
                     else
-                        health.TakeDamage(50); // פגיעה רגילה
+                        health.TakeDamage(50);
                 }
 
+                StopAutoReturn();
                 ResetArrow();
             }
-            // פגיעה בשכבות אחרות שמחזירות את החץ
             else if (Physics.Raycast(arrow.transform.position, moveDirection, out RaycastHit hit2, moveStep.magnitude + 0.1f, hitLayers))
             {
+                StopAutoReturn();
                 ResetArrow();
             }
             else
@@ -158,6 +165,8 @@ public class CrossBow : MonoBehaviour
                 rb.isKinematic = true;
 
             arrowFlying = true;
+
+            autoReturnCoroutine = StartCoroutine(AutoReturnAfterDelay(2.5f));
         }
 
         float elapsed = 0f;
@@ -173,8 +182,28 @@ public class CrossBow : MonoBehaviour
         isReturning = false;
     }
 
+    IEnumerator AutoReturnAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        if (arrowFlying)
+        {
+            ResetArrow();
+        }
+    }
+
+    void StopAutoReturn()
+    {
+        if (autoReturnCoroutine != null)
+        {
+            StopCoroutine(autoReturnCoroutine);
+            autoReturnCoroutine = null;
+        }
+    }
+
     void ResetArrow()
     {
+        StopAutoReturn();
         arrowFlying = false;
         arrowReleased = false;
 
