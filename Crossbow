@@ -18,8 +18,10 @@ public class CrossBow : MonoBehaviour
     public LayerMask enemyLayer;
     public LayerMask hitLayers;
 
+    public float hitRadius = 0.2f; // ✅ מרחב לפגיעה קלה יותר
+
     public Slider chargeSlider;
-    public Image chargeFillImage; // ✅ תמונת ה-Fill לשינוי צבע
+    public Image chargeFillImage;
 
     private Vector3 initialLocalPosition;
     private Vector3 stretchedPosition;
@@ -53,7 +55,7 @@ public class CrossBow : MonoBehaviour
             chargeSlider.minValue = 0f;
             chargeSlider.maxValue = 1f;
             chargeSlider.value = 0f;
-            UpdateChargeSliderColor(0f); // התחלה בצבע ירוק
+            UpdateChargeSliderColor(0f);
         }
     }
 
@@ -84,7 +86,7 @@ public class CrossBow : MonoBehaviour
             if (chargeSlider != null)
             {
                 chargeSlider.value = chargeRatio;
-                UpdateChargeSliderColor(chargeRatio); // ✅ עדכון צבע לפי ערך
+                UpdateChargeSliderColor(chargeRatio);
             }
 
             if (holdTimer >= chargeTime && !arrowReleased)
@@ -126,7 +128,9 @@ public class CrossBow : MonoBehaviour
             Vector3 moveDirection = -arrow.transform.up;
             Vector3 moveStep = moveDirection * arrowSpeed * Time.deltaTime;
 
-            if (Physics.Raycast(arrow.transform.position, moveDirection, out RaycastHit hit, moveStep.magnitude + 0.1f, enemyLayer))
+            RaycastHit hit;
+
+            if (Physics.SphereCast(arrow.transform.position, hitRadius, moveDirection, out hit, moveStep.magnitude + 0.1f, enemyLayer))
             {
                 SimpleEnemyHealth1 health = hit.collider.GetComponent<SimpleEnemyHealth1>();
                 if (health == null && hit.collider.transform.parent != null)
@@ -144,9 +148,9 @@ public class CrossBow : MonoBehaviour
                 StopAutoReturn();
                 ResetArrow();
             }
-            else if (Physics.Raycast(arrow.transform.position, moveDirection, out RaycastHit hit2, moveStep.magnitude + 0.1f, hitLayers))
+            else if (Physics.SphereCast(arrow.transform.position, hitRadius, moveDirection, out hit, moveStep.magnitude + 0.1f, hitLayers))
             {
-                SpawnHitEffect(hit2.point, hit2.normal);
+                SpawnHitEffect(hit.point, hit.normal);
                 StopAutoReturn();
                 ResetArrow();
             }
@@ -294,7 +298,7 @@ public class CrossBow : MonoBehaviour
         if (arrow != null)
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawLine(arrow.transform.position, arrow.transform.position + (-arrow.transform.up * 1f));
+            Gizmos.DrawWireSphere(arrow.transform.position, hitRadius); // ✅ Gizmo עדכני
         }
     }
 }
