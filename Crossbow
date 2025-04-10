@@ -8,8 +8,10 @@ public class CrossBow : MonoBehaviour
     public float forwardDuration = 0.15f;
 
     public GameObject arrow;
+    public GameObject hitEffectPrefab;
+
     public float minArrowSpeed = 20f;
-    public float maxArrowSpeed = 60f;
+    public float maxArrowSpeed = 100f;
     public float chargeTime = 3f;
 
     public LayerMask enemyLayer;
@@ -43,7 +45,6 @@ public class CrossBow : MonoBehaviour
 
     void Update()
     {
-        // ✅ מניעת התחלה אם החץ לא מוכן
         bool arrowReady =
             arrow != null &&
             !arrowReleased &&
@@ -111,11 +112,13 @@ public class CrossBow : MonoBehaviour
                         health.TakeDamage(50);
                 }
 
+                SpawnHitEffect(hit.point, hit.normal);
                 StopAutoReturn();
                 ResetArrow();
             }
             else if (Physics.Raycast(arrow.transform.position, moveDirection, out RaycastHit hit2, moveStep.magnitude + 0.1f, hitLayers))
             {
+                SpawnHitEffect(hit2.point, hit2.normal);
                 StopAutoReturn();
                 ResetArrow();
             }
@@ -126,10 +129,19 @@ public class CrossBow : MonoBehaviour
         }
     }
 
+    void SpawnHitEffect(Vector3 position, Vector3 normal)
+    {
+        if (hitEffectPrefab != null)
+        {
+            Instantiate(hitEffectPrefab, position, Quaternion.LookRotation(normal));
+        }
+    }
+
+    // ✅ חישוב מהירות מצטברת לפי משך לחיצה
     float CalculateArrowSpeed()
     {
         float chargeRatio = Mathf.Clamp01(holdTimer / chargeTime);
-        return Mathf.Lerp(minArrowSpeed, maxArrowSpeed, chargeRatio);
+        return minArrowSpeed + (maxArrowSpeed - minArrowSpeed) * chargeRatio;
     }
 
     IEnumerator StretchRope()
