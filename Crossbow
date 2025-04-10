@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class CrossBow : MonoBehaviour
 {
@@ -18,10 +19,15 @@ public class CrossBow : MonoBehaviour
     public LayerMask enemyLayer;
     public LayerMask hitLayers;
 
-    public float hitRadius = 0.2f; // ✅ מרחב לפגיעה קלה יותר
+    public float hitRadius = 0.2f;
 
     public Slider chargeSlider;
     public Image chargeFillImage;
+
+    public TextMeshProUGUI ammoText; // ✅ טקסט חצים
+
+    public int maxAmmo = 12;
+    private int currentAmmo;
 
     private Vector3 initialLocalPosition;
     private Vector3 stretchedPosition;
@@ -41,6 +47,9 @@ public class CrossBow : MonoBehaviour
 
     void Start()
     {
+        currentAmmo = maxAmmo;
+        UpdateAmmoText();
+
         initialLocalPosition = transform.localPosition;
         stretchedPosition = initialLocalPosition - Vector3.up * bobDistance;
 
@@ -65,7 +74,8 @@ public class CrossBow : MonoBehaviour
             arrow != null &&
             !arrowReleased &&
             !arrowFlying &&
-            arrow.transform.parent == transform;
+            arrow.transform.parent == transform &&
+            currentAmmo > 0; // ✅ לוודא שיש חצים
 
         if (Input.GetMouseButtonDown(1))
         {
@@ -242,6 +252,10 @@ public class CrossBow : MonoBehaviour
 
             arrowFlying = true;
 
+            // ✅ הורדת חץ מהמאגר ועדכון הטקסט
+            currentAmmo = Mathf.Max(0, currentAmmo - 1);
+            UpdateAmmoText();
+
             autoReturnCoroutine = StartCoroutine(AutoReturnAfterDelay(2.5f));
         }
 
@@ -293,12 +307,20 @@ public class CrossBow : MonoBehaviour
         arrow.transform.localRotation = arrowInitialLocalRot;
     }
 
+    void UpdateAmmoText()
+    {
+        if (ammoText != null)
+        {
+            ammoText.text = "" + currentAmmo;
+        }
+    }
+
     void OnDrawGizmosSelected()
     {
         if (arrow != null)
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(arrow.transform.position, hitRadius); // ✅ Gizmo עדכני
+            Gizmos.DrawWireSphere(arrow.transform.position, hitRadius);
         }
     }
 }
