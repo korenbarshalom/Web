@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CrossBow : MonoBehaviour
 {
@@ -17,10 +18,15 @@ public class CrossBow : MonoBehaviour
     public LayerMask enemyLayer;
     public LayerMask hitLayers;
 
+    public Slider chargeSlider;
+    public Image chargeFillImage; // ✅ תמונת ה-Fill לשינוי צבע
+
     private Vector3 initialLocalPosition;
     private Vector3 stretchedPosition;
     private Coroutine moveCoroutine;
     private Coroutine autoReturnCoroutine;
+    private Coroutine sliderResetCoroutine;
+
     private bool isStretching = false;
     private bool isReturning = false;
     private bool arrowReleased = false;
@@ -40,6 +46,14 @@ public class CrossBow : MonoBehaviour
         {
             arrowInitialLocalPos = arrow.transform.localPosition;
             arrowInitialLocalRot = arrow.transform.localRotation;
+        }
+
+        if (chargeSlider != null)
+        {
+            chargeSlider.minValue = 0f;
+            chargeSlider.maxValue = 1f;
+            chargeSlider.value = 0f;
+            UpdateChargeSliderColor(0f); // התחלה בצבע ירוק
         }
     }
 
@@ -65,6 +79,14 @@ public class CrossBow : MonoBehaviour
         {
             holdTimer += Time.deltaTime;
 
+            float chargeRatio = Mathf.Clamp01(holdTimer / chargeTime);
+
+            if (chargeSlider != null)
+            {
+                chargeSlider.value = chargeRatio;
+                UpdateChargeSliderColor(chargeRatio); // ✅ עדכון צבע לפי ערך
+            }
+
             if (holdTimer >= chargeTime && !arrowReleased)
             {
                 isHolding = false;
@@ -79,6 +101,12 @@ public class CrossBow : MonoBehaviour
             if (isHolding)
             {
                 isHolding = false;
+
+                if (sliderResetCoroutine != null)
+                    StopCoroutine(sliderResetCoroutine);
+
+                sliderResetCoroutine = StartCoroutine(SmoothResetSlider(0.15f));
+
                 if (isStretching)
                 {
                     StopCoroutine(moveCoroutine);
@@ -137,11 +165,43 @@ public class CrossBow : MonoBehaviour
         }
     }
 
-    // ✅ חישוב מהירות מצטברת לפי משך לחיצה
     float CalculateArrowSpeed()
     {
         float chargeRatio = Mathf.Clamp01(holdTimer / chargeTime);
         return minArrowSpeed + (maxArrowSpeed - minArrowSpeed) * chargeRatio;
+    }
+
+    IEnumerator SmoothResetSlider(float duration)
+    {
+        if (chargeSlider == null) yield break;
+
+        float startValue = chargeSlider.value;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            float t = elapsed / duration;
+            float current = Mathf.Lerp(startValue, 0f, t);
+            chargeSlider.value = current;
+            UpdateChargeSliderColor(current);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        chargeSlider.value = 0f;
+        UpdateChargeSliderColor(0f);
+    }
+
+    void UpdateChargeSliderColor(float value)
+    {
+        if (chargeFillImage == null) return;
+
+        if (value < 0.4f)
+            chargeFillImage.color = Color.green;
+        else if (value < 0.8f)
+            chargeFillImage.color = Color.yellow;
+        else
+            chargeFillImage.color = Color.red;
     }
 
     IEnumerator StretchRope()
@@ -218,6 +278,11 @@ public class CrossBow : MonoBehaviour
         StopAutoReturn();
         arrowFlying = false;
         arrowReleased = false;
+
+        if (sliderResetCoroutine != null)
+            StopCoroutine(sliderResetCoroutine);
+
+        sliderResetCoroutine = StartCoroutine(SmoothResetSlider(0.15f));
 
         arrow.transform.parent = transform;
         arrow.transform.localPosition = arrowInitialLocalPos;
