@@ -11,14 +11,17 @@ public class SpaceGun : MonoBehaviour
     public ParticleSystem shootingEffect;
     public GameObject[] objectsToEnable;
 
+    [Header("Weapon Overheat Animation")]
+    public Transform weaponTransform;
+    public float overheatMoveDistance = 0.5f;
+    public float overheatRotationZ = 80f;
+    public float overheatDuration = 5f;
+
     [Header("UI")]
     public Slider heatSlider;
     public TextMeshProUGUI overheatText;
-    [Tooltip("בכמה מהר הסליידר יתקרב לערך המטרה")]
-    public float sliderSmoothSpeed = 10f;             // הוגדל ל־10
-    [Tooltip("כמה שניות יארך איפוס הסליידר בסוף")]
-    public float resetSmoothDuration = 0.5f;          // חצי שניה לאיפוס חלק
-
+    public float sliderSmoothSpeed = 10f;
+    public float resetSmoothDuration = 0.5f;
     public Image heatFillImage;
 
     private float attackCooldown = 0.2f;
@@ -28,7 +31,6 @@ public class SpaceGun : MonoBehaviour
     private bool resetInProgress = false;
     private Coroutine reverseDisableCoroutine = null;
     private bool isFiring = false;
-
     private float currentSliderValue = 0f;
 
     void Start()
@@ -36,7 +38,7 @@ public class SpaceGun : MonoBehaviour
         heatSlider.minValue = 0;
         heatSlider.maxValue = objectsToEnable.Length;
         heatSlider.value = 0;
-        currentSliderValue = 0;
+        currentSliderValue = 0f;
 
         overheatText.gameObject.SetActive(true);
         overheatText.text = "";
@@ -46,23 +48,20 @@ public class SpaceGun : MonoBehaviour
 
     void Update()
     {
-        // לחיצה בודדת
-        if (Input.GetMouseButtonDown(0) && !resetInProgress)
+        if (!resetInProgress && Input.GetMouseButtonDown(0))
         {
             isFiring = true;
             StopReverseCoroutine();
             nextTimeToFire = Time.time + attackCooldown;
             Shoot();
         }
-        // החזקת כפתור
-        else if (Input.GetMouseButton(0) && Time.time >= nextTimeToFire && !resetInProgress)
+        else if (!resetInProgress && Input.GetMouseButton(0) && Time.time >= nextTimeToFire)
         {
             isFiring = true;
             StopReverseCoroutine();
             nextTimeToFire = Time.time + attackCooldown;
             Shoot();
         }
-        // עצירת ירי
         else if (isFiring && !Input.GetMouseButton(0))
         {
             isFiring = false;
@@ -70,7 +69,6 @@ public class SpaceGun : MonoBehaviour
                 reverseDisableCoroutine = StartCoroutine(DisableInReverse());
         }
 
-        // עדכון חלק של הסליידר
         if (!resetInProgress)
         {
             currentSliderValue = Mathf.Lerp(currentSliderValue, enabledObjectsCount, Time.deltaTime * sliderSmoothSpeed);
@@ -82,8 +80,11 @@ public class SpaceGun : MonoBehaviour
 
     void Shoot()
     {
-        var bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
-        bullet.AddComponent<BulletMover>().speed = bulletSpeed;
+        if (bulletPrefab != null && firePoint != null)
+        {
+            var bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+            bullet.AddComponent<BulletMover>().speed = bulletSpeed;
+        }
         shootingEffect?.Play();
 
         totalShotsFired++;
@@ -95,37 +96,37 @@ public class SpaceGun : MonoBehaviour
 
             if (enabledObjectsCount == objectsToEnable.Length)
             {
-                StartCoroutine(ShowOverheat());
-                StartCoroutine(ResetAfterDelay());
+                StartCoroutine(ShowOverheatAndAnimate());
             }
         }
     }
 
-    IEnumerator ShowOverheat()
+    IEnumerator ShowOverheatAndAnimate()
     {
-        overheatText.text = "OVERHEAT";
-        yield return new WaitForSeconds(5f);
-        overheatText.text = "";
-    }
-
-    IEnumerator ResetAfterDelay()
-    {
+        // תחילת OVERHEAT
         resetInProgress = true;
+        overheatText.text = "OVERHEAT";
 
-        // למקסימום מיידית כדי להציג OVERHEAT במלואו
+        // קפיצה מיידית של הסליידר לערך המקסימלי
         heatSlider.value = heatSlider.maxValue;
         currentSliderValue = heatSlider.maxValue;
         UpdateSliderColor();
 
-        yield return new WaitForSeconds(5f);
+        // התחלת אנימציית הנשק לאורך כל ה‑OVERHEAT
+        StartCoroutine(WeaponOverheatAnimation());
 
-        // כיבוי כל האובייקטים
+        // ממתינים לסיום ה‑OVERHEAT
+        yield return new WaitForSeconds(overheatDuration);
+        overheatText.text = "";
+
+        // כיבוי אובייקטים
         foreach (var obj in objectsToEnable)
             obj?.SetActive(false);
 
-        totalShotsFired = enabledObjectsCount = 0;
+        totalShotsFired = 0;
+        enabledObjectsCount = 0;
 
-        // איפוס חלק של הסליידר
+        // איפוס חלק של הסליידר בצורה חלקה
         float elapsed = 0f;
         float startVal = currentSliderValue;
         while (elapsed < resetSmoothDuration)
@@ -136,13 +137,46 @@ public class SpaceGun : MonoBehaviour
             UpdateSliderColor();
             yield return null;
         }
-
-        // וודא איפוס מלא
         currentSliderValue = 0f;
         heatSlider.value = 0f;
         UpdateSliderColor();
 
+        // סוף מצב OVERHEAT
         resetInProgress = false;
+    }
+
+    IEnumerator WeaponOverheatAnimation()
+    {
+        if (weaponTransform == null) yield break;
+
+        Vector3 origPos = weaponTransform.localPosition;
+        Quaternion origRot = weaponTransform.localRotation;
+        Vector3 targetPos = origPos + Vector3.back * overheatMoveDistance;
+        Quaternion targetRot = origRot * Quaternion.Euler(0f, 0f, overheatRotationZ);
+
+        float halfTime = overheatDuration / 2f;
+        float elapsed = 0f;
+
+        while (elapsed < overheatDuration)
+        {
+            elapsed += Time.deltaTime;
+            if (elapsed <= halfTime)
+            {
+                float f = elapsed / halfTime;
+                weaponTransform.localPosition = Vector3.Lerp(origPos, targetPos, f);
+                weaponTransform.localRotation = Quaternion.Slerp(origRot, targetRot, f);
+            }
+            else
+            {
+                float f = (elapsed - halfTime) / halfTime;
+                weaponTransform.localPosition = Vector3.Lerp(targetPos, origPos, f);
+                weaponTransform.localRotation = Quaternion.Slerp(targetRot, origRot, f);
+            }
+            yield return null;
+        }
+
+        weaponTransform.localPosition = origPos;
+        weaponTransform.localRotation = origRot;
     }
 
     IEnumerator DisableInReverse()
