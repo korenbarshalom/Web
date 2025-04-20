@@ -14,8 +14,12 @@ public class SpaceGun : MonoBehaviour
     [Header("UI")]
     public Slider heatSlider;
     public TextMeshProUGUI overheatText;
-    public float sliderSmoothSpeed = 5f;
-    public Image heatFillImage; // fill של הסליידר
+    [Tooltip("בכמה מהר הסליידר יתקרב לערך המטרה")]
+    public float sliderSmoothSpeed = 10f;             // הוגדל ל־10
+    [Tooltip("כמה שניות יארך איפוס הסליידר בסוף")]
+    public float resetSmoothDuration = 0.5f;          // חצי שניה לאיפוס חלק
+
+    public Image heatFillImage;
 
     private float attackCooldown = 0.2f;
     private float nextTimeToFire = 0f;
@@ -29,55 +33,45 @@ public class SpaceGun : MonoBehaviour
 
     void Start()
     {
-        if (heatSlider != null)
-        {
-            heatSlider.minValue = 0;
-            heatSlider.maxValue = objectsToEnable.Length;
-            heatSlider.value = 0;
-            currentSliderValue = 0;
-        }
+        heatSlider.minValue = 0;
+        heatSlider.maxValue = objectsToEnable.Length;
+        heatSlider.value = 0;
+        currentSliderValue = 0;
 
-        if (overheatText != null)
-        {
-            overheatText.gameObject.SetActive(true);
-            overheatText.text = "";
-        }
+        overheatText.gameObject.SetActive(true);
+        overheatText.text = "";
 
-        if (heatFillImage != null)
-        {
-            heatFillImage.color = Color.green;
-        }
+        heatFillImage.color = Color.green;
     }
 
     void Update()
     {
-        if (Input.GetMouseButton(0))
+        // לחיצה בודדת
+        if (Input.GetMouseButtonDown(0) && !resetInProgress)
         {
             isFiring = true;
-
-            if (Time.time >= nextTimeToFire && !resetInProgress)
-            {
-                nextTimeToFire = Time.time + attackCooldown;
-                Shoot();
-            }
-
-            if (reverseDisableCoroutine != null)
-            {
-                StopCoroutine(reverseDisableCoroutine);
-                reverseDisableCoroutine = null;
-            }
+            StopReverseCoroutine();
+            nextTimeToFire = Time.time + attackCooldown;
+            Shoot();
         }
-        else if (isFiring)
+        // החזקת כפתור
+        else if (Input.GetMouseButton(0) && Time.time >= nextTimeToFire && !resetInProgress)
+        {
+            isFiring = true;
+            StopReverseCoroutine();
+            nextTimeToFire = Time.time + attackCooldown;
+            Shoot();
+        }
+        // עצירת ירי
+        else if (isFiring && !Input.GetMouseButton(0))
         {
             isFiring = false;
-
             if (!resetInProgress && enabledObjectsCount > 0)
-            {
                 reverseDisableCoroutine = StartCoroutine(DisableInReverse());
-            }
         }
 
-        if (heatSlider != null && !resetInProgress)
+        // עדכון חלק של הסליידר
+        if (!resetInProgress)
         {
             currentSliderValue = Mathf.Lerp(currentSliderValue, enabledObjectsCount, Time.deltaTime * sliderSmoothSpeed);
             heatSlider.value = currentSliderValue;
@@ -88,27 +82,18 @@ public class SpaceGun : MonoBehaviour
 
     void Shoot()
     {
-        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+        var bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
         bullet.AddComponent<BulletMover>().speed = bulletSpeed;
-
-        if (shootingEffect != null)
-        {
-            shootingEffect.Play();
-        }
+        shootingEffect?.Play();
 
         totalShotsFired++;
 
         if (totalShotsFired % 3 == 0 && enabledObjectsCount < objectsToEnable.Length)
         {
-            GameObject objToEnable = objectsToEnable[enabledObjectsCount];
-            if (objToEnable != null)
-            {
-                objToEnable.SetActive(true);
-            }
-
+            objectsToEnable[enabledObjectsCount]?.SetActive(true);
             enabledObjectsCount++;
 
-            if (enabledObjectsCount == 12)
+            if (enabledObjectsCount == objectsToEnable.Length)
             {
                 StartCoroutine(ShowOverheat());
                 StartCoroutine(ResetAfterDelay());
@@ -118,44 +103,43 @@ public class SpaceGun : MonoBehaviour
 
     IEnumerator ShowOverheat()
     {
-        if (overheatText != null)
-        {
-            overheatText.text = "OVERHEAT";
-            yield return new WaitForSeconds(5f);
-            overheatText.text = "";
-        }
+        overheatText.text = "OVERHEAT";
+        yield return new WaitForSeconds(5f);
+        overheatText.text = "";
     }
 
     IEnumerator ResetAfterDelay()
     {
         resetInProgress = true;
 
-        // אפס את הסליידר מידית עד הסוף
-        if (heatSlider != null)
-        {
-            heatSlider.value = heatSlider.maxValue;
-            currentSliderValue = heatSlider.maxValue;
-        }
-
+        // למקסימום מיידית כדי להציג OVERHEAT במלואו
+        heatSlider.value = heatSlider.maxValue;
+        currentSliderValue = heatSlider.maxValue;
         UpdateSliderColor();
 
         yield return new WaitForSeconds(5f);
 
-        foreach (GameObject obj in objectsToEnable)
+        // כיבוי כל האובייקטים
+        foreach (var obj in objectsToEnable)
+            obj?.SetActive(false);
+
+        totalShotsFired = enabledObjectsCount = 0;
+
+        // איפוס חלק של הסליידר
+        float elapsed = 0f;
+        float startVal = currentSliderValue;
+        while (elapsed < resetSmoothDuration)
         {
-            if (obj != null)
-                obj.SetActive(false);
+            elapsed += Time.deltaTime;
+            currentSliderValue = Mathf.Lerp(startVal, 0f, elapsed / resetSmoothDuration);
+            heatSlider.value = currentSliderValue;
+            UpdateSliderColor();
+            yield return null;
         }
 
-        totalShotsFired = 0;
-        enabledObjectsCount = 0;
-
-        if (heatSlider != null)
-        {
-            heatSlider.value = 0;
-            currentSliderValue = 0;
-        }
-
+        // וודא איפוס מלא
+        currentSliderValue = 0f;
+        heatSlider.value = 0f;
         UpdateSliderColor();
 
         resetInProgress = false;
@@ -166,33 +150,27 @@ public class SpaceGun : MonoBehaviour
         while (enabledObjectsCount > 0)
         {
             enabledObjectsCount--;
-            if (objectsToEnable[enabledObjectsCount] != null)
-            {
-                objectsToEnable[enabledObjectsCount].SetActive(false);
-            }
-
+            objectsToEnable[enabledObjectsCount]?.SetActive(false);
             yield return new WaitForSeconds(1f);
         }
-
         totalShotsFired = 0;
     }
 
     void UpdateSliderColor()
     {
-        if (heatFillImage != null && heatSlider != null)
-        {
-            float t = heatSlider.value / heatSlider.maxValue;
+        float t = heatSlider.value / heatSlider.maxValue;
+        if (t < 0.5f)
+            heatFillImage.color = Color.Lerp(Color.green, Color.yellow, t * 2f);
+        else
+            heatFillImage.color = Color.Lerp(Color.yellow, Color.red, (t - 0.5f) * 2f);
+    }
 
-            if (t < 0.5f)
-            {
-                // ירוק לצהוב
-                heatFillImage.color = Color.Lerp(Color.green, Color.yellow, t * 2f);
-            }
-            else
-            {
-                // צהוב לאדום
-                heatFillImage.color = Color.Lerp(Color.yellow, Color.red, (t - 0.5f) * 2f);
-            }
+    void StopReverseCoroutine()
+    {
+        if (reverseDisableCoroutine != null)
+        {
+            StopCoroutine(reverseDisableCoroutine);
+            reverseDisableCoroutine = null;
         }
     }
 }
@@ -200,7 +178,6 @@ public class SpaceGun : MonoBehaviour
 public class BulletMover : MonoBehaviour
 {
     public float speed = 20f;
-
     void Update()
     {
         transform.Translate(Vector3.forward * speed * Time.deltaTime);
