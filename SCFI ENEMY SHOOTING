@@ -1,0 +1,136 @@
+using System.Collections;
+using UnityEngine;
+
+public class EnemyShooter : MonoBehaviour
+{
+    [Header("Shooting Settings")]
+    public GameObject bulletPrefab1;
+    public Transform firePoint1;
+
+    public GameObject bulletPrefab2;
+    public Transform firePoint2;
+
+    public float bulletSpeed = 20f;
+    public float shootingRange = 25f;
+    public float shootInterval = 1f;
+
+    [Header("Recoil Settings")]
+    public Transform recoilObject; // האובייקט שיזוז אחורה ויחזור
+
+    private Transform playerTarget;
+    private float shootTimer = 0f;
+
+    void Update()
+    {
+        if (playerTarget == null)
+        {
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj != null)
+                playerTarget = playerObj.transform;
+            else
+                return;
+        }
+
+        float distanceToPlayer = Vector3.Distance(transform.position, playerTarget.position);
+
+        if (distanceToPlayer <= shootingRange)
+        {
+            shootTimer += Time.deltaTime;
+            if (shootTimer >= shootInterval)
+            {
+                shootTimer = 0f;
+                ShootAtPlayer();
+            }
+        }
+    }
+
+    void ShootAtPlayer()
+    {
+        if (playerTarget == null) return;
+
+        GameObject bullet1 = null;
+        GameObject bullet2 = null;
+
+        // ירי מהנקודה הראשונה
+        if (bulletPrefab1 != null && firePoint1 != null)
+        {
+            bullet1 = Instantiate(bulletPrefab1, firePoint1.position, Quaternion.identity);
+            Vector3 dir1 = (playerTarget.position - firePoint1.position).normalized;
+            Rigidbody rb1 = bullet1.GetComponent<Rigidbody>();
+            if (rb1 != null)
+            {
+                rb1.isKinematic = true;
+                StartCoroutine(MoveBullet(rb1, dir1));
+            }
+        }
+
+        // ירי מהנקודה השנייה
+        if (bulletPrefab2 != null && firePoint2 != null)
+        {
+            bullet2 = Instantiate(bulletPrefab2, firePoint2.position, Quaternion.identity);
+            Vector3 dir2 = (playerTarget.position - firePoint2.position).normalized;
+            Rigidbody rb2 = bullet2.GetComponent<Rigidbody>();
+            if (rb2 != null)
+            {
+                rb2.isKinematic = true;
+                StartCoroutine(MoveBullet(rb2, dir2));
+            }
+        }
+
+        // התעלמות מהתנגשות
+        if (bullet1 != null && bullet2 != null)
+        {
+            Collider col1 = bullet1.GetComponent<Collider>();
+            Collider col2 = bullet2.GetComponent<Collider>();
+            if (col1 != null && col2 != null)
+            {
+                Physics.IgnoreCollision(col1, col2);
+            }
+        }
+
+        // הפעלת רתע (recoil)
+        if (recoilObject != null)
+        {
+            StartCoroutine(RecoilEffect());
+        }
+    }
+
+    IEnumerator MoveBullet(Rigidbody rb, Vector3 direction)
+    {
+        while (rb != null)
+        {
+            rb.MovePosition(rb.position + direction * bulletSpeed * Time.deltaTime);
+            yield return null;
+        }
+    }
+
+    IEnumerator RecoilEffect()
+    {
+        Vector3 originalPos = recoilObject.localPosition;
+        Vector3 recoilPos = originalPos + new Vector3(0, 0, -0.4f);
+
+        float t = 0f;
+        float recoilDuration = 0.2f;
+
+        // זז אחורה
+        while (t < recoilDuration)
+        {
+            recoilObject.localPosition = Vector3.Lerp(originalPos, recoilPos, t / recoilDuration);
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        recoilObject.localPosition = recoilPos;
+
+        // חוזר חזרה
+        t = 0f;
+        while (t < recoilDuration)
+        {
+            recoilObject.localPosition = Vector3.Lerp(recoilPos, originalPos, t / recoilDuration);
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        recoilObject.localPosition = originalPos;
+    }
+}
