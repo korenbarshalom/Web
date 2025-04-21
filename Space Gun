@@ -30,6 +30,9 @@ public class SpaceGun : MonoBehaviour
     [Header("Heat Settings")]
     public int shotsPerHeatStage = 3; // כמה יריות דרושות כדי לעלות שלב אחד של חום
 
+    [Header("Audio")]
+    public AudioSource shootAudioSource; // שדה ל-AudioSource
+
     private float attackCooldown = 0.2f;
     private float nextTimeToFire = 0f;
     private int totalShotsFired = 0;
@@ -111,7 +114,11 @@ public class SpaceGun : MonoBehaviour
             var bullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
             bullet.AddComponent<BulletMover>().speed = bulletSpeed;
         }
+
         shootingEffect?.Play();
+
+        // השמעת סאונד ירי
+        shootAudioSource?.Play();
 
         totalShotsFired++;
 
