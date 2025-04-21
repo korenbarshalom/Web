@@ -1,0 +1,79 @@
+using UnityEngine;
+using System.Collections;
+
+public class EnemyHealth100 : MonoBehaviour
+{
+    public int maxHealth = 100;
+    private int currentHealth;
+
+    [Header("Destroyed Version")]
+    public GameObject destroyedVersion; // הגרסה שתופיע במקום האויב כשהוא מת
+
+    [Header("Hit Reaction")]
+    public Transform hitReactionObject; // האובייקט שיסתובב כשמקבל נזק
+    public float rotationAmountZ = 20f; // כמה מעלות יסתובב
+    public float rotationDuration = 0.15f; // כמה זמן ייקח כל כיוון
+
+    private bool isRotating = false;
+
+    void Start()
+    {
+        currentHealth = maxHealth;
+    }
+
+    public void TakeDamage(int amount)
+    {
+        currentHealth -= amount;
+
+        if (hitReactionObject != null && !isRotating)
+        {
+            StartCoroutine(RotateOnHit());
+        }
+
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    void Die()
+    {
+        // יצירת האובייקט החלופי אם הוגדר
+        if (destroyedVersion != null)
+        {
+            Instantiate(destroyedVersion, transform.position, transform.rotation);
+        }
+
+        Destroy(gameObject); // השמדת האויב המקורי
+    }
+
+    IEnumerator RotateOnHit()
+    {
+        isRotating = true;
+
+        Quaternion initialRotation = hitReactionObject.localRotation;
+        Quaternion targetRotation = initialRotation * Quaternion.Euler(0, 0, rotationAmountZ);
+
+        float t = 0f;
+        while (t < rotationDuration)
+        {
+            hitReactionObject.localRotation = Quaternion.Slerp(initialRotation, targetRotation, t / rotationDuration);
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        hitReactionObject.localRotation = targetRotation;
+
+        // חזרה אחורה
+        t = 0f;
+        while (t < rotationDuration)
+        {
+            hitReactionObject.localRotation = Quaternion.Slerp(targetRotation, initialRotation, t / rotationDuration);
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        hitReactionObject.localRotation = initialRotation;
+        isRotating = false;
+    }
+}
