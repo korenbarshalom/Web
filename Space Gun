@@ -17,6 +17,9 @@ public class SpaceGun : MonoBehaviour
     public float overheatRotationZ = 80f;
     public float overheatDuration = 5f;
 
+    [Header("Overheat Particle")]
+    public ParticleSystem overheatEffect;
+
     [Header("UI")]
     public Slider heatSlider;
     public TextMeshProUGUI overheatText;
@@ -30,8 +33,15 @@ public class SpaceGun : MonoBehaviour
     private int enabledObjectsCount = 0;
     private bool resetInProgress = false;
     private Coroutine reverseDisableCoroutine = null;
+    private Coroutine overheatCoroutine = null;
     private bool isFiring = false;
     private float currentSliderValue = 0f;
+    private float overheatStartTime = -1f;
+
+    // שמירת מצב מיקום ורוטציה לנשק
+    private Vector3 savedOrigPos;
+    private Quaternion savedOrigRot;
+    private bool hasSavedOverheatTransform = false;
 
     void Start()
     {
@@ -44,6 +54,24 @@ public class SpaceGun : MonoBehaviour
         overheatText.text = "";
 
         heatFillImage.color = Color.green;
+    }
+
+    void OnEnable()
+    {
+        if (resetInProgress && overheatStartTime > 0f)
+        {
+            float timePassed = Time.time - overheatStartTime;
+            float remainingTime = overheatDuration - timePassed;
+
+            if (remainingTime > 0f)
+            {
+                overheatCoroutine = StartCoroutine(ContinueOverheatFrom(timePassed));
+            }
+            else
+            {
+                StartCoroutine(FinishOverheatImmediately());
+            }
+        }
     }
 
     void Update()
@@ -89,44 +117,69 @@ public class SpaceGun : MonoBehaviour
 
         totalShotsFired++;
 
-        if (totalShotsFired % 3 == 0 && enabledObjectsCount < objectsToEnable.Length)
+        if (totalShotsFired % 2 == 0 && enabledObjectsCount < objectsToEnable.Length)
         {
             objectsToEnable[enabledObjectsCount]?.SetActive(true);
             enabledObjectsCount++;
 
             if (enabledObjectsCount == objectsToEnable.Length)
             {
-                StartCoroutine(ShowOverheatAndAnimate());
+                if (overheatCoroutine == null)
+                {
+                    overheatCoroutine = StartCoroutine(ShowOverheatAndAnimate());
+                }
             }
         }
     }
 
     IEnumerator ShowOverheatAndAnimate()
     {
-        // תחילת OVERHEAT
         resetInProgress = true;
-        overheatText.text = "OVERHEAT";
+        overheatStartTime = Time.time;
 
-        // קפיצה מיידית של הסליידר לערך המקסימלי
+        overheatText.text = "OVERHEAT";
+        if (overheatEffect != null) overheatEffect.Play();
+
         heatSlider.value = heatSlider.maxValue;
         currentSliderValue = heatSlider.maxValue;
         UpdateSliderColor();
 
-        // התחלת אנימציית הנשק לאורך כל ה‑OVERHEAT
+        if (weaponTransform != null && !hasSavedOverheatTransform)
+        {
+            savedOrigPos = weaponTransform.localPosition;
+            savedOrigRot = weaponTransform.localRotation;
+            hasSavedOverheatTransform = true;
+        }
+
         StartCoroutine(WeaponOverheatAnimation());
 
-        // ממתינים לסיום ה‑OVERHEAT
         yield return new WaitForSeconds(overheatDuration);
+
+        yield return StartCoroutine(FinishOverheatReset());
+    }
+
+    IEnumerator ContinueOverheatFrom(float elapsedTime)
+    {
+        overheatText.text = "OVERHEAT";
+        if (overheatEffect != null && !overheatEffect.isPlaying) overheatEffect.Play();
+
+        StartCoroutine(WeaponOverheatAnimation(elapsedTime));
+
+        yield return new WaitForSeconds(overheatDuration - elapsedTime);
+
+        yield return StartCoroutine(FinishOverheatReset());
+    }
+
+    IEnumerator FinishOverheatReset()
+    {
         overheatText.text = "";
 
-        // כיבוי אובייקטים
         foreach (var obj in objectsToEnable)
             obj?.SetActive(false);
 
         totalShotsFired = 0;
         enabledObjectsCount = 0;
 
-        // איפוס חלק של הסליידר בצורה חלקה
         float elapsed = 0f;
         float startVal = currentSliderValue;
         while (elapsed < resetSmoothDuration)
@@ -137,29 +190,38 @@ public class SpaceGun : MonoBehaviour
             UpdateSliderColor();
             yield return null;
         }
+
         currentSliderValue = 0f;
         heatSlider.value = 0f;
         UpdateSliderColor();
 
-        // סוף מצב OVERHEAT
         resetInProgress = false;
+        overheatCoroutine = null;
+        overheatStartTime = -1f;
+        hasSavedOverheatTransform = false;
     }
 
-    IEnumerator WeaponOverheatAnimation()
+    IEnumerator FinishOverheatImmediately()
     {
-        if (weaponTransform == null) yield break;
+        yield return StartCoroutine(FinishOverheatReset());
+    }
 
-        Vector3 origPos = weaponTransform.localPosition;
-        Quaternion origRot = weaponTransform.localRotation;
+    IEnumerator WeaponOverheatAnimation(float startTime = 0f)
+    {
+        if (weaponTransform == null || !hasSavedOverheatTransform) yield break;
+
+        Vector3 origPos = savedOrigPos;
+        Quaternion origRot = savedOrigRot;
         Vector3 targetPos = origPos + Vector3.back * overheatMoveDistance;
         Quaternion targetRot = origRot * Quaternion.Euler(0f, 0f, overheatRotationZ);
 
         float halfTime = overheatDuration / 2f;
-        float elapsed = 0f;
+        float elapsed = startTime;
 
         while (elapsed < overheatDuration)
         {
             elapsed += Time.deltaTime;
+
             if (elapsed <= halfTime)
             {
                 float f = elapsed / halfTime;
@@ -172,6 +234,7 @@ public class SpaceGun : MonoBehaviour
                 weaponTransform.localPosition = Vector3.Lerp(targetPos, origPos, f);
                 weaponTransform.localRotation = Quaternion.Slerp(targetRot, origRot, f);
             }
+
             yield return null;
         }
 
