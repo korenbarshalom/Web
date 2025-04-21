@@ -1,0 +1,81 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class FlyingEnemy : MonoBehaviour
+{
+    public float speed = 5f;
+    public float rotationSpeed = 5f;
+    public float chaseRange = 50f;
+    public float stopDistance = 10f;
+
+    public float strafeDistance = 3f;
+    public float strafeSpeed = 2f;
+    public float forwardOffset = 1f;
+
+    [Header("Target")]
+    public Transform chaseTarget;
+
+    private bool isStrafing = false;
+    private float strafeTimer = 0f;
+    private Vector3 strafeStartPos;
+
+    void Update()
+    {
+        if (chaseTarget == null) return;
+
+        // מרחק וכיוון אל היעד
+        Vector3 toTarget = chaseTarget.position - transform.position;
+        float distanceToTarget = toTarget.magnitude;
+
+        if (distanceToTarget <= chaseRange)
+        {
+            // סיבוב סביב ציר Y בלבד
+            Vector3 lookDir = toTarget;
+            lookDir.y = 0f;
+            if (lookDir.sqrMagnitude > 0.001f)
+            {
+                Quaternion desiredRot = Quaternion.LookRotation(lookDir);
+                transform.rotation = Quaternion.Slerp(transform.rotation, desiredRot, rotationSpeed * Time.deltaTime);
+            }
+
+            if (distanceToTarget > stopDistance)
+            {
+                // רדיפה רגילה
+                Vector3 chaseDir = toTarget.normalized;
+                transform.position += chaseDir * speed * Time.deltaTime;
+                isStrafing = false;
+            }
+            else
+            {
+                // בתוך stopDistance: סטרייפ + התאמה חלקה לגובה השחקן
+                if (!isStrafing)
+                {
+                    strafeStartPos = transform.position;   // שומרים מיקום מלא (כולל Y) של תחילת הסטרייפ
+                    strafeTimer = 0f;
+                    isStrafing = true;
+                }
+
+                // חישוב תזוזת סטרייפ
+                strafeTimer += Time.deltaTime * strafeSpeed;
+                float strafeOffsetAmt = Mathf.Sin(strafeTimer) * strafeDistance;
+                float forwardOffsetAmt = Mathf.Cos(strafeTimer) * forwardOffset;
+
+                Vector3 strafeDir = transform.right * strafeOffsetAmt;
+                Vector3 forwardDir = transform.forward * forwardOffsetAmt;
+
+                // בונים מיקום יעד
+                Vector3 targetPos = strafeStartPos + strafeDir + forwardDir;
+                // מיישרים Y לגובה של השחקן
+                targetPos.y = chaseTarget.position.y;
+
+                // זזים אליו חלקית (כולל Y)  
+                transform.position = Vector3.Lerp(
+                    transform.position,
+                    targetPos,
+                    Time.deltaTime * strafeSpeed
+                );
+            }
+        }
+    }
+}
