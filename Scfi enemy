@@ -39,11 +39,18 @@ public class FlyingEnemy : MonoBehaviour
                 transform.rotation = Quaternion.Slerp(transform.rotation, desiredRot, rotationSpeed * Time.deltaTime);
             }
 
+            // סטרייפ תמידי
+            strafeTimer += Time.deltaTime * strafeSpeed;
+            float strafeOffset = Mathf.Sin(strafeTimer) * strafeDistance;
+            Vector3 strafeDir = transform.right * strafeOffset;
+
             if (distanceToTarget > stopDistance)
             {
-                // רדיפה רגילה
+                // רדיפה + סטרייפ עדין
                 Vector3 chaseDir = toTarget.normalized;
-                transform.position += chaseDir * speed * Time.deltaTime;
+                Vector3 moveDir = chaseDir + (strafeDir.normalized * 0.2f); // הוספת תנועה קלה ימינה/שמאלה
+
+                transform.position += moveDir.normalized * speed * Time.deltaTime;
                 isStrafing = false;
             }
             else
@@ -56,16 +63,15 @@ public class FlyingEnemy : MonoBehaviour
                     isStrafing = true;
                 }
 
-                // חישוב תזוזת סטרייפ
-                strafeTimer += Time.deltaTime * strafeSpeed;
+                // חישוב תזוזת סטרייפ במקום
                 float strafeOffsetAmt = Mathf.Sin(strafeTimer) * strafeDistance;
                 float forwardOffsetAmt = Mathf.Cos(strafeTimer) * forwardOffset;
 
-                Vector3 strafeDir = transform.right * strafeOffsetAmt;
+                Vector3 idleStrafeDir = transform.right * strafeOffsetAmt;
                 Vector3 forwardDir = transform.forward * forwardOffsetAmt;
 
                 // בונים מיקום יעד
-                Vector3 targetPos = strafeStartPos + strafeDir + forwardDir;
+                Vector3 targetPos = strafeStartPos + idleStrafeDir + forwardDir;
                 // מיישרים Y לגובה של השחקן
                 targetPos.y = chaseTarget.position.y;
 
