@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class EnemyHealth100 : MonoBehaviour
@@ -7,36 +8,109 @@ public class EnemyHealth100 : MonoBehaviour
     private int currentHealth;
 
     [Header("Destroyed Version")]
-    public GameObject destroyedVersion; // הגרסה שתופיע במקום האויב כשהוא מת
+    public GameObject destroyedVersion;
 
     [Header("Hit Reaction")]
-    public Transform hitReactionObject; // האובייקט שיסתובב כשמקבל נזק
-    public float rotationAmountZ = 90f; // כמה מעלות יסתובב
-    public float rotationDuration = 0.15f; // כמה זמן ייקח כל כיוון
+    public Transform hitReactionObject;
+    public float rotationAmountZ = 90f;
+    public float rotationDuration = 0.15f;
 
     [Header("Hit Sound")]
     public AudioClip hitSound;
     public AudioSource audioSource;
 
+    [Header("Health Bar")]
+    public Slider healthBar;
+    public Vector3 healthBarOffset = new Vector3(0, 2f, 0);
+    public Camera assignedCamera;
+
     private bool isRotating = false;
-    private bool isAlternateDirection = false; // בודק אם זאת הפעם השנייה, רביעית וכו'
+    private bool isAlternateDirection = false;
+    private bool hasBeenDamaged = false;
+    private bool isDying = false;
+
+    private Vector3 targetPosition;
+    private Vector3 velocity = Vector3.zero;
+    private float smoothTime = 0.01f; // יותר איטי ויציב מ־Lerp
 
     void Start()
     {
         currentHealth = maxHealth;
+
+        if (assignedCamera == null)
+        {
+            assignedCamera = Camera.main;
+        }
+
+        if (healthBar != null)
+        {
+            healthBar.maxValue = maxHealth;
+            healthBar.value = currentHealth;
+            healthBar.gameObject.SetActive(false);
+            targetPosition = healthBar.transform.position;
+        }
+    }
+
+    void Update()
+    {
+        if (isDying || !hasBeenDamaged || healthBar == null || assignedCamera == null) return;
+
+        Vector3 worldPosition = transform.position + healthBarOffset;
+        Vector3 viewportPosition = assignedCamera.WorldToViewportPoint(worldPosition);
+
+        if (viewportPosition.z > 0 && viewportPosition.x >= 0 && viewportPosition.x <= 1 && viewportPosition.y >= 0 && viewportPosition.y <= 1)
+        {
+            RaycastHit hit;
+            Vector3 directionToCamera = assignedCamera.transform.position - transform.position;
+
+            if (Physics.Raycast(transform.position, directionToCamera, out hit))
+            {
+                if (hit.collider.CompareTag("Wall"))
+                {
+                    healthBar.gameObject.SetActive(false);
+                }
+                else
+                {
+                    healthBar.gameObject.SetActive(true);
+                    targetPosition = assignedCamera.WorldToScreenPoint(worldPosition);
+                }
+            }
+            else
+            {
+                healthBar.gameObject.SetActive(true);
+                targetPosition = assignedCamera.WorldToScreenPoint(worldPosition);
+            }
+        }
+        else
+        {
+            healthBar.gameObject.SetActive(false);
+        }
+
+        // תנועה חלקה במקום Lerp
+        healthBar.transform.position = Vector3.SmoothDamp(healthBar.transform.position, targetPosition, ref velocity, smoothTime);
     }
 
     public void TakeDamage(int amount)
     {
         currentHealth -= amount;
 
-        // השמעת סאונד פגיעה אם הוגדר
+        if (!hasBeenDamaged)
+        {
+            hasBeenDamaged = true;
+            if (healthBar != null)
+                healthBar.gameObject.SetActive(true);
+        }
+
+        if (healthBar != null)
+        {
+            healthBar.value = currentHealth;
+        }
+
         if (hitSound != null && audioSource != null)
         {
             audioSource.PlayOneShot(hitSound);
         }
 
-        // ריאקציית סיבוב אם יש אובייקט מוגדר ולא באמצע תנועה
         if (hitReactionObject != null && !isRotating)
         {
             StartCoroutine(RotateOnHit());
@@ -50,9 +124,17 @@ public class EnemyHealth100 : MonoBehaviour
 
     void Die()
     {
+        if (isDying) return;
+        isDying = true;
+
         if (destroyedVersion != null)
         {
             Instantiate(destroyedVersion, transform.position, transform.rotation);
+        }
+
+        if (healthBar != null)
+        {
+            Destroy(healthBar.gameObject);
         }
 
         Destroy(gameObject);
@@ -62,9 +144,7 @@ public class EnemyHealth100 : MonoBehaviour
     {
         isRotating = true;
 
-        // קובע אם צריך לסובב קדימה או אחורה
         float actualRotationZ = isAlternateDirection ? -rotationAmountZ : rotationAmountZ;
-
         Quaternion initialRotation = hitReactionObject.localRotation;
         Quaternion targetRotation = initialRotation * Quaternion.Euler(0, 0, actualRotationZ);
 
@@ -88,8 +168,6 @@ public class EnemyHealth100 : MonoBehaviour
 
         hitReactionObject.localRotation = initialRotation;
         isRotating = false;
-
-        // הפוך את הכיוון לפעם הבאה
         isAlternateDirection = !isAlternateDirection;
     }
 }
