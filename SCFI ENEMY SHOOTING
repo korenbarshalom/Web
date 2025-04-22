@@ -17,6 +17,14 @@ public class EnemyShooter : MonoBehaviour
     [Header("Recoil Settings")]
     public Transform recoilObject; // האובייקט שיזוז אחורה ויחזור
 
+    [Header("Fire Effects")]
+    public ParticleSystem fireEffect1;
+    public ParticleSystem fireEffect2;
+
+    [Header("Shoot Sound")]
+    public AudioClip shootSound;
+    public AudioSource audioSource;
+
     private Transform playerTarget;
     private float shootTimer = 0f;
 
@@ -55,6 +63,8 @@ public class EnemyShooter : MonoBehaviour
         if (bulletPrefab1 != null && firePoint1 != null)
         {
             bullet1 = Instantiate(bulletPrefab1, firePoint1.position, Quaternion.identity);
+            Destroy(bullet1, 6f); // מחיקה אוטומטית אחרי 6 שניות
+
             Vector3 dir1 = (playerTarget.position - firePoint1.position).normalized;
             Rigidbody rb1 = bullet1.GetComponent<Rigidbody>();
             if (rb1 != null)
@@ -62,12 +72,17 @@ public class EnemyShooter : MonoBehaviour
                 rb1.isKinematic = true;
                 StartCoroutine(MoveBullet(rb1, dir1));
             }
+
+            if (fireEffect1 != null)
+                fireEffect1.Play();
         }
 
         // ירי מהנקודה השנייה
         if (bulletPrefab2 != null && firePoint2 != null)
         {
             bullet2 = Instantiate(bulletPrefab2, firePoint2.position, Quaternion.identity);
+            Destroy(bullet2, 6f); // מחיקה אוטומטית אחרי 6 שניות
+
             Vector3 dir2 = (playerTarget.position - firePoint2.position).normalized;
             Rigidbody rb2 = bullet2.GetComponent<Rigidbody>();
             if (rb2 != null)
@@ -75,6 +90,15 @@ public class EnemyShooter : MonoBehaviour
                 rb2.isKinematic = true;
                 StartCoroutine(MoveBullet(rb2, dir2));
             }
+
+            if (fireEffect2 != null)
+                fireEffect2.Play();
+        }
+
+        // הפעלת סאונד ירי
+        if (shootSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(shootSound);
         }
 
         // התעלמות מהתנגשות
@@ -88,7 +112,6 @@ public class EnemyShooter : MonoBehaviour
             }
         }
 
-        // הפעלת רתע (recoil)
         if (recoilObject != null)
         {
             StartCoroutine(RecoilEffect());
@@ -112,7 +135,6 @@ public class EnemyShooter : MonoBehaviour
         float t = 0f;
         float recoilDuration = 0.2f;
 
-        // זז אחורה
         while (t < recoilDuration)
         {
             recoilObject.localPosition = Vector3.Lerp(originalPos, recoilPos, t / recoilDuration);
@@ -122,7 +144,6 @@ public class EnemyShooter : MonoBehaviour
 
         recoilObject.localPosition = recoilPos;
 
-        // חוזר חזרה
         t = 0f;
         while (t < recoilDuration)
         {
