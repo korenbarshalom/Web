@@ -11,10 +11,15 @@ public class EnemyHealth100 : MonoBehaviour
 
     [Header("Hit Reaction")]
     public Transform hitReactionObject; // האובייקט שיסתובב כשמקבל נזק
-    public float rotationAmountZ = 20f; // כמה מעלות יסתובב
+    public float rotationAmountZ = 90f; // כמה מעלות יסתובב
     public float rotationDuration = 0.15f; // כמה זמן ייקח כל כיוון
 
+    [Header("Hit Sound")]
+    public AudioClip hitSound;
+    public AudioSource audioSource;
+
     private bool isRotating = false;
+    private bool isAlternateDirection = false; // בודק אם זאת הפעם השנייה, רביעית וכו'
 
     void Start()
     {
@@ -25,6 +30,13 @@ public class EnemyHealth100 : MonoBehaviour
     {
         currentHealth -= amount;
 
+        // השמעת סאונד פגיעה אם הוגדר
+        if (hitSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(hitSound);
+        }
+
+        // ריאקציית סיבוב אם יש אובייקט מוגדר ולא באמצע תנועה
         if (hitReactionObject != null && !isRotating)
         {
             StartCoroutine(RotateOnHit());
@@ -38,21 +50,23 @@ public class EnemyHealth100 : MonoBehaviour
 
     void Die()
     {
-        // יצירת האובייקט החלופי אם הוגדר
         if (destroyedVersion != null)
         {
             Instantiate(destroyedVersion, transform.position, transform.rotation);
         }
 
-        Destroy(gameObject); // השמדת האויב המקורי
+        Destroy(gameObject);
     }
 
     IEnumerator RotateOnHit()
     {
         isRotating = true;
 
+        // קובע אם צריך לסובב קדימה או אחורה
+        float actualRotationZ = isAlternateDirection ? -rotationAmountZ : rotationAmountZ;
+
         Quaternion initialRotation = hitReactionObject.localRotation;
-        Quaternion targetRotation = initialRotation * Quaternion.Euler(0, 0, rotationAmountZ);
+        Quaternion targetRotation = initialRotation * Quaternion.Euler(0, 0, actualRotationZ);
 
         float t = 0f;
         while (t < rotationDuration)
@@ -64,7 +78,6 @@ public class EnemyHealth100 : MonoBehaviour
 
         hitReactionObject.localRotation = targetRotation;
 
-        // חזרה אחורה
         t = 0f;
         while (t < rotationDuration)
         {
@@ -75,5 +88,8 @@ public class EnemyHealth100 : MonoBehaviour
 
         hitReactionObject.localRotation = initialRotation;
         isRotating = false;
+
+        // הפוך את הכיוון לפעם הבאה
+        isAlternateDirection = !isAlternateDirection;
     }
 }
