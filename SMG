@@ -1,53 +1,234 @@
 using UnityEngine;
 using System.Collections;
+using TMPro;                   // ✅ TextMeshPro
 
 public class SimpleShooter : MonoBehaviour
 {
+    /* -------- BULLET / PHYSICS -------- */
     [Header("Bullet Settings")]
     public GameObject bulletPrefab;
     public Transform firePoint;
 
     [Header("Crosshair / Camera Reference")]
-    public Camera crosshairCamera;           // אם ריק – נשתמש במצלמה הראשית
+    public Camera crosshairCamera;          // אם ריק – Camera.main
 
     [Header("Bullet Physics")]
-    public float bulletForce = 1000f;        // עוצמת הכוח (Impulse) שמופעל על הקליע
-    public float bulletSpeed = 20f;          // מהירות קליע – אופציונלי אם תוסיף BulletMover
+    public float bulletForce = 1000f;       // כוח - AddForce
+    public float bulletSpeed = 20f;         // שמור אם תשתמש בסקריפט נוסף
 
+    [Header("Bullet Pool / Container")]
+    public Transform bulletContainer;       // ✅ אובייקט ריק שיאחסן את כל הכדורים
+
+    /* -------- MUZZLE FLASH / PARTICLE -------- */
+    [Header("Muzzle Flash")]
+    public ParticleSystem muzzleFlash;      // ✅ יופעל בכל ירייה
+
+    /* -------- RECOIL -------- */
+    [Header("Recoil Settings")]
+    public Transform weaponTransform;       // האקדח
+    public float recoilRotationZ = 5f;
+    public float recoilDuration = 0.1f;
+
+    /* -------- FIRE / COOLDOWN -------- */
     [Header("Fire Rate")]
     public float fireRate = 0.2f;
     private float nextTimeToFire = 0f;
 
+    /* -------- AUDIO -------- */
+    [Header("Audio")]
+    public AudioSource shootingSource;      // מקור צליל (Loop=FALSE)
+    public AudioClip shootingClip;        // קליפ ירי יחיד
+    public float loopInterval = 0.35f;      // מרווח מינימלי בין קליפים
+    private float nextLoopTime = 0f;
+
+    /* -------- AMMO -------- */
+    [Header("Ammo UI / Logic")]
+    public TextMeshProUGUI ammoText;        // ✅ טקסט המחסנית
+    public int magazineSize = 30;
+    public int reserveAmmo = 60;           // סך-הכול 90 = 3 מחסניות
+    public float reloadTime = 1.2f;
+    private int bulletsInMag;
+    private bool isReloading = false;
+
+    /* -------- ROBOT REWARD -------- */
+    [Header("Robot Reward")]
+    public int rewardPerRobot = 60;
+    public float robotScanInterval = 0.5f;
+
+    /* -------- INTERNAL -------- */
+    private bool isRecoiling = false;
+    private float nextRobotScan = 0f;
+    private int lastRobotCount = 0;
+
+    /* ====================================================================== */
+    void Start()
+    {
+        bulletsInMag = magazineSize;
+        lastRobotCount = CountRobotsInScene();
+        UpdateAmmoUI();
+    }
+
     void Update()
     {
-        if (Input.GetMouseButton(0) && Time.time >= nextTimeToFire)
+        if (isReloading) return;            // אי-אפשר לירות בזמן טעינה
+
+        /* -------- ירי -------- */
+        if (Input.GetMouseButton(0) && bulletsInMag > 0)
         {
-            nextTimeToFire = Time.time + fireRate;
-            Shoot();
+            TryPlayLoop();
+
+            if (Time.time >= nextTimeToFire)
+            {
+                nextTimeToFire = Time.time + fireRate;
+                Shoot();
+            }
+        }
+        else
+        {
+            StopLoopImmediately();
+        }
+
+        /* -------- טעינה ידנית (R) -------- */
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            if (bulletsInMag < magazineSize && reserveAmmo > 0)
+                StartCoroutine(Reload());
+        }
+
+        /* -------- סריקה למספר רובוטים -------- */
+        if (Time.time >= nextRobotScan)
+        {
+            ScanRobots();
+            nextRobotScan = Time.time + robotScanInterval;
         }
     }
 
+    /* ==================== ROBOT SCAN ==================== */
+    void ScanRobots()
+    {
+        int current = CountRobotsInScene();
+        int destroyed = lastRobotCount - current;
+
+        if (destroyed > 0)
+        {
+            reserveAmmo += destroyed * rewardPerRobot;
+            UpdateAmmoUI();
+
+            if (bulletsInMag == 0 && !isReloading)
+                StartCoroutine(Reload());
+        }
+
+        lastRobotCount = current;
+    }
+
+    int CountRobotsInScene()
+    {
+        return GameObject.FindGameObjectsWithTag("Robot").Length;
+    }
+
+    /* ================== SHOOT ================== */
     void Shoot()
     {
-        // כיוון הירי תמיד מהמ​רכז (ה-crosshair)
-        Vector3 shootDir = (crosshairCamera != null
-                            ? crosshairCamera.transform.forward
-                            : Camera.main.transform.forward);
-        Quaternion shootRot = Quaternion.LookRotation(shootDir);
+        Vector3 dir = (crosshairCamera != null ? crosshairCamera.transform.forward
+                                               : Camera.main.transform.forward);
+        Quaternion rot = Quaternion.LookRotation(dir);
 
-        // יצירת קליע מיושר לכיוון הירי
-        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, shootRot);
+        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, rot, bulletContainer);
+        // אם bulletContainer == null הכדור יווצר ללא הורה
 
-        // הפעלת כוח
         Rigidbody rb = bullet.GetComponent<Rigidbody>();
         if (rb != null)
         {
             rb.useGravity = true;
             rb.isKinematic = false;
             rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
-            rb.AddForce(shootDir * bulletForce, ForceMode.Impulse);
+            rb.AddForce(dir * bulletForce, ForceMode.Impulse);
         }
 
-        Destroy(bullet, 5f); // ניקוי אחרי 5 שניות
+        Destroy(bullet, 5f);
+
+        muzzleFlash?.Play();               // ✅ אפקט ירי
+
+        bulletsInMag--;
+        UpdateAmmoUI();
+
+        if (weaponTransform != null && !isRecoiling)
+            StartCoroutine(RecoilAnimation());
+
+        if (bulletsInMag == 0 && reserveAmmo > 0)
+            StartCoroutine(Reload());
+    }
+
+    /* ----------------- SOUND ----------------- */
+    void TryPlayLoop()
+    {
+        if (shootingSource == null || shootingClip == null) return;
+
+        if (Time.time >= nextLoopTime)
+        {
+            shootingSource.PlayOneShot(shootingClip);
+            nextLoopTime = Time.time + loopInterval;
+        }
+    }
+
+    void StopLoopImmediately()
+    {
+        nextLoopTime = 0f;
+        if (shootingSource != null && shootingSource.isPlaying)
+            shootingSource.Stop();
+    }
+
+    /* ----------------- RELOAD ----------------- */
+    IEnumerator Reload()
+    {
+        isReloading = true;
+        StopLoopImmediately();
+
+        yield return new WaitForSeconds(reloadTime);
+
+        int bulletsNeeded = magazineSize - bulletsInMag;
+        int bulletsToReload = Mathf.Min(bulletsNeeded, reserveAmmo);
+
+        bulletsInMag += bulletsToReload;
+        reserveAmmo -= bulletsToReload;
+
+        UpdateAmmoUI();
+        isReloading = false;
+    }
+
+    /* ----------------- UI ----------------- */
+    void UpdateAmmoUI()
+    {
+        if (ammoText != null)
+            ammoText.text = $"{bulletsInMag}/{reserveAmmo}";
+    }
+
+    /* ----------------- RECOIL ----------------- */
+    IEnumerator RecoilAnimation()
+    {
+        isRecoiling = true;
+
+        Quaternion startRot = weaponTransform.localRotation;
+        Quaternion endRot = startRot * Quaternion.Euler(0f, 0f, recoilRotationZ);
+        float half = recoilDuration * 0.5f;
+
+        float t = 0f;
+        while (t < half)
+        {
+            t += Time.deltaTime;
+            weaponTransform.localRotation = Quaternion.Slerp(startRot, endRot, t / half);
+            yield return null;
+        }
+
+        t = 0f;
+        while (t < half)
+        {
+            t += Time.deltaTime;
+            weaponTransform.localRotation = Quaternion.Slerp(endRot, startRot, t / half);
+            yield return null;
+        }
+
+        weaponTransform.localRotation = startRot;
+        isRecoiling = false;
     }
 }
