@@ -1,0 +1,53 @@
+using UnityEngine;
+using System.Collections;
+
+public class SimpleShooter : MonoBehaviour
+{
+    [Header("Bullet Settings")]
+    public GameObject bulletPrefab;
+    public Transform firePoint;
+
+    [Header("Crosshair / Camera Reference")]
+    public Camera crosshairCamera;           // אם ריק – נשתמש במצלמה הראשית
+
+    [Header("Bullet Physics")]
+    public float bulletForce = 1000f;        // עוצמת הכוח (Impulse) שמופעל על הקליע
+    public float bulletSpeed = 20f;          // מהירות קליע – אופציונלי אם תוסיף BulletMover
+
+    [Header("Fire Rate")]
+    public float fireRate = 0.2f;
+    private float nextTimeToFire = 0f;
+
+    void Update()
+    {
+        if (Input.GetMouseButton(0) && Time.time >= nextTimeToFire)
+        {
+            nextTimeToFire = Time.time + fireRate;
+            Shoot();
+        }
+    }
+
+    void Shoot()
+    {
+        // כיוון הירי תמיד מהמ​רכז (ה-crosshair)
+        Vector3 shootDir = (crosshairCamera != null
+                            ? crosshairCamera.transform.forward
+                            : Camera.main.transform.forward);
+        Quaternion shootRot = Quaternion.LookRotation(shootDir);
+
+        // יצירת קליע מיושר לכיוון הירי
+        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, shootRot);
+
+        // הפעלת כוח
+        Rigidbody rb = bullet.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.useGravity = true;
+            rb.isKinematic = false;
+            rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+            rb.AddForce(shootDir * bulletForce, ForceMode.Impulse);
+        }
+
+        Destroy(bullet, 5f); // ניקוי אחרי 5 שניות
+    }
+}
