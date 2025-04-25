@@ -1,0 +1,201 @@
+using UnityEngine;
+using UnityEngine.UI;          // ✅ Slider
+using System.Collections;      // ✅ לפי ההעדפה שלך
+
+public class ChargeShooter : MonoBehaviour
+{
+    /* -------- BULLET / PHYSICS -------- */
+    [Header("Bullet Settings")]
+    public GameObject bulletPrefab;
+    public Transform firePoint;
+
+    /* -------- CHARGE -------- */
+    [Header("Charge Settings")]
+    public float minForce = 300f;
+    public float maxForce = 1500f;
+    public float maxChargeTime = 2f;        // אחרי זה נורה אוטומטית
+
+    [Header("Charge Timing")]
+    public float minChargeDelay = 0.5f;     // צריך להחזיק לפחות זמן זה כדי לשמוע סאונד ולירות
+
+    /* -------- CHARGE INDICATORS -------- */
+    [Header("Charge Indicator X")]
+    public Transform chargeIndicatorX;
+    public float indicatorMaxShiftX = 0.2f;
+
+    [Header("Charge Indicator Z")]
+    public Transform chargeIndicatorZ;
+    public float indicatorMaxShiftZ = 0.2f;
+
+    [Header("Return Animation")]
+    public float indicatorReturnDuration = 0.25f;
+
+    /* -------- UI -------- */
+    [Header("Charge Slider")]
+    public Slider chargeSlider;
+
+    /* -------- AUDIO -------- */
+    [Header("Audio")]
+    public AudioSource chargeAudioSource;   // קליפ בלופ
+    public AudioSource shotAudioSource;     // קליפ ירייה
+
+    /* -------- EFFECTS -------- */
+    [Header("Shooting Effect")]
+    public ParticleSystem shootingEffect;
+
+    /* -------- CAMERA -------- */
+    [Header("Crosshair / Camera")]
+    public Camera crosshairCamera;
+
+    /* -------- POOL -------- */
+    [Header("Bullet Pool / Container")]
+    public Transform bulletContainer;
+
+    /* -------- INTERNAL -------- */
+    private bool isCharging = false;
+    private bool chargeSoundStarted = false;
+    private float chargeStart = 0f;
+    private Vector3 indicatorXStartPos;
+    private Vector3 indicatorZStartPos;
+
+    void Start()
+    {
+        if (crosshairCamera == null) crosshairCamera = Camera.main;
+
+        if (chargeIndicatorX != null) indicatorXStartPos = chargeIndicatorX.localPosition;
+        if (chargeIndicatorZ != null) indicatorZStartPos = chargeIndicatorZ.localPosition;
+
+        if (chargeSlider != null) chargeSlider.value = 0f;
+    }
+
+    void Update()
+    {
+        /* --- התחלת טעינה --- */
+        if (Input.GetMouseButtonDown(0))
+        {
+            isCharging = true;
+            chargeSoundStarted = false;
+            chargeStart = Time.time;
+
+            if (chargeAudioSource != null)
+                chargeAudioSource.Stop();   // נוודא שמתחילים בשקט
+        }
+
+        /* --- תהליך טעינה --- */
+        if (isCharging)
+        {
+            float heldTime = Time.time - chargeStart;
+            float chargePercent = Mathf.Clamp01(heldTime / maxChargeTime);
+
+            // הפעלת סאונד טעינה אחרי minChargeDelay
+            if (!chargeSoundStarted && heldTime >= minChargeDelay)
+            {
+                if (chargeAudioSource != null) chargeAudioSource.Play();
+                chargeSoundStarted = true;
+            }
+
+            // אינדיקטורים
+            if (chargeIndicatorX != null)
+            {
+                Vector3 p = indicatorXStartPos;
+                p.x += indicatorMaxShiftX * chargePercent;
+                chargeIndicatorX.localPosition = p;
+            }
+            if (chargeIndicatorZ != null)
+            {
+                Vector3 p = indicatorZStartPos;
+                p.z += indicatorMaxShiftZ * chargePercent;
+                chargeIndicatorZ.localPosition = p;
+            }
+
+            // Slider
+            if (chargeSlider != null) chargeSlider.value = chargePercent;
+
+            // שחרור אוטומטי
+            if (heldTime >= maxChargeTime)
+                FinishChargeAndShoot();
+        }
+
+        /* --- שחרור ידני --- */
+        if (Input.GetMouseButtonUp(0) && isCharging)
+        {
+            float heldTime = Time.time - chargeStart;
+
+            if (heldTime >= minChargeDelay)
+                FinishChargeAndShoot();      // ירייה רגילה
+            else
+                CancelCharge();              // שחרור מוקדם – לא יורה
+        }
+    }
+
+    /* ---------- CANCEL (שחרור מוקדם) ---------- */
+    void CancelCharge()
+    {
+        isCharging = false;
+
+        if (chargeAudioSource != null) chargeAudioSource.Stop();
+        if (chargeSlider != null) chargeSlider.value = 0f;
+
+        ResetIndicators();
+    }
+
+    /* ---------- FINISH & SHOOT ---------- */
+    void FinishChargeAndShoot()
+    {
+        isCharging = false;
+
+        FireChargedShot();
+
+        if (chargeAudioSource != null) chargeAudioSource.Stop();
+        if (chargeSlider != null) chargeSlider.value = 0f;
+
+        ResetIndicators();
+    }
+
+    /* ------------- FIRE ------------- */
+    void FireChargedShot()
+    {
+        float heldTime = Time.time - chargeStart;
+        float chargePercent = Mathf.Clamp01(heldTime / maxChargeTime);
+        float finalForce = Mathf.Lerp(minForce, maxForce, chargePercent);
+
+        GameObject bullet = Instantiate(
+            bulletPrefab,
+            firePoint.position,
+            Quaternion.LookRotation(crosshairCamera.transform.forward),
+            bulletContainer);
+
+        if (bullet.TryGetComponent(out Rigidbody rb))
+        {
+            rb.useGravity = true;
+            rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+            rb.AddForce(crosshairCamera.transform.forward * finalForce, ForceMode.Impulse);
+        }
+
+        if (shootingEffect != null) shootingEffect.Play();
+        if (shotAudioSource != null) shotAudioSource.Play();
+    }
+
+    /* ----- INDICATORS RETURN ----- */
+    void ResetIndicators()
+    {
+        if (chargeIndicatorX != null)
+            StartCoroutine(ReturnIndicatorSmooth(chargeIndicatorX, indicatorXStartPos, indicatorReturnDuration));
+        if (chargeIndicatorZ != null)
+            StartCoroutine(ReturnIndicatorSmooth(chargeIndicatorZ, indicatorZStartPos, indicatorReturnDuration));
+    }
+
+    IEnumerator ReturnIndicatorSmooth(Transform ind, Vector3 target, float dur)
+    {
+        Vector3 start = ind.localPosition;
+        float t = 0f;
+
+        while (t < dur)
+        {
+            ind.localPosition = Vector3.Lerp(start, target, t / dur);
+            t += Time.deltaTime;
+            yield return null;
+        }
+        ind.localPosition = target;
+    }
+}
