@@ -16,6 +16,7 @@ public class WeaponSwitcher : MonoBehaviour
     public GameObject extraWeapon4; // נשק נוסף 4 – pickup חדש
     public GameObject extraWeapon5; // נשק נוסף 5 – pickup חדש
     public GameObject extraWeapon6;          // נשק נוסף 6 – pickup חדש
+    public GameObject extraWeapon7;      // נשק נוסף 7 – pickup חדש
 
     // Pickup objects for weapon pickups
     public Transform gunPickupObject; // Pickup עבור ה-Gun
@@ -26,6 +27,7 @@ public class WeaponSwitcher : MonoBehaviour
     public Transform extraWeaponPickupObject4; // Pickup עבור extraWeapon4
     public Transform extraWeaponPickupObject5; // Pickup עבור extraWeapon5
     public Transform extraWeaponPickupObject6; // Pickup עבור extraWeapon6
+    public Transform extraWeaponPickupObject7;   // Pickup עבור extraWeapon7
 
     // דגלי פתיחה (Unlock) עבור הנשקים שהופכים ל-Pickup
     private bool gunUnlocked = false;
@@ -36,6 +38,7 @@ public class WeaponSwitcher : MonoBehaviour
     private bool extraWeapon4Unlocked = false;
     private bool extraWeapon5Unlocked = false;
     private bool extraWeapon6Unlocked = false;
+    private bool extraWeapon7Unlocked = false;
 
     // הגדרות ירי עבור הרובה (במקרה זה האקדח הוא gun)
     public GameObject bulletPrefab; // פרפאב כדור
@@ -143,7 +146,7 @@ public class WeaponSwitcher : MonoBehaviour
     private void Start()
     {
         // אתחול מערך הנשקים – הסדר חשוב: gun, ak47, knife, pistol, extraWeapon, extraWeapon2, extraWeapon3, extraWeapon4, extraWeapon5
-        weapons = new GameObject[] { gun, ak47, knife, pistol, extraWeapon, extraWeapon2, extraWeapon3, extraWeapon4, extraWeapon5, extraWeapon6 };
+        weapons = new GameObject[] { gun, ak47, knife, pistol, extraWeapon, extraWeapon2, extraWeapon3, extraWeapon4, extraWeapon5, extraWeapon6, extraWeapon7 };
 
         // שמירת המיקום והסיבוב ההתחלתי לכל נשק לצורך אנימציות סוויי והחלפה
         initialPositions = new Vector3[weapons.Length];
@@ -387,6 +390,26 @@ public class WeaponSwitcher : MonoBehaviour
                 extraWeaponPickupObject6.gameObject.SetActive(false);
             }
         }
+        // --- Extra Weapon 7 Pickup ---
+        if (!extraWeapon7Unlocked && extraWeaponPickupObject7 != null && Input.GetKeyDown(KeyCode.F))
+        {
+            float dist7 = Vector3.Distance(player.position, extraWeaponPickupObject7.position);
+            if (dist7 <= 2f)
+            {
+                if (currentPickupWeaponIndex != -1 && currentPickupWeaponIndex != 10)
+                    DropWeapon(currentPickupWeaponIndex);
+
+                currentPickupWeaponIndex = 10;
+                extraWeapon7Unlocked = true;
+                Debug.Log("Extra Weapon 7 unlocked!");
+
+                if (gunPickupSound != null && gunPickupAudioSource != null)
+                    gunPickupAudioSource.PlayOneShot(gunPickupSound);
+
+                StartCoroutine(SmoothSwitchWeapon(10));      // index 10
+                extraWeaponPickupObject7.gameObject.SetActive(false);
+            }
+        }
 
         // --- החלפת נשקים בגלגלת העכבר ---
         float scroll = Input.GetAxis("Mouse ScrollWheel");
@@ -401,7 +424,7 @@ public class WeaponSwitcher : MonoBehaviour
                 attempts++;
                 if (attempts > weapons.Length) break;
             }
-            while ((weapons[nextIndex] == knife) ||                             // ← חדש
+            while ((weapons[nextIndex] == knife) ||                             // ← מסנן את ה-Knife
              (weapons[nextIndex] == gun && !gunUnlocked) ||
              (weapons[nextIndex] == ak47 && !akUnlocked) ||
              (weapons[nextIndex] == extraWeapon && !extraWeaponUnlocked) ||
@@ -409,7 +432,9 @@ public class WeaponSwitcher : MonoBehaviour
              (weapons[nextIndex] == extraWeapon3 && !extraWeapon3Unlocked) ||
              (weapons[nextIndex] == extraWeapon4 && !extraWeapon4Unlocked) ||
              (weapons[nextIndex] == extraWeapon5 && !extraWeapon5Unlocked) ||
-              (weapons[nextIndex] == extraWeapon6 && !extraWeapon6Unlocked));
+             (weapons[nextIndex] == extraWeapon6 && !extraWeapon6Unlocked) ||
+             (weapons[nextIndex] == extraWeapon7 && !extraWeapon7Unlocked));   // ← חדש
+
 
 
 
@@ -643,6 +668,27 @@ public class WeaponSwitcher : MonoBehaviour
 
             extraWeapon6.transform.localPosition =
                 Vector3.Lerp(extraWeapon6.transform.localPosition,
+                             combinedTarget,
+                             Time.deltaTime * recoilSpeed);
+        }
+        // --- Weapon Sway עבור extraWeapon7 ---
+        if (extraWeapon7 != null && extraWeapon7.activeSelf)
+        {
+            int index = System.Array.IndexOf(weapons, extraWeapon7);
+
+            Vector3 recoilTarget = initialPositions[index] +
+                                   (Input.GetButton("Fire1") ? -Vector3.forward * recoilAmount : Vector3.zero);
+
+            Vector3 swayOffset = new Vector3(-Input.GetAxis("Mouse X") * swayAmount,
+                                             -Input.GetAxis("Mouse Y") * swayAmount, 0);
+
+            Vector3 combinedTarget = recoilTarget + swayOffset;
+
+            if (idleTimer > 2f)
+                combinedTarget += new Vector3(0, idleOffsetY, 0);
+
+            extraWeapon7.transform.localPosition =
+                Vector3.Lerp(extraWeapon7.transform.localPosition,
                              combinedTarget,
                              Time.deltaTime * recoilSpeed);
         }
@@ -968,6 +1014,10 @@ public class WeaponSwitcher : MonoBehaviour
         {
             StartCoroutine(RespawnPickupCoroutine(extraWeaponPickupObject6));
         }
+        else if (currentWeapon == extraWeapon7 && extraWeaponPickupObject7 != null)
+        {
+            StartCoroutine(RespawnPickupCoroutine(extraWeaponPickupObject7));
+        }
 
         currentWeaponIndex = newIndex;
         GameObject newWeapon = weapons[newIndex];
@@ -1029,9 +1079,14 @@ public class WeaponSwitcher : MonoBehaviour
         {
             extraWeapon6Unlocked = false;
         }
+        else if (index == 10)
+        {
+            extraWeapon7Unlocked = false;
+        }
 
         if (weapons[index] != null)
             weapons[index].SetActive(false);
+
     }
 
     private void UseKnife()
