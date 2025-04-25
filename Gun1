@@ -6,7 +6,7 @@ using System.Collections.Generic;
 public class WeaponSwitcher : MonoBehaviour
 {
     // --- הגדרות החלפת וניהול נשקים ---
-    public GameObject gun;         // נשק 1 (למשל רובה, אך כאן מייצג את האקדח)
+    public GameObject gun;         // נשק 1 (למשל אקדח)
     public GameObject ak47;        // AK47
     public GameObject knife;       // סכין
     public GameObject pistol;      // אקדח (משמש לנשק נוסף, במקרה זה לא בשימוש)
@@ -14,6 +14,7 @@ public class WeaponSwitcher : MonoBehaviour
     public GameObject extraWeapon2; // נשק נוסף 2 – מוצג בגלגלת רק לאחר פתיחה
     public GameObject extraWeapon3; // נשק נוסף 3 – pickup חדש
     public GameObject extraWeapon4; // נשק נוסף 4 – pickup חדש
+    public GameObject extraWeapon5; // נשק נוסף 5 – pickup חדש
 
     // Pickup objects for weapon pickups
     public Transform gunPickupObject; // Pickup עבור ה-Gun
@@ -22,6 +23,7 @@ public class WeaponSwitcher : MonoBehaviour
     public Transform extraWeaponPickupObject2; // Pickup עבור extraWeapon2
     public Transform extraWeaponPickupObject3; // Pickup עבור extraWeapon3
     public Transform extraWeaponPickupObject4; // Pickup עבור extraWeapon4
+    public Transform extraWeaponPickupObject5; // Pickup עבור extraWeapon5
 
     // דגלי פתיחה (Unlock) עבור הנשקים שהופכים ל-Pickup
     private bool gunUnlocked = false;
@@ -30,6 +32,7 @@ public class WeaponSwitcher : MonoBehaviour
     private bool extraWeapon2Unlocked = false;
     private bool extraWeapon3Unlocked = false;
     private bool extraWeapon4Unlocked = false;
+    private bool extraWeapon5Unlocked = false;
 
     // הגדרות ירי עבור הרובה (במקרה זה האקדח הוא gun)
     public GameObject bulletPrefab; // פרפאב כדור
@@ -89,7 +92,7 @@ public class WeaponSwitcher : MonoBehaviour
     public Vector3 slideDirection = new Vector3(1f, 0f, 0f);
 
     // מערך הנשקים ואינדקס הנשק הפעיל
-    // הסדר חשוב: index 0 = gun, 1 = ak47, 2 = knife, 3 = pistol, 4 = extraWeapon, 5 = extraWeapon2, 6 = extraWeapon3, 7 = extraWeapon4
+    // הסדר חשוב: index 0 = gun, 1 = ak47, 2 = knife, 3 = pistol, 4 = extraWeapon, 5 = extraWeapon2, 6 = extraWeapon3, 7 = extraWeapon4, 8 = extraWeapon5
     private int currentWeaponIndex = 0;
     private GameObject[] weapons;
 
@@ -101,7 +104,7 @@ public class WeaponSwitcher : MonoBehaviour
     private Quaternion[] initialRotations;  // שמירת סיבובי הנשקים ההתחלתיים
 
     // משתנה לניהול נשק pickup נוכחי (ערך -1 אם לא הועלה נשק)
-    // ערכים: 0 עבור Gun, 1 עבור AK47, 4 עבור extraWeapon, 5 עבור extraWeapon2, 6 עבור extraWeapon3, 7 עבור extraWeapon4
+    // ערכים: 0 עבור Gun, 1 עבור AK47, 4 עבור extraWeapon, 5 עבור extraWeapon2, 6 עבור extraWeapon3, 7 עבור extraWeapon4, 8 עבור extraWeapon5
     private int currentPickupWeaponIndex = -1;
 
     // זמן השהייה לפני שה-Pickup יחזור לחיים (למשל 30 שניות)
@@ -136,8 +139,8 @@ public class WeaponSwitcher : MonoBehaviour
 
     private void Start()
     {
-        // אתחול מערך הנשקים – הסדר חשוב: gun, ak47, knife, pistol, extraWeapon, extraWeapon2, extraWeapon3, extraWeapon4
-        weapons = new GameObject[] { gun, ak47, knife, pistol, extraWeapon, extraWeapon2, extraWeapon3, extraWeapon4 };
+        // אתחול מערך הנשקים – הסדר חשוב: gun, ak47, knife, pistol, extraWeapon, extraWeapon2, extraWeapon3, extraWeapon4, extraWeapon5
+        weapons = new GameObject[] { gun, ak47, knife, pistol, extraWeapon, extraWeapon2, extraWeapon3, extraWeapon4, extraWeapon5 };
 
         // שמירת המיקום והסיבוב ההתחלתי לכל נשק לצורך אנימציות סוויי והחלפה
         initialPositions = new Vector3[weapons.Length];
@@ -340,6 +343,28 @@ public class WeaponSwitcher : MonoBehaviour
             }
         }
 
+        // --- Extra Weapon 5 Pickup (נשק נוסף חדש) ---
+        if (!extraWeapon5Unlocked && extraWeaponPickupObject5 != null && Input.GetKeyDown(KeyCode.F))
+        {
+            float dist5 = Vector3.Distance(player.position, extraWeaponPickupObject5.position);
+            if (dist5 <= 2f)
+            {
+                if (currentPickupWeaponIndex != -1 && currentPickupWeaponIndex != 8)
+                {
+                    DropWeapon(currentPickupWeaponIndex);
+                }
+                currentPickupWeaponIndex = 8;
+                extraWeapon5Unlocked = true;
+                Debug.Log("Extra Weapon 5 unlocked!");
+                if (gunPickupSound != null && gunPickupAudioSource != null)
+                {
+                    gunPickupAudioSource.PlayOneShot(gunPickupSound);
+                }
+                StartCoroutine(SmoothSwitchWeapon(8)); // index 8
+                extraWeaponPickupObject5.gameObject.SetActive(false);
+            }
+        }
+
         // --- החלפת נשקים בגלגלת העכבר ---
         float scroll = Input.GetAxis("Mouse ScrollWheel");
         if (scroll != 0f && !isSwitching)
@@ -358,7 +383,8 @@ public class WeaponSwitcher : MonoBehaviour
                    (weapons[nextIndex] == extraWeapon && !extraWeaponUnlocked) ||
                    (weapons[nextIndex] == extraWeapon2 && !extraWeapon2Unlocked) ||
                    (weapons[nextIndex] == extraWeapon3 && !extraWeapon3Unlocked) ||
-                   (weapons[nextIndex] == extraWeapon4 && !extraWeapon4Unlocked));
+                   (weapons[nextIndex] == extraWeapon4 && !extraWeapon4Unlocked) ||
+                   (weapons[nextIndex] == extraWeapon5 && !extraWeapon5Unlocked));
 
             if (nextIndex != currentWeaponIndex)
             {
@@ -473,7 +499,8 @@ public class WeaponSwitcher : MonoBehaviour
         float idleAmplitude = 0.02f;
         float idleOffsetY = Mathf.Sin(Time.time * idleFrequency) * idleAmplitude;
 
-        // --- Recoil & Weapon Sway עם הוספת Idle (מלבד Knife) ---
+        // --- Recoil & Weapon Sway (לכל הנשקים חוץ מ־Knife) ---
+        // עבור כל נשק (מלבד Knife) נשתמש באותה לוגיקה כמו ב־Gun/AK47:
         if (gun.activeSelf)
         {
             Vector3 recoilTarget = initialGunPosition + (Input.GetButton("Fire1") ? -Vector3.forward * recoilAmount : Vector3.zero);
@@ -490,68 +517,85 @@ public class WeaponSwitcher : MonoBehaviour
             Vector3 recoilTarget = initialAK47Position + (Input.GetButton("Fire1") ? -Vector3.forward * recoilAmount : Vector3.zero);
             Vector3 swayOffset = new Vector3(-Input.GetAxis("Mouse X") * swayAmount, -Input.GetAxis("Mouse Y") * swayAmount, 0);
             Vector3 combinedTarget = recoilTarget + swayOffset;
-            if (idleTimer > 3f)
+            if (idleTimer > 2f)
             {
                 combinedTarget += new Vector3(0, idleOffsetY, 0);
             }
             ak47.transform.localPosition = Vector3.Lerp(ak47.transform.localPosition, combinedTarget, Time.deltaTime * recoilSpeed);
         }
-        if (knife.activeSelf)
-        {
-            int index = System.Array.IndexOf(weapons, knife);
-            Vector3 target = initialPositions[index] + new Vector3(-Input.GetAxis("Mouse X") * swayAmount, -Input.GetAxis("Mouse Y") * swayAmount, 0);
-            // לא מוסיפים Idle לנשק knife
-            knife.transform.localPosition = Vector3.Lerp(knife.transform.localPosition, target, Time.deltaTime * swaySmoothing);
-        }
+        // עבור כל הנשקים האחרים (למעט Knife) – משתמשים ב־initialPositions:
         if (pistol.activeSelf)
         {
             int index = System.Array.IndexOf(weapons, pistol);
-            Vector3 target = initialPositions[index] + new Vector3(-Input.GetAxis("Mouse X") * swayAmount, -Input.GetAxis("Mouse Y") * swayAmount, 0);
-            if (idleTimer > 3f)
+            Vector3 recoilTarget = initialPositions[index] + (Input.GetButton("Fire1") ? -Vector3.forward * recoilAmount : Vector3.zero);
+            Vector3 swayOffset = new Vector3(-Input.GetAxis("Mouse X") * swayAmount, -Input.GetAxis("Mouse Y") * swayAmount, 0);
+            Vector3 combinedTarget = recoilTarget + swayOffset;
+            if (idleTimer > 2f)
             {
-                target += new Vector3(0, idleOffsetY, 0);
+                combinedTarget += new Vector3(0, idleOffsetY, 0);
             }
-            pistol.transform.localPosition = Vector3.Lerp(pistol.transform.localPosition, target, Time.deltaTime * swaySmoothing);
+            pistol.transform.localPosition = Vector3.Lerp(pistol.transform.localPosition, combinedTarget, Time.deltaTime * recoilSpeed);
         }
         if (extraWeapon != null && extraWeapon.activeSelf)
         {
             int index = System.Array.IndexOf(weapons, extraWeapon);
-            Vector3 target = initialPositions[index] + new Vector3(-Input.GetAxis("Mouse X") * swayAmount, -Input.GetAxis("Mouse Y") * swayAmount, 0);
-            if (idleTimer > 3f)
+            Vector3 recoilTarget = initialPositions[index] + (Input.GetButton("Fire1") ? -Vector3.forward * recoilAmount : Vector3.zero);
+            Vector3 swayOffset = new Vector3(-Input.GetAxis("Mouse X") * swayAmount, -Input.GetAxis("Mouse Y") * swayAmount, 0);
+            Vector3 combinedTarget = recoilTarget + swayOffset;
+            if (idleTimer > 2f)
             {
-                target += new Vector3(0, idleOffsetY, 0);
+                combinedTarget += new Vector3(0, idleOffsetY, 0);
             }
-            extraWeapon.transform.localPosition = Vector3.Lerp(extraWeapon.transform.localPosition, target, Time.deltaTime * swaySmoothing);
+            extraWeapon.transform.localPosition = Vector3.Lerp(extraWeapon.transform.localPosition, combinedTarget, Time.deltaTime * recoilSpeed);
         }
         if (extraWeapon2 != null && extraWeapon2.activeSelf)
         {
             int index = System.Array.IndexOf(weapons, extraWeapon2);
-            Vector3 target = initialPositions[index] + new Vector3(-Input.GetAxis("Mouse X") * swayAmount, -Input.GetAxis("Mouse Y") * swayAmount, 0);
-            if (idleTimer > 3f)
+            Vector3 recoilTarget = initialPositions[index] + (Input.GetButton("Fire1") ? -Vector3.forward * recoilAmount : Vector3.zero);
+            Vector3 swayOffset = new Vector3(-Input.GetAxis("Mouse X") * swayAmount, -Input.GetAxis("Mouse Y") * swayAmount, 0);
+            Vector3 combinedTarget = recoilTarget + swayOffset;
+            if (idleTimer > 2f)
             {
-                target += new Vector3(0, idleOffsetY, 0);
+                combinedTarget += new Vector3(0, idleOffsetY, 0);
             }
-            extraWeapon2.transform.localPosition = Vector3.Lerp(extraWeapon2.transform.localPosition, target, Time.deltaTime * swaySmoothing);
+            extraWeapon2.transform.localPosition = Vector3.Lerp(extraWeapon2.transform.localPosition, combinedTarget, Time.deltaTime * recoilSpeed);
         }
         if (extraWeapon3 != null && extraWeapon3.activeSelf)
         {
             int index = System.Array.IndexOf(weapons, extraWeapon3);
-            Vector3 target = initialPositions[index] + new Vector3(-Input.GetAxis("Mouse X") * swayAmount, -Input.GetAxis("Mouse Y") * swayAmount, 0);
-            if (idleTimer > 3f)
+            Vector3 recoilTarget = initialPositions[index] + (Input.GetButton("Fire1") ? -Vector3.forward * recoilAmount : Vector3.zero);
+            Vector3 swayOffset = new Vector3(-Input.GetAxis("Mouse X") * swayAmount, -Input.GetAxis("Mouse Y") * swayAmount, 0);
+            Vector3 combinedTarget = recoilTarget + swayOffset;
+            if (idleTimer > 2f)
             {
-                target += new Vector3(0, idleOffsetY, 0);
+                combinedTarget += new Vector3(0, idleOffsetY, 0);
             }
-            extraWeapon3.transform.localPosition = Vector3.Lerp(extraWeapon3.transform.localPosition, target, Time.deltaTime * swaySmoothing);
+            extraWeapon3.transform.localPosition = Vector3.Lerp(extraWeapon3.transform.localPosition, combinedTarget, Time.deltaTime * recoilSpeed);
         }
         if (extraWeapon4 != null && extraWeapon4.activeSelf)
         {
             int index = System.Array.IndexOf(weapons, extraWeapon4);
-            Vector3 target = initialPositions[index] + new Vector3(-Input.GetAxis("Mouse X") * swayAmount, -Input.GetAxis("Mouse Y") * swayAmount, 0);
-            if (idleTimer > 3f)
+            Vector3 recoilTarget = initialPositions[index] + (Input.GetButton("Fire1") ? -Vector3.forward * recoilAmount : Vector3.zero);
+            Vector3 swayOffset = new Vector3(-Input.GetAxis("Mouse X") * swayAmount, -Input.GetAxis("Mouse Y") * swayAmount, 0);
+            Vector3 combinedTarget = recoilTarget + swayOffset;
+            if (idleTimer > 2f)
             {
-                target += new Vector3(0, idleOffsetY, 0);
+                combinedTarget += new Vector3(0, idleOffsetY, 0);
             }
-            extraWeapon4.transform.localPosition = Vector3.Lerp(extraWeapon4.transform.localPosition, target, Time.deltaTime * swaySmoothing);
+            extraWeapon4.transform.localPosition = Vector3.Lerp(extraWeapon4.transform.localPosition, combinedTarget, Time.deltaTime * recoilSpeed);
+        }
+        // --- Weapon Sway עבור extraWeapon5 ---
+        if (extraWeapon5 != null && extraWeapon5.activeSelf)
+        {
+            int index = System.Array.IndexOf(weapons, extraWeapon5);
+            Vector3 recoilTarget = initialPositions[index] + (Input.GetButton("Fire1") ? -Vector3.forward * recoilAmount : Vector3.zero);
+            Vector3 swayOffset = new Vector3(-Input.GetAxis("Mouse X") * swayAmount, -Input.GetAxis("Mouse Y") * swayAmount, 0);
+            Vector3 combinedTarget = recoilTarget + swayOffset;
+            if (idleTimer > 2f)
+            {
+                combinedTarget += new Vector3(0, idleOffsetY, 0);
+            }
+            extraWeapon5.transform.localPosition = Vector3.Lerp(extraWeapon5.transform.localPosition, combinedTarget, Time.deltaTime * recoilSpeed);
         }
 
         // --- שימוש ב־Knife ---
@@ -752,7 +796,7 @@ public class WeaponSwitcher : MonoBehaviour
     private IEnumerator RotateAK(float duration)
     {
         Quaternion originalRotation = ak47.transform.localRotation;
-        Quaternion targetRotation = originalRotation * Quaternion.Euler(0, 0, -50f);
+        Quaternion targetRotation = originalRotation * Quaternion.Euler(0, 50, 0f);
         float halfDuration = duration / 2f;
         float elapsed = 0f;
         while (elapsed < halfDuration)
@@ -778,7 +822,7 @@ public class WeaponSwitcher : MonoBehaviour
     private IEnumerator TranslateAK(float duration)
     {
         Vector3 originalPosition = initialAK47Position;
-        Vector3 targetPosition = originalPosition + new Vector3(0f, -0.5f, 0f);
+        Vector3 targetPosition = originalPosition + new Vector3(0f, -0.3f, 0f);
         float halfDuration = duration / 2f;
         float elapsed = 0f;
         while (elapsed < halfDuration)
@@ -867,6 +911,10 @@ public class WeaponSwitcher : MonoBehaviour
         {
             StartCoroutine(RespawnPickupCoroutine(extraWeaponPickupObject4));
         }
+        else if (currentWeapon == extraWeapon5 && extraWeaponPickupObject5 != null)
+        {
+            StartCoroutine(RespawnPickupCoroutine(extraWeaponPickupObject5));
+        }
 
         currentWeaponIndex = newIndex;
         GameObject newWeapon = weapons[newIndex];
@@ -920,6 +968,10 @@ public class WeaponSwitcher : MonoBehaviour
         {
             extraWeapon4Unlocked = false;
         }
+        else if (index == 8)
+        {
+            extraWeapon5Unlocked = false;
+        }
         if (weapons[index] != null)
             weapons[index].SetActive(false);
     }
@@ -945,7 +997,7 @@ public class WeaponSwitcher : MonoBehaviour
     {
         Quaternion originalRotation = gun.transform.localRotation;
         Quaternion targetRotation = originalRotation * Quaternion.Euler(0, 0, 6f);
-        float localDuration = 0.1f; // משך כל שלב (לסיבוב ולחזרה)
+        float localDuration = 0.11f; // משך כל שלב (לסיבוב ולחזרה)
         float t = 0f;
         while (t < localDuration)
         {
@@ -963,4 +1015,4 @@ public class WeaponSwitcher : MonoBehaviour
         }
         gun.transform.localRotation = originalRotation;
     }
-}
+} 
