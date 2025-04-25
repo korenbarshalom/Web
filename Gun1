@@ -158,7 +158,7 @@ public class WeaponSwitcher : MonoBehaviour
         }
 
         // הפעלה מיידית של הנשק הסטנדרטי (למשל סכין, index 2) כדי לא להפעיל נשק pickup שלא נפתח
-        SwitchWeaponImmediate(2);
+        SwitchWeaponImmediate(3);
 
         // שמירת מיקום התחלתי עבור הנשקים עם ריקול
         if (gun != null)
@@ -401,14 +401,16 @@ public class WeaponSwitcher : MonoBehaviour
                 attempts++;
                 if (attempts > weapons.Length) break;
             }
-            while ((weapons[nextIndex] == gun && !gunUnlocked) ||
-              (weapons[nextIndex] == ak47 && !akUnlocked) ||
-              (weapons[nextIndex] == extraWeapon && !extraWeaponUnlocked) ||
-              (weapons[nextIndex] == extraWeapon2 && !extraWeapon2Unlocked) ||
-              (weapons[nextIndex] == extraWeapon3 && !extraWeapon3Unlocked) ||
-              (weapons[nextIndex] == extraWeapon4 && !extraWeapon4Unlocked) ||
-              (weapons[nextIndex] == extraWeapon5 && !extraWeapon5Unlocked) ||
-              (weapons[nextIndex] == extraWeapon6 && !extraWeapon6Unlocked));  // ← חדש
+            while ((weapons[nextIndex] == knife) ||                             // ← חדש
+             (weapons[nextIndex] == gun && !gunUnlocked) ||
+             (weapons[nextIndex] == ak47 && !akUnlocked) ||
+             (weapons[nextIndex] == extraWeapon && !extraWeaponUnlocked) ||
+             (weapons[nextIndex] == extraWeapon2 && !extraWeapon2Unlocked) ||
+             (weapons[nextIndex] == extraWeapon3 && !extraWeapon3Unlocked) ||
+             (weapons[nextIndex] == extraWeapon4 && !extraWeapon4Unlocked) ||
+             (weapons[nextIndex] == extraWeapon5 && !extraWeapon5Unlocked) ||
+              (weapons[nextIndex] == extraWeapon6 && !extraWeapon6Unlocked));
+
 
 
             if (nextIndex != currentWeaponIndex)
