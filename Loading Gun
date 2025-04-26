@@ -85,9 +85,9 @@ public class ChargeShooter : MonoBehaviour
         if (isCharging)
         {
             float heldTime = Time.time - chargeStart;
-            float chargePercent = Mathf.Clamp01(heldTime / maxChargeTime);
+            float chargePerc = Mathf.Clamp01(heldTime / maxChargeTime);
 
-            // הפעלת סאונד טעינה אחרי minChargeDelay
+            // סאונד טעינה
             if (!chargeSoundStarted && heldTime >= minChargeDelay)
             {
                 if (chargeAudioSource != null) chargeAudioSource.Play();
@@ -98,18 +98,17 @@ public class ChargeShooter : MonoBehaviour
             if (chargeIndicatorX != null)
             {
                 Vector3 p = indicatorXStartPos;
-                p.x += indicatorMaxShiftX * chargePercent;
+                p.x += indicatorMaxShiftX * chargePerc;
                 chargeIndicatorX.localPosition = p;
             }
             if (chargeIndicatorZ != null)
             {
                 Vector3 p = indicatorZStartPos;
-                p.z += indicatorMaxShiftZ * chargePercent;
+                p.z += indicatorMaxShiftZ * chargePerc;
                 chargeIndicatorZ.localPosition = p;
             }
 
-            // Slider
-            if (chargeSlider != null) chargeSlider.value = chargePercent;
+            if (chargeSlider != null) chargeSlider.value = chargePerc;
 
             // שחרור אוטומטי
             if (heldTime >= maxChargeTime)
@@ -122,9 +121,9 @@ public class ChargeShooter : MonoBehaviour
             float heldTime = Time.time - chargeStart;
 
             if (heldTime >= minChargeDelay)
-                FinishChargeAndShoot();      // ירייה רגילה
+                FinishChargeAndShoot();
             else
-                CancelCharge();              // שחרור מוקדם – לא יורה
+                CancelCharge();
         }
     }
 
@@ -156,14 +155,20 @@ public class ChargeShooter : MonoBehaviour
     void FireChargedShot()
     {
         float heldTime = Time.time - chargeStart;
-        float chargePercent = Mathf.Clamp01(heldTime / maxChargeTime);
-        float finalForce = Mathf.Lerp(minForce, maxForce, chargePercent);
+        float chargePerc = Mathf.Clamp01(heldTime / maxChargeTime);
+        float finalForce = Mathf.Lerp(minForce, maxForce, chargePerc);
 
         GameObject bullet = Instantiate(
             bulletPrefab,
             firePoint.position,
             Quaternion.LookRotation(crosshairCamera.transform.forward),
             bulletContainer);
+
+        // מעבירים לבולט את אחוז הטעינה כדי לחשב נזק מדויק גם אם פגענו מיד
+        if (bullet.TryGetComponent(out Bullet3 bComp))
+        {
+            bComp.SetChargePercent(chargePerc);
+        }
 
         if (bullet.TryGetComponent(out Rigidbody rb))
         {
