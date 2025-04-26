@@ -1,0 +1,87 @@
+using UnityEngine;
+using System.Collections;      // ✅ לפי ההעדפה שלך
+
+public class Bullet3 : MonoBehaviour
+{
+    /* ---------- DAMAGE BY SPEED / CHARGE ---------- */
+    [Header("Damage Mapping")]
+    public int minDamage = 20;   // נזק כשהמהירות / הטעינה מינימלית
+    public int maxDamage = 100;  // נזק כשהמהירות / הטעינה מקסימלית
+    public float minSpeed = 1f;   // m/s – תחתיו ייחשב לטעינה 0
+    public float maxSpeed = 300f; // m/s – מעליו ייחשב לטעינה 1
+
+    /* ---------- FX ---------- */
+    public GameObject hitEffect;
+    public float offsetDistance = 0.05f;
+    public float spriteLifetime = 2f;
+
+    [Header("Effect Pool / Container")]
+    public Transform effectContainer;
+
+    /* ---------- COMPONENTS ---------- */
+    private Rigidbody rb;
+
+    /* ---------- INTERNAL ---------- */
+    // ערך 0-1 שמגיע מהChargeShooter; -1 אומר שלא הועבר ערך ונחשב לפי מהירות
+    private float chargePercent = -1f;
+
+    /// <summary>נקרא מה-ChargeShooter מיד לאחר יצירת הכדור</summary>
+    public void SetChargePercent(float percent)
+    {
+        chargePercent = Mathf.Clamp01(percent);
+    }
+
+    void Start()
+    {
+        rb = GetComponent<Rigidbody>();
+        if (rb != null)
+            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        /* -------- 1. חישוב נזק -------- */
+        float t; // ערך נורמליזציה 0-1
+
+        if (chargePercent >= 0f)
+        {
+            // יש לנו אחוז טעינה מדויק
+            t = chargePercent;
+        }
+        else
+        {
+            // לא התקבל – מחשבים לפי מהירות אמיתית
+            float speed = (rb != null) ? rb.linearVelocity.magnitude : 0f;
+            t = Mathf.InverseLerp(minSpeed, maxSpeed, Mathf.Clamp(speed, minSpeed, maxSpeed));
+        }
+
+        int totalDamage = Mathf.RoundToInt(Mathf.Lerp(minDamage, maxDamage, t));
+
+        /* -------- 2. הורדת חיים לכל סוגי האויבים -------- */
+        EnemyHealth eh = collision.gameObject.GetComponentInParent<EnemyHealth>();
+        SimpleEnemyHealth seh = collision.gameObject.GetComponentInParent<SimpleEnemyHealth>();
+        SimpleEnemyHealth1 s1 = collision.gameObject.GetComponentInParent<SimpleEnemyHealth1>();
+        SimpleEnemyHealth6 s6 = collision.gameObject.GetComponentInParent<SimpleEnemyHealth6>();
+        EnemyHealth100 e100 = collision.gameObject.GetComponentInParent<EnemyHealth100>();
+
+        if (eh != null) eh.TakeDamage(totalDamage);
+        if (seh != null) seh.TakeDamage(totalDamage);
+        if (s1 != null) s1.TakeDamage(totalDamage);
+        if (s6 != null) s6.TakeDamage(totalDamage);
+        if (e100 != null) e100.TakeDamage(totalDamage);
+
+        /* -------- 3. FX -------- */
+        if (hitEffect != null && collision.contacts.Length > 0)
+        {
+            Vector3 p = collision.contacts[0].point;
+            Vector3 n = collision.contacts[0].normal;
+
+            GameObject fx = Instantiate(hitEffect, p + n * offsetDistance, Quaternion.LookRotation(n));
+            if (effectContainer != null) fx.transform.SetParent(effectContainer);
+            Destroy(fx, spriteLifetime);
+        }
+
+        /* -------- 4. השמדת הכדור -------- */
+        Destroy(gameObject);
+    }
+}
