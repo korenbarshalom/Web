@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections;
-using TMPro; // ✅ תוספת ל-TextMeshPro
+using TMPro; // ✅ TextMeshPro
 
 public class TripleShooter : MonoBehaviour
 {
@@ -38,12 +38,13 @@ public class TripleShooter : MonoBehaviour
     public AudioClip reloadSoundClip;
 
     [Header("Ammo Settings")]
-    public int maxAmmoPerMagazine = 12;
-    public int currentAmmo = 2;
-    public int magazines = 6;
-    public TextMeshProUGUI ammoText; // ✅ טקסט של כדורים ומחסניות
+    public int maxAmmoPerMagazine = 2; // ✅ 2 כדורים בכל מחסנית
+    public int currentAmmo = 2;         // ✅ מתחילים עם 2 כדורים
+    public int magazines = 6;           // ✅ 6 מחסניות
+    public TextMeshProUGUI ammoText;    // ✅ טקסט למחסניות וכדורים
 
     private bool isReloading = false;
+    private bool waitingForReload = false; // ✅ הוספה
 
     void Start()
     {
@@ -61,8 +62,9 @@ public class TripleShooter : MonoBehaviour
             if (shootAnimationObject != null)
                 StartCoroutine(PlayShootAnimation());
 
-            if (shotsFired >= 2)
+            if (shotsFired >= 2 && !waitingForReload)
             {
+                waitingForReload = true; // ✅ כדי למנוע קריאה כפולה
                 StartCoroutine(Reload());
             }
         }
@@ -70,18 +72,20 @@ public class TripleShooter : MonoBehaviour
 
     void FireTriple()
     {
+        if (currentAmmo <= 0)
+            return;
+
         ShootBullet(firePoint.position, firePoint.rotation);
         ShootBullet(firePoint.position, firePoint.rotation * Quaternion.Euler(0f, -spreadAngle, 0f));
         ShootBullet(firePoint.position, firePoint.rotation * Quaternion.Euler(0f, spreadAngle, 0f));
 
-        // ✅ הפעלת סאונד ירי
         if (shootAudioSource != null && shootSoundClip != null)
         {
             shootAudioSource.PlayOneShot(shootSoundClip);
         }
 
-        // ✅ הורדת כדור מהמחסנית
         currentAmmo--;
+
         UpdateAmmoUI();
     }
 
@@ -100,6 +104,7 @@ public class TripleShooter : MonoBehaviour
         if (bulletScript != null)
         {
             bulletScript.SetStartPosition(position);
+            bulletScript.tripleShooter = this;
         }
 
         StartCoroutine(MoveAndDestroy(bullet, position));
@@ -163,7 +168,6 @@ public class TripleShooter : MonoBehaviour
     {
         isReloading = true;
 
-        // ✅ הפעלת סאונד רילוד
         if (reloadAudioSource != null && reloadSoundClip != null)
         {
             reloadAudioSource.PlayOneShot(reloadSoundClip);
@@ -199,21 +203,27 @@ public class TripleShooter : MonoBehaviour
             reloadAnimationObject.localPosition = startPosition;
         }
 
-        // ✅ אחרי 2 יריות → טעינה מחדש
         if (magazines > 0)
         {
-            currentAmmo = maxAmmoPerMagazine;
             magazines--;
+            currentAmmo = maxAmmoPerMagazine;
         }
         else
         {
-            currentAmmo = 0; // אין מחסניות יותר
+            currentAmmo = 0;
         }
 
         UpdateAmmoUI();
 
         shotsFired = 0;
         isReloading = false;
+        waitingForReload = false;
+    }
+
+    public void AddMagazines(int amount)
+    {
+        magazines += amount;
+        UpdateAmmoUI();
     }
 
     void UpdateAmmoUI()
@@ -221,6 +231,19 @@ public class TripleShooter : MonoBehaviour
         if (ammoText != null)
         {
             ammoText.text = currentAmmo + " / " + magazines;
+        }
+    }
+
+    void OnDestroy()
+    {
+        // ✅ הוספה - כששחקן הורס אויב עם תג "Robot"
+        if (CompareTag("Robot"))
+        {
+            TripleShooter shooter = FindObjectOfType<TripleShooter>();
+            if (shooter != null)
+            {
+                shooter.AddMagazines(2);
+            }
         }
     }
 }
