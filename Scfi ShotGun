@@ -1,0 +1,168 @@
+using UnityEngine;
+using System.Collections;    // ✅ לפי ההעדפה שלך
+
+public class TripleShooter : MonoBehaviour
+{
+    [Header("Bullet Settings")]
+    public GameObject bulletPrefab;
+    public Transform firePoint;
+    public float bulletSpeed = 50f;
+    public float spreadAngle = 10f;
+    public float bulletMaxDistance = 20f;
+    public Transform bulletContainer;
+
+    [Header("Fire Settings")]
+    public float fireRate = 0.25f;
+    private float nextFireTime = 0f;
+    private int shotsFired = 0; // ✅ סופר יריות
+
+    [Header("Twist Settings")]
+    public float twistAmount = 0.5f;
+    public float twistFrequency = 2f;
+
+    [Header("Shoot Animation Settings")]
+    public Transform shootAnimationObject;
+    public float recoilAngle = 6f;
+    public float recoilDuration = 0.1f;
+
+    [Header("Reload Settings")]
+    public Transform reloadAnimationObject;    // ✅ האובייקט שיזוז ברילוד
+    public float reloadDistance = 0.3f;         // כמה מטר לזוז אחורה בציר X
+    public float reloadDuration = 0.3f;         // כמה זמן תנועה
+
+    private bool isReloading = false;
+
+    void Update()
+    {
+        if (Input.GetMouseButton(0) && Time.time >= nextFireTime && !isReloading)
+        {
+            nextFireTime = Time.time + fireRate;
+            FireTriple();
+            shotsFired++;
+
+            if (shootAnimationObject != null)
+                StartCoroutine(PlayShootAnimation());
+
+            if (shotsFired >= 2)
+            {
+                StartCoroutine(Reload());
+            }
+        }
+    }
+
+    void FireTriple()
+    {
+        ShootBullet(firePoint.position, firePoint.rotation);
+        ShootBullet(firePoint.position, firePoint.rotation * Quaternion.Euler(0f, -spreadAngle, 0f));
+        ShootBullet(firePoint.position, firePoint.rotation * Quaternion.Euler(0f, spreadAngle, 0f));
+    }
+
+    void ShootBullet(Vector3 position, Quaternion rotation)
+    {
+        GameObject bullet = Instantiate(bulletPrefab, position, rotation, bulletContainer);
+
+        Rigidbody rb = bullet.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.isKinematic = true;
+            rb.useGravity = false;
+        }
+
+        StartCoroutine(MoveAndDestroy(bullet, position));
+    }
+
+    IEnumerator MoveAndDestroy(GameObject bullet, Vector3 startPosition)
+    {
+        float timer = 0f;
+
+        while (bullet != null)
+        {
+            bullet.transform.position += bullet.transform.forward * bulletSpeed * Time.deltaTime;
+
+            Vector3 up = bullet.transform.up;
+            float offset = Mathf.Sin(timer * twistFrequency * 2f * Mathf.PI) * twistAmount;
+            bullet.transform.position += up * offset * Time.deltaTime;
+
+            float distance = Vector3.Distance(startPosition, bullet.transform.position);
+            if (distance >= bulletMaxDistance)
+            {
+                Destroy(bullet);
+                yield break;
+            }
+
+            timer += Time.deltaTime;
+            yield return null;
+        }
+    }
+
+    IEnumerator PlayShootAnimation()
+    {
+        Quaternion startRotation = shootAnimationObject.localRotation;
+        Quaternion recoilRotation = startRotation * Quaternion.Euler(0f, recoilAngle, 0f);
+
+        float elapsed = 0f;
+
+        while (elapsed < recoilDuration)
+        {
+            float t = elapsed / recoilDuration;
+            shootAnimationObject.localRotation = Quaternion.Slerp(startRotation, recoilRotation, t);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        shootAnimationObject.localRotation = recoilRotation;
+
+        elapsed = 0f;
+
+        while (elapsed < recoilDuration)
+        {
+            float t = elapsed / recoilDuration;
+            shootAnimationObject.localRotation = Quaternion.Slerp(recoilRotation, startRotation, t);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        shootAnimationObject.localRotation = startRotation;
+    }
+
+    IEnumerator Reload()
+    {
+        isReloading = true;
+
+        if (reloadAnimationObject != null)
+        {
+            Vector3 startPosition = reloadAnimationObject.localPosition;
+            Vector3 backPosition = startPosition + new Vector3(-reloadDistance, 0f, 0f);
+
+            float elapsed = 0f;
+
+            // תנועה אחורה
+            while (elapsed < reloadDuration)
+            {
+                float t = elapsed / reloadDuration;
+                reloadAnimationObject.localPosition = Vector3.Lerp(startPosition, backPosition, t);
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            reloadAnimationObject.localPosition = backPosition;
+
+            elapsed = 0f;
+
+            // חזרה קדימה
+            while (elapsed < reloadDuration)
+            {
+                float t = elapsed / reloadDuration;
+                reloadAnimationObject.localPosition = Vector3.Lerp(backPosition, startPosition, t);
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            reloadAnimationObject.localPosition = startPosition;
+        }
+
+        // מסיים טעינה
+        shotsFired = 0;
+        isReloading = false;
+    }
+}
