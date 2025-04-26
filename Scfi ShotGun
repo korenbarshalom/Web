@@ -233,17 +233,4 @@ public class TripleShooter : MonoBehaviour
             ammoText.text = currentAmmo + " / " + magazines;
         }
     }
-
-    void OnDestroy()
-    {
-        // ✅ הוספה - כששחקן הורס אויב עם תג "Robot"
-        if (CompareTag("Robot"))
-        {
-            TripleShooter shooter = FindObjectOfType<TripleShooter>();
-            if (shooter != null)
-            {
-                shooter.AddMagazines(2);
-            }
-        }
-    }
 }
