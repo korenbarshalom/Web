@@ -38,13 +38,19 @@ public class TripleShooter : MonoBehaviour
     public AudioClip reloadSoundClip;
 
     [Header("Ammo Settings")]
-    public int maxAmmoPerMagazine = 2; // ✅ 2 כדורים בכל מחסנית
-    public int currentAmmo = 2;         // ✅ מתחילים עם 2 כדורים
-    public int magazines = 6;           // ✅ 6 מחסניות
-    public TextMeshProUGUI ammoText;    // ✅ טקסט למחסניות וכדורים
+    public int maxAmmoPerMagazine = 2;
+    public int currentAmmo = 2;
+    public int magazines = 6;
+    public TextMeshProUGUI ammoText;
+
+    [Header("Muzzle Flash Settings")]
+    public ParticleSystem muzzleFlash;
+
+    [Header("Robot Destroy Settings")] // ✅ חדש
+    public LayerMask robotLayer;           // ✅ שכבת הרובוטים שאתה תבחר
 
     private bool isReloading = false;
-    private bool waitingForReload = false; // ✅ הוספה
+    private bool waitingForReload = false;
 
     void Start()
     {
@@ -64,7 +70,7 @@ public class TripleShooter : MonoBehaviour
 
             if (shotsFired >= 2 && !waitingForReload)
             {
-                waitingForReload = true; // ✅ כדי למנוע קריאה כפולה
+                waitingForReload = true;
                 StartCoroutine(Reload());
             }
         }
@@ -82,6 +88,11 @@ public class TripleShooter : MonoBehaviour
         if (shootAudioSource != null && shootSoundClip != null)
         {
             shootAudioSource.PlayOneShot(shootSoundClip);
+        }
+
+        if (muzzleFlash != null)
+        {
+            muzzleFlash.Play();
         }
 
         currentAmmo--;
@@ -104,7 +115,6 @@ public class TripleShooter : MonoBehaviour
         if (bulletScript != null)
         {
             bulletScript.SetStartPosition(position);
-            bulletScript.tripleShooter = this;
         }
 
         StartCoroutine(MoveAndDestroy(bullet, position));
@@ -231,6 +241,15 @@ public class TripleShooter : MonoBehaviour
         if (ammoText != null)
         {
             ammoText.text = currentAmmo + " / " + magazines;
+        }
+    }
+
+    // ✅ פונקציה לזהות אם רובוט הושמד לפי שכבה
+    public void OnObjectDestroyed(GameObject destroyedObject)
+    {
+        if (((1 << destroyedObject.layer) & robotLayer) != 0)
+        {
+            AddMagazines(2);
         }
     }
 }
