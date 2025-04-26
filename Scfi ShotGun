@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using TMPro; // ✅ תוספת ל-TextMeshPro
 
 public class TripleShooter : MonoBehaviour
 {
@@ -36,11 +37,22 @@ public class TripleShooter : MonoBehaviour
     public AudioSource reloadAudioSource;
     public AudioClip reloadSoundClip;
 
+    [Header("Ammo Settings")]
+    public int maxAmmoPerMagazine = 12;
+    public int currentAmmo = 2;
+    public int magazines = 6;
+    public TextMeshProUGUI ammoText; // ✅ טקסט של כדורים ומחסניות
+
     private bool isReloading = false;
+
+    void Start()
+    {
+        UpdateAmmoUI();
+    }
 
     void Update()
     {
-        if (Input.GetMouseButton(0) && Time.time >= nextFireTime && !isReloading)
+        if (Input.GetMouseButton(0) && Time.time >= nextFireTime && !isReloading && currentAmmo > 0)
         {
             nextFireTime = Time.time + fireRate;
             FireTriple();
@@ -67,6 +79,10 @@ public class TripleShooter : MonoBehaviour
         {
             shootAudioSource.PlayOneShot(shootSoundClip);
         }
+
+        // ✅ הורדת כדור מהמחסנית
+        currentAmmo--;
+        UpdateAmmoUI();
     }
 
     void ShootBullet(Vector3 position, Quaternion rotation)
@@ -183,7 +199,28 @@ public class TripleShooter : MonoBehaviour
             reloadAnimationObject.localPosition = startPosition;
         }
 
+        // ✅ אחרי 2 יריות → טעינה מחדש
+        if (magazines > 0)
+        {
+            currentAmmo = maxAmmoPerMagazine;
+            magazines--;
+        }
+        else
+        {
+            currentAmmo = 0; // אין מחסניות יותר
+        }
+
+        UpdateAmmoUI();
+
         shotsFired = 0;
         isReloading = false;
+    }
+
+    void UpdateAmmoUI()
+    {
+        if (ammoText != null)
+        {
+            ammoText.text = currentAmmo + " / " + magazines;
+        }
     }
 }
