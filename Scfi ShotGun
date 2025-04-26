@@ -1,5 +1,5 @@
 using UnityEngine;
-using System.Collections;    // ✅ לפי ההעדפה שלך
+using System.Collections;
 
 public class TripleShooter : MonoBehaviour
 {
@@ -14,7 +14,7 @@ public class TripleShooter : MonoBehaviour
     [Header("Fire Settings")]
     public float fireRate = 0.25f;
     private float nextFireTime = 0f;
-    private int shotsFired = 0; // ✅ סופר יריות
+    private int shotsFired = 0;
 
     [Header("Twist Settings")]
     public float twistAmount = 0.5f;
@@ -26,9 +26,15 @@ public class TripleShooter : MonoBehaviour
     public float recoilDuration = 0.1f;
 
     [Header("Reload Settings")]
-    public Transform reloadAnimationObject;    // ✅ האובייקט שיזוז ברילוד
-    public float reloadDistance = 0.3f;         // כמה מטר לזוז אחורה בציר X
-    public float reloadDuration = 0.3f;         // כמה זמן תנועה
+    public Transform reloadAnimationObject;
+    public float reloadDistance = 0.3f;
+    public float reloadDuration = 0.3f;
+
+    [Header("Sound Settings")]
+    public AudioSource shootAudioSource;
+    public AudioClip shootSoundClip;
+    public AudioSource reloadAudioSource;
+    public AudioClip reloadSoundClip;
 
     private bool isReloading = false;
 
@@ -55,6 +61,12 @@ public class TripleShooter : MonoBehaviour
         ShootBullet(firePoint.position, firePoint.rotation);
         ShootBullet(firePoint.position, firePoint.rotation * Quaternion.Euler(0f, -spreadAngle, 0f));
         ShootBullet(firePoint.position, firePoint.rotation * Quaternion.Euler(0f, spreadAngle, 0f));
+
+        // ✅ הפעלת סאונד ירי
+        if (shootAudioSource != null && shootSoundClip != null)
+        {
+            shootAudioSource.PlayOneShot(shootSoundClip);
+        }
     }
 
     void ShootBullet(Vector3 position, Quaternion rotation)
@@ -66,6 +78,12 @@ public class TripleShooter : MonoBehaviour
         {
             rb.isKinematic = true;
             rb.useGravity = false;
+        }
+
+        Bullet4 bulletScript = bullet.GetComponent<Bullet4>();
+        if (bulletScript != null)
+        {
+            bulletScript.SetStartPosition(position);
         }
 
         StartCoroutine(MoveAndDestroy(bullet, position));
@@ -129,6 +147,12 @@ public class TripleShooter : MonoBehaviour
     {
         isReloading = true;
 
+        // ✅ הפעלת סאונד רילוד
+        if (reloadAudioSource != null && reloadSoundClip != null)
+        {
+            reloadAudioSource.PlayOneShot(reloadSoundClip);
+        }
+
         if (reloadAnimationObject != null)
         {
             Vector3 startPosition = reloadAnimationObject.localPosition;
@@ -136,7 +160,6 @@ public class TripleShooter : MonoBehaviour
 
             float elapsed = 0f;
 
-            // תנועה אחורה
             while (elapsed < reloadDuration)
             {
                 float t = elapsed / reloadDuration;
@@ -149,7 +172,6 @@ public class TripleShooter : MonoBehaviour
 
             elapsed = 0f;
 
-            // חזרה קדימה
             while (elapsed < reloadDuration)
             {
                 float t = elapsed / reloadDuration;
@@ -161,7 +183,6 @@ public class TripleShooter : MonoBehaviour
             reloadAnimationObject.localPosition = startPosition;
         }
 
-        // מסיים טעינה
         shotsFired = 0;
         isReloading = false;
     }
