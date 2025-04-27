@@ -1,0 +1,94 @@
+using UnityEngine;
+using System.Collections.Generic;
+
+[RequireComponent(typeof(Rigidbody))]
+public class SupportDrone : MonoBehaviour
+{
+    [Header("Follow Settings")]
+    public float followHeightOffset = 3f;      // גובה מעל הרובוט
+    public float sideOffset = 2f;               // צד מהאויב
+    public float moveSpeed = 5f;                // מהירות תנועה
+    public float randomMovementRadius = 1f;     // טווח תזוזה חופשית
+    public float randomMovementSmoothness = 2f; // חלקות תזוזה חופשית
+    public float rotationSpeed = 5f;            // מהירות סיבוב אל המטרה
+    public string robotTag = "Robot";           // טאג של הרובוטים
+
+    private Transform targetRobot;
+    private Rigidbody rb;
+    private Vector3 randomOffset;
+    private Vector3 currentRandomOffsetVelocity;
+
+    void Start()
+    {
+        rb = GetComponent<Rigidbody>();
+        rb.isKinematic = true; // ✅ קיינמטיק
+        GenerateNewRandomOffset();
+    }
+
+    void Update()
+    {
+        UpdateTarget(); // ✅ תמיד מחפש את הקרוב ביותר
+
+        if (targetRobot == null)
+            return;
+
+        // חישוב יעד בסיסי (מעל וקצת מהצד)
+        Vector3 baseTargetPosition = targetRobot.position + Vector3.up * followHeightOffset + targetRobot.right * sideOffset;
+
+        // תנועה חופשית חלקה (SmoothDamp)
+        randomOffset = Vector3.SmoothDamp(randomOffset, GetNewRandomOffset(), ref currentRandomOffsetVelocity, randomMovementSmoothness);
+
+        // יעד סופי
+        Vector3 finalTargetPosition = baseTargetPosition + randomOffset;
+        transform.position = Vector3.MoveTowards(transform.position, finalTargetPosition, moveSpeed * Time.deltaTime);
+
+        // סיבוב אל המטרה רק בציר Y
+        Vector3 lookDirection = targetRobot.position - transform.position;
+        lookDirection.y = 0f; // מתעלם מהפרשי גובה
+        if (lookDirection.sqrMagnitude > 0.001f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        }
+    }
+
+    void UpdateTarget()
+    {
+        GameObject[] robots = GameObject.FindGameObjectsWithTag(robotTag);
+
+        if (robots.Length == 0)
+        {
+            targetRobot = null;
+            return;
+        }
+
+        float closestDistance = Mathf.Infinity;
+        Transform closestRobot = null;
+
+        foreach (GameObject robot in robots)
+        {
+            float distance = Vector3.Distance(transform.position, robot.transform.position);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestRobot = robot.transform;
+            }
+        }
+
+        targetRobot = closestRobot;
+    }
+
+    Vector3 GetNewRandomOffset()
+    {
+        return new Vector3(
+            Mathf.Sin(Time.time * 0.7f) * randomMovementRadius,
+            Mathf.Sin(Time.time * 1.1f) * randomMovementRadius * 0.5f,
+            Mathf.Cos(Time.time * 0.5f) * randomMovementRadius
+        );
+    }
+
+    void GenerateNewRandomOffset()
+    {
+        randomOffset = GetNewRandomOffset();
+    }
+}
