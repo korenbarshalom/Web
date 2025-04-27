@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro; // ✅ TextMeshPro
 
 public class TripleShooter : MonoBehaviour
@@ -16,10 +17,6 @@ public class TripleShooter : MonoBehaviour
     public float fireRate = 0.25f;
     private float nextFireTime = 0f;
     private int shotsFired = 0;
-
-    [Header("Twist Settings")]
-    public float twistAmount = 0.5f;
-    public float twistFrequency = 2f;
 
     [Header("Shoot Animation Settings")]
     public Transform shootAnimationObject;
@@ -46,19 +43,22 @@ public class TripleShooter : MonoBehaviour
     [Header("Muzzle Flash Settings")]
     public ParticleSystem muzzleFlash;
 
-    [Header("Robot Destroy Settings")] // ✅ חדש
-    public LayerMask robotLayer;           // ✅ שכבת הרובוטים שאתה תבחר
-
     private bool isReloading = false;
     private bool waitingForReload = false;
+
+    // List to track robots for destruction detection
+    private List<GameObject> trackedRobots = new List<GameObject>();
 
     void Start()
     {
         UpdateAmmoUI();
+        // Init tracking of all robots in the scene
+        trackedRobots = new List<GameObject>(GameObject.FindGameObjectsWithTag("Robot"));
     }
 
     void Update()
     {
+        // Fire logic
         if (Input.GetMouseButton(0) && Time.time >= nextFireTime && !isReloading && currentAmmo > 0)
         {
             nextFireTime = Time.time + fireRate;
@@ -74,6 +74,20 @@ public class TripleShooter : MonoBehaviour
                 StartCoroutine(Reload());
             }
         }
+
+        // Detect and handle destroyed robots
+        DetectDestroyedRobots();
+    }
+
+    void DetectDestroyedRobots()
+    {
+        GameObject[] currentRobots = GameObject.FindGameObjectsWithTag("Robot");
+        if (currentRobots.Length < trackedRobots.Count)
+        {
+            int destroyedCount = trackedRobots.Count - currentRobots.Length;
+            AddMagazines(2 * destroyedCount);
+        }
+        trackedRobots = new List<GameObject>(currentRobots);
     }
 
     void FireTriple()
@@ -86,17 +100,12 @@ public class TripleShooter : MonoBehaviour
         ShootBullet(firePoint.position, firePoint.rotation * Quaternion.Euler(0f, spreadAngle, 0f));
 
         if (shootAudioSource != null && shootSoundClip != null)
-        {
             shootAudioSource.PlayOneShot(shootSoundClip);
-        }
 
         if (muzzleFlash != null)
-        {
             muzzleFlash.Play();
-        }
 
         currentAmmo--;
-
         UpdateAmmoUI();
     }
 
@@ -113,65 +122,47 @@ public class TripleShooter : MonoBehaviour
 
         Bullet4 bulletScript = bullet.GetComponent<Bullet4>();
         if (bulletScript != null)
-        {
             bulletScript.SetStartPosition(position);
-        }
 
         StartCoroutine(MoveAndDestroy(bullet, position));
     }
 
     IEnumerator MoveAndDestroy(GameObject bullet, Vector3 startPosition)
     {
-        float timer = 0f;
-
         while (bullet != null)
         {
             bullet.transform.position += bullet.transform.forward * bulletSpeed * Time.deltaTime;
-
-            Vector3 up = bullet.transform.up;
-            float offset = Mathf.Sin(timer * twistFrequency * 2f * Mathf.PI) * twistAmount;
-            bullet.transform.position += up * offset * Time.deltaTime;
-
-            float distance = Vector3.Distance(startPosition, bullet.transform.position);
-            if (distance >= bulletMaxDistance)
+            if (Vector3.Distance(startPosition, bullet.transform.position) >= bulletMaxDistance)
             {
                 Destroy(bullet);
                 yield break;
             }
-
-            timer += Time.deltaTime;
             yield return null;
         }
     }
 
     IEnumerator PlayShootAnimation()
     {
-        Quaternion startRotation = shootAnimationObject.localRotation;
-        Quaternion recoilRotation = startRotation * Quaternion.Euler(0f, recoilAngle, 0f);
-
+        Quaternion startRot = shootAnimationObject.localRotation;
+        Quaternion recoilRot = startRot * Quaternion.Euler(0f, recoilAngle, 0f);
         float elapsed = 0f;
 
         while (elapsed < recoilDuration)
         {
-            float t = elapsed / recoilDuration;
-            shootAnimationObject.localRotation = Quaternion.Slerp(startRotation, recoilRotation, t);
+            shootAnimationObject.localRotation = Quaternion.Slerp(startRot, recoilRot, elapsed / recoilDuration);
             elapsed += Time.deltaTime;
             yield return null;
         }
-
-        shootAnimationObject.localRotation = recoilRotation;
+        shootAnimationObject.localRotation = recoilRot;
 
         elapsed = 0f;
-
         while (elapsed < recoilDuration)
         {
-            float t = elapsed / recoilDuration;
-            shootAnimationObject.localRotation = Quaternion.Slerp(recoilRotation, startRotation, t);
+            shootAnimationObject.localRotation = Quaternion.Slerp(recoilRot, startRot, elapsed / recoilDuration);
             elapsed += Time.deltaTime;
             yield return null;
         }
-
-        shootAnimationObject.localRotation = startRotation;
+        shootAnimationObject.localRotation = startRot;
     }
 
     IEnumerator Reload()
@@ -179,38 +170,30 @@ public class TripleShooter : MonoBehaviour
         isReloading = true;
 
         if (reloadAudioSource != null && reloadSoundClip != null)
-        {
             reloadAudioSource.PlayOneShot(reloadSoundClip);
-        }
 
         if (reloadAnimationObject != null)
         {
-            Vector3 startPosition = reloadAnimationObject.localPosition;
-            Vector3 backPosition = startPosition + new Vector3(-reloadDistance, 0f, 0f);
-
+            Vector3 startPos = reloadAnimationObject.localPosition;
+            Vector3 backPos = startPos + Vector3.left * reloadDistance;
             float elapsed = 0f;
 
             while (elapsed < reloadDuration)
             {
-                float t = elapsed / reloadDuration;
-                reloadAnimationObject.localPosition = Vector3.Lerp(startPosition, backPosition, t);
+                reloadAnimationObject.localPosition = Vector3.Lerp(startPos, backPos, elapsed / reloadDuration);
                 elapsed += Time.deltaTime;
                 yield return null;
             }
-
-            reloadAnimationObject.localPosition = backPosition;
+            reloadAnimationObject.localPosition = backPos;
 
             elapsed = 0f;
-
             while (elapsed < reloadDuration)
             {
-                float t = elapsed / reloadDuration;
-                reloadAnimationObject.localPosition = Vector3.Lerp(backPosition, startPosition, t);
+                reloadAnimationObject.localPosition = Vector3.Lerp(backPos, startPos, elapsed / reloadDuration);
                 elapsed += Time.deltaTime;
                 yield return null;
             }
-
-            reloadAnimationObject.localPosition = startPosition;
+            reloadAnimationObject.localPosition = startPos;
         }
 
         if (magazines > 0)
@@ -218,13 +201,9 @@ public class TripleShooter : MonoBehaviour
             magazines--;
             currentAmmo = maxAmmoPerMagazine;
         }
-        else
-        {
-            currentAmmo = 0;
-        }
+        else currentAmmo = 0;
 
         UpdateAmmoUI();
-
         shotsFired = 0;
         isReloading = false;
         waitingForReload = false;
@@ -239,17 +218,6 @@ public class TripleShooter : MonoBehaviour
     void UpdateAmmoUI()
     {
         if (ammoText != null)
-        {
             ammoText.text = currentAmmo + " / " + magazines;
-        }
-    }
-
-    // ✅ פונקציה לזהות אם רובוט הושמד לפי שכבה
-    public void OnObjectDestroyed(GameObject destroyedObject)
-    {
-        if (((1 << destroyedObject.layer) & robotLayer) != 0)
-        {
-            AddMagazines(2);
-        }
     }
 }
