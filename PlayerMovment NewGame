@@ -29,6 +29,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     private float cameraLerpSpeed = 5f; // ✅ מהירות החזרה של המצלמה
 
+    [SerializeField]
+    private float cameraSideAmount = 0.2f; // ✅ תוספת חדשה - כמה המצלמה תזוז ימינה/שמאלה (מאוד קטן)
+
     private Vector3 initialCameraLocalPosition;
     private Animator animator;
     private CharacterController characterController;
@@ -108,7 +111,7 @@ public class PlayerMovement : MonoBehaviour
         characterController.Move(velocity * Time.deltaTime);
 
         RotateWithMouse();
-        UpdateCameraPosition(verticalInput);
+        UpdateCameraPosition(verticalInput, horizontalInput);
     }
 
     private void RotateWithMouse()
@@ -118,7 +121,7 @@ public class PlayerMovement : MonoBehaviour
         transform.rotation = Quaternion.Euler(0, currentRotationY, 0);
     }
 
-    private void UpdateCameraPosition(float verticalInput)
+    private void UpdateCameraPosition(float verticalInput, float horizontalInput)
     {
         if (cameraTransform == null) return;
 
@@ -126,7 +129,12 @@ public class PlayerMovement : MonoBehaviour
 
         if (verticalInput > 0.1f) // זז קדימה
         {
-            targetLocalPosition += Vector3.back * cameraBackwardAmount; // ✅ מתקנים: להזיז על ציר Z של המצלמה
+            targetLocalPosition += Vector3.back * cameraBackwardAmount;
+        }
+
+        if (Mathf.Abs(horizontalInput) > 0.1f) // זז שמאלה או ימינה
+        {
+            targetLocalPosition += Vector3.right * horizontalInput * cameraSideAmount;
         }
 
         cameraTransform.localPosition = Vector3.Lerp(cameraTransform.localPosition, targetLocalPosition, cameraLerpSpeed * Time.deltaTime);
