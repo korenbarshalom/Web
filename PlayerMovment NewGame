@@ -23,6 +23,13 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     private float Gravity = -9.81f; // ✅ משתנה גרביטציה חדש
 
+    [SerializeField]
+    private float cameraBackwardAmount = 0.5f; // ✅ כמה המצלמה תזוז אחורה כשזזים קדימה
+
+    [SerializeField]
+    private float cameraLerpSpeed = 5f; // ✅ מהירות החזרה של המצלמה
+
+    private Vector3 initialCameraLocalPosition;
     private Animator animator;
     private CharacterController characterController;
     private float ySpeed;
@@ -37,6 +44,11 @@ public class PlayerMovement : MonoBehaviour
         characterController = GetComponent<CharacterController>();
         originalStepOffset = characterController.stepOffset;
         currentRotationY = transform.eulerAngles.y;
+
+        if (cameraTransform != null)
+        {
+            initialCameraLocalPosition = cameraTransform.localPosition; // שומר את המיקום ההתחלתי של המצלמה
+        }
     }
 
     void Update()
@@ -96,6 +108,7 @@ public class PlayerMovement : MonoBehaviour
         characterController.Move(velocity * Time.deltaTime);
 
         RotateWithMouse();
+        UpdateCameraPosition(verticalInput);
     }
 
     private void RotateWithMouse()
@@ -103,6 +116,20 @@ public class PlayerMovement : MonoBehaviour
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
         currentRotationY += mouseX;
         transform.rotation = Quaternion.Euler(0, currentRotationY, 0);
+    }
+
+    private void UpdateCameraPosition(float verticalInput)
+    {
+        if (cameraTransform == null) return;
+
+        Vector3 targetLocalPosition = initialCameraLocalPosition;
+
+        if (verticalInput > 0.1f) // זז קדימה
+        {
+            targetLocalPosition += Vector3.back * cameraBackwardAmount; // ✅ מתקנים: להזיז על ציר Z של המצלמה
+        }
+
+        cameraTransform.localPosition = Vector3.Lerp(cameraTransform.localPosition, targetLocalPosition, cameraLerpSpeed * Time.deltaTime);
     }
 
     private void OnApplicationFocus(bool focus)
