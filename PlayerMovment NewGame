@@ -2,41 +2,22 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField]
-    private float maximumSpeed;
+    [SerializeField] private float maximumSpeed;
+    [SerializeField] private float rotationSpeed;
+    [SerializeField] private float jumpSpeed;
+    [SerializeField] private float jumpButtonGracePeriod;
+    [SerializeField] private Transform cameraTransform;
+    [SerializeField] private float mouseSensitivity = 2f;
+    [SerializeField] private float Gravity = -9.81f;
+    [SerializeField] private float cameraBackwardAmount = 0.5f;
+    [SerializeField] private float cameraLerpSpeed = 5f;
+    [SerializeField] private float cameraSideAmount = 0.2f;
+    [SerializeField] private float sprintMultiplier = 1.5f;
+    [SerializeField] private float rollForce = 8f;
+    [SerializeField] private Animator animator;
 
-    [SerializeField]
-    private float rotationSpeed;
-
-    [SerializeField]
-    private float jumpSpeed;
-
-    [SerializeField]
-    private float jumpButtonGracePeriod;
-
-    [SerializeField]
-    private Transform cameraTransform;
-
-    [SerializeField]
-    private float mouseSensitivity = 2f;
-
-    [SerializeField]
-    private float Gravity = -9.81f;
-
-    [SerializeField]
-    private float cameraBackwardAmount = 0.5f;
-
-    [SerializeField]
-    private float cameraLerpSpeed = 5f;
-
-    [SerializeField]
-    private float cameraSideAmount = 0.2f;
-
-    [SerializeField]
-    private float sprintMultiplier = 1.5f;
-
-    [SerializeField]
-    private Animator animator; // ✅ שדה חדש - להכניס Animator ידנית
+    [Header("Camera Rotation Limits")]
+    [SerializeField] private Vector2 cameraLimit = new Vector2(-40, 40); // ✅ הגבלת סיבוב למעלה/למטה
 
     private Vector3 initialCameraLocalPosition;
     private CharacterController characterController;
@@ -45,7 +26,14 @@ public class PlayerMovement : MonoBehaviour
     private float? lastGroundedTime;
     private float? jumpButtonPressedTime;
     private float currentRotationY;
+    private float mouseX;
+    private float mouseY;
     private bool hasJumped = false;
+    private bool wasGroundedLastFrame = false;
+    private bool isRolling = false;
+    private Vector3 rollDirection = Vector3.zero;
+    private float rollTimer = 0f;
+    private float rollDuration = 0.5f;
 
     void Start()
     {
@@ -54,21 +42,17 @@ public class PlayerMovement : MonoBehaviour
         currentRotationY = transform.eulerAngles.y;
 
         if (cameraTransform != null)
-        {
             initialCameraLocalPosition = cameraTransform.localPosition;
-        }
 
-        // ✅ אם לא הכניסו Animator - נחפש אוטומטית
         if (animator == null)
-        {
             animator = GetComponent<Animator>();
-        }
     }
 
     void Update()
     {
         HandleMovement();
         HandleJump();
+        HandleRoll();
         RotateWithMouse();
         UpdateCameraPosition();
     }
@@ -78,45 +62,51 @@ public class PlayerMovement : MonoBehaviour
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
 
-        Vector3 movementDirection = new Vector3(horizontalInput, 0, verticalInput);
-        float inputMagnitude = Mathf.Clamp01(movementDirection.magnitude);
+        Vector3 forward = cameraTransform.forward;
+        Vector3 right = cameraTransform.right;
+        forward.y = 0f;
+        right.y = 0f;
+        forward.Normalize();
+        right.Normalize();
+
+        Vector3 moveDirection = forward * verticalInput + right * horizontalInput;
+        float inputMagnitude = Mathf.Clamp01(moveDirection.magnitude);
 
         animator.SetFloat("Input Magnitude", inputMagnitude, 0.05f, Time.deltaTime);
 
         float speed = inputMagnitude * maximumSpeed;
-
         bool isSprinting = Input.GetKey(KeyCode.W) && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift));
         if (isSprinting)
-        {
             speed *= sprintMultiplier;
-        }
 
-        movementDirection = Quaternion.Euler(0, transform.eulerAngles.y, 0) * movementDirection;
-        movementDirection.Normalize();
-
+        moveDirection.Normalize();
         ySpeed += Gravity * Time.deltaTime;
 
         if (characterController.isGrounded)
         {
-            lastGroundedTime = Time.time;
-            if (ySpeed < 0)
+            if (!wasGroundedLastFrame)
             {
-                ySpeed = -0.5f;
+                lastGroundedTime = Time.time;
+                wasGroundedLastFrame = true;
+                hasJumped = false;
             }
+
+            if (ySpeed < 0)
+                ySpeed = -0.5f;
 
             if (Input.GetButtonDown("Jump"))
-            {
                 jumpButtonPressedTime = Time.time;
-            }
-
-            hasJumped = false;
+        }
+        else
+        {
+            wasGroundedLastFrame = false;
         }
 
         if (Time.time - lastGroundedTime <= jumpButtonGracePeriod)
         {
             characterController.stepOffset = originalStepOffset;
 
-            if (Time.time - jumpButtonPressedTime <= jumpButtonGracePeriod && !hasJumped)
+            if (jumpButtonPressedTime.HasValue && Time.time - jumpButtonPressedTime <= jumpButtonGracePeriod && !hasJumped)
             {
                 ySpeed = jumpSpeed;
                 jumpButtonPressedTime = null;
@@ -131,12 +121,71 @@ public class PlayerMovement : MonoBehaviour
             characterController.stepOffset = 0;
         }
 
-        Vector3 velocity = movementDirection * speed;
+        Vector3 velocity = moveDirection * speed;
         velocity.y = ySpeed;
+
+        if (isRolling)
+            velocity += rollDirection * rollForce;
 
         characterController.Move(velocity * Time.deltaTime);
 
         HandleAnimationStates(horizontalInput, verticalInput, isSprinting);
+
+        if (moveDirection.magnitude > 0.1f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        }
+    }
+
+    private void HandleRoll()
+    {
+        if (Input.GetKeyDown(KeyCode.C) && !isRolling)
+        {
+            bool isW = Input.GetKey(KeyCode.W);
+            bool isA = Input.GetKey(KeyCode.A);
+            bool isS = Input.GetKey(KeyCode.S);
+            bool isD = Input.GetKey(KeyCode.D);
+
+            if (isW)
+            {
+                animator.SetTrigger("RollForward");
+                rollDirection = transform.forward;
+            }
+            else if (isS)
+            {
+                animator.SetTrigger("RollBackward");
+                rollDirection = -transform.forward;
+            }
+            else if (isA)
+            {
+                animator.SetTrigger("RollLeft");
+                rollDirection = -transform.right;
+            }
+            else if (isD)
+            {
+                animator.SetTrigger("RollRight");
+                rollDirection = transform.right;
+            }
+            else
+            {
+                animator.SetTrigger("RollForward");
+                rollDirection = transform.forward;
+            }
+
+            isRolling = true;
+            rollTimer = rollDuration;
+        }
+
+        if (isRolling)
+        {
+            rollTimer -= Time.deltaTime;
+            if (rollTimer <= 0f)
+            {
+                isRolling = false;
+                rollDirection = Vector3.zero;
+            }
+        }
     }
 
     private void HandleAnimationStates(float horizontalInput, float verticalInput, bool isSprinting)
@@ -160,9 +209,15 @@ public class PlayerMovement : MonoBehaviour
 
     private void RotateWithMouse()
     {
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
-        currentRotationY += mouseX;
-        transform.rotation = Quaternion.Euler(0, currentRotationY, 0);
+        mouseX += Input.GetAxis("Mouse X") * mouseSensitivity;
+        mouseY -= Input.GetAxis("Mouse Y") * mouseSensitivity;
+        mouseY = Mathf.Clamp(mouseY, cameraLimit.x, cameraLimit.y);
+
+        transform.rotation = Quaternion.Euler(0, mouseX, 0);
+        if (cameraTransform != null)
+        {
+            cameraTransform.localRotation = Quaternion.Euler(mouseY, 0, 0);
+        }
     }
 
     private void UpdateCameraPosition()
@@ -175,28 +230,17 @@ public class PlayerMovement : MonoBehaviour
         Vector3 targetLocalPosition = initialCameraLocalPosition;
 
         if (verticalInput > 0.1f)
-        {
             targetLocalPosition += Vector3.back * cameraBackwardAmount;
-        }
 
         if (Mathf.Abs(horizontalInput) > 0.1f)
-        {
             targetLocalPosition += Vector3.right * horizontalInput * cameraSideAmount;
-        }
 
         cameraTransform.localPosition = Vector3.Lerp(cameraTransform.localPosition, targetLocalPosition, cameraLerpSpeed * Time.deltaTime);
     }
 
     private void OnApplicationFocus(bool focus)
     {
-        if (focus)
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-        }
-        else
-        {
-            Cursor.lockState = CursorLockMode.None;
-        }
+        Cursor.lockState = focus ? CursorLockMode.Locked : CursorLockMode.None;
     }
 
     public bool IsGrounded()
