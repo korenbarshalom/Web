@@ -21,40 +21,59 @@ public class PlayerMovement : MonoBehaviour
     private float mouseSensitivity = 2f;
 
     [SerializeField]
-    private float Gravity = -9.81f; // ✅ משתנה גרביטציה חדש
+    private float Gravity = -9.81f;
 
     [SerializeField]
-    private float cameraBackwardAmount = 0.5f; // ✅ כמה המצלמה תזוז אחורה כשזזים קדימה
+    private float cameraBackwardAmount = 0.5f;
 
     [SerializeField]
-    private float cameraLerpSpeed = 5f; // ✅ מהירות החזרה של המצלמה
+    private float cameraLerpSpeed = 5f;
 
     [SerializeField]
-    private float cameraSideAmount = 0.2f; // ✅ תוספת חדשה - כמה המצלמה תזוז ימינה/שמאלה (מאוד קטן)
+    private float cameraSideAmount = 0.2f;
+
+    [SerializeField]
+    private float sprintMultiplier = 1.5f;
+
+    [SerializeField]
+    private Animator animator; // ✅ שדה חדש - להכניס Animator ידנית
 
     private Vector3 initialCameraLocalPosition;
-    private Animator animator;
     private CharacterController characterController;
     private float ySpeed;
     private float originalStepOffset;
     private float? lastGroundedTime;
     private float? jumpButtonPressedTime;
     private float currentRotationY;
+    private bool hasJumped = false;
 
     void Start()
     {
-        animator = GetComponent<Animator>();
         characterController = GetComponent<CharacterController>();
         originalStepOffset = characterController.stepOffset;
         currentRotationY = transform.eulerAngles.y;
 
         if (cameraTransform != null)
         {
-            initialCameraLocalPosition = cameraTransform.localPosition; // שומר את המיקום ההתחלתי של המצלמה
+            initialCameraLocalPosition = cameraTransform.localPosition;
+        }
+
+        // ✅ אם לא הכניסו Animator - נחפש אוטומטית
+        if (animator == null)
+        {
+            animator = GetComponent<Animator>();
         }
     }
 
     void Update()
+    {
+        HandleMovement();
+        HandleJump();
+        RotateWithMouse();
+        UpdateCameraPosition();
+    }
+
+    private void HandleMovement()
     {
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
@@ -62,18 +81,20 @@ public class PlayerMovement : MonoBehaviour
         Vector3 movementDirection = new Vector3(horizontalInput, 0, verticalInput);
         float inputMagnitude = Mathf.Clamp01(movementDirection.magnitude);
 
-        if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
-        {
-            inputMagnitude /= 2;
-        }
-
         animator.SetFloat("Input Magnitude", inputMagnitude, 0.05f, Time.deltaTime);
 
         float speed = inputMagnitude * maximumSpeed;
+
+        bool isSprinting = Input.GetKey(KeyCode.W) && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift));
+        if (isSprinting)
+        {
+            speed *= sprintMultiplier;
+        }
+
         movementDirection = Quaternion.Euler(0, transform.eulerAngles.y, 0) * movementDirection;
         movementDirection.Normalize();
 
-        ySpeed += Gravity * Time.deltaTime; // ✅ משתמשים בגרביטציה שהגדרת
+        ySpeed += Gravity * Time.deltaTime;
 
         if (characterController.isGrounded)
         {
@@ -82,22 +103,27 @@ public class PlayerMovement : MonoBehaviour
             {
                 ySpeed = -0.5f;
             }
-        }
 
-        if (Input.GetButtonDown("Jump"))
-        {
-            jumpButtonPressedTime = Time.time;
+            if (Input.GetButtonDown("Jump"))
+            {
+                jumpButtonPressedTime = Time.time;
+            }
+
+            hasJumped = false;
         }
 
         if (Time.time - lastGroundedTime <= jumpButtonGracePeriod)
         {
             characterController.stepOffset = originalStepOffset;
 
-            if (Time.time - jumpButtonPressedTime <= jumpButtonGracePeriod)
+            if (Time.time - jumpButtonPressedTime <= jumpButtonGracePeriod && !hasJumped)
             {
                 ySpeed = jumpSpeed;
                 jumpButtonPressedTime = null;
                 lastGroundedTime = null;
+
+                animator.SetTrigger("Jump");
+                hasJumped = true;
             }
         }
         else
@@ -110,8 +136,26 @@ public class PlayerMovement : MonoBehaviour
 
         characterController.Move(velocity * Time.deltaTime);
 
-        RotateWithMouse();
-        UpdateCameraPosition(verticalInput, horizontalInput);
+        HandleAnimationStates(horizontalInput, verticalInput, isSprinting);
+    }
+
+    private void HandleAnimationStates(float horizontalInput, float verticalInput, bool isSprinting)
+    {
+        bool isW = Input.GetKey(KeyCode.W);
+        bool isA = Input.GetKey(KeyCode.A);
+        bool isS = Input.GetKey(KeyCode.S);
+        bool isD = Input.GetKey(KeyCode.D);
+
+        animator.SetBool("RunForward", isW);
+        animator.SetBool("RunBackward", isS);
+        animator.SetBool("RunLeft", isA);
+        animator.SetBool("RunRight", isD);
+        animator.SetBool("Sprint", isSprinting);
+    }
+
+    private void HandleJump()
+    {
+        // ניהול קפיצה מטופל ב-HandleMovement
     }
 
     private void RotateWithMouse()
@@ -121,18 +165,21 @@ public class PlayerMovement : MonoBehaviour
         transform.rotation = Quaternion.Euler(0, currentRotationY, 0);
     }
 
-    private void UpdateCameraPosition(float verticalInput, float horizontalInput)
+    private void UpdateCameraPosition()
     {
         if (cameraTransform == null) return;
 
+        float verticalInput = Input.GetAxis("Vertical");
+        float horizontalInput = Input.GetAxis("Horizontal");
+
         Vector3 targetLocalPosition = initialCameraLocalPosition;
 
-        if (verticalInput > 0.1f) // זז קדימה
+        if (verticalInput > 0.1f)
         {
             targetLocalPosition += Vector3.back * cameraBackwardAmount;
         }
 
-        if (Mathf.Abs(horizontalInput) > 0.1f) // זז שמאלה או ימינה
+        if (Mathf.Abs(horizontalInput) > 0.1f)
         {
             targetLocalPosition += Vector3.right * horizontalInput * cameraSideAmount;
         }
@@ -150,5 +197,15 @@ public class PlayerMovement : MonoBehaviour
         {
             Cursor.lockState = CursorLockMode.None;
         }
+    }
+
+    public bool IsGrounded()
+    {
+        return characterController.isGrounded;
+    }
+
+    public bool WasRecentlyGrounded()
+    {
+        return Time.time - lastGroundedTime <= jumpButtonGracePeriod;
     }
 }
