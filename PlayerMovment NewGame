@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -17,7 +19,13 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Animator animator;
 
     [Header("Camera Rotation Limits")]
-    [SerializeField] private Vector2 cameraLimit = new Vector2(-40, 40); // ✅ הגבלת סיבוב למעלה/למטה
+    [SerializeField] private Vector2 cameraLimit = new Vector2(-40, 40);
+
+    [Header("Mouse Sensitivity UI")]
+    [SerializeField] private Slider mouseSensitivitySlider;
+    [SerializeField] private TextMeshProUGUI mouseSensitivityText;
+    [SerializeField] private float minMouseSensitivity = 0f;
+    [SerializeField] private float maxMouseSensitivity = 5f;
 
     private Vector3 initialCameraLocalPosition;
     private CharacterController characterController;
@@ -35,6 +43,13 @@ public class PlayerMovement : MonoBehaviour
     private float rollTimer = 0f;
     private float rollDuration = 0.5f;
 
+    private bool externalJumpTriggered = false;
+    private bool isKnockbackActive = false;
+
+    // ✅ Cooldown ל-Roll
+    private float rollCooldown = 1f;
+    private float nextRollTime = 0f;
+
     void Start()
     {
         characterController = GetComponent<CharacterController>();
@@ -46,6 +61,19 @@ public class PlayerMovement : MonoBehaviour
 
         if (animator == null)
             animator = GetComponent<Animator>();
+
+        if (mouseSensitivitySlider != null)
+        {
+            mouseSensitivitySlider.minValue = minMouseSensitivity;
+            mouseSensitivitySlider.maxValue = maxMouseSensitivity;
+            mouseSensitivitySlider.value = mouseSensitivity;
+            mouseSensitivitySlider.onValueChanged.AddListener(OnMouseSensitivityChanged);
+        }
+
+        if (mouseSensitivityText != null)
+        {
+            mouseSensitivityText.text = mouseSensitivity.ToString("F2");
+        }
     }
 
     void Update()
@@ -61,6 +89,9 @@ public class PlayerMovement : MonoBehaviour
     {
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
+
+        if (isKnockbackActive)
+            horizontalInput = 0f;
 
         Vector3 forward = cameraTransform.forward;
         Vector3 right = cameraTransform.right;
@@ -106,7 +137,7 @@ public class PlayerMovement : MonoBehaviour
         {
             characterController.stepOffset = originalStepOffset;
 
-            if (jumpButtonPressedTime.HasValue && Time.time - jumpButtonPressedTime <= jumpButtonGracePeriod && !hasJumped)
+            if ((jumpButtonPressedTime.HasValue && Time.time - jumpButtonPressedTime <= jumpButtonGracePeriod && !hasJumped) || externalJumpTriggered)
             {
                 ySpeed = jumpSpeed;
                 jumpButtonPressedTime = null;
@@ -114,6 +145,7 @@ public class PlayerMovement : MonoBehaviour
 
                 animator.SetTrigger("Jump");
                 hasJumped = true;
+                externalJumpTriggered = false;
             }
         }
         else
@@ -140,7 +172,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleRoll()
     {
-        if (Input.GetKeyDown(KeyCode.C) && !isRolling)
+        if (Input.GetKeyDown(KeyCode.C) && !isRolling && Time.time >= nextRollTime)
         {
             bool isW = Input.GetKey(KeyCode.W);
             bool isA = Input.GetKey(KeyCode.A);
@@ -175,6 +207,7 @@ public class PlayerMovement : MonoBehaviour
 
             isRolling = true;
             rollTimer = rollDuration;
+            nextRollTime = Time.time + rollCooldown; // ✅ התחלת קירור
         }
 
         if (isRolling)
@@ -202,10 +235,7 @@ public class PlayerMovement : MonoBehaviour
         animator.SetBool("Sprint", isSprinting);
     }
 
-    private void HandleJump()
-    {
-        // ניהול קפיצה מטופל ב-HandleMovement
-    }
+    private void HandleJump() { }
 
     private void RotateWithMouse()
     {
@@ -243,13 +273,25 @@ public class PlayerMovement : MonoBehaviour
         Cursor.lockState = focus ? CursorLockMode.Locked : CursorLockMode.None;
     }
 
-    public bool IsGrounded()
+    public bool IsGrounded() => characterController.isGrounded;
+
+    public bool WasRecentlyGrounded() => Time.time - lastGroundedTime <= jumpButtonGracePeriod;
+
+    public void ForceJumpByEnemy() => externalJumpTriggered = true;
+
+    public void StartKnockbackLock()
     {
-        return characterController.isGrounded;
+        isKnockbackActive = true;
+        Invoke(nameof(EndKnockbackLock), 0.4f);
     }
 
-    public bool WasRecentlyGrounded()
+    private void EndKnockbackLock() => isKnockbackActive = false;
+
+    public void OnMouseSensitivityChanged(float value)
     {
-        return Time.time - lastGroundedTime <= jumpButtonGracePeriod;
+        mouseSensitivity = value;
+
+        if (mouseSensitivityText != null)
+            mouseSensitivityText.text = value.ToString("F2");
     }
 }
