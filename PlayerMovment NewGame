@@ -83,6 +83,7 @@ public class PlayerMovement : MonoBehaviour
         HandleRoll();
         RotateWithMouse();
         UpdateCameraPosition();
+        HandleAttacks(); // ✅ נוספה תמיכה בהתקפות
     }
 
     private void HandleMovement()
@@ -207,7 +208,7 @@ public class PlayerMovement : MonoBehaviour
 
             isRolling = true;
             rollTimer = rollDuration;
-            nextRollTime = Time.time + rollCooldown; // ✅ התחלת קירור
+            nextRollTime = Time.time + rollCooldown;
         }
 
         if (isRolling)
@@ -219,6 +220,21 @@ public class PlayerMovement : MonoBehaviour
                 rollDirection = Vector3.zero;
             }
         }
+    }
+
+    private void HandleAttacks()
+    {
+        if (Input.GetMouseButtonDown(0))
+            animator.SetTrigger("Attack1");
+
+        if (Input.GetMouseButtonDown(1))
+            animator.SetTrigger("Attack2");
+
+        if (Input.GetKeyDown(KeyCode.Q))
+            animator.SetTrigger("Attack3");
+
+        if (Input.GetKeyDown(KeyCode.E))
+            animator.SetTrigger("Attack4");
     }
 
     private void HandleAnimationStates(float horizontalInput, float verticalInput, bool isSprinting)
