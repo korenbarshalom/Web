@@ -46,9 +46,12 @@ public class PlayerMovement : MonoBehaviour
     private bool externalJumpTriggered = false;
     private bool isKnockbackActive = false;
 
-    // ✅ Cooldown ל-Roll
     private float rollCooldown = 1f;
     private float nextRollTime = 0f;
+
+    // ✅ Attack Cooldown
+    private float attackCooldown = 0.75f;
+    private float nextAttackTime = 0f;
 
     void Start()
     {
@@ -83,7 +86,7 @@ public class PlayerMovement : MonoBehaviour
         HandleRoll();
         RotateWithMouse();
         UpdateCameraPosition();
-        HandleAttacks(); // ✅ נוספה תמיכה בהתקפות
+        HandleAttacks();
     }
 
     private void HandleMovement()
@@ -224,17 +227,28 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleAttacks()
     {
+        if (Time.time < nextAttackTime) return;
+
         if (Input.GetMouseButtonDown(0))
+        {
             animator.SetTrigger("Attack1");
-
-        if (Input.GetMouseButtonDown(1))
+            nextAttackTime = Time.time + attackCooldown;
+        }
+        else if (Input.GetMouseButtonDown(1))
+        {
             animator.SetTrigger("Attack2");
-
-        if (Input.GetKeyDown(KeyCode.Q))
+            nextAttackTime = Time.time + attackCooldown;
+        }
+        else if (Input.GetKeyDown(KeyCode.Q))
+        {
             animator.SetTrigger("Attack3");
-
-        if (Input.GetKeyDown(KeyCode.E))
+            nextAttackTime = Time.time + attackCooldown;
+        }
+        else if (Input.GetKeyDown(KeyCode.E))
+        {
             animator.SetTrigger("Attack4");
+            nextAttackTime = Time.time + attackCooldown;
+        }
     }
 
     private void HandleAnimationStates(float horizontalInput, float verticalInput, bool isSprinting)
