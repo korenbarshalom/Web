@@ -27,6 +27,11 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float minMouseSensitivity = 0f;
     [SerializeField] private float maxMouseSensitivity = 5f;
 
+    [Header("Sword Activation")]
+    [SerializeField] private GameObject swordObject;
+
+    private bool attackBlocked = false;
+
     private Vector3 initialCameraLocalPosition;
     private CharacterController characterController;
     private float ySpeed;
@@ -49,7 +54,6 @@ public class PlayerMovement : MonoBehaviour
     private float rollCooldown = 1f;
     private float nextRollTime = 0f;
 
-    // ✅ Attack Cooldown
     private float attackCooldown = 0.75f;
     private float nextAttackTime = 0f;
 
@@ -81,6 +85,9 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        GameObject bomb = GameObject.FindGameObjectWithTag("Bomb");
+        attackBlocked = bomb != null && bomb.activeSelf;
+
         HandleMovement();
         HandleJump();
         HandleRoll();
@@ -229,6 +236,16 @@ public class PlayerMovement : MonoBehaviour
     {
         if (Time.time < nextAttackTime) return;
 
+        if (attackBlocked)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                animator.SetTrigger("Throw");
+                nextAttackTime = Time.time + attackCooldown;
+            }
+            return;
+        }
+
         if (Input.GetMouseButtonDown(0))
         {
             animator.SetTrigger("Attack1");
@@ -248,6 +265,15 @@ public class PlayerMovement : MonoBehaviour
         {
             animator.SetTrigger("Attack4");
             nextAttackTime = Time.time + attackCooldown;
+        }
+    }
+
+    public void RestoreAttacks()
+    {
+        attackBlocked = false;
+        if (swordObject != null)
+        {
+            swordObject.SetActive(true);
         }
     }
 
