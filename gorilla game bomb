@@ -1,0 +1,218 @@
+using UnityEngine;
+using System.Collections;
+
+public class GrenadeThrower : MonoBehaviour
+{
+    [Header("Grenade Settings")]
+    public GameObject grenadeObject;
+    public float throwForce = 10f;
+    public float upwardForce = 5f;
+    public bool destroyAfterSeconds = true;
+
+    [Header("Explosion Effects")]
+    public ParticleSystem groundExplosionEffect;
+    public ParticleSystem defaultExplosionEffect;
+
+    [Header("Activation After Throw")]
+    public GameObject objectToActivate;
+
+    [Header("Bomb1 Layer Detection")]
+    public LayerMask bomb1Layer;
+
+    [Header("References")]
+    public Camera mainCamera;
+    public AudioSource throwSound;
+    public AudioSource explosionSound;
+
+    private bool isThrowing = false;
+    private bool grenadeInHand = true;
+    private Coroutine armTimerCoroutine;
+    private bool wasInactive = false;
+
+    void Update()
+    {
+        // זיהוי שהרימון הודלק מחדש ידנית
+        if (grenadeObject != null)
+        {
+            if (grenadeObject.activeInHierarchy && wasInactive)
+            {
+                ResetState(); // איפוס משתנים כשחוזר לפעולה
+                wasInactive = false;
+            }
+            else if (!grenadeObject.activeInHierarchy)
+            {
+                wasInactive = true;
+            }
+
+            // הפעלת טיימר חימוש
+            if (grenadeObject.activeInHierarchy && armTimerCoroutine == null && !isThrowing)
+            {
+                armTimerCoroutine = StartCoroutine(ArmTimer());
+            }
+        }
+    }
+
+    private IEnumerator ArmTimer()
+    {
+        yield return new WaitForSeconds(3f);
+
+        if (!isThrowing && grenadeObject.activeInHierarchy)
+        {
+            TriggerHandExplosion();
+        }
+
+        armTimerCoroutine = null;
+    }
+
+    public void ThrowGrenade()
+    {
+        if (grenadeObject == null || isThrowing || !grenadeObject.activeInHierarchy)
+            return;
+
+        isThrowing = true;
+        grenadeInHand = false;
+
+        GameObject clone = Instantiate(grenadeObject, grenadeObject.transform.position, grenadeObject.transform.rotation);
+        clone.SetActive(true);
+        clone.transform.parent = null;
+
+        grenadeObject.SetActive(false);
+
+        Rigidbody rb = clone.GetComponent<Rigidbody>();
+        if (rb == null)
+            rb = clone.AddComponent<Rigidbody>();
+
+        rb.isKinematic = false;
+
+        Vector3 throwDirection = mainCamera != null
+            ? mainCamera.transform.forward * throwForce + mainCamera.transform.up * upwardForce
+            : transform.forward * throwForce + transform.up * upwardForce;
+
+        rb.AddForce(throwDirection, ForceMode.Impulse);
+
+        clone.AddComponent<OnHit>().Init(groundExplosionEffect, defaultExplosionEffect, explosionSound, objectToActivate);
+
+        if (throwSound != null)
+            throwSound.Play();
+
+        if (objectToActivate != null)
+            Invoke(nameof(ActivateObject), 1f);
+    }
+
+    private void ActivateObject()
+    {
+        if (objectToActivate != null)
+            objectToActivate.SetActive(true);
+    }
+
+    private void ResetState()
+    {
+        isThrowing = false;
+        grenadeInHand = true;
+        armTimerCoroutine = null;
+    }
+
+    private void TriggerHandExplosion()
+    {
+        if (defaultExplosionEffect != null)
+        {
+            Instantiate(defaultExplosionEffect, grenadeObject.transform.position, Quaternion.identity).Play();
+        }
+
+        if (explosionSound != null)
+            explosionSound.Play();
+
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null && Vector3.Distance(grenadeObject.transform.position, player.transform.position) <= 35f)
+        {
+            PlayerHealth1 health = player.GetComponent<PlayerHealth1>();
+            if (health != null)
+            {
+                health.TakeDamage(50);
+            }
+        }
+
+        if (objectToActivate != null)
+            objectToActivate.SetActive(true);
+
+        grenadeObject.SetActive(false);
+        isThrowing = false;
+        grenadeInHand = false;
+    }
+
+    private class OnHit : MonoBehaviour
+    {
+        private ParticleSystem groundEffect;
+        private ParticleSystem defaultEffect;
+        private AudioSource explosionAudio;
+        private GameObject objectToActivate;
+        private bool hasHit = false;
+
+        public void Init(ParticleSystem groundFx, ParticleSystem defaultFx, AudioSource explosionSound, GameObject activateObject)
+        {
+            groundEffect = groundFx;
+            defaultEffect = defaultFx;
+            explosionAudio = explosionSound;
+            objectToActivate = activateObject;
+            Invoke(nameof(ExplodeAutomatically), 4f);
+        }
+
+        private void OnCollisionEnter(Collision collision)
+        {
+            if (hasHit) return;
+            hasHit = true;
+
+            TriggerExplosion(collision.gameObject.CompareTag("Ground") ? groundEffect : defaultEffect);
+        }
+
+        private void ExplodeAutomatically()
+        {
+            if (hasHit) return;
+            hasHit = true;
+
+            TriggerExplosion(defaultEffect);
+        }
+
+        private void TriggerExplosion(ParticleSystem effect)
+        {
+            if (effect != null)
+                Instantiate(effect, transform.position, Quaternion.identity).Play();
+
+            if (explosionAudio != null)
+                explosionAudio.Play();
+
+            if (objectToActivate != null)
+                objectToActivate.SetActive(true);
+
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null && Vector3.Distance(transform.position, player.transform.position) <= 20f)
+            {
+                PlayerHealth1 health = player.GetComponent<PlayerHealth1>();
+                if (health != null)
+                {
+                    health.TakeDamage(50);
+                }
+            }
+
+            GameObject gorilla = GameObject.FindGameObjectWithTag("Gorilla");
+            if (gorilla != null && Vector3.Distance(transform.position, gorilla.transform.position) <= 35f)
+            {
+                GorillaHealth gorillaHealth = gorilla.GetComponent<GorillaHealth>();
+                if (gorillaHealth != null)
+                {
+                    gorillaHealth.TakeDamage(100);
+                }
+            }
+
+            Destroy(gameObject);
+        }
+    }
+}
+
+public class Bomb1DeathNotifier : MonoBehaviour
+{
+    private void OnDestroy()
+    {
+        // This class is currently unused and kept for reference.
+    }
+}
