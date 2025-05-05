@@ -57,6 +57,12 @@ public class PlayerMovement : MonoBehaviour
     private float attackCooldown = 0.75f;
     private float nextAttackTime = 0f;
 
+    private float attack3Cooldown = 3f; // זמן המתנה בין לחיצות על Q
+    private float nextAttack3Time = 0f;
+
+    [HideInInspector] public Vector3 moveDirection = Vector3.zero;
+    [HideInInspector] public bool isSwinging = false;
+
     void Start()
     {
         characterController = GetComponent<CharacterController>();
@@ -98,6 +104,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleMovement()
     {
+        if (!characterController.enabled) return;
+
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
 
@@ -111,7 +119,8 @@ public class PlayerMovement : MonoBehaviour
         forward.Normalize();
         right.Normalize();
 
-        Vector3 moveDirection = forward * verticalInput + right * horizontalInput;
+        moveDirection = forward * verticalInput + right * horizontalInput;
+
         float inputMagnitude = Mathf.Clamp01(moveDirection.magnitude);
 
         animator.SetFloat("Input Magnitude", inputMagnitude, 0.05f, Time.deltaTime);
@@ -122,7 +131,11 @@ public class PlayerMovement : MonoBehaviour
             speed *= sprintMultiplier;
 
         moveDirection.Normalize();
-        ySpeed += Gravity * Time.deltaTime;
+        if (!isSwinging)
+            ySpeed += Gravity * Time.deltaTime;
+        else
+            ySpeed += (Gravity / 2f) * Time.deltaTime;
+
 
         if (characterController.isGrounded)
         {
@@ -183,7 +196,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleRoll()
     {
-        if (Input.GetKeyDown(KeyCode.C) && !isRolling && Time.time >= nextRollTime)
+        if (Input.GetKeyDown(KeyCode.LeftControl) && !isRolling && Time.time >= nextRollTime)
         {
             bool isW = Input.GetKey(KeyCode.W);
             bool isA = Input.GetKey(KeyCode.A);
@@ -240,8 +253,7 @@ public class PlayerMovement : MonoBehaviour
         {
             if (Input.GetMouseButtonDown(0))
             {
-                animator.SetTrigger("Throw");
-                nextAttackTime = Time.time + attackCooldown;
+                nextAttackTime = Time.time + attackCooldown; // Throw trigger removed
             }
             return;
         }
@@ -256,11 +268,12 @@ public class PlayerMovement : MonoBehaviour
             animator.SetTrigger("Attack2");
             nextAttackTime = Time.time + attackCooldown;
         }
-        else if (Input.GetKeyDown(KeyCode.Q))
+        else if (Input.GetKeyDown(KeyCode.Q) && Time.time >= nextAttack3Time)
         {
             animator.SetTrigger("Attack3");
-            nextAttackTime = Time.time + attackCooldown;
+            nextAttack3Time = Time.time + attack3Cooldown;
         }
+
         else if (Input.GetKeyDown(KeyCode.E))
         {
             animator.SetTrigger("Attack4");
