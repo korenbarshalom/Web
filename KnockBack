@@ -1,0 +1,87 @@
+using System.Collections;
+using UnityEngine;
+
+public class PlayerKnockbackByEnemy : MonoBehaviour
+{
+    public float knockbackDistance = 50f;
+    public float knockbackDuration = 0.4f;
+    public float knockbackHeight = 0.3f;
+    public float activationRange = 20f;
+    public AnimationCurve knockbackCurve = AnimationCurve.EaseInOut(0, 1, 1, 0); // ✅ מוסיף דעיכה טבעית
+
+    private CharacterController playerController;
+    private Transform playerTransform;
+    private bool isKnockbackInProgress = false;
+
+    private PlayerMovement playerMovement;
+    private PlayerHealth1 playerHealth;
+
+    void Start()
+    {
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null)
+        {
+            playerTransform = playerObj.transform;
+            playerController = playerObj.GetComponent<CharacterController>();
+            playerMovement = playerObj.GetComponent<PlayerMovement>();
+            playerHealth = playerObj.GetComponent<PlayerHealth1>();
+        }
+        else
+        {
+            Debug.LogError("Player with tag 'Player' not found!");
+        }
+    }
+
+    public void TriggerPlayerKnockback()
+    {
+        if (playerTransform != null && playerController != null && !isKnockbackInProgress)
+        {
+            float distance = Vector3.Distance(transform.position, playerTransform.position);
+
+            if (distance <= activationRange)
+            {
+                StartCoroutine(ApplyKnockbackOverTime());
+
+                if (playerHealth != null)
+                {
+                    playerHealth.TakeDamage(20);
+                }
+            }
+        }
+    }
+
+    private IEnumerator ApplyKnockbackOverTime()
+    {
+        isKnockbackInProgress = true;
+        float elapsed = 0f;
+
+        // כיוון דחיפה אחורה + מעט למעלה
+        Vector3 direction = (-playerTransform.forward + Vector3.up * knockbackHeight).normalized;
+
+        if (playerMovement != null)
+        {
+            playerMovement.ForceJumpByEnemy();
+            playerMovement.StartKnockbackLock();
+        }
+
+        while (elapsed < knockbackDuration)
+        {
+            if (playerController == null || playerTransform == null)
+            {
+                isKnockbackInProgress = false;
+                yield break;
+            }
+
+            float t = elapsed / knockbackDuration;
+            float curveStrength = knockbackCurve.Evaluate(t); // משתמש בעקומה לדעיכה
+            Vector3 move = direction * knockbackDistance * curveStrength * Time.deltaTime;
+
+            playerController.Move(move);
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        isKnockbackInProgress = false;
+    }
+}
