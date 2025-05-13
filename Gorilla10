@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections;
 
 public class GorillaEnemyAI : MonoBehaviour
 {
@@ -18,7 +19,7 @@ public class GorillaEnemyAI : MonoBehaviour
     private NavMeshAgent agent;
     private Transform player;
 
-    private float attackCooldown = 3f, lastAttackTime = -Mathf.Infinity;
+    private float attackCooldown = 3.2f, lastAttackTime = -Mathf.Infinity;
     private int lastAttackIndex = -1;
     [HideInInspector] public bool isInvulnerable = false;
 
@@ -79,6 +80,10 @@ public class GorillaEnemyAI : MonoBehaviour
             triggeredSwing = true;
             agent.SetDestination(swingStartPoint.position);
             SetAnimationState(false, true, false);
+
+            // ✅ הפיכת הגורילה לבלתי פגיעה ל-10 שניות
+            StartCoroutine(TempInvulnerability());
+
             return;
         }
 
@@ -220,7 +225,7 @@ public class GorillaEnemyAI : MonoBehaviour
         walkSpeed *= 1.5f;
         idleSpeed *= 1.5f;
         approachSpeed *= 1.5f;
-        attackCooldown = 2.2f;
+        attackCooldown = 2.5f;
 
         if (swingStartPoint != null)
         {
@@ -228,7 +233,6 @@ public class GorillaEnemyAI : MonoBehaviour
             swingStartPoint = null;
         }
     }
-
 
     private void PlayRandomAttackAnimation()
     {
@@ -267,5 +271,13 @@ public class GorillaEnemyAI : MonoBehaviour
     {
         isAttackingBot = false;
         randomBotTarget = null;
+    }
+
+    // ✅ חסינות זמנית לפגיעות חיים
+    private IEnumerator TempInvulnerability()
+    {
+        gorillaHealth.isInvulnerable = true;
+        yield return new WaitForSeconds(10f);
+        gorillaHealth.isInvulnerable = false;
     }
 }
