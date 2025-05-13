@@ -4,79 +4,58 @@ using UnityEngine.AI;
 public class GorillaEnemyAI : MonoBehaviour
 {
     [Header("Chase Settings")]
-    public float chaseRange = 20f;
-    public float walkRange = 8f;
-    public float attackRange = 2f;
-    public float stopDistance = 1.5f;
-
-    public float runSpeed = 6f;
-    public float walkSpeed = 3.5f;
-    public float idleSpeed = 1.5f;
-
-    [Header("New Walk/Run Range Settings")]
-    public float walkAnimationRange = 50f;
-    public float walkAnimationSpeed = 4f;
-    public float runAnimationSpeed = 7f;
+    public float chaseRange = 20f, walkRange = 8f, attackRange = 2f, stopDistance = 1.5f;
+    public float runSpeed = 6f, walkSpeed = 3.5f, idleSpeed = 1.5f;
 
     [Range(1, 99)] public int avoidancePriority = 50;
     public string targetTag = "Player";
 
-    [Header("Rotation Settings")]
+    [Header("Rotation & References")]
     [SerializeField] private float rotationSpeed = 5f;
-
-    [Header("References")]
     [SerializeField] private Animator animator;
 
     private NavMeshAgent agent;
     private Transform player;
 
-    private float attackCooldown = 3.8f;
-    private float lastAttackTime = -Mathf.Infinity;
+    private float attackCooldown = 3.8f, lastAttackTime = -Mathf.Infinity;
     private int lastAttackIndex = -1;
-
-    [Header("Damage Control")]
     [HideInInspector] public bool isInvulnerable = false;
 
-    // ✅ Bots
     private GameObject[] bots;
     private Transform randomBotTarget;
-    private float botFocusChance = 0.1f; // 🔽 היה 0.25
-    private float botAttackChance = 0.1f; // 🔽 היה 0.33
-    private float botCheckCooldown = 2f;
-    private float lastBotCheckTime = -999f;
-
+    [Range(0f, 1f)] public float botEngageChance = 0.25f;
+    private float botCheckCooldown = 2f, lastBotCheckTime = -999f;
     private bool isAttackingBot = false;
+
+    [Header("Swing Settings")]
+    public Transform[] swingPoints;
+    public Transform swingStartPoint;
+    public float swingTriggerDistance = 8f, swingSpeed = 2f, swingHeight = 4f, approachSpeed = 6f;
+
+    private int currentSwingIndex = 0;
+    private bool isSwinging = false, preparingToSwing = false;
+    private float swingProgress = 0f;
+    private Vector3 swingStart, swingEnd;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        if (agent == null)
-        {
-            Debug.LogError("Missing NavMeshAgent component!");
-            enabled = false;
-            return;
-        }
+        if (!agent) { Debug.LogError("Missing NavMeshAgent!"); enabled = false; return; }
 
         agent.avoidancePriority = avoidancePriority;
         agent.speed = idleSpeed;
         agent.stoppingDistance = stopDistance;
-
-        if (animator == null)
-            animator = GetComponent<Animator>();
+        if (!animator) animator = GetComponent<Animator>();
 
         GameObject playerObject = GameObject.FindGameObjectWithTag(targetTag);
-        if (playerObject != null)
-        {
-            player = playerObject.transform;
-        }
+        if (playerObject) player = playerObject.transform;
     }
 
     void Update()
     {
-        if (player == null || agent == null || !agent.isOnNavMesh)
-            return;
+        if (HandleSwing()) return;
+        if (!player || !agent || !agent.isOnNavMesh) return;
 
-        // ✅ עדכון בוטים אחת ל־botCheckCooldown שניות
         if (Time.time - lastBotCheckTime >= botCheckCooldown)
         {
             bots = GameObject.FindGameObjectsWithTag("Bots");
@@ -84,24 +63,19 @@ public class GorillaEnemyAI : MonoBehaviour
 
             foreach (var bot in bots)
             {
-                float distToBot = Vector3.Distance(transform.position, bot.transform.position);
-                float distToPlayer = Vector3.Distance(transform.position, player.position);
-
-                if (Random.value < botFocusChance && distToBot <= 10f && distToPlayer > 12f)
+                if (Vector3.Distance(transform.position, bot.transform.position) <= 10f &&
+                    Vector3.Distance(transform.position, player.position) > 12f &&
+                    Random.value < botEngageChance)
                 {
                     randomBotTarget = bot.transform;
                     break;
                 }
             }
-
             lastBotCheckTime = Time.time;
         }
 
-        Transform currentTarget = player;
-        if (randomBotTarget != null && Random.value < 0.25f) // 🔽 פחות סיכוי להעדיף בוט
-            currentTarget = randomBotTarget;
-
-        float distance = Vector3.Distance(transform.position, currentTarget.position);
+        Transform target = (randomBotTarget && Random.value < botEngageChance) ? randomBotTarget : player;
+        float distance = Vector3.Distance(transform.position, target.position);
 
         if (distance <= attackRange)
         {
@@ -110,112 +84,122 @@ public class GorillaEnemyAI : MonoBehaviour
 
             if (Time.time - lastAttackTime >= attackCooldown)
             {
-                if (currentTarget.CompareTag("Bots") && Random.value < botAttackChance)
+                bool isBot = target.CompareTag("Bots");
+                if (!isBot || (isBot && Random.value < botEngageChance))
                 {
                     PlayRandomAttackAnimation();
                     lastAttackTime = Time.time;
-                    isAttackingBot = true;
-                    Invoke(nameof(ReturnToPlayerFocus), 1.5f); // 🔽 פחות זמן מבוט
-                }
-                else if (currentTarget.CompareTag("Player"))
-                {
-                    PlayRandomAttackAnimation();
-                    lastAttackTime = Time.time;
-                    isAttackingBot = false;
+                    isAttackingBot = isBot;
+                    if (isBot) Invoke(nameof(ReturnToPlayerFocus), 1.5f);
                 }
             }
 
-            SetAnimationState(run: false, walk: false, idle: false);
-        }
-        else if (distance <= walkRange)
-        {
-            agent.speed = walkSpeed;
-            if (distance > stopDistance)
-            {
-                agent.SetDestination(currentTarget.position);
-            }
-            else
-            {
-                agent.SetDestination(transform.position);
-                agent.velocity = Vector3.zero;
-            }
-            SetAnimationState(run: false, walk: true, idle: false);
-        }
-        else if (distance <= chaseRange)
-        {
-            agent.speed = runSpeed;
-            if (distance > stopDistance)
-            {
-                agent.SetDestination(currentTarget.position);
-            }
-            else
-            {
-                agent.SetDestination(transform.position);
-                agent.velocity = Vector3.zero;
-            }
-            SetAnimationState(run: true, walk: false, idle: false);
+            SetAnimationState(false, false, false);
         }
         else
         {
-            agent.SetDestination(player.position);
-
-            if (distance <= walkAnimationRange && distance > attackRange)
-            {
-                agent.speed = walkAnimationSpeed;
-                SetAnimationState(run: false, walk: true, idle: false);
-            }
-            else
-            {
-                agent.speed = runAnimationSpeed;
-                SetAnimationState(run: true, walk: false, idle: false);
-            }
+            agent.speed = (distance <= walkRange) ? walkSpeed : runSpeed;
+            agent.SetDestination(target.position);
+            SetAnimationState(distance > walkRange, distance <= walkRange, false);
         }
 
-        if (isAttackingBot && randomBotTarget != null)
-            RotateTowards(randomBotTarget);
-        else
-            RotateTowards(player);
+        RotateTowards(isAttackingBot && randomBotTarget ? randomBotTarget : player);
+    }
+
+    private bool HandleSwing()
+    {
+        if (preparingToSwing) { PrepareSwingMovement(); return true; }
+        if (isSwinging) { DoArcSwing(); return true; }
+
+        if (swingStartPoint && swingPoints.Length > 0 &&
+            Vector3.Distance(transform.position, swingStartPoint.position) <= swingTriggerDistance)
+        {
+            BeginSwingApproach();
+            return true;
+        }
+        return false;
+    }
+
+    private void BeginSwingApproach()
+    {
+        agent.enabled = false;
+        preparingToSwing = true;
+        animator.SetTrigger("Swing");
+    }
+
+    private void PrepareSwingMovement()
+    {
+        Vector3 target = swingPoints[0].position;
+        transform.position = Vector3.MoveTowards(transform.position, target, approachSpeed * Time.deltaTime);
+        if (Vector3.Distance(transform.position, target) < 0.1f)
+        {
+            preparingToSwing = false;
+            StartSwing();
+        }
+    }
+
+    private void DoArcSwing()
+    {
+        if (currentSwingIndex >= swingPoints.Length) return;
+
+        swingProgress += Time.deltaTime * swingSpeed;
+        Vector3 flatPos = Vector3.Lerp(swingStart, swingEnd, swingProgress);
+        float heightOffset = Mathf.Sin(swingProgress * Mathf.PI) * swingHeight;
+        transform.position = flatPos + Vector3.up * heightOffset;
+
+        if (swingProgress >= 1f)
+        {
+            if (++currentSwingIndex >= swingPoints.Length)
+                EndSwing();
+            else
+            {
+                swingStart = swingPoints[currentSwingIndex - 1].position;
+                swingEnd = swingPoints[currentSwingIndex].position;
+                swingProgress = 0f;
+            }
+        }
+    }
+
+    private void StartSwing()
+    {
+        isSwinging = true;
+        currentSwingIndex = 1;
+        swingStart = swingPoints[0].position;
+        swingEnd = swingPoints[1].position;
+        swingProgress = 0f;
+    }
+
+    private void EndSwing()
+    {
+        isSwinging = false;
+        agent.enabled = true;
+        agent.SetDestination(player.position);
     }
 
     private void PlayRandomAttackAnimation()
     {
-        int newAttackIndex;
-        do
-        {
-            newAttackIndex = Random.Range(0, 3);
-        } while (newAttackIndex == lastAttackIndex);
-
-        lastAttackIndex = newAttackIndex;
+        int newIndex;
+        do { newIndex = Random.Range(0, 3); } while (newIndex == lastAttackIndex);
+        lastAttackIndex = newIndex;
         isInvulnerable = true;
 
-        switch (newAttackIndex)
+        animator.SetTrigger(newIndex switch
         {
-            case 0:
-                animator.SetTrigger("Attack");
-                break;
-            case 1:
-                animator.SetTrigger("Attack2");
-                break;
-            case 2:
-                animator.SetTrigger("Attack3");
-                break;
-        }
+            0 => "Attack",
+            1 => "Attack2",
+            2 => "Attack3",
+            _ => "Attack"
+        });
     }
 
-    public void EndAttack()
-    {
-        isInvulnerable = false;
-    }
+    public void EndAttack() => isInvulnerable = false;
 
     private void RotateTowards(Transform target)
     {
-        Vector3 direction = target.position - transform.position;
-        direction.y = 0;
-        if (direction.magnitude > 0.5f)
-        {
-            Quaternion lookRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
-        }
+        Vector3 dir = target.position - transform.position;
+        dir.y = 0;
+        if (dir.magnitude > 0.5f)
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * rotationSpeed);
     }
 
     private void SetAnimationState(bool run, bool walk, bool idle)
