@@ -6,13 +6,14 @@ public class GorillaEnemyAI : MonoBehaviour
     [Header("Chase Settings")]
     public float chaseRange = 20f, walkRange = 8f, attackRange = 2f, stopDistance = 1.5f;
     public float runSpeed = 6f, walkSpeed = 3.5f, idleSpeed = 1.5f;
-
     [Range(1, 99)] public int avoidancePriority = 50;
     public string targetTag = "Player";
 
     [Header("Rotation & References")]
     [SerializeField] private float rotationSpeed = 5f;
     [SerializeField] private Animator animator;
+    public GorillaHealth gorillaHealth;
+    public Transform resumePoint;
 
     private NavMeshAgent agent;
     private Transform player;
@@ -33,7 +34,7 @@ public class GorillaEnemyAI : MonoBehaviour
     public float swingTriggerDistance = 8f, swingSpeed = 2f, swingHeight = 4f, approachSpeed = 6f;
 
     private int currentSwingIndex = 0;
-    private bool isSwinging = false, preparingToSwing = false;
+    private bool isSwinging = false, preparingToSwing = false, triggeredSwing = false, finishedSwing = false;
     private float swingProgress = 0f;
     private Vector3 swingStart, swingEnd;
 
@@ -45,6 +46,7 @@ public class GorillaEnemyAI : MonoBehaviour
         agent.avoidancePriority = avoidancePriority;
         agent.speed = idleSpeed;
         agent.stoppingDistance = stopDistance;
+
         if (!animator) animator = GetComponent<Animator>();
 
         GameObject playerObject = GameObject.FindGameObjectWithTag(targetTag);
@@ -53,8 +55,51 @@ public class GorillaEnemyAI : MonoBehaviour
 
     void Update()
     {
+        if (!player || !agent || !gorillaHealth) return;
+
+        // חזרה לאחר Swing
+        if (finishedSwing && resumePoint != null)
+        {
+            float dist = Vector3.Distance(transform.position, resumePoint.position);
+            if (dist <= 15f)
+            {
+                agent.enabled = true;
+                finishedSwing = false;
+                triggeredSwing = false;
+
+                agent.SetDestination(player.position);
+                SetAnimationState(true, false, false);
+            }
+            return;
+        }
+
+        // בדיקת חיים להתחלת Swing
+        if (!triggeredSwing && gorillaHealth.CurrentHealth <= gorillaHealth.maxHealth * 0.3f && swingStartPoint != null)
+        {
+            triggeredSwing = true;
+            agent.SetDestination(swingStartPoint.position);
+            SetAnimationState(false, true, false);
+            return;
+        }
+
+        // הליכה לנקודת Swing
+        if (triggeredSwing && !preparingToSwing && !isSwinging && swingStartPoint != null)
+        {
+            float dist = Vector3.Distance(transform.position, swingStartPoint.position);
+            if (dist > swingTriggerDistance)
+            {
+                agent.SetDestination(swingStartPoint.position);
+                SetAnimationState(false, true, false);
+                return;
+            }
+            else
+            {
+                BeginSwingApproach();
+                return;
+            }
+        }
+
         if (HandleSwing()) return;
-        if (!player || !agent || !agent.isOnNavMesh) return;
 
         if (Time.time - lastBotCheckTime >= botCheckCooldown)
         {
@@ -110,13 +155,6 @@ public class GorillaEnemyAI : MonoBehaviour
     {
         if (preparingToSwing) { PrepareSwingMovement(); return true; }
         if (isSwinging) { DoArcSwing(); return true; }
-
-        if (swingStartPoint && swingPoints.Length > 0 &&
-            Vector3.Distance(transform.position, swingStartPoint.position) <= swingTriggerDistance)
-        {
-            BeginSwingApproach();
-            return true;
-        }
         return false;
     }
 
@@ -125,12 +163,14 @@ public class GorillaEnemyAI : MonoBehaviour
         agent.enabled = false;
         preparingToSwing = true;
         animator.SetTrigger("Swing");
+        transform.rotation = Quaternion.identity;
     }
 
     private void PrepareSwingMovement()
     {
         Vector3 target = swingPoints[0].position;
         transform.position = Vector3.MoveTowards(transform.position, target, approachSpeed * Time.deltaTime);
+
         if (Vector3.Distance(transform.position, target) < 0.1f)
         {
             preparingToSwing = false;
@@ -172,8 +212,14 @@ public class GorillaEnemyAI : MonoBehaviour
     private void EndSwing()
     {
         isSwinging = false;
-        agent.enabled = true;
-        agent.SetDestination(player.position);
+        preparingToSwing = false;
+        finishedSwing = true;
+
+        if (swingStartPoint != null)
+        {
+            Destroy(swingStartPoint.gameObject);
+            swingStartPoint = null;
+        }
     }
 
     private void PlayRandomAttackAnimation()
