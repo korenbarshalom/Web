@@ -7,7 +7,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float maximumSpeed;
     [SerializeField] private float rotationSpeed;
     [SerializeField] private float jumpSpeed;
-    [SerializeField] private float jumpButtonGracePeriod;
     [SerializeField] private Transform cameraTransform;
     [SerializeField] private float mouseSensitivity = 2f;
     [SerializeField] private float Gravity = -9.81f;
@@ -17,6 +16,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float sprintMultiplier = 1.5f;
     [SerializeField] private float rollForce = 8f;
     [SerializeField] private Animator animator;
+    [SerializeField] private ParticleSystem sprintEffect;
 
     [Header("Camera Rotation Limits")]
     [SerializeField] private Vector2 cameraLimit = new Vector2(-40, 40);
@@ -50,6 +50,7 @@ public class PlayerMovement : MonoBehaviour
 
     private bool externalJumpTriggered = false;
     private bool isKnockbackActive = false;
+    private bool wasSprintingLastFrame = false;
 
     private float rollCooldown = 1f;
     private float nextRollTime = 0f;
@@ -61,7 +62,7 @@ public class PlayerMovement : MonoBehaviour
     private float nextAttack3Time = 0f;
 
     [HideInInspector] public Vector3 moveDirection = Vector3.zero;
-    [HideInInspector] public bool isSwinging = false;
+    
 
     void Start()
     {
@@ -127,21 +128,31 @@ public class PlayerMovement : MonoBehaviour
 
         float speed = inputMagnitude * maximumSpeed;
         bool isSprinting = Input.GetKey(KeyCode.W) && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift));
+        if (isSprinting && !wasSprintingLastFrame)
+        {
+            if (sprintEffect != null) sprintEffect.Play();
+            // אם זה AudioSource: sprintSound.Play();
+        }
+        else if (!isSprinting && wasSprintingLastFrame)
+        {
+            if (sprintEffect != null) sprintEffect.Stop();
+            // אם זה AudioSource: sprintSound.Stop();
+        }
+
+        wasSprintingLastFrame = isSprinting;
+
         if (isSprinting)
             speed *= sprintMultiplier;
 
         moveDirection.Normalize();
-        if (!isSwinging)
-            ySpeed += Gravity * Time.deltaTime;
-        else
-            ySpeed += (Gravity / 2f) * Time.deltaTime;
+        ySpeed += Gravity * Time.deltaTime;
+
 
 
         if (characterController.isGrounded)
         {
             if (!wasGroundedLastFrame)
             {
-                lastGroundedTime = Time.time;
                 wasGroundedLastFrame = true;
                 hasJumped = false;
             }
@@ -149,33 +160,22 @@ public class PlayerMovement : MonoBehaviour
             if (ySpeed < 0)
                 ySpeed = -0.5f;
 
-            if (Input.GetButtonDown("Jump"))
-                jumpButtonPressedTime = Time.time;
-        }
-        else
-        {
-            wasGroundedLastFrame = false;
-        }
-
-        if (Time.time - lastGroundedTime <= jumpButtonGracePeriod)
-        {
-            characterController.stepOffset = originalStepOffset;
-
-            if ((jumpButtonPressedTime.HasValue && Time.time - jumpButtonPressedTime <= jumpButtonGracePeriod && !hasJumped) || externalJumpTriggered)
+            if (Input.GetButtonDown("Jump") || externalJumpTriggered)
             {
                 ySpeed = jumpSpeed;
-                jumpButtonPressedTime = null;
-                lastGroundedTime = null;
-
                 animator.SetTrigger("Jump");
                 hasJumped = true;
                 externalJumpTriggered = false;
             }
+
+            characterController.stepOffset = originalStepOffset;
         }
         else
         {
+            wasGroundedLastFrame = false;
             characterController.stepOffset = 0;
         }
+
 
         Vector3 velocity = moveDirection * speed;
         velocity.y = ySpeed;
@@ -196,6 +196,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleRoll()
     {
+        
+
         if (Input.GetKeyDown(KeyCode.LeftControl) && !isRolling && Time.time >= nextRollTime)
         {
             bool isW = Input.GetKey(KeyCode.W);
@@ -344,7 +346,7 @@ public class PlayerMovement : MonoBehaviour
 
     public bool IsGrounded() => characterController.isGrounded;
 
-    public bool WasRecentlyGrounded() => Time.time - lastGroundedTime <= jumpButtonGracePeriod;
+    
 
     public void ForceJumpByEnemy() => externalJumpTriggered = true;
 
