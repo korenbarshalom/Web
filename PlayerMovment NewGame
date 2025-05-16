@@ -352,6 +352,9 @@ public class PlayerMovement : MonoBehaviour
 
     public void ForceJumpByEnemy() => externalJumpTriggered = true;
 
+
+
+
     public void StartKnockbackLock()
     {
         isKnockbackActive = true;
