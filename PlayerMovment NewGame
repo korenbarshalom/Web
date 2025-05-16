@@ -344,7 +344,11 @@ public class PlayerMovement : MonoBehaviour
 
     public bool IsGrounded() => characterController.isGrounded;
 
-    
+
+    public void ForceJump(float force)
+    {
+        ySpeed = force;
+    }
 
     public void ForceJumpByEnemy() => externalJumpTriggered = true;
 
