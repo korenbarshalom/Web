@@ -36,8 +36,6 @@ public class PlayerMovement : MonoBehaviour
     private CharacterController characterController;
     private float ySpeed;
     private float originalStepOffset;
-    private float? lastGroundedTime;
-    private float? jumpButtonPressedTime;
     private float currentRotationY;
     private float mouseX;
     private float mouseY;
