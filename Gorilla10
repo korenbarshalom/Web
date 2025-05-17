@@ -19,7 +19,7 @@ public class GorillaEnemyAI : MonoBehaviour
     private NavMeshAgent agent;
     private Transform player;
 
-    private float attackCooldown = 3.2f, lastAttackTime = -Mathf.Infinity;
+    private float attackCooldown = 2.3f, lastAttackTime = -Mathf.Infinity;
     private int lastAttackIndex = -1;
     [HideInInspector] public bool isInvulnerable = false;
 
@@ -38,6 +38,8 @@ public class GorillaEnemyAI : MonoBehaviour
     private bool isSwinging = false, preparingToSwing = false, triggeredSwing = false, finishedSwing = false;
     private float swingProgress = 0f;
     private Vector3 swingStart, swingEnd;
+
+    private bool waitingForPlayerAfterSwing = false;
 
     void Start()
     {
@@ -58,32 +60,38 @@ public class GorillaEnemyAI : MonoBehaviour
     {
         if (!player || !agent || !gorillaHealth) return;
 
-        // חזרה לאחר Swing
-        if (finishedSwing && resumePoint != null)
+        // ✅ חזרה לאחר Swing – מחכה לשחקן שיתקרב לפחות מ־25 מטר
+        if (finishedSwing)
         {
-            float dist = Vector3.Distance(transform.position, resumePoint.position);
-            if (dist <= 15f)
+            float distToPlayer = Vector3.Distance(transform.position, player.position);
+            if (!waitingForPlayerAfterSwing)
+            {
+                waitingForPlayerAfterSwing = true;
+                agent.enabled = false;
+                SetAnimationState(false, false, true); // מצב עמידה
+            }
+
+            if (distToPlayer < 35f)
             {
                 agent.enabled = true;
-                finishedSwing = false;
-                triggeredSwing = false;
-
                 agent.SetDestination(player.position);
                 SetAnimationState(true, false, false);
+                finishedSwing = false;
+                triggeredSwing = false;
+                waitingForPlayerAfterSwing = false;
             }
+
             return;
         }
 
-        // בדיקת חיים להתחלת Swing
+        // התחלת Swing
         if (!triggeredSwing && gorillaHealth.CurrentHealth <= gorillaHealth.maxHealth * 0.3f && swingStartPoint != null)
         {
             triggeredSwing = true;
+            agent.speed = runSpeed;
             agent.SetDestination(swingStartPoint.position);
-            SetAnimationState(false, true, false);
-
-            // ✅ הפיכת הגורילה לבלתי פגיעה ל-10 שניות
+            SetAnimationState(true, false, false);
             StartCoroutine(TempInvulnerability());
-
             return;
         }
 
@@ -220,12 +228,11 @@ public class GorillaEnemyAI : MonoBehaviour
         preparingToSwing = false;
         finishedSwing = true;
 
-        // ✅ שדרוג מהירות ו־Cooldown אחרי Swing
         runSpeed *= 1.5f;
         walkSpeed *= 1.5f;
         idleSpeed *= 1.5f;
         approachSpeed *= 1.5f;
-        attackCooldown = 2.5f;
+        attackCooldown = 1.5f;
 
         if (swingStartPoint != null)
         {
@@ -273,7 +280,6 @@ public class GorillaEnemyAI : MonoBehaviour
         randomBotTarget = null;
     }
 
-    // ✅ חסינות זמנית לפגיעות חיים
     private IEnumerator TempInvulnerability()
     {
         gorillaHealth.isInvulnerable = true;
