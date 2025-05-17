@@ -5,7 +5,7 @@ using System.Collections;
 public class GorillaEnemyAI : MonoBehaviour
 {
     [Header("Chase Settings")]
-    public float chaseRange = 20f, walkRange = 8f, attackRange = 2f, stopDistance = 1.5f;
+    public float chaseRange = 20f, walkRange = 8f, stopDistance = 1.5f;
     public float runSpeed = 6f, walkSpeed = 3.5f, idleSpeed = 1.5f;
     [Range(1, 99)] public int avoidancePriority = 50;
     public string targetTag = "Player";
@@ -16,10 +16,12 @@ public class GorillaEnemyAI : MonoBehaviour
     public GorillaHealth gorillaHealth;
     public Transform resumePoint;
 
+    public CapsuleCollider attackTriggerCollider;
+
     private NavMeshAgent agent;
     private Transform player;
 
-    private float attackCooldown = 2.3f, lastAttackTime = -Mathf.Infinity;
+    private float attackCooldown = 2.9f, lastAttackTime = -Mathf.Infinity;
     private int lastAttackIndex = -1;
     [HideInInspector] public bool isInvulnerable = false;
 
@@ -41,6 +43,9 @@ public class GorillaEnemyAI : MonoBehaviour
 
     private bool waitingForPlayerAfterSwing = false;
 
+    private float stuckTimer = 0f;
+    private Vector3 lastPosition;
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -54,13 +59,15 @@ public class GorillaEnemyAI : MonoBehaviour
 
         GameObject playerObject = GameObject.FindGameObjectWithTag(targetTag);
         if (playerObject) player = playerObject.transform;
+
+        if (attackTriggerCollider != null)
+            attackTriggerCollider.isTrigger = true;
     }
 
     void Update()
     {
         if (!player || !agent || !gorillaHealth) return;
 
-        // ✅ חזרה לאחר Swing – מחכה לשחקן שיתקרב לפחות מ־25 מטר
         if (finishedSwing)
         {
             float distToPlayer = Vector3.Distance(transform.position, player.position);
@@ -68,7 +75,7 @@ public class GorillaEnemyAI : MonoBehaviour
             {
                 waitingForPlayerAfterSwing = true;
                 agent.enabled = false;
-                SetAnimationState(false, false, true); // מצב עמידה
+                SetAnimationState(false, false, true);
             }
 
             if (distToPlayer < 35f)
@@ -84,7 +91,6 @@ public class GorillaEnemyAI : MonoBehaviour
             return;
         }
 
-        // התחלת Swing
         if (!triggeredSwing && gorillaHealth.CurrentHealth <= gorillaHealth.maxHealth * 0.3f && swingStartPoint != null)
         {
             triggeredSwing = true;
@@ -95,7 +101,6 @@ public class GorillaEnemyAI : MonoBehaviour
             return;
         }
 
-        // הליכה לנקודת Swing
         if (triggeredSwing && !preparingToSwing && !isSwinging && swingStartPoint != null)
         {
             float dist = Vector3.Distance(transform.position, swingStartPoint.position);
@@ -135,33 +140,48 @@ public class GorillaEnemyAI : MonoBehaviour
         Transform target = (randomBotTarget && Random.value < botEngageChance) ? randomBotTarget : player;
         float distance = Vector3.Distance(transform.position, target.position);
 
-        if (distance <= attackRange)
-        {
-            agent.SetDestination(transform.position);
-            agent.velocity = Vector3.zero;
+        agent.speed = (distance <= walkRange) ? walkSpeed : runSpeed;
+        agent.SetDestination(target.position);
+        SetAnimationState(distance > walkRange, distance <= walkRange, false);
 
-            if (Time.time - lastAttackTime >= attackCooldown)
+        RotateTowards(isAttackingBot && randomBotTarget ? randomBotTarget : player);
+
+        if (Vector3.Distance(transform.position, lastPosition) < 0.1f)
+            stuckTimer += Time.deltaTime;
+        else
+            stuckTimer = 0f;
+
+        lastPosition = transform.position;
+
+        if (stuckTimer > 2f)
+        {
+            Debug.Log("⛔ הגורילה תקועה – ResetPath");
+            agent.ResetPath();
+            stuckTimer = 0f;
+        }
+
+        // ✅ תקיפה חוזרת אם השחקן עדיין בקוליידר
+        if (attackTriggerCollider != null && player != null)
+        {
+            Collider playerCollider = player.GetComponent<Collider>();
+            if (playerCollider != null && attackTriggerCollider.bounds.Intersects(playerCollider.bounds))
             {
-                bool isBot = target.CompareTag("Bots");
-                if (!isBot || (isBot && Random.value < botEngageChance))
+                if (Time.time - lastAttackTime >= attackCooldown)
                 {
                     PlayRandomAttackAnimation();
                     lastAttackTime = Time.time;
-                    isAttackingBot = isBot;
-                    if (isBot) Invoke(nameof(ReturnToPlayerFocus), 1.5f);
                 }
             }
-
-            SetAnimationState(false, false, false);
         }
-        else
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player") && Time.time - lastAttackTime >= attackCooldown)
         {
-            agent.speed = (distance <= walkRange) ? walkSpeed : runSpeed;
-            agent.SetDestination(target.position);
-            SetAnimationState(distance > walkRange, distance <= walkRange, false);
+            PlayRandomAttackAnimation();
+            lastAttackTime = Time.time;
         }
-
-        RotateTowards(isAttackingBot && randomBotTarget ? randomBotTarget : player);
     }
 
     private bool HandleSwing()
