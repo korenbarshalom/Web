@@ -42,6 +42,9 @@ public class GorillaEnemyAI : MonoBehaviour
     public float rollCheckInterval = 5f;
     public float rollTriggerChance = 0.25f; // 25%
     public float rollTriggerDistance = 50f;
+    [Header("Roll Reset Point")]
+    public Transform rollReactivatePoint;
+    public float reactivateDistance = 10f;
 
     private float rollCheckTimer = 0f;
 
@@ -82,8 +85,12 @@ public class GorillaEnemyAI : MonoBehaviour
     agent.enabled &&
     player != null &&
     gorillaHealth.CurrentHealth <= gorillaHealth.maxHealth * 0.7f &&
-    gorillaHealth.CurrentHealth > gorillaHealth.maxHealth * 0.5f &&
+    (
+        gorillaHealth.CurrentHealth > gorillaHealth.maxHealth * 0.5f ||
+        (rollReactivatePoint != null && Vector3.Distance(transform.position, rollReactivatePoint.position) <= reactivateDistance)
+    ) &&
     !IsPlayerInAttackRange())
+
 
 
         {
