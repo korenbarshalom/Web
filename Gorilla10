@@ -21,15 +21,9 @@ public class GorillaEnemyAI : MonoBehaviour
     private NavMeshAgent agent;
     private Transform player;
 
-    private float attackCooldown = 2.9f, lastAttackTime = -Mathf.Infinity;
+    private float attackCooldown = 2.5f, lastAttackTime = -Mathf.Infinity;
     private int lastAttackIndex = -1;
     [HideInInspector] public bool isInvulnerable = false;
-
-    private GameObject[] bots;
-    private Transform randomBotTarget;
-    [Range(0f, 1f)] public float botEngageChance = 0.25f;
-    private float botCheckCooldown = 2f, lastBotCheckTime = -999f;
-    private bool isAttackingBot = false;
 
     [Header("Swing Settings")]
     public Transform[] swingPoints;
@@ -40,11 +34,20 @@ public class GorillaEnemyAI : MonoBehaviour
     private bool isSwinging = false, preparingToSwing = false, triggeredSwing = false, finishedSwing = false;
     private float swingProgress = 0f;
     private Vector3 swingStart, swingEnd;
+    [Header("Roll Settings")]
+    public float rollSpeed = 20f;
+    public float maxRollDistance = 40f;
+    public float maxArcHeight = 4f;
+
+
 
     private bool waitingForPlayerAfterSwing = false;
-
     private float stuckTimer = 0f;
     private Vector3 lastPosition;
+
+    private bool isRolling = false;
+    private float rollCooldown = 6f;
+    private float lastRollTime = -999f;
 
     void Start()
     {
@@ -66,7 +69,9 @@ public class GorillaEnemyAI : MonoBehaviour
 
     void Update()
     {
-        if (!player || !agent || !gorillaHealth) return;
+        if (!player || !agent || !gorillaHealth || isRolling) return;
+
+        TryRollAttack();
 
         if (finishedSwing)
         {
@@ -81,7 +86,9 @@ public class GorillaEnemyAI : MonoBehaviour
             if (distToPlayer < 35f)
             {
                 agent.enabled = true;
-                agent.SetDestination(player.position);
+                if (agent.isOnNavMesh)
+                    agent.SetDestination(player.position);
+
                 SetAnimationState(true, false, false);
                 finishedSwing = false;
                 triggeredSwing = false;
@@ -95,7 +102,9 @@ public class GorillaEnemyAI : MonoBehaviour
         {
             triggeredSwing = true;
             agent.speed = runSpeed;
-            agent.SetDestination(swingStartPoint.position);
+            if (agent.isOnNavMesh)
+                agent.SetDestination(swingStartPoint.position);
+
             SetAnimationState(true, false, false);
             StartCoroutine(TempInvulnerability());
             return;
@@ -106,7 +115,9 @@ public class GorillaEnemyAI : MonoBehaviour
             float dist = Vector3.Distance(transform.position, swingStartPoint.position);
             if (dist > swingTriggerDistance)
             {
-                agent.SetDestination(swingStartPoint.position);
+                if (agent.isOnNavMesh)
+                    agent.SetDestination(swingStartPoint.position);
+
                 SetAnimationState(false, true, false);
                 return;
             }
@@ -119,32 +130,14 @@ public class GorillaEnemyAI : MonoBehaviour
 
         if (HandleSwing()) return;
 
-        if (Time.time - lastBotCheckTime >= botCheckCooldown)
-        {
-            bots = GameObject.FindGameObjectsWithTag("Bots");
-            randomBotTarget = null;
-
-            foreach (var bot in bots)
-            {
-                if (Vector3.Distance(transform.position, bot.transform.position) <= 10f &&
-                    Vector3.Distance(transform.position, player.position) > 12f &&
-                    Random.value < botEngageChance)
-                {
-                    randomBotTarget = bot.transform;
-                    break;
-                }
-            }
-            lastBotCheckTime = Time.time;
-        }
-
-        Transform target = (randomBotTarget && Random.value < botEngageChance) ? randomBotTarget : player;
-        float distance = Vector3.Distance(transform.position, target.position);
-
+        float distance = Vector3.Distance(transform.position, player.position);
         agent.speed = (distance <= walkRange) ? walkSpeed : runSpeed;
-        agent.SetDestination(target.position);
-        SetAnimationState(distance > walkRange, distance <= walkRange, false);
 
-        RotateTowards(isAttackingBot && randomBotTarget ? randomBotTarget : player);
+        if (agent.isOnNavMesh)
+            agent.SetDestination(player.position);
+
+        SetAnimationState(distance > walkRange, distance <= walkRange, false);
+        RotateTowards(player);
 
         if (Vector3.Distance(transform.position, lastPosition) < 0.1f)
             stuckTimer += Time.deltaTime;
@@ -156,11 +149,11 @@ public class GorillaEnemyAI : MonoBehaviour
         if (stuckTimer > 2f)
         {
             Debug.Log("⛔ הגורילה תקועה – ResetPath");
-            agent.ResetPath();
+            if (agent.isOnNavMesh)
+                agent.ResetPath();
             stuckTimer = 0f;
         }
 
-        // ✅ תקיפה חוזרת אם השחקן עדיין בקוליידר
         if (attackTriggerCollider != null && player != null)
         {
             Collider playerCollider = player.GetComponent<Collider>();
@@ -173,6 +166,73 @@ public class GorillaEnemyAI : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void TryRollAttack()
+    {
+        if (Time.time - lastRollTime < rollCooldown) return;
+        if (gorillaHealth.CurrentHealth > gorillaHealth.maxHealth * 0.7f) return;
+
+        float dist = Vector3.Distance(transform.position, player.position);
+        if (dist > 50f) return;
+
+        if (Random.value < 0.05f)
+        {
+            StartCoroutine(PerformRollAttack());
+            lastRollTime = Time.time;
+        }
+    }
+
+    private IEnumerator PerformRollAttack()
+    {
+        isRolling = true;
+        agent.enabled = false;
+
+        float preRollWait = 0.9f;
+        float timer = 0f;
+
+        animator.SetTrigger("Roll");
+
+        while (timer < preRollWait)
+        {
+            RotateTowards(player);
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        Vector3 rollStartPosition = transform.position;
+        Vector3 direction = (player.position - rollStartPosition).normalized;
+
+        float intendedDistance = Vector3.Distance(rollStartPosition, player.position);
+        float targetDistance = Mathf.Min(intendedDistance, maxRollDistance); // ✅ הגבלה ל־40 מטר
+
+        float distanceTraveled = 0f;
+
+        while (distanceTraveled < targetDistance)
+        {
+            float t = distanceTraveled / targetDistance;
+
+            Vector3 flatPos = rollStartPosition + direction * distanceTraveled;
+            float arcY = Mathf.Sin(Mathf.PI * t) * maxArcHeight;
+
+            float groundY = rollStartPosition.y;
+            if (Physics.Raycast(flatPos + Vector3.up * 2f, Vector3.down, out RaycastHit hit, 10f))
+            {
+                groundY = hit.point.y;
+            }
+
+            Vector3 nextPos = flatPos;
+            nextPos.y = groundY + arcY;
+
+            transform.position = nextPos;
+
+            distanceTraveled += rollSpeed * Time.deltaTime;
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(0.6f);
+        agent.enabled = true;
+        isRolling = false;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -292,12 +352,6 @@ public class GorillaEnemyAI : MonoBehaviour
         animator.SetBool("run", run);
         animator.SetBool("walk", walk);
         animator.SetBool("idle", idle);
-    }
-
-    private void ReturnToPlayerFocus()
-    {
-        isAttackingBot = false;
-        randomBotTarget = null;
     }
 
     private IEnumerator TempInvulnerability()
