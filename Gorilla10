@@ -78,7 +78,8 @@ public class GorillaEnemyAI : MonoBehaviour
         if (player == null || player.gameObject == null)
     return;
 
-        if (!isRolling && agent.enabled && player != null && gorillaHealth.CurrentHealth <= gorillaHealth.maxHealth * 0.7f)
+        if (!isRolling && agent.enabled && player != null && gorillaHealth.CurrentHealth <= gorillaHealth.maxHealth * 0.7f && !IsPlayerInAttackRange())
+
         {
             rollCheckTimer += Time.deltaTime;
 
@@ -216,6 +217,7 @@ public class GorillaEnemyAI : MonoBehaviour
             yield return null;
         }
 
+
         Vector3 rollStartPosition = transform.position;
         Vector3 direction = (player.position - rollStartPosition).normalized;
 
@@ -247,9 +249,20 @@ public class GorillaEnemyAI : MonoBehaviour
             yield return null;
         }
 
-        yield return new WaitForSeconds(1f);
-        agent.enabled = true;
-        isRolling = false;
+        yield return new WaitForSeconds(0.5f);
+
+// ✅ תיקון – ניסיון לחזור לנקודת NavMesh הקרובה
+bool warped = agent.Warp(transform.position);
+
+if (!warped)
+{
+    Debug.LogWarning("⚠️ הגורילה נחתה מחוץ ל־NavMesh ולא הצליחה לחזור. נשארת סטטית.");
+    // אופציונלי: תוכל להעביר אותה לנקודת גיבוי אם אתה שומר אחת
+}
+
+agent.enabled = true;
+isRolling = false;
+
     }
 
     private void OnTriggerEnter(Collider other)
@@ -377,4 +390,14 @@ public class GorillaEnemyAI : MonoBehaviour
         yield return new WaitForSeconds(10f);
         gorillaHealth.isInvulnerable = false;
     }
+    private bool IsPlayerInAttackRange()
+    {
+        if (attackTriggerCollider == null || player == null) return false;
+
+        Collider playerCollider = player.GetComponent<Collider>();
+        if (playerCollider == null) return false;
+
+        return attackTriggerCollider.bounds.Intersects(playerCollider.bounds);
+    }
+
 }
