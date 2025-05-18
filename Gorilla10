@@ -78,7 +78,13 @@ public class GorillaEnemyAI : MonoBehaviour
         if (player == null || player.gameObject == null)
     return;
 
-        if (!isRolling && agent.enabled && player != null && gorillaHealth.CurrentHealth <= gorillaHealth.maxHealth * 0.7f && !IsPlayerInAttackRange())
+        if (!isRolling &&
+    agent.enabled &&
+    player != null &&
+    gorillaHealth.CurrentHealth <= gorillaHealth.maxHealth * 0.7f &&
+    gorillaHealth.CurrentHealth > gorillaHealth.maxHealth * 0.5f &&
+    !IsPlayerInAttackRange())
+
 
         {
             rollCheckTimer += Time.deltaTime;
