@@ -38,6 +38,12 @@ public class GorillaEnemyAI : MonoBehaviour
     public float rollSpeed = 20f;
     public float maxRollDistance = 40f;
     public float maxArcHeight = 4f;
+    [Header("Roll Trigger Settings")]
+    public float rollCheckInterval = 5f;
+    public float rollTriggerChance = 0.25f; // 25%
+    public float rollTriggerDistance = 50f;
+
+    private float rollCheckTimer = 0f;
 
 
 
@@ -69,9 +75,28 @@ public class GorillaEnemyAI : MonoBehaviour
 
     void Update()
     {
-        if (!player || !agent || !gorillaHealth || isRolling) return;
+        if (player == null || player.gameObject == null)
+    return;
 
-        TryRollAttack();
+        if (!isRolling && agent.enabled && player != null && gorillaHealth.CurrentHealth <= gorillaHealth.maxHealth * 0.7f)
+        {
+            rollCheckTimer += Time.deltaTime;
+
+            if (rollCheckTimer >= rollCheckInterval)
+            {
+                rollCheckTimer = 0f;
+
+                float distToPlayer = Vector3.Distance(transform.position, player.position);
+                if (distToPlayer <= rollTriggerDistance)
+                {
+                    if (Random.value < rollTriggerChance)
+                    {
+                        StartCoroutine(PerformRollAttack());
+                    }
+                }
+            }
+        }
+
 
         if (finishedSwing)
         {
@@ -168,24 +193,15 @@ public class GorillaEnemyAI : MonoBehaviour
         }
     }
 
-    private void TryRollAttack()
-    {
-        if (Time.time - lastRollTime < rollCooldown) return;
-        if (gorillaHealth.CurrentHealth > gorillaHealth.maxHealth * 0.7f) return;
-
-        float dist = Vector3.Distance(transform.position, player.position);
-        if (dist > 50f) return;
-
-        if (Random.value < 0.05f)
-        {
-            StartCoroutine(PerformRollAttack());
-            lastRollTime = Time.time;
-        }
-    }
+   
 
     private IEnumerator PerformRollAttack()
     {
         isRolling = true;
+
+        if (player == null || player.gameObject == null)
+            yield break;
+
         agent.enabled = false;
 
         float preRollWait = 0.9f;
@@ -203,8 +219,9 @@ public class GorillaEnemyAI : MonoBehaviour
         Vector3 rollStartPosition = transform.position;
         Vector3 direction = (player.position - rollStartPosition).normalized;
 
-        float intendedDistance = Vector3.Distance(rollStartPosition, player.position);
-        float targetDistance = Mathf.Min(intendedDistance, maxRollDistance); // ✅ הגבלה ל־40 מטר
+        float intendedDistance = Vector3.Distance(rollStartPosition, player.position) + 7f;
+        float targetDistance = Mathf.Min(intendedDistance, maxRollDistance);
+
 
         float distanceTraveled = 0f;
 
@@ -230,7 +247,7 @@ public class GorillaEnemyAI : MonoBehaviour
             yield return null;
         }
 
-        yield return new WaitForSeconds(0.6f);
+        yield return new WaitForSeconds(1f);
         agent.enabled = true;
         isRolling = false;
     }
