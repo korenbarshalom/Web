@@ -1,0 +1,18 @@
+private void HandleAnimationStates(float horizontalInput, float verticalInput, bool isSprinting)
+{
+    float h = Input.GetAxis("Horizontal");
+    float v = Input.GetAxis("Vertical");
+
+    if (Input.GetKey(KeyCode.LeftShift) && v > 0f)
+        v = 1.5f;
+
+    // החלפת כיוונים באלכסון קדימה בצורה חלקה
+    if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.A))
+        h = Mathf.Lerp(h, Mathf.Abs(h), 0.2f);  // מעבר חלק לשמאל הפוך
+
+    if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.D))
+        h = Mathf.Lerp(h, -Mathf.Abs(h), 0.2f); // מעבר חלק לימין הפוך
+
+    animator.SetFloat("Horizontal", h, 0.15f, Time.deltaTime);
+    animator.SetFloat("Vertical", v, 0.15f, Time.deltaTime);
+}
