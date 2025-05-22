@@ -26,6 +26,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private TextMeshProUGUI mouseSensitivityText;
     [SerializeField] private float minMouseSensitivity = 0f;
     [SerializeField] private float maxMouseSensitivity = 5f;
+    private float attack2Cooldown = 1.5f; // cooldown נפרד לתקיפה ימנית
 
     [Header("Sword Activation")]
     [SerializeField] private GameObject swordObject;
@@ -52,6 +53,7 @@ public class PlayerMovement : MonoBehaviour
 
     private float rollCooldown = 1f;
     private float nextRollTime = 0f;
+    private float attackLockUntil = 0f; // זמן שבו מותר שוב לתקוף
 
     private float attackCooldown = 0.75f;
     private float nextAttackTime = 0f;
@@ -60,7 +62,13 @@ public class PlayerMovement : MonoBehaviour
     private float nextAttack3Time = 0f;
 
     [HideInInspector] public Vector3 moveDirection = Vector3.zero;
-    
+
+    // מוסיף פונקציה שמחזירה true אם הדמות זזה על הקרקע
+    private bool IsMoving()
+    {
+        Vector3 horizontalVelocity = new Vector3(characterController.velocity.x, 0, characterController.velocity.z);
+        return horizontalVelocity.magnitude > 0.1f;
+    }
 
     void Start()
     {
@@ -207,26 +215,36 @@ public class PlayerMovement : MonoBehaviour
             {
                 animator.SetTrigger("RollForward");
                 rollDirection = transform.forward;
+                attackLockUntil = Time.time + 0.5f;
+
             }
             else if (isS)
             {
                 animator.SetTrigger("RollBackward");
                 rollDirection = -transform.forward;
+                attackLockUntil = Time.time + 0.5f;
+
             }
             else if (isA)
             {
                 animator.SetTrigger("RollLeft");
                 rollDirection = -transform.right;
+                attackLockUntil = Time.time + 0.5f;
+
             }
             else if (isD)
             {
                 animator.SetTrigger("RollRight");
                 rollDirection = transform.right;
+                attackLockUntil = Time.time + 0.5f;
+
             }
             else
             {
                 animator.SetTrigger("RollForward");
                 rollDirection = transform.forward;
+                attackLockUntil = Time.time + 0.5f;
+
             }
 
             isRolling = true;
@@ -248,61 +266,51 @@ public class PlayerMovement : MonoBehaviour
     private void HandleAttacks()
     {
         if (Time.time < nextAttackTime) return;
+        if (Time.time < attackLockUntil) return;
 
         if (attackBlocked)
         {
             if (Input.GetMouseButtonDown(0))
             {
-                nextAttackTime = Time.time + attackCooldown; // Throw trigger removed
+                nextAttackTime = Time.time + attackCooldown;
             }
             return;
         }
 
+        bool isMoving = IsMoving();
+
         if (Input.GetMouseButtonDown(0))
         {
-            animator.SetTrigger("Attack1");
+            animator.SetTrigger(isMoving ? "AttackWalk1" : "Attack1");
             nextAttackTime = Time.time + attackCooldown;
         }
         else if (Input.GetMouseButtonDown(1))
         {
-            animator.SetTrigger("Attack2");
-            nextAttackTime = Time.time + attackCooldown;
+            animator.SetTrigger(isMoving ? "AttackWalk2" : "Attack2");
+            nextAttackTime = Time.time + attack2Cooldown;
         }
+
         else if (Input.GetKeyDown(KeyCode.Q) && Time.time >= nextAttack3Time)
         {
-            animator.SetTrigger("Attack3");
+            animator.SetTrigger(isMoving ? "AttackWalk3" : "Attack3");
             nextAttack3Time = Time.time + attack3Cooldown;
         }
-
-        else if (Input.GetKeyDown(KeyCode.E))
-        {
-            animator.SetTrigger("Attack4");
-            nextAttackTime = Time.time + attackCooldown;
-        }
     }
 
-    public void RestoreAttacks()
-    {
-        attackBlocked = false;
-        if (swordObject != null)
-        {
-            swordObject.SetActive(true);
-        }
-    }
+
 
     private void HandleAnimationStates(float horizontalInput, float verticalInput, bool isSprinting)
     {
-        bool isW = Input.GetKey(KeyCode.W);
-        bool isA = Input.GetKey(KeyCode.A);
-        bool isS = Input.GetKey(KeyCode.S);
-        bool isD = Input.GetKey(KeyCode.D);
+        float h = Input.GetAxis("Horizontal");
+        float v = Input.GetAxis("Vertical");
 
-        animator.SetBool("RunForward", isW);
-        animator.SetBool("RunBackward", isS);
-        animator.SetBool("RunLeft", isA);
-        animator.SetBool("RunRight", isD);
-        animator.SetBool("Sprint", isSprinting);
+        if (Input.GetKey(KeyCode.LeftShift) && v > 0f)
+            v = 1.5f;
+
+        animator.SetFloat("Horizontal", h, 0.15f, Time.deltaTime);
+        animator.SetFloat("Vertical", v, 0.15f, Time.deltaTime);
     }
+
 
     private void HandleJump() { }
 
