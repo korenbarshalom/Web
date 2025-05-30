@@ -206,51 +206,46 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleRoll()
     {
-        
-
         if (Input.GetKeyDown(KeyCode.LeftControl) && !isRolling && Time.time >= nextRollTime)
         {
-            bool isW = Input.GetKey(KeyCode.W);
-            bool isA = Input.GetKey(KeyCode.A);
-            bool isS = Input.GetKey(KeyCode.S);
-            bool isD = Input.GetKey(KeyCode.D);
+            // מחשב כיוון מהמבט של המצלמה + אינפוט
+            Vector3 camForward = cameraTransform.forward;
+            Vector3 camRight = cameraTransform.right;
+            camForward.y = 0f;
+            camRight.y = 0f;
+            camForward.Normalize();
+            camRight.Normalize();
 
-            if (isW)
+            float horizontal = Input.GetAxisRaw("Horizontal");
+            float vertical = Input.GetAxisRaw("Vertical");
+            Vector3 inputDir = camForward * vertical + camRight * horizontal;
+
+            // אם אין תנועה – רול קדימה לפי המצלמה
+            if (inputDir.sqrMagnitude < 0.01f)
+                inputDir = camForward;
+
+            rollDirection = inputDir.normalized;
+
+            // סובב את הדמות מיד לכיוון ה-roll
+            if (rollDirection.sqrMagnitude > 0.01f)
             {
-                animator.SetTrigger("RollForward");
-                rollDirection = transform.forward;
-                attackLockUntil = Time.time + 0.5f;
-
+                Quaternion targetRotation = Quaternion.LookRotation(rollDirection);
+                transform.rotation = targetRotation;
             }
-            else if (isS)
-            {
+
+            // טריגרים לפי אינפוט
+            if (vertical > 0.1f)
+                animator.SetTrigger("RollForward");
+            else if (vertical < -0.1f)
                 animator.SetTrigger("RollBackward");
-                rollDirection = -transform.forward;
-                attackLockUntil = Time.time + 0.5f;
-
-            }
-            else if (isA)
-            {
+            else if (horizontal < -0.1f)
                 animator.SetTrigger("RollLeft");
-                rollDirection = -transform.right;
-                attackLockUntil = Time.time + 0.5f;
-
-            }
-            else if (isD)
-            {
+            else if (horizontal > 0.1f)
                 animator.SetTrigger("RollRight");
-                rollDirection = transform.right;
-                attackLockUntil = Time.time + 0.5f;
-
-            }
             else
-            {
-                animator.SetTrigger("RollForward");
-                rollDirection = transform.forward;
-                attackLockUntil = Time.time + 0.5f;
+                animator.SetTrigger("RollForward"); // ברירת מחדל
 
-            }
-
+            attackLockUntil = Time.time + 0.5f;
             isRolling = true;
             rollTimer = rollDuration;
             nextRollTime = Time.time + rollCooldown;
@@ -266,6 +261,7 @@ public class PlayerMovement : MonoBehaviour
             }
         }
     }
+
 
     private void HandleAttacks()
     {
@@ -331,23 +327,23 @@ public class PlayerMovement : MonoBehaviour
     private void HandleJump() { }
 
     private void RotateWithMouse()
+{
+    mouseX += Input.GetAxis("Mouse X") * mouseSensitivity;
+    mouseY -= Input.GetAxis("Mouse Y") * mouseSensitivity;
+    mouseY = Mathf.Clamp(mouseY, cameraLimit.x, cameraLimit.y);
+
+    // רק אם הדמות זזה, סובב את השחקן
+    if (IsMoving())
     {
-        mouseX += Input.GetAxis("Mouse X") * mouseSensitivity;
-        mouseY -= Input.GetAxis("Mouse Y") * mouseSensitivity;
-        mouseY = Mathf.Clamp(mouseY, cameraLimit.x, cameraLimit.y);
-
-        // רק אם הדמות זזה, סובב את השחקן
-        if (IsMoving())
-        {
-            transform.rotation = Quaternion.Euler(0, mouseX, 0);
-        }
-
-        if (cameraTransform != null)
-        {
-            // סיבוב המצלמה לפי העכבר: X - למעלה/למטה, Y - סיבוב סביב הדמות
-            cameraTransform.rotation = Quaternion.Euler(mouseY, mouseX, 0);
-        }
+        transform.rotation = Quaternion.Euler(0, mouseX, 0);
     }
+
+    if (cameraTransform != null)
+    {
+        // סיבוב המצלמה לפי העכבר: X - למעלה/למטה, Y - סיבוב סביב הדמות
+        cameraTransform.rotation = Quaternion.Euler(mouseY, mouseX, 0);
+    }
+}
 
 
 
