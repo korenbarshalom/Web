@@ -4,7 +4,7 @@ using TMPro;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] private float maximumSpeed;
+    [SerializeField] public float maximumSpeed;
     [SerializeField] private float rotationSpeed;
     [SerializeField] private float jumpSpeed;
     [SerializeField] private Transform cameraTransform;
@@ -17,6 +17,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float rollForce = 8f;
     [SerializeField] private Animator animator;
     [SerializeField] private ParticleSystem sprintEffect;
+    [Header("Footstep Sounds")]
+    [SerializeField] private AudioClip landingClip;
+    [SerializeField] private float footstepVolume = 0.5f;
 
     [Header("Camera Rotation Limits")]
     [SerializeField] private Vector2 cameraLimit = new Vector2(-40, 40);
@@ -26,7 +29,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private TextMeshProUGUI mouseSensitivityText;
     [SerializeField] private float minMouseSensitivity = 0f;
     [SerializeField] private float maxMouseSensitivity = 5f;
-    private float attack2Cooldown = 1.5f; // cooldown נפרד לתקיפה ימנית
+    private float attack2Cooldown = 1.2f; // cooldown נפרד לתקיפה ימנית
 
     [Header("Sword Activation")]
     [SerializeField] private GameObject swordObject;
@@ -50,6 +53,7 @@ public class PlayerMovement : MonoBehaviour
     private bool externalJumpTriggered = false;
     private bool isKnockbackActive = false;
     private bool wasSprintingLastFrame = false;
+    private bool playLandingSoundOnGrounded = false;
 
     private float rollCooldown = 1f;
     private float nextRollTime = 0f;
@@ -295,6 +299,11 @@ public class PlayerMovement : MonoBehaviour
             animator.SetTrigger(isMoving ? "AttackWalk3" : "Attack3");
             nextAttack3Time = Time.time + attack3Cooldown;
         }
+        else if (Input.GetKeyDown(KeyCode.E) && Time.time >= nextAttack3Time)
+        {
+            animator.SetTrigger(isMoving ? "AttackWalk4" : "Attack4");
+            nextAttack3Time = Time.time + attack3Cooldown;
+        }
     }
 
 
@@ -306,6 +315,13 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetKey(KeyCode.LeftShift) && v > 0f)
             v = 1.5f;
+
+        // החלפת כיוונים באלכסון קדימה בצורה חלקה
+        if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.A))
+            h = Mathf.Lerp(h, Mathf.Abs(h), 0.2f);  // מעבר חלק לשמאל הפוך
+
+        if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.D))
+            h = Mathf.Lerp(h, -Mathf.Abs(h), 0.2f); // מעבר חלק לימין הפוך
 
         animator.SetFloat("Horizontal", h, 0.15f, Time.deltaTime);
         animator.SetFloat("Vertical", v, 0.15f, Time.deltaTime);
@@ -320,12 +336,20 @@ public class PlayerMovement : MonoBehaviour
         mouseY -= Input.GetAxis("Mouse Y") * mouseSensitivity;
         mouseY = Mathf.Clamp(mouseY, cameraLimit.x, cameraLimit.y);
 
-        transform.rotation = Quaternion.Euler(0, mouseX, 0);
+        // רק אם הדמות זזה, סובב את השחקן
+        if (IsMoving())
+        {
+            transform.rotation = Quaternion.Euler(0, mouseX, 0);
+        }
+
         if (cameraTransform != null)
         {
-            cameraTransform.localRotation = Quaternion.Euler(mouseY, 0, 0);
+            // סיבוב המצלמה לפי העכבר: X - למעלה/למטה, Y - סיבוב סביב הדמות
+            cameraTransform.rotation = Quaternion.Euler(mouseY, mouseX, 0);
         }
     }
+
+
 
     private void UpdateCameraPosition()
     {
@@ -378,4 +402,21 @@ public class PlayerMovement : MonoBehaviour
         if (mouseSensitivityText != null)
             mouseSensitivityText.text = value.ToString("F2");
     }
+    private void OnLand(AnimationEvent animationEvent)
+    {
+        if (animationEvent.animatorClipInfo.weight > 0.5f && landingClip != null)
+        {
+            if (characterController.isGrounded)
+            {
+                AudioSource.PlayClipAtPoint(landingClip, transform.position, footstepVolume);
+            }
+            else
+            {
+                playLandingSoundOnGrounded = true;
+            }
+        }
+    }
+
+
+
 }
