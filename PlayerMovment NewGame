@@ -368,24 +368,53 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleJump() { }
 
+    // ---------- ADD TO THE CLASS (fields) ----------
+    [SerializeField] private float moveStartTurnSmoothTime = 0.1f;
+    private float moveStartTurnVelocity;
+    private bool wasMovingLastFrame;
+    private bool smoothTurnActive;
+
+    // ---------- REPLACE THE ENTIRE RotateWithMouse() METHOD ----------
     private void RotateWithMouse()
     {
         mouseX += Input.GetAxis("Mouse X") * mouseSensitivity;
         mouseY -= Input.GetAxis("Mouse Y") * mouseSensitivity;
         mouseY = Mathf.Clamp(mouseY, cameraLimit.x, cameraLimit.y);
 
-        // רק אם הדמות זזה, סובב את השחקן
-        if (IsMoving())
+        bool isMoving = IsMoving();
+
+        // התחלת תנועה → הפעל החלקה
+        if (isMoving && !wasMovingLastFrame)
         {
-            transform.rotation = Quaternion.Euler(0, mouseX, 0);
+            smoothTurnActive = true;
+            moveStartTurnVelocity = 0f;
         }
+
+        // רוטציה חלקה בתחילת תנועה
+        if (smoothTurnActive)
+        {
+            float smoothY = Mathf.SmoothDampAngle(transform.eulerAngles.y, mouseX, ref moveStartTurnVelocity, moveStartTurnSmoothTime);
+            transform.rotation = Quaternion.Euler(0f, smoothY, 0f);
+
+            // סיום החלקה כשהפרש זוויות קטן מאוד
+            if (Mathf.Abs(Mathf.DeltaAngle(transform.eulerAngles.y, mouseX)) < 0.1f)
+                smoothTurnActive = false;
+        }
+        // רוטציה רגילה אחרי החלקה
+        else if (isMoving)
+        {
+            transform.rotation = Quaternion.Euler(0f, mouseX, 0f);
+        }
+
+        wasMovingLastFrame = isMoving;
 
         if (cameraTransform != null)
         {
-            // סיבוב המצלמה לפי העכבר: X - למעלה/למטה, Y - סיבוב סביב הדמות
-            cameraTransform.rotation = Quaternion.Euler(mouseY, mouseX, 0);
+            cameraTransform.rotation = Quaternion.Euler(mouseY, mouseX, 0f);
         }
     }
+
+
 
 
 
