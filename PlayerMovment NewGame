@@ -20,6 +20,13 @@ public class PlayerMovement : MonoBehaviour
     [Header("Footstep Sounds")]
     [SerializeField] private AudioClip landingClip;
     [SerializeField] private float footstepVolume = 0.5f;
+    [SerializeField] private float attackTurnSpeed = 720f; // ° לשנייה – כמו בגלגול
+                                   // ─── Attack-Turn Settings ───
+    [SerializeField] private float attackTurnSmoothTime = 0.12f; // כמה “רך” יהיה הסיבוב
+    private float attackTurnVelocity;   // מומנטום פנימי ל-SmoothDampAngle
+    private bool attackTurning;        // true בזמן שמבצעים סיבוב חלק
+    private float attackTargetYaw;      // ה-Yaw שאליו מכוונים (מצלמה)
+
 
     [Header("Camera Rotation Limits")]
     [SerializeField] private Vector2 cameraLimit = new Vector2(-40, 40);
@@ -263,44 +270,79 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
+    // --- החליף את כל המתודה הישנה בזה ---
     private void HandleAttacks()
     {
+        /* ───────── סיבוב חלק (כמו HandleRoll) ───────── */
+        if (attackTurning)
+        {
+            float currentYaw = transform.eulerAngles.y;
+
+            // SmoothDampAngle → מעבר רך אל היעד
+            float newYaw = Mathf.SmoothDampAngle(
+                currentYaw,
+                attackTargetYaw,
+                ref attackTurnVelocity,
+                attackTurnSmoothTime);
+
+            transform.rotation = Quaternion.Euler(0f, newYaw, 0f);
+
+            // סיימנו להסתובב?
+            if (Mathf.Abs(Mathf.DeltaAngle(newYaw, attackTargetYaw)) < 0.1f)
+                attackTurning = false;
+        }
+
+        /* ───────── מגבלות זמן / נעילות ───────── */
         if (Time.time < nextAttackTime) return;
         if (Time.time < attackLockUntil) return;
 
         if (attackBlocked)
         {
             if (Input.GetMouseButtonDown(0))
-            {
                 nextAttackTime = Time.time + attackCooldown;
-            }
             return;
         }
 
         bool isMoving = IsMoving();
 
+        /* ───────── קלטי התקפה ───────── */
         if (Input.GetMouseButtonDown(0))
         {
-            animator.SetTrigger(isMoving ? "AttackWalk1" : "Attack1");
-            nextAttackTime = Time.time + attackCooldown;
+            TriggerAttack(isMoving ? "AttackWalk1" : "Attack1", attackCooldown, isMoving);
         }
         else if (Input.GetMouseButtonDown(1))
         {
-            animator.SetTrigger(isMoving ? "AttackWalk2" : "Attack2");
-            nextAttackTime = Time.time + attack2Cooldown;
+            TriggerAttack(isMoving ? "AttackWalk2" : "Attack2", attack2Cooldown, isMoving);
         }
-
         else if (Input.GetKeyDown(KeyCode.Q) && Time.time >= nextAttack3Time)
         {
-            animator.SetTrigger(isMoving ? "AttackWalk3" : "Attack3");
+            TriggerAttack(isMoving ? "AttackWalk3" : "Attack3", attack3Cooldown, isMoving);
             nextAttack3Time = Time.time + attack3Cooldown;
         }
         else if (Input.GetKeyDown(KeyCode.E) && Time.time >= nextAttack3Time)
         {
-            animator.SetTrigger(isMoving ? "AttackWalk4" : "Attack4");
+            TriggerAttack(isMoving ? "AttackWalk4" : "Attack4", attack3Cooldown, isMoving);
             nextAttack3Time = Time.time + attack3Cooldown;
         }
     }
+
+    /* ───────── מפעיל אנימציה + מתחיל סיבוב חלק (רק כאשר עומדים) ───────── */
+    private void TriggerAttack(string triggerName, float cooldown, bool isMoving)
+    {
+        animator.SetTrigger(triggerName);
+        nextAttackTime = Time.time + cooldown;
+
+        // אם לא זזים – מסתובבים בעדינות אל כיוון המצלמה
+        if (!isMoving)
+        {
+            attackTargetYaw = cameraTransform.eulerAngles.y;
+            attackTurnVelocity = 0f;  // איפוס המהירות של SmoothDampAngle
+            attackTurning = true;
+        }
+    }
+
+
+
 
 
 
@@ -327,23 +369,23 @@ public class PlayerMovement : MonoBehaviour
     private void HandleJump() { }
 
     private void RotateWithMouse()
-{
-    mouseX += Input.GetAxis("Mouse X") * mouseSensitivity;
-    mouseY -= Input.GetAxis("Mouse Y") * mouseSensitivity;
-    mouseY = Mathf.Clamp(mouseY, cameraLimit.x, cameraLimit.y);
-
-    // רק אם הדמות זזה, סובב את השחקן
-    if (IsMoving())
     {
-        transform.rotation = Quaternion.Euler(0, mouseX, 0);
-    }
+        mouseX += Input.GetAxis("Mouse X") * mouseSensitivity;
+        mouseY -= Input.GetAxis("Mouse Y") * mouseSensitivity;
+        mouseY = Mathf.Clamp(mouseY, cameraLimit.x, cameraLimit.y);
 
-    if (cameraTransform != null)
-    {
-        // סיבוב המצלמה לפי העכבר: X - למעלה/למטה, Y - סיבוב סביב הדמות
-        cameraTransform.rotation = Quaternion.Euler(mouseY, mouseX, 0);
+        // רק אם הדמות זזה, סובב את השחקן
+        if (IsMoving())
+        {
+            transform.rotation = Quaternion.Euler(0, mouseX, 0);
+        }
+
+        if (cameraTransform != null)
+        {
+            // סיבוב המצלמה לפי העכבר: X - למעלה/למטה, Y - סיבוב סביב הדמות
+            cameraTransform.rotation = Quaternion.Euler(mouseY, mouseX, 0);
+        }
     }
-}
 
 
 
