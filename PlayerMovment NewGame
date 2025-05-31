@@ -21,7 +21,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private AudioClip landingClip;
     [SerializeField] private float footstepVolume = 0.5f;
     [SerializeField] private float attackTurnSpeed = 720f; // ° לשנייה – כמו בגלגול
-                                   // ─── Attack-Turn Settings ───
+                                                           // ─── Attack-Turn Settings ───
     [SerializeField] private float attackTurnSmoothTime = 0.12f; // כמה “רך” יהיה הסיבוב
     private float attackTurnVelocity;   // מומנטום פנימי ל-SmoothDampAngle
     private bool attackTurning;        // true בזמן שמבצעים סיבוב חלק
@@ -369,10 +369,11 @@ public class PlayerMovement : MonoBehaviour
     private void HandleJump() { }
 
     // ---------- ADD TO THE CLASS (fields) ----------
-    [SerializeField] private float moveStartTurnSmoothTime = 0.1f;
+    [SerializeField] private float moveStartTurnSmoothTime = 0.12f;
     private float moveStartTurnVelocity;
     private bool wasMovingLastFrame;
     private bool smoothTurnActive;
+    
 
     // ---------- REPLACE THE ENTIRE RotateWithMouse() METHOD ----------
     private void RotateWithMouse()
@@ -382,15 +383,19 @@ public class PlayerMovement : MonoBehaviour
         mouseY = Mathf.Clamp(mouseY, cameraLimit.x, cameraLimit.y);
 
         bool isMoving = IsMoving();
+        float verticalInput = Input.GetAxisRaw("Vertical");
+        float horizontalInput = Input.GetAxisRaw("Horizontal");
 
-        // התחלת תנועה → הפעל החלקה
-        if (isMoving && !wasMovingLastFrame)
+        // עובד רק אם התחלת לזוז עם W (ולא A/S/D)
+        bool startedMovingWithW = isMoving && !wasMovingLastFrame && verticalInput > 0f && Mathf.Abs(horizontalInput) < 0.01f;
+
+        if (startedMovingWithW)
         {
             smoothTurnActive = true;
             moveStartTurnVelocity = 0f;
         }
 
-        // רוטציה חלקה בתחילת תנועה
+        // רוטציה חלקה בתחילת תנועה רק עם W
         if (smoothTurnActive)
         {
             float smoothY = Mathf.SmoothDampAngle(transform.eulerAngles.y, mouseX, ref moveStartTurnVelocity, moveStartTurnSmoothTime);
@@ -400,11 +405,13 @@ public class PlayerMovement : MonoBehaviour
             if (Mathf.Abs(Mathf.DeltaAngle(transform.eulerAngles.y, mouseX)) < 0.1f)
                 smoothTurnActive = false;
         }
-        // רוטציה רגילה אחרי החלקה
+        // רוטציה רגילה – כל זמן שזזים, או התחלת לזוז עם A/S/D
         else if (isMoving)
         {
+            // אם ההחלקה הסתיימה או זזים ב-A/S/D, פשוט כיוון העכבר
             transform.rotation = Quaternion.Euler(0f, mouseX, 0f);
         }
+        // כשעומדים – לא משפיע על הדמות בכלל
 
         wasMovingLastFrame = isMoving;
 
@@ -413,6 +420,10 @@ public class PlayerMovement : MonoBehaviour
             cameraTransform.rotation = Quaternion.Euler(mouseY, mouseX, 0f);
         }
     }
+
+
+
+
 
 
 
