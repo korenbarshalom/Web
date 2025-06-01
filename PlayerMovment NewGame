@@ -347,8 +347,12 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
         // ❌ אל תאפשר לתקוף בזמן קפיצה או באוויר
-        if (!isGrounded && !characterController.isGrounded)
+        // ❌ אל תאפשר לתקוף אם הדמות קופצת או באוויר
+        // ❌ אל תאפשר לתקוף אם הדמות לא באמת עומדת על הקרקע
+        if (!characterController.isGrounded || ySpeed > 0f || isJumping)
             return;
+
+
 
 
 
