@@ -26,6 +26,7 @@ public class PlayerMovement : MonoBehaviour
     private float attackTurnVelocity;   // מומנטום פנימי ל-SmoothDampAngle
     private bool attackTurning;        // true בזמן שמבצעים סיבוב חלק
     private float attackTargetYaw;      // ה-Yaw שאליו מכוונים (מצלמה)
+    private bool isInAir;
 
 
     [Header("Camera Rotation Limits")]
@@ -72,6 +73,14 @@ public class PlayerMovement : MonoBehaviour
     private float attack3Cooldown = 3f; // זמן המתנה בין לחיצות על Q
     private float nextAttack3Time = 0f;
 
+
+    [Header("Ground Check Settings")]
+    public float rayDistance = 1.1f;       // Distancia desde el centro del personaje hacia abajo
+    public LayerMask groundLayer;          // Capa que define qué es suelo
+    public bool isGrounded;
+    public bool isJumping;
+    public float floorDistanceCheck;
+    private float lastY;
     [HideInInspector] public Vector3 moveDirection = Vector3.zero;
 
     // מוסיף פונקציה שמחזירה true אם הדמות זזה על הקרקע
@@ -86,6 +95,7 @@ public class PlayerMovement : MonoBehaviour
         characterController = GetComponent<CharacterController>();
         originalStepOffset = characterController.stepOffset;
         currentRotationY = transform.eulerAngles.y;
+        lastY = transform.position.y;
 
         if (cameraTransform != null)
             initialCameraLocalPosition = cameraTransform.localPosition;
@@ -112,6 +122,9 @@ public class PlayerMovement : MonoBehaviour
         GameObject bomb = GameObject.FindGameObjectWithTag("Bomb");
         attackBlocked = bomb != null && bomb.activeSelf;
 
+        isGrounded = IsGrounded(); // מתעדכן בכל Frame
+
+
         HandleMovement();
         HandleJump();
         HandleRoll();
@@ -122,6 +135,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleMovement()
     {
+
         if (!characterController.enabled) return;
 
         float horizontalInput = Input.GetAxis("Horizontal");
@@ -180,8 +194,11 @@ public class PlayerMovement : MonoBehaviour
             if (Input.GetButtonDown("Jump") || externalJumpTriggered)
             {
                 ySpeed = jumpSpeed;
+                //isJumping = true;
+                Invoke("IsJumping", 0.5f);
                 animator.SetTrigger("Jump");
                 hasJumped = true;
+                isInAir = true;
                 externalJumpTriggered = false;
             }
 
@@ -190,7 +207,18 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             wasGroundedLastFrame = false;
+            isInAir = true;
             characterController.stepOffset = 0;
+        }
+
+        if (isJumping && !characterController.isGrounded)
+        {
+            if (IsCloseToGroundWhileFalling(floorDistanceCheck))
+            {
+                // El jugador está cayendo y cerca del suelo
+                isJumping = false;
+                animator.SetTrigger("Landing");
+            }
         }
 
 
@@ -494,6 +522,25 @@ public class PlayerMovement : MonoBehaviour
             }
         }
     }
+    public void IsJumping()
+    {
+        isJumping = true;
+    }
+    public bool IsCloseToGroundWhileFalling(float distance)
+    {
+        float currentY = transform.position.y;
+        float deltaY = currentY - lastY;
+        lastY = currentY;
+
+        if (deltaY >= 0)
+            return false;
+
+        Ray ray = new Ray(transform.position, Vector3.down);
+        Debug.DrawRay(transform.position, Vector3.down * distance, Color.magenta);
+
+        return Physics.Raycast(ray, distance, groundLayer);
+    }
+
 
 
 
