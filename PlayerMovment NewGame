@@ -82,6 +82,10 @@ public class PlayerMovement : MonoBehaviour
     public float floorDistanceCheck;
     private float lastY;
     [HideInInspector] public Vector3 moveDirection = Vector3.zero;
+    /* ──────────────── Advanced Ground Check ──────────────── */
+    [Header("Advanced Ground Check")]
+    [SerializeField] private Transform groundCheckPoint;     // נקודת הבדיקה (GroundCheck)
+    [SerializeField] private float groundCheckRadius = 0.28f; // רדיוס הספרה
 
     // מוסיף פונקציה שמחזירה true אם הדמות זזה על הקרקע
     private bool IsMoving()
@@ -192,22 +196,22 @@ public class PlayerMovement : MonoBehaviour
                 ySpeed = -0.5f;
 
             if (Input.GetButtonDown("Jump") || externalJumpTriggered)
-            {
-                // אפס רול לגמרי
-                isRolling = false;
-                rollDirection = Vector3.zero;
+         {
+          // אפס רול לגמרי
+          isRolling = false;
+          rollDirection = Vector3.zero;
 
-                // איפוס Animator לפני שליחת Trigger חדש
-                animator.ResetTrigger("Jump");
-                animator.ResetTrigger("Landing");
+          // איפוס Animator לפני שליחת Trigger חדש
+          animator.ResetTrigger("Jump");
+          animator.ResetTrigger("Landing");
 
-                ySpeed = jumpSpeed;
-                animator.SetTrigger("Jump");
-                Invoke("IsJumping", 0.5f);
-                hasJumped = true;
-                isInAir = true;
-                externalJumpTriggered = false;
-            }
+          ySpeed = jumpSpeed;
+          animator.SetTrigger("Jump");
+          Invoke("IsJumping", 0.5f);
+          hasJumped = true;
+          isInAir = true;
+          externalJumpTriggered = false;
+         }
 
 
             characterController.stepOffset = originalStepOffset;
@@ -342,6 +346,11 @@ public class PlayerMovement : MonoBehaviour
                 nextAttackTime = Time.time + attackCooldown;
             return;
         }
+        // ❌ אל תאפשר לתקוף בזמן קפיצה או באוויר
+        if (!isGrounded && !characterController.isGrounded)
+            return;
+
+
 
         bool isMoving = IsMoving();
 
@@ -380,11 +389,6 @@ public class PlayerMovement : MonoBehaviour
             attackTurning = true;
         }
     }
-
-
-
-
-
 
     private void HandleAnimationStates(float horizontalInput, float verticalInput, bool isSprinting)
     {
@@ -465,16 +469,6 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
-
-
-
-
-
-
-
-
-
-
     private void UpdateCameraPosition()
     {
         if (cameraTransform == null) return;
@@ -498,7 +492,25 @@ public class PlayerMovement : MonoBehaviour
         Cursor.lockState = focus ? CursorLockMode.Locked : CursorLockMode.None;
     }
 
-    public bool IsGrounded() => characterController.isGrounded;
+    public bool IsGrounded()
+    {
+        // בדיקת CharacterController הרגילה
+        bool ccGrounded = characterController.isGrounded;
+
+        // ספרה קטנה סביב GroundCheck
+        bool sphereGrounded = false;
+        if (groundCheckPoint != null)
+        {
+            sphereGrounded = Physics.CheckSphere(
+                groundCheckPoint.position,
+                groundCheckRadius,
+                groundLayer,
+                QueryTriggerInteraction.Ignore);
+        }
+
+        return ccGrounded || sphereGrounded;
+    }
+
 
 
     public void ForceJump(float force)
@@ -543,23 +555,22 @@ public class PlayerMovement : MonoBehaviour
     public void IsJumping()
     {
         isJumping = true;
+        animator?.SetBool("isInAir", true); // אם אתה משתמש ב־BlendTree או תנאי מעבר
     }
+
     public bool IsCloseToGroundWhileFalling(float distance)
     {
-        float currentY = transform.position.y;
-        float deltaY = currentY - lastY;
-        lastY = currentY;
+        // ספרה יורדת מעט מלפנים כדי לבדוק "כמעט נחת"
+        Vector3 origin = groundCheckPoint != null ? groundCheckPoint.position + Vector3.up * 0.05f
+                                                  : transform.position + Vector3.up * 0.05f;
 
-        if (deltaY >= 0)
-            return false;
-
-        Ray ray = new Ray(transform.position, Vector3.down);
-        Debug.DrawRay(transform.position, Vector3.down * distance, Color.magenta);
-
-        return Physics.Raycast(ray, distance, groundLayer);
+        return Physics.SphereCast(
+            origin,
+            groundCheckRadius,
+            Vector3.down,
+            out _,
+            distance + 0.05f,
+            groundLayer,
+            QueryTriggerInteraction.Ignore);
     }
-
-
-
-
 }
