@@ -193,14 +193,22 @@ public class PlayerMovement : MonoBehaviour
 
             if (Input.GetButtonDown("Jump") || externalJumpTriggered)
             {
+                // אפס רול לגמרי
+                isRolling = false;
+                rollDirection = Vector3.zero;
+
+                // איפוס Animator לפני שליחת Trigger חדש
+                animator.ResetTrigger("Jump");
+                animator.ResetTrigger("Landing");
+
                 ySpeed = jumpSpeed;
-                //isJumping = true;
-                Invoke("IsJumping", 0.5f);
                 animator.SetTrigger("Jump");
+                Invoke("IsJumping", 0.5f);
                 hasJumped = true;
                 isInAir = true;
                 externalJumpTriggered = false;
             }
+
 
             characterController.stepOffset = originalStepOffset;
         }
@@ -211,15 +219,19 @@ public class PlayerMovement : MonoBehaviour
             characterController.stepOffset = 0;
         }
 
-        if (isJumping && !characterController.isGrounded)
+        if (!characterController.isGrounded && isJumping)
         {
             if (IsCloseToGroundWhileFalling(floorDistanceCheck))
             {
-                // El jugador está cayendo y cerca del suelo
                 isJumping = false;
                 animator.SetTrigger("Landing");
+
+                // איפוס לוגיקה אחרי רול באוויר
+                isRolling = false;
+                rollDirection = Vector3.zero;
             }
         }
+
 
 
         Vector3 velocity = moveDirection * speed;
@@ -401,7 +413,7 @@ public class PlayerMovement : MonoBehaviour
     private float moveStartTurnVelocity;
     private bool wasMovingLastFrame;
     private bool smoothTurnActive;
-    
+
 
     // ---------- REPLACE THE ENTIRE RotateWithMouse() METHOD ----------
     private void RotateWithMouse()
@@ -414,7 +426,13 @@ public class PlayerMovement : MonoBehaviour
         float verticalInput = Input.GetAxisRaw("Vertical");
         float horizontalInput = Input.GetAxisRaw("Horizontal");
 
-        // עובד רק אם התחלת לזוז עם W (ולא A/S/D)
+        // אם התחלת לזוז – לבטל סיבוב התקפה (כי תנועה עדיפה)
+        if (isMoving && attackTurning)
+        {
+            attackTurning = false;
+        }
+
+        // התחלת לזוז עם W בלבד (בלי A/S/D)
         bool startedMovingWithW = isMoving && !wasMovingLastFrame && verticalInput > 0f && Mathf.Abs(horizontalInput) < 0.01f;
 
         if (startedMovingWithW)
@@ -429,17 +447,14 @@ public class PlayerMovement : MonoBehaviour
             float smoothY = Mathf.SmoothDampAngle(transform.eulerAngles.y, mouseX, ref moveStartTurnVelocity, moveStartTurnSmoothTime);
             transform.rotation = Quaternion.Euler(0f, smoothY, 0f);
 
-            // סיום החלקה כשהפרש זוויות קטן מאוד
             if (Mathf.Abs(Mathf.DeltaAngle(transform.eulerAngles.y, mouseX)) < 0.1f)
                 smoothTurnActive = false;
         }
-        // רוטציה רגילה – כל זמן שזזים, או התחלת לזוז עם A/S/D
+        // רוטציה רגילה כשזזים, אם לא בתוך החלקה
         else if (isMoving)
         {
-            // אם ההחלקה הסתיימה או זזים ב-A/S/D, פשוט כיוון העכבר
             transform.rotation = Quaternion.Euler(0f, mouseX, 0f);
         }
-        // כשעומדים – לא משפיע על הדמות בכלל
 
         wasMovingLastFrame = isMoving;
 
@@ -448,6 +463,9 @@ public class PlayerMovement : MonoBehaviour
             cameraTransform.rotation = Quaternion.Euler(mouseY, mouseX, 0f);
         }
     }
+
+
+
 
 
 
