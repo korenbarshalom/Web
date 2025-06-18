@@ -15,6 +15,7 @@ public class PlayerMovement1 : MonoBehaviour
     [Header("Movement Settings")]
     // מומלץ להגדיר את ה-lookSpeed ברירת מחדל כ-1.5 אם זה מה שנדרש.
     public float walkSpeed = 10f;
+    public float runSpeed = 15f;
     public float jumpPower = 7f;
     public float gravity = 10f;
     public float lookSpeed = 1.5f;   // רגישות עכבר (ניתן לעדכן באמצעות הסליידר)
@@ -218,7 +219,7 @@ public class PlayerMovement1 : MonoBehaviour
         playerCollider = GetComponent<Collider>();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-        jumpPower = 14f;
+        
 
         if (playerCamera != null)
             playerCamera.enabled = true;
@@ -602,7 +603,19 @@ public class PlayerMovement1 : MonoBehaviour
             {
                 accelerationMultiplier = Mathf.Lerp(forwardAccelerationMultiplier, 1f, forwardAccelerationTimer / forwardAccelerationDuration);
             }
-            float currentSpeed = ((Input.GetKey(KeyCode.LeftControl) && !slideKeyDisabled) ? crouchSpeed : walkSpeed) * accelerationMultiplier;
+            float baseSpeed = walkSpeed;
+
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                baseSpeed = runSpeed;
+            }
+            else if (Input.GetKey(KeyCode.LeftControl) && !slideKeyDisabled)
+            {
+                baseSpeed = crouchSpeed;
+            }
+
+            float currentSpeed = baseSpeed * accelerationMultiplier;
+
 
 
             float previousY = moveDirection.y;
@@ -656,7 +669,7 @@ public class PlayerMovement1 : MonoBehaviour
         else
         {
             characterController.height = defaultHeight;
-            walkSpeed = 20f;
+            
         }
 
 
