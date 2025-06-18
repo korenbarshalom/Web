@@ -23,7 +23,9 @@ public class PlayerMovement1 : MonoBehaviour
     public float defaultHeight = 2f;
     public float crouchHeight = 1f;
     public float crouchSpeed = 3f;
-   
+    public float crouchRunSpeed = 5f;
+
+
 
     [Header("Slide Settings")]
     public float slideDuration = 1f;
@@ -605,14 +607,22 @@ public class PlayerMovement1 : MonoBehaviour
             }
             float baseSpeed = walkSpeed;
 
-            if (Input.GetKey(KeyCode.LeftShift))
+            bool isCrouching = Input.GetKey(KeyCode.LeftControl) && !slideKeyDisabled;
+            bool isRunning = Input.GetKey(KeyCode.LeftShift);
+
+            if (isCrouching && isRunning)
             {
-                baseSpeed = runSpeed;
+                baseSpeed = crouchRunSpeed;
             }
-            else if (Input.GetKey(KeyCode.LeftControl) && !slideKeyDisabled)
+            else if (isCrouching)
             {
                 baseSpeed = crouchSpeed;
             }
+            else if (isRunning)
+            {
+                baseSpeed = runSpeed;
+            }
+
 
             float currentSpeed = baseSpeed * accelerationMultiplier;
 
