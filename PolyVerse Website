@@ -7,285 +7,348 @@
 
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-
   <!-- Model-Viewer -->
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
   <style>
     /* ---------- Reset ---------- */
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:"Inter",sans-serif;line-height:1.6;background:#1e1e20;color:#ffffff}
-    img{max-width:100%;display:block}
-    a{text-decoration:none;color:inherit}
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0 }
+    body { font-family:"Inter",sans-serif; line-height:1.6; background:#1e1e20; color:#fff }
+    a { text-decoration:none; color:inherit }
+    section, footer { opacity:0; animation:fadeInUp 0.6s ease-out forwards }
 
-    /* ---------- Design Tokens ---------- */
-    :root{
+    /* ---------- Design Tokens & Keyframes ---------- */
+    :root {
       --bg:#1e1e20;
       --text:#ffffff;
       --card-bg:#2a2a2d;
       --accent:#ff9800;
       --radius:12px;
     }
+    @keyframes fadeInUp {
+      from { opacity:0; transform:translateY(20px) }
+      to   { opacity:1; transform:translateY(0) }
+    }
+    @keyframes pulse {
+      0%,100% { transform:scale(1) }
+      50%     { transform:scale(1.05) }
+    }
 
     /* ---------- Buttons ---------- */
-    .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 1.5rem;
-      border:none;border-radius:var(--radius);font-weight:600;cursor:pointer;
-      background:var(--accent);color:#fff;transition:transform .2s,box-shadow .2s}
-    .btn:hover{transform:scale(1.05);box-shadow:0 6px 14px rgba(0,0,0,.4)}
-    .btn:active{transform:scale(.97)}
+    .btn {
+      display:inline-flex; align-items:center; gap:.5rem;
+      padding:.75rem 1.5rem; border:none; border-radius:var(--radius);
+      font-weight:600; cursor:pointer; background:var(--accent);
+      color:#fff; transition:transform .2s, box-shadow .2s;
+    }
+    .btn:hover { transform:scale(1.05); box-shadow:0 6px 14px rgba(0,0,0,.4) }
+    .btn:active { transform:scale(.97) }
+    .back-btn { margin-bottom:1rem; }
 
     /* ---------- Navbar ---------- */
-    nav{position:sticky;top:0;z-index:10;display:flex;align-items:center;
-      justify-content:space-between;padding:.5rem 1rem;background:var(--card-bg);
-      box-shadow:0 1px 3px rgba(0,0,0,.5)}
-    .logo{display:flex;align-items:center;gap:.5rem}
-    nav ul{display:flex;gap:1rem;list-style:none}
-    nav li{display:inline-block}
+    nav {
+      position:sticky; top:0; z-index:10;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:.75rem 1rem; background:var(--card-bg);
+      box-shadow:0 1px 3px rgba(0,0,0,.5);
+    }
+    .logo { display:flex; align-items:center; gap:.5rem }
+    nav ul { display:flex; gap:1rem; list-style:none }
+    @media(max-width:600px){ nav ul{ display:none } }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      background: linear-gradient(135deg, #6d5bf5, #956bfa);
+      padding:4rem 1rem; text-align:center;
+    }
+    .hero h1 { font-size:2.5rem; margin-bottom:1rem }
+    .hero p  { font-size:1.125rem; margin-bottom:2rem; color:rgba(255,255,255,0.85) }
 
     /* ---------- Gallery ---------- */
-    main{max-width:1280px;margin-inline:auto;padding:2rem 1rem}
-    .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem}
-    .card{
-      background:var(--card-bg);
-      border-radius:var(--radius);
-      overflow:hidden;
-      box-shadow:0 2px 6px rgba(0,0,0,.3);
-      transition:transform .25s,box-shadow .25s;
-      display:flex;
-      flex-direction:column;
+    main { max-width:1280px; margin:2rem auto; padding:0 1rem }
+    .gallery {
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+      gap:1.5rem;
     }
-    .card:hover{transform:translateY(-4px);box-shadow:0 6px 18px rgba(0,0,0,.6)}
-    .card img{width:100%;height:auto;cursor:pointer}
-    .card .info{padding:1rem;display:flex;flex-direction:column;gap:.3rem}
-    .card h3{font-size:1rem;font-weight:600;color:#fff}
-    .card p{font-size:.875rem;color:#aaa;margin-bottom:.5rem}
-
-    /* ---------- Search ---------- */
-    .search-box{max-width:300px}
-    .search-box input{width:100%;padding:.6rem 1rem;border-radius:var(--radius);
-      border:2px solid var(--accent);background:#0002;color:#fff;outline:none}
+    .card {
+      background:var(--card-bg); border-radius:var(--radius);
+      overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,.3);
+      transition:transform .3s, box-shadow .3s;
+      display:flex; flex-direction:column;
+    }
+    .card:hover {
+      transform:scale(1.05);
+      box-shadow:0 8px 24px rgba(255,152,0,0.5);
+    }
+    .card img { width:100%; cursor:pointer }
+    .card .info { padding:1rem; flex-grow:1; display:flex; flex-direction:column }
+    .card h3 { font-size:1rem; margin-bottom:.5rem }
+    .card p  { font-size:.875rem; color:#aaa }
 
     /* ---------- Modals ---------- */
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center}
-    .modal.active{display:flex}
-    .modal-content{background:var(--card-bg);padding:2rem;border-radius:var(--radius);width:90%;max-width:400px;max-height:90vh;overflow:auto}
-    .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
-    .modal-header h2{font-size:1.25rem}
-    .close{background:none;border:none;font-size:1.25rem;cursor:pointer;color:var(--text)}
+    .modal {
+      position:fixed; inset:0; background:rgba(0,0,0,.6);
+      display:none; align-items:center; justify-content:center;
+    }
+    .modal.active { display:flex }
+    .modal-content {
+      background:var(--card-bg); padding:2rem; border-radius:var(--radius);
+      width:90%; max-width:400px; max-height:90vh; overflow:auto;
+      transform:scale(0.8); opacity:0; transition:.3s ease-out;
+    }
+    .modal.active .modal-content { transform:scale(1); opacity:1 }
+    .modal-header { display:flex;justify-content:space-between;align-items:center; margin-bottom:1rem }
+    .close { background:none; border:none; font-size:1.25rem; cursor:pointer; color:var(--text) }
 
-    /* ---------- Preview Images in Viewer ---------- */
-    .modal-content .preview-images {
-      display: flex;
-      gap: .5rem;
-      margin-top: 1rem;
+    /* ---------- Checkout Page ---------- */
+    #checkoutPage {
+      display:none; padding:2rem; min-height:100vh;
+      background:var(--bg); color:var(--text);
     }
-    .modal-content .preview-images img {
-      width: 100px;
-      height: auto;
-      border-radius: var(--radius);
-      cursor: pointer;
+    #checkoutPage form {
+      max-width:500px; margin:auto; display:flex; flex-direction:column; gap:1rem;
+    }
+    #checkoutPage label { display:flex; flex-direction:column; font-weight:600 }
+    #checkoutPage input {
+      padding:.75rem 1rem; border:none; border-radius:var(--radius);
+      background:var(--card-bg); color:#fff; outline:none;
     }
 
-    @media(max-width:600px){
-      nav ul{display:none}
+    /* ---------- Contact Footer ---------- */
+    footer {
+      padding:2rem 1rem; text-align:center; background:#111;
+      margin-top:2rem;
     }
+    footer p { margin:.5rem 0 }
+
   </style>
 </head>
 <body>
 
-  <!-- ===== Navbar ===== -->
+  <!-- NAVBAR -->
   <nav id="navbar">
     <div class="logo">
-      <img
-        src="https://sdmntprnorthcentralus.oaiusercontent.com/files/00000000-9f28-622f-8bd2-bfc50c6cdffb/raw?se=2025-06-21T20%3A56%3A48Z&sp=r&sv=2024-08-04&sr=b&scid=4ca4426e-3962-51ff-9fd0-d286d76fde4e&skoid=bbd22fc4-f881-4ea4-b2f3-c12033cf6a8b&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-21T17%3A17%3A44Z&ske=2025-06-22T17%3A17%3A44Z&sks=b&skv=2024-08-04&sig=njJcKZ9ByVm3EoEfWITqzwgNJf0sBEMLz6M22o6w110%3D"
-        alt="PolyVerse Logo"
-        style="height:32px;width:32px;border-radius:6px"
-      >
+      <img src="https://sdmntprnorthcentralus.oaiusercontent.com/files/00000000-9f28-622f-8bd2-bfc50c6cdffb/raw?se=2025-06-21T20%3A56%3A48Z&sp=r&sv=2024-08-04&sr=b&scid=4ca4426e-3962-51ff-9fd0-d286d76fde4e&skoid=bbd22fc4-f881-4ea4-b2f3-c12033cf6a8b&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-21T17%3A17%3A44Z&ske=2025-06-22T17%3A17%3A44Z&sks=b&skv=2024-08-04&sig=njJcKZ9ByVm3EoEfWITqzwgNJf0sBEMLz6M22o6w110%3D" 
+           alt="polyVerse logo" style="height:32px;width:32px;border-radius:6px">
       <span style="font-weight:600;font-size:1.1rem">polyVerse</span>
     </div>
-
-    <div class="search-box">
-      <input id="search" type="search" placeholder="Search models…">
-    </div>
-
     <ul>
-      <li><button class="btn" id="loginBtn">Log&nbsp;In</button></li>
+      <li><button class="btn" id="loginBtn">Log In</button></li>
       <li><button class="btn" id="cartBtn">🛒 <span id="cartCount">0</span></button></li>
     </ul>
   </nav>
 
-  <!-- ===== Main / Gallery ===== -->
-  <main>
+  <!-- HERO -->
+  <section class="hero">
+    <h1>Every low poly model you could ever need</h1>
+    <p>Build something beautiful with 10+ free models</p>
+    <div class="hero-search">
+      <input id="heroSearch" type="search" placeholder="Search for anything">
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <main id="mainContent">
     <section class="gallery" id="gallery"></section>
   </main>
 
-  <!-- ===== Cart Modal ===== -->
+  <!-- CHECKOUT PAGE -->
+  <section id="checkoutPage">
+    <button class="btn back-btn" id="backHome">← Back to Shop</button>
+    <h2 style="text-align:center; margin-bottom:1rem;">Checkout</h2>
+    <form id="checkoutForm">
+      <label>
+        Full Name
+        <input type="text" required placeholder="Your Name">
+      </label>
+      <label>
+        Email Address
+        <input type="email" required placeholder="you@example.com">
+      </label>
+      <label>
+        Billing Address
+        <input type="text" required placeholder="Street, City, Country">
+      </label>
+      <button type="submit" class="btn" style="justify-content:center;">Pay with PayPal</button>
+    </form>
+  </section>
+
+  <!-- CONTACT INFO FOOTER -->
+  <footer>
+    <h3>Contact Us</h3>
+    <p>Email: korenbarshalom@gmail.com</p>
+    <p>Phone: 052-221-5113</p>
+  </footer>
+
+  <!-- CART MODAL -->
   <div class="modal" id="cartModal">
     <div class="modal-content">
-      <div class="modal-header"><h2>Cart</h2><button class="close" data-close>&times;</button></div>
+      <div class="modal-header">
+        <h2>Cart</h2>
+        <button class="close" data-close>&times;</button>
+      </div>
       <ul id="cartItems"></ul>
       <p id="total">$0.00</p>
-      <button class="btn" style="width:100%">Checkout (PayPal stub)</button>
+      <button id="checkoutBtn" class="btn checkout-btn">Proceed to Payment</button>
     </div>
   </div>
 
-  <!-- ===== Login Modal ===== -->
+  <!-- LOGIN MODAL -->
   <div class="modal" id="loginModal">
     <div class="modal-content">
-      <div class="modal-header"><h2>Log In</h2><button class="close" data-close>&times;</button></div>
+      <div class="modal-header">
+        <h2>Log In</h2>
+        <button class="close" data-close>&times;</button>
+      </div>
       <label>Email <input type="email" style="width:100%;margin:.5rem 0"></label>
       <label>Password <input type="password" style="width:100%;margin:.5rem 0 1rem"></label>
       <button class="btn" style="width:100%">Continue</button>
-      <p style="margin-top:1rem;font-size:.875rem">Auth backend coming soon.</p>
+      <p style="margin-top:1rem;font-size:.875rem;color:#aaa">Auth backend coming soon.</p>
     </div>
   </div>
 
-  <!-- ===== Model Viewer Modal ===== -->
+  <!-- MODEL VIEWER MODAL -->
   <div class="modal" id="viewerModal">
     <div class="modal-content" style="max-width:800px">
-      <div class="modal-header"><h2 id="viewerTitle"></h2><button class="close" data-close>&times;</button></div>
-      <model-viewer
-        id="viewer"
-        alt="3D model"
-        src=""
-        camera-controls
-        auto-rotate
-        style="height:400px;background:#eee;border-radius:var(--radius)"
-      ></model-viewer>
-      <!-- added preview-images container -->
+      <div class="modal-header">
+        <h2 id="viewerTitle"></h2>
+        <button class="close" data-close>&times;</button>
+      </div>
+      <model-viewer id="viewer" alt="3D model" src="" camera-controls auto-rotate style="height:400px;background:#eee;border-radius:var(--radius)"></model-viewer>
       <div class="preview-images" id="previewImages"></div>
       <button id="addToCart" class="btn" style="margin-top:1rem;width:100%">Add to Cart</button>
     </div>
   </div>
 
   <script type="module">
-    /* ====== Sample Data (שימו לב: החלפנו ל-.glb, והוספנו previews אופציונלי) ====== */
+    // === DATA & HOOKS ===
     const models = [
-      {
-        id: 1,
-        title: 'Human Character Base',
-        price: 0,
-        src: 'assets/models/model1.glb',
-        thumb: 'https://img.itch.zone/aW1hZ2UvMzYzMDcyMC8yMTYwNTk3NS5wbmc=/347x500/0EGaXE.png',
-        previews: [
-          'https://placehold.co/150x150?text=View+1',
-          'https://placehold.co/150x150?text=View+2',
-          'https://placehold.co/150x150?text=View+3'
-        ]
-      },
-      { id:2,  title:'Human Character Base', price:0, src:'assets/models/model2.glb',  thumb:'https://img.itch.zone/aW1hZ2UvMzYyNjQzMS8yMTU4MTkwOS5wbmc=/347x500/zwrvpj.png' },
-      { id:3,  title:'Space Marine',          price:0, src:'assets/models/model3.glb',  thumb:'https://placehold.co/400x400?text=Marine' },
-      { id:4,  title:'Low-Poly Knight',       price:0, src:'assets/models/model4.glb',  thumb:'https://placehold.co/400x400?text=Knight' },
-      { id:5,  title:'Cartoon Archer',        price:0, src:'assets/models/model5.glb',  thumb:'https://placehold.co/400x400?text=Archer' },
-      { id:6,  title:'Steampunk Bot',         price:0, src:'assets/models/model6.glb',  thumb:'https://placehold.co/400x400?text=Bot' },
-      { id:7,  title:'Voxel Mage',            price:0, src:'assets/models/model7.glb',  thumb:'https://placehold.co/400x400?text=Mage' },
-      { id:8,  title:'Sci-Fi Soldier',        price:0, src:'assets/models/model8.glb',  thumb:'https://placehold.co/400x400?text=Soldier' },
-      { id:9,  title:'Alien Brute',           price:0, src:'assets/models/model9.glb',  thumb:'https://placehold.co/400x400?text=Alien' },
-      { id:10, title:'Mutant Bug',            price:0, src:'assets/models/model10.glb', thumb:'https://placehold.co/400x400?text=Bug' }
+      {id:1,title:'Human Character Base',price:0,src:'assets/models/model1.glb',thumb:'https://img.itch.zone/aW1hZ2UvMzYzMDcyMC8yMTYwNTk3NS5wbmc=/347x500/0EGaXE.png'},
+      {id:2,title:'Human Character Base',price:0,src:'assets/models/model2.glb',thumb:'https://img.itch.zone/aW1hZ2UvMzYyNjQzMS8yMTU4MTkwOS5wbmc=/347x500/zwrvpj.png'},
+      {id:3,title:'Player Model',price:0,src:'assets/models/model3.glb',thumb:'https://img.itch.zone/aW1hZ2UvMzYyNjI1OC8yMTYwMzg1Mi5wbmc=/347x500/Qsh9nF.png'},
+      {id:4,title:'Knight',price:0,src:'assets/models/model4.glb',thumb:'https://placehold.co/400x400?text=Knight'},
+      {id:5,title:'Archer',price:0,src:'assets/models/model5.glb',thumb:'https://placehold.co/400x400?text=Archer'},
+      {id:6,title:'Steampunk',price:0,src:'assets/models/model6.glb',thumb:'https://placehold.co/400x400?text=Bot'},
+      {id:7,title:'Voxel Mage',price:0,src:'assets/models/model7.glb',thumb:'https://placehold.co/400x400?text=Mage'},
+      {id:8,title:'Sci-Fi Soldier',price:0,src:'assets/models/model8.glb',thumb:'https://placehold.co/400x400?text=Soldier'},
     ];
+    const gallery     = document.getElementById('gallery');
+    const heroSearch  = document.getElementById('heroSearch');
+    const cartBtn     = document.getElementById('cartBtn');
+    const loginBtn    = document.getElementById('loginBtn');
+    const cartModal   = document.getElementById('cartModal');
+    const loginModal  = document.getElementById('loginModal');
+    const viewerModal = document.getElementById('viewerModal');
+    const viewer      = document.getElementById('viewer');
+    const viewerTitle = document.getElementById('viewerTitle');
+    const addToCart   = document.getElementById('addToCart');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    const cartItems   = document.getElementById('cartItems');
+    const total       = document.getElementById('total');
+    const cartCount   = document.getElementById('cartCount');
+    const previewsEl  = document.getElementById('previewImages');
+    const mainContent = document.getElementById('mainContent');
+    const checkoutPage= document.getElementById('checkoutPage');
+    const backHome    = document.getElementById('backHome');
 
-    /* ====== DOM Hooks ====== */
-    const gallery       = document.getElementById('gallery');
-    const search        = document.getElementById('search');
-    const cartBtn       = document.getElementById('cartBtn');
-    const loginBtn      = document.getElementById('loginBtn');
-    const cartModal     = document.getElementById('cartModal');
-    const loginModal    = document.getElementById('loginModal');
-    const viewerModal   = document.getElementById('viewerModal');
-    const viewer        = document.getElementById('viewer');
-    const viewerTitle   = document.getElementById('viewerTitle');
-    const addToCartBtn  = document.getElementById('addToCart');
-    const cartItems     = document.getElementById('cartItems');
-    const total         = document.getElementById('total');
-    const cartCount     = document.getElementById('cartCount');
-    const previewImages = document.getElementById('previewImages');
-
-    /* ====== Cart ====== */
+    // === CART LOGIC ===
     let cart = [];
     function updateCartUI(){
       cartCount.textContent = cart.length;
-      cartItems.innerHTML  = '';
+      cartItems.innerHTML = '';
       let sum = 0;
-      cart.forEach(i => {
-        const li = document.createElement('li');
-        li.textContent = `${i.title} – ${i.price ? `$${i.price}` : 'Free'}`;
+      cart.forEach(i =>{
+        const li=document.createElement('li');
+        li.textContent = `${i.title} – ${i.price?`$${i.price}`:'Free'}`;
         cartItems.appendChild(li);
-        sum += i.price || 0;
+        sum+=i.price||0;
       });
-      total.textContent = '$' + sum.toFixed(2);
+      total.textContent = '$'+sum.toFixed(2);
     }
     updateCartUI();
 
-    /* ====== Render Gallery ====== */
+    // === RENDER GALLERY ===
     function renderGallery(list){
       gallery.innerHTML = '';
-      list.forEach(m => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          <img src="${m.thumb}" alt="" data-id="${m.id}">
+      list.forEach(m=>{
+        const card=document.createElement('div');
+        card.className='card';
+        card.innerHTML=`
+          <img src="${m.thumb}" data-id="${m.id}">
           <div class="info">
             <h3>${m.title}</h3>
-            <p>${m.price ? `$${m.price.toFixed(2)}` : 'Free'}</p>
+            <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>
           </div>`;
         gallery.appendChild(card);
       });
     }
     renderGallery(models);
 
-    /* ====== Search ====== */
-    search.addEventListener('input', e => {
-      const q = e.target.value.toLowerCase();
-      renderGallery(models.filter(m => m.title.toLowerCase().includes(q)));
+    // === SEARCH ===
+    heroSearch.addEventListener('input',e=>{
+      const q=e.target.value.toLowerCase();
+      renderGallery(models.filter(m=>m.title.toLowerCase().includes(q)));
     });
 
-    /* ====== Navbar Scroll Hide/Show ====== */
-    let prevY = window.scrollY;
-    window.addEventListener('scroll', () => {
-      const nav = document.getElementById('navbar');
-      if (window.scrollY < prevY) nav.classList.remove('scroll-down');
-      else nav.classList.add('scroll-down');
-      prevY = window.scrollY;
+    // === NAV SCROLL CLASS (unused styling) ===
+    let prevY=window.scrollY;
+    window.addEventListener('scroll',()=>{
+      const nav=document.getElementById('navbar');
+      window.scrollY<prevY?nav.classList.remove('scroll-down'):nav.classList.add('scroll-down');
+      prevY=window.scrollY;
     });
 
-    /* ====== Modal Helpers ====== */
-    function open(modal){ modal.classList.add('active') }
-    function close(modal){ modal.classList.remove('active') }
-    document.querySelectorAll('[data-close]').forEach(btn => btn.onclick = () => close(btn.closest('.modal')));
-    cartBtn.onclick    = () => open(cartModal);
-    loginBtn.onclick   = () => open(loginModal);
-    window.addEventListener('keydown', e => e.key==='Escape' && document.querySelectorAll('.modal.active').forEach(close));
+    // === MODALS ===
+    function open(m){m.classList.add('active')}
+    function close(m){m.classList.remove('active')}
+    document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>close(b.closest('.modal')));
+    cartBtn.onclick=()=>open(cartModal);
+    loginBtn.onclick=()=>open(loginModal);
+    window.addEventListener('keydown',e=>e.key==='Escape'&&document.querySelectorAll('.modal.active').forEach(close));
 
-    /* ====== Gallery Delegation (Preview on Image) ====== */
-    gallery.addEventListener('click', e => {
-      if (e.target.tagName !== 'IMG' || !e.target.dataset.id) return;
-      const m = models.find(x => x.id == e.target.dataset.id);
-
-      // set 3D model
-      viewer.src             = m.src;
-      viewerTitle.textContent = m.title;
-      addToCartBtn.dataset.id = m.id;
-
-      // populate optional previews
-      previewImages.innerHTML = '';
-      if (m.previews && m.previews.length) {
-        m.previews.forEach(src => {
-          const img = document.createElement('img');
-          img.src = src;
-          previewImages.appendChild(img);
-        });
-      }
-
+    // === VIEWER ===
+    gallery.addEventListener('click',e=>{
+      if(e.target.tagName!=='IMG'||!e.target.dataset.id)return;
+      const m=models.find(x=>x.id==e.target.dataset.id);
+      viewer.src=m.src;
+      viewerTitle.textContent=m.title;
+      addToCart.dataset.id=m.id;
+      previewsEl.innerHTML='';
+      if(m.previews) m.previews.forEach(src=>{
+        const img=document.createElement('img'); img.src=src;
+        previewsEl.appendChild(img);
+      });
       open(viewerModal);
     });
 
-    /* ====== Add to Cart ====== */
-    addToCartBtn.onclick = () => {
-      const id = +addToCartBtn.dataset.id;
-      const m = models.find(x => x.id === id);
-      if (!cart.some(c => c.id === id)) { cart.push(m); updateCartUI(); }
+    // === ADD TO CART ===
+    addToCart.onclick=()=>{
+      const id=+addToCart.dataset.id;
+      const m=models.find(x=>x.id===id);
+      if(!cart.some(c=>c.id===id)){cart.push(m);updateCartUI()}
       close(viewerModal);
     };
+
+    // === GO TO CHECKOUT ===
+    checkoutBtn.onclick=e=>{
+      close(cartModal);
+      mainContent.style.display='none';
+      checkoutPage.style.display='block';
+      window.scrollTo(0,0);
+    };
+    backHome.onclick=e=>{
+      checkoutPage.style.display='none';
+      mainContent.style.display='block';
+      window.scrollTo(0,0);
+    };
+
+    // === SUBMIT FAKE CHECKOUT ===
+    document.getElementById('checkoutForm').addEventListener('submit',e=>{
+      e.preventDefault();
+      alert('Redirecting to PayPal…');
+      // כאן תזהה ל- PayPal אמיתי
+    });
   </script>
 </body>
 </html>
