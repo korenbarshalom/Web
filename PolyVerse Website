@@ -85,7 +85,7 @@
   <!-- ===== Navbar ===== -->
   <nav id="navbar">
     <div class="logo">
-      <img src="https://imgur.com/a/Gq0cdtS" alt="PolyVerse Logo" style="height:32px;width:32px;border-radius:6px">
+      <img src="https://sdmntprwestus2.oaiusercontent.com/files/00000000-8bd4-61f8-91b4-61eb7d7c6abf/raw?se=2025-06-21T15%3A35%3A11Z&sp=r&sv=2024-08-04&sr=b&scid=1ba98a64-2409-5f3c-94be-8f63ef3f5147&skoid=30ec2761-8f41-44db-b282-7a0f8809659b&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-20T18%3A37%3A43Z&ske=2025-06-21T18%3A37%3A43Z&sks=b&skv=2024-08-04&sig=DCr4N9IwKaV%2B6MzB6uZO9qruYIoIsI0j8D8XoIp9ZzY%3D" alt="PolyVerse Logo" style="height:32px;width:32px;border-radius:6px">
       <span style="font-weight:600;font-size:1.1rem">polyVerse</span>
     </div>
 
@@ -137,7 +137,7 @@
   <script type="module">
     /* ====== Sample Data ====== */
     const models = [
-      {id:1,title:'Human Character Base',price:0,src:'assets/models/model1.fbx',thumb:'https://img.itch.zone/aW1hZ2UvMzYzMDcyMC8yMTYwNTk3NS5wbmc=/original/R%2Bz3uf.png'},
+      {id:1,title:'Human Character Base',price:0,src:'assets/models/model1.fbx',thumb:'https://imgur.com/a/Gq0cdtS'},
       {id:2,title:'Human Character Base',price:0,src:'assets/models/model2.fbx',thumb:'https://img.itch.zone/aW1hZ2UvMzYyNjQzMS8yMTU4MTkwOS5wbmc=/347x500/zwrvpj.png'},
       {id:3,title:'Space Marine',price:0,src:'assets/models/model3.fbx',thumb:'https://placehold.co/400x400?text=Marine'},
       {id:4,title:'Low-Poly Knight',price:0,src:'assets/models/model4.fbx',thumb:'https://placehold.co/400x400?text=Knight'},
