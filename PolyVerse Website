@@ -1,0 +1,266 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>polyVerse – Low-Poly Rigged Models</title>
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+<!-- Model-Viewer -->
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+<style>
+/* ---------- Tiny Reset ---------- */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Inter",sans-serif;line-height:1.6;background:var(--bg);color:var(--text);transition:background .3s,color .3s}
+img{max-width:100%;display:block}
+a{text-decoration:none;color:inherit}
+
+/* ---------- Theme Variables ---------- */
+:root{
+  --bg:#f9f9fb;        --text:#222;      --accent:#14e0c3;
+  --card-bg:#fff;      --radius:12px;    --pattern-opacity:.05;
+}
+[data-theme="dark"]{
+  --bg:#1a1833;        --text:#dcddff;   --accent:#ff4da6;
+  --card-bg:#2a2750;   --pattern-opacity:0;
+}
+
+/* ---------- Background Flair ---------- */
+body::before{
+  content:"";
+  position:fixed;top:0;right:0;width:600px;height:600px;
+  background:radial-gradient(circle at top right,rgba(0,0,0,.15) 0%,transparent 70%);
+  opacity:var(--pattern-opacity);pointer-events:none;z-index:-1;
+}
+
+/* ---------- Buttons ---------- */
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 1.5rem;
+  border:none;border-radius:var(--radius);font-weight:600;cursor:pointer;
+  background:var(--accent);color:#fff;transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s}
+.btn:hover{transform:scale(1.05);box-shadow:0 6px 14px rgba(0,0,0,.15)}
+.btn:active{transform:scale(.97)}
+
+/* ---------- Navbar ---------- */
+nav{position:sticky;top:0;z-index:10;display:flex;align-items:center;
+  justify-content:space-between;padding:.5rem 1rem;background:var(--card-bg);
+  box-shadow:0 1px 3px rgba(0,0,0,.05);transition:transform .4s}
+nav.scroll-up{transform:translateY(0)}nav.scroll-down{transform:translateY(-100%)}
+.logo{font-size:1.25rem;font-weight:600}
+nav ul{display:flex;gap:1rem;list-style:none}
+nav li{display:inline-block}
+
+/* ---------- Gallery ---------- */
+main{max-width:1280px;margin-inline:auto;padding:2rem 1rem}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem}
+.card{background:var(--card-bg);border-radius:var(--radius);box-shadow:0 2px 6px rgba(0,0,0,.1);
+  overflow:hidden;padding:1rem;transition:transform .25s,box-shadow .25s,border-radius .35s ease-out}
+/* removed border-radius change on hover */
+.card:hover{transform:translateY(-4px);box-shadow:0 6px 18px rgba(0,0,0,.15)}
+.card h3{font-size:1rem;margin:.75rem 0 .5rem}
+.price{font-weight:600;color:var(--accent)}
+
+/* ---------- Search ---------- */
+.search-box{position:relative;max-width:300px}
+.search-box input{width:100%;padding:.6rem 1rem;border-radius:var(--radius);border:2px solid var(--accent);outline:none}
+
+/* ---------- Modals (Cart / Login) ---------- */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center}
+.modal.active{display:flex}
+.modal-content{background:var(--card-bg);padding:2rem;border-radius:var(--radius);width:90%;max-width:400px;max-height:90vh;overflow:auto}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.modal-header h2{font-size:1.25rem}
+.close{background:none;border:none;font-size:1.25rem;cursor:pointer;color:var(--text)}
+
+/* ---------- Theme Toggle ---------- */
+.toggle{background:none;border:none;cursor:pointer;font-size:1.25rem}
+
+/* ---------- Responsive ---------- */
+@media(max-width:600px){
+  nav ul{display:none}
+  .hamburger{display:block;}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== Navbar ===== -->
+<nav id="navbar">
+  <span class="logo">polyVerse</span>
+
+  <div class="search-box">
+    <input id="search" type="search" placeholder="Search models…">
+  </div>
+
+  <ul>
+    <li><button class="toggle" id="themeToggle">🌙</button></li>
+    <li><button class="btn" id="loginBtn">Log&nbsp;In</button></li>
+    <li>
+      <button class="btn" id="cartBtn">🛒 <span id="cartCount">0</span></button>
+    </li>
+  </ul>
+</nav>
+
+<!-- ===== Main / Gallery ===== -->
+<main>
+  <section class="gallery" id="gallery"></section>
+</main>
+
+<!-- ===== Cart Modal ===== -->
+<div class="modal" id="cartModal">
+  <div class="modal-content">
+    <div class="modal-header"><h2>Cart</h2><button class="close" data-close>&times;</button></div>
+    <ul id="cartItems"></ul>
+    <p id="total">$0.00</p>
+    <button class="btn" style="width:100%">Checkout (PayPal stub)</button>
+  </div>
+</div>
+
+<!-- ===== Login Modal ===== -->
+<div class="modal" id="loginModal">
+  <div class="modal-content">
+    <div class="modal-header"><h2>Log In</h2><button class="close" data-close>&times;</button></div>
+    <label>Email <input type="email" style="width:100%;margin:.5rem 0"></label>
+    <label>Password <input type="password" style="width:100%;margin:.5rem 0 1rem"></label>
+    <button class="btn" style="width:100%">Continue</button>
+    <p style="margin-top:1rem;font-size:.875rem">Auth backend coming soon.</p>
+  </div>
+</div>
+
+<!-- ===== Model Viewer Modal (preview) ===== -->
+<div class="modal" id="viewerModal">
+  <div class="modal-content" style="max-width:800px">
+    <div class="modal-header"><h2 id="viewerTitle"></h2><button class="close" data-close>&times;</button></div>
+    <model-viewer id="viewer" alt="3D model" src="" camera-controls auto-rotate style="height:400px;background:#eee"></model-viewer>
+    <button id="addToCart" class="btn" style="margin-top:1rem;width:100%">Add to Cart</button>
+  </div>
+</div>
+
+<script type="module">
+/* ====== Sample Data ====== */
+const models=[
+  {id:1,title:'Robot Buddy',price:0,src:'assets/models/model1.fbx',thumb:'https://placehold.co/400x400?text=Robot'},
+  {id:2,title:'Cyber Ninja',price:9.99,src:'assets/models/model2.fbx',thumb:'https://placehold.co/400x400?text=Ninja'},
+  {id:3,title:'Space Marine',price:14.99,src:'assets/models/model3.fbx',thumb:'https://placehold.co/400x400?text=Marine'},
+  {id:4,title:'Low-Poly Knight',price:4.99,src:'assets/models/model4.fbx',thumb:'https://placehold.co/400x400?text=Knight'},
+  {id:5,title:'Cartoon Archer',price:0,src:'assets/models/model5.fbx',thumb:'https://placehold.co/400x400?text=Archer'},
+  {id:6,title:'Steampunk Bot',price:7.5,src:'assets/models/model6.fbx',thumb:'https://placehold.co/400x400?text=Bot'},
+  {id:7,title:'Voxel Mage',price:3.5,src:'assets/models/model7.fbx',thumb:'https://placehold.co/400x400?text=Mage'},
+  {id:8,title:'Sci-Fi Soldier',price:0,src:'assets/models/model8.fbx',thumb:'https://placehold.co/400x400?text=Soldier'},
+  {id:9,title:'Alien Brute',price:8.75,src:'assets/models/model9.fbx',thumb:'https://placehold.co/400x400?text=Alien'},
+  {id:10,title:'Mutant Bug',price:5,src:'assets/models/model10.fbx',thumb:'https://placehold.co/400x400?text=Bug'}
+];
+
+/* ====== DOM Hooks ====== */
+const gallery=document.getElementById('gallery');
+const search=document.getElementById('search');
+const themeToggle=document.getElementById('themeToggle');
+const cartBtn=document.getElementById('cartBtn');
+const loginBtn=document.getElementById('loginBtn');
+const cartModal=document.getElementById('cartModal');
+const loginModal=document.getElementById('loginModal');
+const viewerModal=document.getElementById('viewerModal');
+const viewer=document.getElementById('viewer');
+const viewerTitle=document.getElementById('viewerTitle');
+const addToCartBtn=document.getElementById('addToCart');
+const cartItems=document.getElementById('cartItems');
+const total=document.getElementById('total');
+const cartCount=document.getElementById('cartCount');
+
+/* ====== Render Gallery ====== */
+function renderGallery(list){
+  gallery.innerHTML='';
+  list.forEach(m=>{
+    const card=document.createElement('div');
+    card.className='card';
+    card.innerHTML=`
+      <img src="${m.thumb}" alt="">
+      <h3>${m.title}</h3>
+      <p class="price">${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>
+      <button class="btn buy" data-id="${m.id}">Preview</button>`;
+    gallery.appendChild(card);
+  });
+  /* Staggered fade-in */
+  [...gallery.children].forEach((el,i)=>{el.style.opacity=0;setTimeout(()=>el.style.transition='opacity .4s ease',50);setTimeout(()=>el.style.opacity=1,100*i)});
+}
+renderGallery(models);
+
+/* ====== Search Filter ====== */
+search.addEventListener('input',e=>{
+  const q=e.target.value.toLowerCase();
+  renderGallery(models.filter(m=>m.title.toLowerCase().includes(q)));
+});
+
+/* ====== Theme Toggle ====== */
+const storedTheme=localStorage.getItem('theme')||'light';
+document.documentElement.dataset.theme=storedTheme;
+themeToggle.textContent=storedTheme==='dark'?'☀️':'🌙';
+themeToggle.addEventListener('click',()=>{
+  const t=document.documentElement.dataset.theme==='light'?'dark':'light';
+  document.documentElement.dataset.theme=t;
+  localStorage.setItem('theme',t);
+  themeToggle.textContent=t==='dark'?'☀️':'🌙';
+});
+
+/* ====== Navbar hide/reveal on scroll ====== */
+let prevY=window.scrollY;
+window.addEventListener('scroll',()=>{
+  const nav=document.getElementById('navbar');
+  if(window.scrollY<prevY)nav.classList.add('scroll-up'),nav.classList.remove('scroll-down');
+  else nav.classList.add('scroll-down'),nav.classList.remove('scroll-up');
+  prevY=window.scrollY;
+});
+
+/* ====== Cart System ====== */
+let cart=JSON.parse(localStorage.getItem('cart')||'[]');
+function updateCartUI(){
+  cartCount.textContent=cart.length;
+  cartItems.innerHTML='';
+  let sum=0;
+  cart.forEach(item=>{
+    const li=document.createElement('li');
+    li.textContent=item.title+' – '+(item.price?`$${item.price}`:'Free');
+    cartItems.appendChild(li);
+    sum+=item.price||0;
+  });
+  total.textContent='$'+sum.toFixed(2);
+  localStorage.setItem('cart',JSON.stringify(cart));
+}
+updateCartUI();
+
+/* ====== Modal Helpers ====== */
+function open(modal){modal.classList.add('active')}
+function close(modal){modal.classList.remove('active')}
+document.querySelectorAll('[data-close]').forEach(btn=>btn.onclick=()=>close(btn.closest('.modal')));
+cartBtn.onclick=()=>open(cartModal);
+loginBtn.onclick=()=>open(loginModal);
+window.addEventListener('keydown',e=>e.key==='Escape'&&document.querySelectorAll('.modal.active').forEach(close));
+
+/* ====== Gallery Delegation (Preview) ====== */
+gallery.addEventListener('click',e=>{
+  if(!e.target.matches('.buy'))return;
+  const m=models.find(x=>x.id==e.target.dataset.id);
+  viewer.src=m.src;viewerTitle.textContent=m.title;
+  addToCartBtn.dataset.id=m.id;
+  open(viewerModal);
+});
+
+/* ====== Add to Cart from Viewer ====== */
+addToCartBtn.onclick=()=>{
+  const id=addToCartBtn.dataset.id;
+  const m=models.find(x=>x.id==id);
+  if(!cart.some(c=>c.id==id)){cart.push(m);updateCartUI();}
+  close(viewerModal);
+};
+
+/* ====== IntersectionObserver for cards (optional extra) ====== */
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(ent=>ent.isIntersecting&&(ent.target.style.transform='scale(1)',io.unobserve(ent.target)));
+},{threshold:.2});
+document.querySelectorAll('.card').forEach(c=>{c.style.transform='scale(.8)';io.observe(c)});
+</script>
+</body>
+</html>
