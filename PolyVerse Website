@@ -56,13 +56,23 @@
     nav ul { display:flex; gap:1rem; list-style:none }
     @media(max-width:600px){ nav ul{ display:none } }
 
-    /* ---------- Hero ---------- */
+    /* ---------- Hero Section (blue gradient) ---------- */
     .hero {
-      background: linear-gradient(135deg, #6d5bf5, #956bfa);
+      background: linear-gradient(135deg, #2196F3, #1E88E5);
       padding:4rem 1rem; text-align:center;
     }
     .hero h1 { font-size:2.5rem; margin-bottom:1rem }
     .hero p  { font-size:1.125rem; margin-bottom:2rem; color:rgba(255,255,255,0.85) }
+
+    /* ---------- Search Bar Styling ---------- */
+    .hero-search { margin-top:1rem }
+    .hero-search input {
+      width:100%; max-width:600px;
+      padding:1rem 1.5rem;
+      border:none; border-radius:var(--radius);
+      outline:none; font-size:1rem;
+    }
+    .hero-search input::placeholder { color:#ccc }
 
     /* ---------- Gallery ---------- */
     main { max-width:1280px; margin:2rem auto; padding:0 1rem }
@@ -129,7 +139,7 @@
   <!-- NAVBAR -->
   <nav id="navbar">
     <div class="logo">
-      <img src="https://sdmntprnorthcentralus.oaiusercontent.com/files/00000000-9f28-622f-8bd2-bfc50c6cdffb/raw?se=2025-06-21T20%3A56%3A48Z&sp=r&sv=2024-08-04&sr=b&scid=4ca4426e-3962-51ff-9fd0-d286d76fde4e&skoid=bbd22fc4-f881-4ea4-b2f3-c12033cf6a8b&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-21T17%3A17%3A44Z&ske=2025-06-22T17%3A17%3A44Z&sks=b&skv=2024-08-04&sig=njJcKZ9ByVm3EoEfWITqzwgNJf0sBEMLz6M22o6w110%3D" 
+      <img src="https://sdmntprnorthcentralus.oaiusercontent.com/files/00000000-9f28-622f-8bd2-bfc50c6cdffb/raw?se=2025-06-21T20%3A56%3A48Z&sp=r&sv=2024-08-04&sr=b&scid=4ca4426e-3962-51ff-9fd0-d286d76fde4e&skoid=bbd22fc4-f881-4ea4-b2f3-c12033cf6a8b&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-21T17%3A17%3A44Z&ske=2025-06-22T17%3A17%3A44Z&sks=b&skv=2024-08-04&sig=njJcKZ9ByVm3EoEfWITqzwgNJf0sBEMLz6M22o6w110%3D"
            alt="polyVerse logo" style="height:32px;width:32px;border-radius:6px">
       <span style="font-weight:600;font-size:1.1rem">polyVerse</span>
     </div>
@@ -291,23 +301,12 @@
       renderGallery(models.filter(m=>m.title.toLowerCase().includes(q)));
     });
 
-    // === NAV SCROLL CLASS (unused styling) ===
-    let prevY=window.scrollY;
-    window.addEventListener('scroll',()=>{
-      const nav=document.getElementById('navbar');
-      window.scrollY<prevY?nav.classList.remove('scroll-down'):nav.classList.add('scroll-down');
-      prevY=window.scrollY;
-    });
-
-    // === MODALS ===
+    // === MODALS & VIEWER & CHECKOUT NAV ===
     function open(m){m.classList.add('active')}
     function close(m){m.classList.remove('active')}
     document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>close(b.closest('.modal')));
     cartBtn.onclick=()=>open(cartModal);
     loginBtn.onclick=()=>open(loginModal);
-    window.addEventListener('keydown',e=>e.key==='Escape'&&document.querySelectorAll('.modal.active').forEach(close));
-
-    // === VIEWER ===
     gallery.addEventListener('click',e=>{
       if(e.target.tagName!=='IMG'||!e.target.dataset.id)return;
       const m=models.find(x=>x.id==e.target.dataset.id);
@@ -316,21 +315,12 @@
       addToCart.dataset.id=m.id;
       previewsEl.innerHTML='';
       if(m.previews) m.previews.forEach(src=>{
-        const img=document.createElement('img'); img.src=src;
-        previewsEl.appendChild(img);
+        const img=document.createElement('img'); img.src=src; previewsEl.appendChild(img);
       });
       open(viewerModal);
     });
+    addToCart.onclick=()=>{ const id=+addToCart.dataset.id; const m=models.find(x=>x.id===id); if(!cart.some(c=>c.id===id)){cart.push(m);updateCartUI()} close(viewerModal); };
 
-    // === ADD TO CART ===
-    addToCart.onclick=()=>{
-      const id=+addToCart.dataset.id;
-      const m=models.find(x=>x.id===id);
-      if(!cart.some(c=>c.id===id)){cart.push(m);updateCartUI()}
-      close(viewerModal);
-    };
-
-    // === GO TO CHECKOUT ===
     checkoutBtn.onclick=e=>{
       close(cartModal);
       mainContent.style.display='none';
@@ -343,12 +333,16 @@
       window.scrollTo(0,0);
     };
 
-    // === SUBMIT FAKE CHECKOUT ===
+    // === FAKE CHECKOUT SUBMIT ===
     document.getElementById('checkoutForm').addEventListener('submit',e=>{
       e.preventDefault();
       alert('Redirecting to PayPal…');
-      // כאן תזהה ל- PayPal אמיתי
+      // implement real PayPal redirect here
     });
+
+    // close on ESC
+    window.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.modal.active').forEach(close); });
+
   </script>
 </body>
 </html>
