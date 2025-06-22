@@ -303,7 +303,10 @@
   <!-- NAVBAR -->
   <nav id="navbar">
     <div class="logo">
-      <img src="https://sdmntpreastus.oaiusercontent.com/files/00000000-6d40-61f9-ac31-3adaac5f30a5/raw?se=2025-06-22T08%3A04%3A49Z&sp=r&sv=2024-08-04&sr=b&scid=e1d20f76-2703-5001-9233-c99a861c5935&skoid=f28c0102-4d9d-4950-baf0-4a8e5f6cf9d4&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-21T16%3A27%3A37Z&ske=2025-06-22T16%3A27%3A37Z&sks=b&skv=2024-08-04&sig=8YVUYGZug60%2BrZxDIQph%2BJjfzqh3/iZZqecjvt2jdfI%3D"
+     <img src="https://img.itch.zone/aW1hZ2UvMzY2NTA1MS8yMTgwOTEzNC5wbmc=/250x600/Q5BHfP.png"
+     alt="  polyVerse logo"
+     
+
            alt="polyVerse logo" style="height:32px;width:32px;border-radius:6px">
       <span style="font-weight:600;font-size:1.1rem">polyVerse</span>
     </div>
@@ -542,25 +545,26 @@
 
     // --- Model detail & checkout navigation ---
     function openModelPage(m){
-      modelImg.src=m.thumb;
-      modelTitle.textContent=m.title;
-      modelDesc.textContent=m.desc;
-      
-      // Set the 3D model source
-      if (m.src) {
-        modelViewer.src = m.src;
-      }
-      
-      // Reset view to image by default
-      modelImg.style.display = 'block';
-      modelViewer.style.display = 'none';
-      viewToggle.textContent = '3D View';
-      
-      mainContent.style.display='none';
-      checkoutPage.style.display='none';
-      modelPage.style.display='block';
-      window.scrollTo(0,0);
-    }
+  modelImg.src = m.thumb;
+  modelTitle.textContent = m.title;
+  modelDesc.textContent = m.desc;
+  
+  // Set the 3D model source
+  if (m.src) {
+    modelViewer.src = m.src;
+  }
+
+  // Show 3D model by default, hide image and toggle
+  modelImg.style.display = 'none';
+  modelViewer.style.display = 'block';
+  viewToggle.style.display = 'none'; // hide the toggle button
+
+  mainContent.style.display = 'none';
+  checkoutPage.style.display = 'none';
+  modelPage.style.display = 'block';
+  window.scrollTo(0,0);
+}
+
     
     // Toggle between image and 3D view
     viewToggle.addEventListener('click', () => {
