@@ -47,10 +47,10 @@
     .buy-btn {
       background:red;
       transition:transform .2s;
-      animation: none;
+      animation:none;
     }
     .buy-btn:hover {
-      animation: pulse 0.6s infinite alternate;
+      animation:pulse 0.6s infinite alternate;
       box-shadow:0 6px 14px rgba(0,0,0,.4);
     }
 
@@ -67,7 +67,7 @@
 
     /* ---------- Hero Section (blue gradient) ---------- */
     .hero {
-      background: linear-gradient(135deg, #2196F3, #1E88E5);
+      background:linear-gradient(135deg,#2196F3,#1E88E5);
       padding:4rem 1rem; text-align:center;
     }
     .hero h1 { font-size:2.5rem; margin-bottom:1rem }
@@ -106,28 +106,23 @@
     .card h3 { font-size:1rem; margin-bottom:.5rem }
     .card p  { font-size:.875rem; color:#aaa }
 
-    /* ---------- Modals (existing overlay) ---------- */
+    /* ---------- Modals (overlay stays global) ---------- */
     .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
+      position:fixed; inset:0;
+      background:rgba(0,0,0,0.6);   /* semi-transparent dark overlay */
+      display:none;
+      align-items:center; justify-content:center;
+      z-index:1000;
     }
-    .modal.active {
-      display: flex;
-    }
+    .modal.active { display:flex }
+
     .modal-content {
-      background: var(--card-bg);
-      transform: scale(0.8);
-      opacity: 0;
-      transition: .3s ease-out;
+      background:var(--card-bg);
+      transform:scale(0.8); opacity:0;
+      transition:.3s ease-out;
     }
     .modal.active .modal-content {
-      transform: scale(1);
-      opacity: 1;
+      transform:scale(1); opacity:1;
     }
 
     /* ---------- Model Detail Page ---------- */
@@ -143,7 +138,7 @@
     @media(min-width:700px){
       #modelPage .model-detail { flex-direction:row }
       #modelPage .model-detail img { flex:1; max-width:50% }
-      #modelPage .model-detail .desc { flex:1; }
+      #modelPage .model-detail .desc { flex:1 }
     }
     #modelPage img { width:100%; border-radius:var(--radius) }
     #modelPage h2 { margin-bottom:.5rem }
@@ -170,87 +165,101 @@
     }
     footer p { margin:.5rem 0 }
 
-    /* ---------- New Login Modal Styles ---------- */
+    /* ---------- Redesigned Login / Register Modal ---------- */
     #loginModal .modal-content {
-      padding: 2rem;
-      border-radius: var(--radius);
-      max-width: 360px;
-      width: 100%;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-      position: relative;
+      position:relative;
+      width:100%; max-width:380px;
+      padding:2rem 2rem 2.5rem;
+      border-radius:var(--radius);
+      background:var(--card-bg);
+      box-shadow:0 8px 24px rgba(0,0,0,0.4);
     }
     #loginModal .modal-header {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      margin-bottom: 1.5rem;
+      position:relative;
+      display:flex; justify-content:center; align-items:center;
+      margin-bottom:1.5rem;
     }
     #loginModal .modal-header h2 {
-      font-size: 2rem;
-      color: var(--text);
+      font-size:2rem; font-weight:600; color:var(--text);
     }
     #loginModal .modal-header .close {
-      position: absolute;
-      top: 0;
-      right: 0;
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      line-height: 1;
-      cursor: pointer;
-      color: var(--text);
+      position:absolute; top:-0.5rem; right:-0.5rem;
+      width:32px; height:32px;
+      border:none; border-radius:50%;
+      background:transparent;
+      color:var(--text); font-size:1.5rem; line-height:1;
+      cursor:pointer;
+      transition:background .2s;
     }
-    #loginModal .login-input {
-      width: 100%;
-      padding: .75rem 1rem;
-      border-radius: var(--radius);
-      border: none;
-      background: var(--bg);
-      color: #fff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      margin-bottom: 1rem;
-      outline: none;
+    #loginModal .modal-header .close:hover {
+      background:rgba(255,255,255,0.08);
     }
-    #loginModal .login-btn {
-      width: 100%;
-      padding: .75rem 1rem;
-      border: none;
-      border-radius: var(--radius);
-      background: var(--accent);
-      color: #fff;
-      font-weight: 600;
-      transition: background-color .2s, transform .2s;
-      cursor: pointer;
-      margin-top: .5rem;
+
+    #loginModal label {
+      width:100%; display:block; font-size:.85rem; font-weight:600;
+      margin-bottom:.25rem; color:#ccc;
     }
-    #loginModal .login-btn:hover {
-      background: #ffb74d;
-      transform: translateY(-1px);
-    }
-    .google-btn {
+    #loginModal input.login-input {
       width:100%;
       padding:.75rem 1rem;
-      border:none;
-      border-radius:var(--radius);
-      background:#fff;
-      color:#444;
-      font-weight:600;
-      margin-top:1rem;
+      border:none; border-radius:var(--radius);
+      background:#202024;
+      color:#fff;
+      box-shadow:0 2px 6px rgba(0,0,0,0.3);
+      margin-bottom:1.25rem;
+      outline:none;
+    }
+    #loginModal input.login-input::placeholder { color:#888 }
+
+    /* row that holds Continue + Create Account */
+    #loginModal .action-row{
+      display:flex; gap:1rem; margin-bottom:1rem;
+    }
+    #loginModal .action-row .btn{
+      flex:1; justify-content:center;
+    }
+
+    #loginModal .login-btn,
+    #loginModal .register-submit{
+      width:100%;
+      display:block;
+      padding:.75rem 1rem;
+      border:none; border-radius:var(--radius);
+      background:var(--accent);
+      color:#fff; font-weight:600; text-align:center;
       cursor:pointer;
-      transition:background-color .2s, transform .2s;
-      box-shadow:0 2px 6px rgba(0,0,0,0.2);
+      transition:background-color .2s,transform .2s;
+    }
+    #loginModal .login-btn:hover,
+    #loginModal .register-submit:hover {
+      background:#ffb74d;
+      transform:translateY(-1px);
+    }
+
+    .google-btn {
+      width:100%; display:block;
+      margin-top:1rem;
+      padding:.75rem 1rem;
+      border:none; border-radius:var(--radius);
+      background:#fff; color:#444; font-weight:600; text-align:center;
+      cursor:pointer;
+      box-shadow:0 2px 6px rgba(0,0,0,0.25);
+      transition:background-color .2s,transform .2s;
     }
     .google-btn:hover {
       background:#f1f1f1;
       transform:translateY(-1px);
     }
+
     #loginModal p {
-      margin-top: 1rem;
-      font-size: .875rem;
-      color: #aaa;
-      text-align: center;
+      margin-top:1.25rem;
+      font-size:.825rem;
+      color:#999;
+      text-align:center;
     }
+
+    /* hide register view by default */
+    #registerView{ display:none; }
   </style>
 </head>
 <body>
@@ -297,7 +306,7 @@
   <!-- CHECKOUT PAGE -->
   <section id="checkoutPage">
     <button class="btn back-btn" id="backHome">← Back to Shop</button>
-    <h2 style="text-align:center; margin-bottom:1rem;">Checkout</h2>
+    <h2 style="text-align:center;margin-bottom:1rem;">Checkout</h2>
     <form id="checkoutForm">
       <label>
         Full Name
@@ -322,24 +331,47 @@
     <p>Phone: 052-221-5113</p>
   </footer>
 
-  <!-- LOGIN MODAL -->
+  <!-- LOGIN / REGISTER MODAL -->
   <div class="modal" id="loginModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Log In</h2>
+        <h2 id="modalTitle">Log In</h2>
         <button class="close" data-close>&times;</button>
       </div>
-      <label>
-        Email
+
+      <!-- ===== LOGIN VIEW ===== -->
+      <div id="loginView">
+        <label>Email</label>
         <input type="email" class="login-input" placeholder="you@example.com" required>
-      </label>
-      <label>
-        Password
+
+        <label>Password</label>
         <input type="password" class="login-input" placeholder="Your password" required>
-      </label>
-      <button class="btn login-btn">Continue</button>
-      <button class="google-btn">Log in with Google</button>
-      <p>Auth backend coming soon.</p>
+
+        <div class="action-row">
+          <button class="login-btn">Continue</button>
+          <button class="btn" id="createAccountBtn">Create&nbsp;Account</button>
+        </div>
+
+        <button class="google-btn">Log in with Google</button>
+        <p>Auth backend coming soon.</p>
+      </div>
+
+      <!-- ===== REGISTER VIEW ===== -->
+      <div id="registerView">
+        <label>Full Name</label>
+        <input type="text" class="login-input" placeholder="Your Name" required>
+
+        <label>Email</label>
+        <input type="email" class="login-input" placeholder="you@example.com" required>
+
+        <label>Password</label>
+        <input type="password" class="login-input" placeholder="Choose a strong password" required>
+
+        <button class="register-submit">Create Account</button>
+
+        <button class="google-btn">Sign up with Google</button>
+        <p style="margin-top:.75rem;">Already have an account? <a href="#" id="backToLogin" style="color:var(--accent);">Log In</a></p>
+      </div>
     </div>
   </div>
 
@@ -357,86 +389,111 @@
     ];
 
     // DOM refs
-    const gallery       = document.getElementById('gallery');
-    const heroSearch    = document.getElementById('heroSearch');
-    const loginBtn      = document.getElementById('loginBtn');
-    const loginModal    = document.getElementById('loginModal');
-    const modelPage     = document.getElementById('modelPage');
-    const modelImg      = document.getElementById('modelImg');
-    const modelTitle    = document.getElementById('modelTitle');
-    const modelDesc     = document.getElementById('modelDesc');
-    const backModel     = document.getElementById('backModel');
-    const buyNowBtn     = document.getElementById('buyNowBtn');
-    const mainContent   = document.getElementById('mainContent');
-    const checkoutPage  = document.getElementById('checkoutPage');
-    const backHome      = document.getElementById('backHome');
+    const gallery      = document.getElementById('gallery');
+    const heroSearch   = document.getElementById('heroSearch');
+    const loginBtn     = document.getElementById('loginBtn');
+    const loginModal   = document.getElementById('loginModal');
+    const modelPage    = document.getElementById('modelPage');
+    const modelImg     = document.getElementById('modelImg');
+    const modelTitle   = document.getElementById('modelTitle');
+    const modelDesc    = document.getElementById('modelDesc');
+    const backModel    = document.getElementById('backModel');
+    const buyNowBtn    = document.getElementById('buyNowBtn');
+    const mainContent  = document.getElementById('mainContent');
+    const checkoutPage = document.getElementById('checkoutPage');
+    const backHome     = document.getElementById('backHome');
 
-    // render gallery
-    function renderGallery(list) {
-      gallery.innerHTML = '';
-      list.forEach(m => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
+    // NEW refs for login/register toggle
+    const loginView   = document.getElementById('loginView');
+    const registerView= document.getElementById('registerView');
+    const modalTitle  = document.getElementById('modalTitle');
+    const createAccBtn= document.getElementById('createAccountBtn');
+    const backToLogin = document.getElementById('backToLogin');
+
+    // --- Gallery ---
+    function renderGallery(list){
+      gallery.innerHTML='';
+      list.forEach(m=>{
+        const card=document.createElement('div');
+        card.className='card';
+        card.innerHTML=`
           <img src="${m.thumb}" alt="${m.title}">
           <div class="info">
             <h3>${m.title}</h3>
-            <p>${m.price ? `$${m.price.toFixed(2)}` : 'Free'}</p>
+            <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>
           </div>`;
-        card.onclick = () => openModelPage(m);
+        card.onclick=()=>openModelPage(m);
         gallery.appendChild(card);
       });
     }
     renderGallery(models);
 
-    // search
-    heroSearch.addEventListener('input', e => {
-      const q = e.target.value.toLowerCase();
-      renderGallery(models.filter(m => m.title.toLowerCase().includes(q)));
+    heroSearch.addEventListener('input',e=>{
+      const q=e.target.value.toLowerCase();
+      renderGallery(models.filter(m=>m.title.toLowerCase().includes(q)));
     });
 
-    // open model detail
-    function openModelPage(m) {
-      modelImg.src      = m.thumb;
-      modelTitle.textContent = m.title;
-      modelDesc.textContent  = m.desc;
-      mainContent.style.display   = 'none';
-      checkoutPage.style.display  = 'none';
-      modelPage.style.display     = 'block';
+    // --- Model detail & checkout navigation ---
+    function openModelPage(m){
+      modelImg.src=m.thumb;
+      modelTitle.textContent=m.title;
+      modelDesc.textContent=m.desc;
+      mainContent.style.display='none';
+      checkoutPage.style.display='none';
+      modelPage.style.display='block';
       window.scrollTo(0,0);
     }
-
-    backModel.onclick = () => {
-      modelPage.style.display   = 'none';
-      mainContent.style.display = 'block';
+    backModel.onclick=()=>{
+      modelPage.style.display='none';
+      mainContent.style.display='block';
+      window.scrollTo(0,0);
+    };
+    buyNowBtn.onclick=()=>{
+      modelPage.style.display='none';
+      mainContent.style.display='none';
+      checkoutPage.style.display='block';
+      window.scrollTo(0,0);
+    };
+    backHome.onclick=()=>{
+      checkoutPage.style.display='none';
+      modelPage.style.display='none';
+      mainContent.style.display='block';
       window.scrollTo(0,0);
     };
 
-    buyNowBtn.onclick = () => {
-      modelPage.style.display   = 'none';
-      mainContent.style.display = 'none';
-      checkoutPage.style.display= 'block';
-      window.scrollTo(0,0);
-    };
-
-    backHome.onclick = () => {
-      checkoutPage.style.display  = 'none';
-      modelPage.style.display     = 'none';
-      mainContent.style.display   = 'block';
-      window.scrollTo(0,0);
-    };
-
-    // login modal logic
-    function openModal(m){ m.classList.add('active') }
-    function closeModal(m){ m.classList.remove('active') }
-    document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => closeModal(b.closest('.modal')));
-    loginBtn.onclick = () => openModal(loginModal);
-    window.addEventListener('keydown', e => {
-      if (e.key === 'Escape') document.querySelectorAll('.modal.active').forEach(closeModal);
+    // --- Login / Register modal logic ---
+    function openModal(m){ 
+      m.classList.add('active'); 
+      showLogin();               // always default to login view
+    }
+    function closeModal(m){ m.classList.remove('active'); }
+    document.querySelectorAll('[data-close]').forEach(btn=>{
+      btn.onclick=()=>closeModal(btn.closest('.modal'));
+    });
+    loginBtn.onclick=()=>openModal(loginModal);
+    window.addEventListener('keydown',e=>{
+      if(e.key==='Escape') document.querySelectorAll('.modal.active').forEach(closeModal);
     });
 
-    // fake checkout
-    document.getElementById('checkoutForm').addEventListener('submit', e => {
+    // toggle helpers
+    function showLogin(){
+      loginView.style.display='block';
+      registerView.style.display='none';
+      modalTitle.textContent='Log In';
+    }
+    function showRegister(){
+      loginView.style.display='none';
+      registerView.style.display='block';
+      modalTitle.textContent='Create Account';
+    }
+    createAccBtn.onclick=showRegister;
+    backToLogin.onclick=e=>{
+      e.preventDefault();
+      showLogin();
+    };
+
+    // --- Fake checkout ---
+    document.getElementById('checkoutForm').addEventListener('submit',e=>{
       e.preventDefault();
       alert('Redirecting to PayPal…');
       // implement real PayPal redirect here
