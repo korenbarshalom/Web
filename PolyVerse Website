@@ -339,7 +339,7 @@
           auto-rotate 
           shadow-intensity="1"
           environment-image="neutral"
-          exposure="1"
+          exposure="0.5"
           shadow-softness="0.5"
           style="display:none;">
         </model-viewer>
@@ -433,7 +433,7 @@
         price:0, 
         thumb:'https://img.itch.zone/aW1hZ2UvMzYzMDcyMC8yMTYwNTk3NS5wbmc=/347x500/0EGaXE.png', 
         desc:'A versatile low-poly human base mesh, ready for your animations and rigs.',
-        src: '3DHuman1.gltf'  // Your existing .gltf file
+        src: '3DHuman4.gltf'  // Your existing .gltf file
       },
       { 
         id:2, 
@@ -441,7 +441,7 @@
         price:0, 
         thumb:'https://img.itch.zone/aW1hZ2UvMzYyNjQzMS8yMTU4MTkwOS5wbmc=/347x500/zwrvpj.png', 
         desc:'Alternate low-poly human model optimized for mobile and VR.',
-        src: '3DHuman1.gltf'
+        src: '3DHuman11.gltf'
       },
       { 
         id:3, 
@@ -449,7 +449,7 @@
         price:0, 
         thumb:'https://img.itch.zone/aW1hZ2UvMzYyNjI1OC8yMTYwMzg1Mi5wbmc=/347x500/Qsh9nF.png', 
         desc:'A stylized player avatar with simple topology for game characters.',
-        src: '3DHuman2.gltf'
+        src: '3DPlayer3.gltf'
       },
       { 
         id:4, 
