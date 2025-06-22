@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Model Viewer -->
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>polyVerse – Low-Poly Rigged Models</title>
@@ -137,12 +140,45 @@
     }
     @media(min-width:700px){
       #modelPage .model-detail { flex-direction:row }
-      #modelPage .model-detail img { flex:1; max-width:50% }
+      #modelPage .model-detail .model-viewer-container { flex:1; max-width:50% }
       #modelPage .model-detail .desc { flex:1 }
     }
     #modelPage img { width:100%; border-radius:var(--radius) }
     #modelPage h2 { margin-bottom:.5rem }
     #modelPage p  { line-height:1.4; margin-bottom:1rem }
+
+    /* ---------- Model Viewer Styling ---------- */
+    model-viewer {
+      width:100%;
+      height:400px;
+      border-radius:var(--radius);
+      background:var(--card-bg);
+      --poster-color: transparent;
+    }
+
+    .model-viewer-container {
+      position:relative;
+      border-radius:var(--radius);
+      overflow:hidden;
+    }
+
+    .view-toggle {
+      position:absolute;
+      top:10px;
+      right:10px;
+      background:rgba(0,0,0,0.7);
+      color:white;
+      border:none;
+      padding:8px 12px;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:12px;
+      z-index:10;
+    }
+
+    .view-toggle:hover {
+      background:rgba(0,0,0,0.9);
+    }
 
     /* ---------- Checkout Page ---------- */
     #checkoutPage {
@@ -294,7 +330,20 @@
   <section id="modelPage">
     <button class="btn back-btn" id="backModel">← Back to Shop</button>
     <div class="model-detail">
-      <img id="modelImg" src="" alt="Model preview">
+      <div class="model-viewer-container">
+        <button class="view-toggle" id="viewToggle">3D View</button>
+        <img id="modelImg" src="" alt="Model preview">
+        <model-viewer 
+          id="modelViewer"
+          camera-controls 
+          auto-rotate 
+          shadow-intensity="1"
+          environment-image="neutral"
+          exposure="1"
+          shadow-softness="0.5"
+          style="display:none;">
+        </model-viewer>
+      </div>
       <div class="desc">
         <h2 id="modelTitle"></h2>
         <p id="modelDesc"></p>
@@ -378,14 +427,70 @@
   <script type="module">
     // === DATA & HOOKS ===
     const models = [
-      { id:1, title:'Human Character Base', price:0, thumb:'https://img.itch.zone/aW1hZ2UvMzYzMDcyMC8yMTYwNTk3NS5wbmc=/347x500/0EGaXE.png', desc:'A versatile low-poly human base mesh, ready for your animations and rigs.' },
-      { id:2, title:'Human Character Base', price:0, thumb:'https://img.itch.zone/aW1hZ2UvMzYyNjQzMS8yMTU4MTkwOS5wbmc=/347x500/zwrvpj.png', desc:'Alternate low-poly human model optimized for mobile and VR.' },
-      { id:3, title:'Player Model', price:0, thumb:'https://img.itch.zone/aW1hZ2UvMzYyNjI1OC8yMTYwMzg1Mi5wbmc=/347x500/Qsh9nF.png', desc:'A stylized player avatar with simple topology for game characters.' },
-      { id:4, title:'Knight', price:0, thumb:'https://placehold.co/400x400?text=Knight', desc:'A medieval knight in low-poly style.' },
-      { id:5, title:'Archer', price:0, thumb:'https://placehold.co/400x400?text=Archer', desc:'A ready-to-animate archer character.' },
-      { id:6, title:'Steampunk Bot', price:0, thumb:'https://placehold.co/400x400?text=Bot', desc:'Low-poly steampunk robot NPC.' },
-      { id:7, title:'Voxel Mage', price:0, thumb:'https://placehold.co/400x400?text=Mage', desc:'Blocky mage perfect for voxel games.' },
-      { id:8, title:'Sci-Fi Soldier', price:0, thumb:'https://placehold.co/400x400?text=Soldier', desc:'Futuristic soldier rigged for animation.' },
+      { 
+        id:1, 
+        title:'Human Character Base', 
+        price:0, 
+        thumb:'https://img.itch.zone/aW1hZ2UvMzYzMDcyMC8yMTYwNTk3NS5wbmc=/347x500/0EGaXE.png', 
+        desc:'A versatile low-poly human base mesh, ready for your animations and rigs.',
+        src: '3DHuman1.gltf'  // Your existing .gltf file
+      },
+      { 
+        id:2, 
+        title:'Human Character Base', 
+        price:0, 
+        thumb:'https://img.itch.zone/aW1hZ2UvMzYyNjQzMS8yMTU4MTkwOS5wbmc=/347x500/zwrvpj.png', 
+        desc:'Alternate low-poly human model optimized for mobile and VR.',
+        src: '3DHuman1.gltf'
+      },
+      { 
+        id:3, 
+        title:'Player Model', 
+        price:0, 
+        thumb:'https://img.itch.zone/aW1hZ2UvMzYyNjI1OC8yMTYwMzg1Mi5wbmc=/347x500/Qsh9nF.png', 
+        desc:'A stylized player avatar with simple topology for game characters.',
+        src: '3DHuman2.gltf'
+      },
+      { 
+        id:4, 
+        title:'Knight', 
+        price:0, 
+        thumb:'https://placehold.co/400x400?text=Knight', 
+        desc:'A medieval knight in low-poly style.',
+        src: 'knight.glb'
+      },
+      { 
+        id:5, 
+        title:'Archer', 
+        price:0, 
+        thumb:'https://placehold.co/400x400?text=Archer', 
+        desc:'A ready-to-animate archer character.',
+        src: 'archer.glb'
+      },
+      { 
+        id:6, 
+        title:'Steampunk Bot', 
+        price:0, 
+        thumb:'https://placehold.co/400x400?text=Bot', 
+        desc:'Low-poly steampunk robot NPC.',
+        src: 'robot.glb'
+      },
+      { 
+        id:7, 
+        title:'Voxel Mage', 
+        price:0, 
+        thumb:'https://placehold.co/400x400?text=Mage', 
+        desc:'Blocky mage perfect for voxel games.',
+        src: 'mage.glb'
+      },
+      { 
+        id:8, 
+        title:'Sci-Fi Soldier', 
+        price:0, 
+        thumb:'https://placehold.co/400x400?text=Soldier', 
+        desc:'Futuristic soldier rigged for animation.',
+        src: 'soldier.glb'
+      },
     ];
 
     // DOM refs
@@ -397,6 +502,8 @@
     const modelImg     = document.getElementById('modelImg');
     const modelTitle   = document.getElementById('modelTitle');
     const modelDesc    = document.getElementById('modelDesc');
+    const modelViewer  = document.getElementById('modelViewer');
+    const viewToggle   = document.getElementById('viewToggle');
     const backModel    = document.getElementById('backModel');
     const buyNowBtn    = document.getElementById('buyNowBtn');
     const mainContent  = document.getElementById('mainContent');
@@ -438,11 +545,38 @@
       modelImg.src=m.thumb;
       modelTitle.textContent=m.title;
       modelDesc.textContent=m.desc;
+      
+      // Set the 3D model source
+      if (m.src) {
+        modelViewer.src = m.src;
+      }
+      
+      // Reset view to image by default
+      modelImg.style.display = 'block';
+      modelViewer.style.display = 'none';
+      viewToggle.textContent = '3D View';
+      
       mainContent.style.display='none';
       checkoutPage.style.display='none';
       modelPage.style.display='block';
       window.scrollTo(0,0);
     }
+    
+    // Toggle between image and 3D view
+    viewToggle.addEventListener('click', () => {
+      if (modelImg.style.display === 'none') {
+        // Switch to image view
+        modelImg.style.display = 'block';
+        modelViewer.style.display = 'none';
+        viewToggle.textContent = '3D View';
+      } else {
+        // Switch to 3D view
+        modelImg.style.display = 'none';
+        modelViewer.style.display = 'block';
+        viewToggle.textContent = 'Image View';
+      }
+    });
+    
     backModel.onclick=()=>{
       modelPage.style.display='none';
       mainContent.style.display='block';
