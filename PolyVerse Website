@@ -434,7 +434,7 @@
         id:1, 
         title:'Human Character Base', 
         price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzYzMDcyMC8yMTYwNTk3NS5wbmc=/347x500/0EGaXE.png', 
+        thumb:'https://img.itch.zone/aW1hZ2UvMzY2NTA1MS8yMTgxNzY2OS5wbmc=/250x600/Ipc1ZC.png', 
         desc:'A versatile low-poly human base mesh, ready for your animations and rigs.',
         src: '3DHuman4.gltf'  // Your existing .gltf file
       },
@@ -442,7 +442,7 @@
         id:2, 
         title:'Human Character Base', 
         price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzYyNjQzMS8yMTU4MTkwOS5wbmc=/347x500/zwrvpj.png', 
+        thumb:'https://img.itch.zone/aW1hZ2UvMzYyNjQzMS8yMTgxNjg3OS5wbmc=/347x500/tvf3ho.png', 
         desc:'Alternate low-poly human model optimized for mobile and VR.',
         src: '3DHuman11.gltf'
       },
@@ -452,7 +452,7 @@
         price:0, 
         thumb:'https://img.itch.zone/aW1hZ2UvMzYyNjI1OC8yMTYwMzg1Mi5wbmc=/347x500/Qsh9nF.png', 
         desc:'A stylized player avatar with simple topology for game characters.',
-        src: '3DPlayer3.gltf'
+        src: '3DPlayer2.gltf'
       },
       { 
         id:4, 
