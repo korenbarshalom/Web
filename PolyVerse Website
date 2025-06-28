@@ -578,6 +578,113 @@
     }
     /* --- Hide hero search on model page --- */
     .hero-search.hide { display: none !important; }
+
+    /* ---------- Download Dropdown Panel ---------- */
+    .download-dropdown {
+      position: absolute;
+      bottom: 100%;
+      right: 0;
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.1);
+      display: none;
+      flex-direction: column;
+      gap: 0.5rem;
+      min-width: 140px;
+      z-index: 100;
+      margin-bottom: 0.5rem;
+      backdrop-filter: blur(10px);
+    }
+    .download-dropdown.active {
+      display: flex;
+      animation: fadeInUp 0.2s ease-out;
+    }
+    .download-dropdown::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      right: 20px;
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 6px solid var(--card-bg);
+    }
+    .download-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: #232326;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .download-option:hover {
+      background: #2a2a2d;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .download-option:active {
+      transform: translateY(0);
+    }
+    .download-option .format-icon {
+      font-size: 1.1rem;
+      opacity: 0.8;
+    }
+    .download-option .format-name {
+      font-weight: 600;
+    }
+    .download-option .format-ext {
+      opacity: 0.6;
+      font-size: 0.8rem;
+    }
+
+    /* Position the download button container */
+    .download-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    /* Update buy button to be download button for free models */
+    .download-btn {
+      background: var(--accent);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 0.5rem 1.25rem;
+      border: none;
+      border-radius: 8px;
+      margin-left: auto;
+      margin-top: 0.5rem;
+      margin-bottom: 0;
+      display: block;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+      transition: background 0.18s, box-shadow 0.18s, transform 0.15s;
+      min-width: 110px;
+      max-width: 160px;
+      text-align: center;
+      cursor: pointer;
+    }
+    .download-btn:hover {
+      background: #ffb74d;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+      transform: translateY(-2px) scale(1.03);
+    }
+    @media (max-width: 700px) {
+      .download-btn {
+        margin-left: 0;
+        width: 100%;
+        max-width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
@@ -637,7 +744,27 @@
               <h2 id="modelTitle"></h2>
               <p id="modelDesc"></p>
             </div>
-            <button class="btn buy-btn" id="buyNowBtn">Buy Now</button>
+            <div class="download-container">
+              <button class="btn buy-btn" id="buyNowBtn">Buy Now</button>
+              <button class="download-btn" id="downloadBtn" style="display:none;">Download</button>
+              <div class="download-dropdown" id="downloadDropdown">
+                <a href="#" class="download-option" data-format="fbx">
+                  <span class="format-icon">📦</span>
+                  <span class="format-name">FBX</span>
+                  <span class="format-ext">.fbx</span>
+                </a>
+                <a href="#" class="download-option" data-format="glb">
+                  <span class="format-icon">🎮</span>
+                  <span class="format-name">GLB</span>
+                  <span class="format-ext">.glb</span>
+                </a>
+                <a href="#" class="download-option" data-format="gltf">
+                  <span class="format-icon">🌐</span>
+                  <span class="format-name">GLTF</span>
+                  <span class="format-ext">.gltf</span>
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -729,7 +856,8 @@
         price:0, 
         thumb:'https://img.itch.zone/aW1hZ2UvMzYzMDcyMC8yMTYwNTk3NS5wbmc=/347x500/0EGaXE.png', 
         desc:'A versatile low-poly human base mesh, ready for your animations and rigs.',
-        src: '3DHuman4.gltf'  // Your existing .gltf file
+        src: '3DHumenModel.gltf',  // Your existing .gltf file
+        availableFormats: ['gltf'] // Only GLTF is currently available
       },
       { 
         id:2, 
@@ -737,7 +865,8 @@
         price:0, 
         thumb:'https://img.itch.zone/aW1hZ2UvMzYyNjQzMS8yMTgxNjg3OS5wbmc=/347x500/tvf3ho.png', 
         desc:'Alternate low-poly human model optimized for mobile and VR.',
-        src: '3DHuman11.gltf'
+        src: '3DHuman11.gltf',
+        availableFormats: ['gltf']
       },
       { 
         id:3, 
@@ -745,7 +874,8 @@
         price:0, 
         thumb:'https://img.itch.zone/aW1hZ2UvMzYyNjI1OC8yMTYwMzg1Mi5wbmc=/347x500/Qsh9nF.png', 
         desc:'A stylized player avatar with simple topology for game characters.',
-        src: 'A19.glb'
+        src: 'A19.glb',
+        availableFormats: ['glb']
       },
       { 
         id:4, 
@@ -753,7 +883,8 @@
         price:0, 
         thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzNy5wbmc=/250x600/xUXRMO.png', 
         desc:'A medieval knight in low-poly style.',
-        src: 'AFramer.gltf'
+        src: 'AFramer.gltf',
+        availableFormats: ['gltf']
       },
       { 
         id:5, 
@@ -761,7 +892,8 @@
         price:0, 
         thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzOC5wbmc=/250x600/ATA380.png', 
         desc:'A ready-to-animate archer character.',
-        src: 'Aspacemarine.gltf'
+        src: 'Aspacemarine.gltf',
+        availableFormats: ['gltf']
       },
       { 
         id:6, 
@@ -769,7 +901,8 @@
         price:0, 
         thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzOS5wbmc=/250x600/tht5cv.png', 
         desc:'Low-poly steampunk robot NPC.',
-        src: 'Police.gltf'
+        src: 'Police.gltf',
+        availableFormats: ['gltf']
       },
       { 
         id:7, 
@@ -777,7 +910,8 @@
         price:0, 
         thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTg0MC5wbmc=/250x600/iZBPRT.png', 
         desc:'Blocky mage perfect for voxel games.',
-        src: 'AS.gltf'
+        src: 'AS.gltf',
+        availableFormats: ['gltf']
       },
       { 
         id:8, 
@@ -785,7 +919,8 @@
         price:0, 
         thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTg0MS5wbmc=/250x600/lZnMKc.png', 
         desc:'Futuristic soldier rigged for animation.',
-        src: 'AS1.gltf'
+        src: 'AS1.gltf',
+        availableFormats: ['gltf']
       },
     ];
 
@@ -818,6 +953,10 @@
     const suggestedModels = document.getElementById('suggestedModels');
 
     const heroBanner = document.querySelector('.hero');
+
+    // NEW refs for download functionality
+    const downloadBtn = document.getElementById('downloadBtn');
+    const downloadDropdown = document.getElementById('downloadDropdown');
 
     // Track last opened model for context-aware back
     let lastOpenedModel = null;
@@ -923,6 +1062,17 @@
       renderSuggestedModels(m.id);
       // Remember last opened model for checkout back
       lastOpenedModel = m;
+      
+      // Handle free vs paid models
+      if (m.price === 0) {
+        // Free model - show download button
+        buyNowBtn.style.display = 'none';
+        downloadBtn.style.display = 'block';
+      } else {
+        // Paid model - show buy button
+        buyNowBtn.style.display = 'block';
+        downloadBtn.style.display = 'none';
+      }
     }
 
     // --- Suggested Models Logic ---
@@ -1051,6 +1201,103 @@
       alert('Redirecting to PayPal…');
       // implement real PayPal redirect here
     });
+
+    // --- Download functionality ---
+    downloadBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      downloadDropdown.classList.toggle('active');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!downloadBtn.contains(e.target) && !downloadDropdown.contains(e.target)) {
+        downloadDropdown.classList.remove('active');
+      }
+    });
+
+    // Handle format downloads
+    document.querySelectorAll('.download-option').forEach(option => {
+      option.addEventListener('click', (e) => {
+        e.preventDefault();
+        const format = e.currentTarget.dataset.format;
+        const modelName = lastOpenedModel ? lastOpenedModel.title.replace(/\s+/g, '_') : 'model';
+        
+        // Check what formats are actually available for this model
+        const availableFormats = getAvailableFormats(lastOpenedModel);
+        
+        if (!availableFormats.includes(format)) {
+          // Format not available - show message
+          alert(`Sorry, ${format.toUpperCase()} format is not available for this model yet.\n\nAvailable formats: ${availableFormats.map(f => f.toUpperCase()).join(', ')}`);
+          downloadDropdown.classList.remove('active');
+          return;
+        }
+        
+        // Get the correct file URL for this format
+        const fileUrl = getFileUrlForFormat(lastOpenedModel, format);
+        
+        if (!fileUrl) {
+          alert(`Download not available for ${format.toUpperCase()} format.`);
+          downloadDropdown.classList.remove('active');
+          return;
+        }
+        
+        // Create download link
+        const link = document.createElement('a');
+        link.href = fileUrl;
+        link.download = `${modelName}.${format}`;
+        link.style.display = 'none';
+        
+        // Trigger download
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Close dropdown
+        downloadDropdown.classList.remove('active');
+        
+        // Show success message
+        alert(`Downloading ${modelName}.${format}...`);
+      });
+    });
+
+    // Helper function to get available formats for a model
+    function getAvailableFormats(model) {
+      if (!model) return [];
+      
+      // Use the availableFormats property if it exists
+      if (model.availableFormats && Array.isArray(model.availableFormats)) {
+        return model.availableFormats;
+      }
+      
+      // Fallback: check the file extension
+      if (model.src) {
+        const extension = model.src.split('.').pop().toLowerCase();
+        if (extension === 'gltf' || extension === 'glb') {
+          return [extension];
+        }
+      }
+      
+      return [];
+    }
+
+    // Helper function to get the correct file URL for a format
+    function getFileUrlForFormat(model, format) {
+      if (!model) return null;
+      
+      // Check if this format is available for this model
+      const availableFormats = getAvailableFormats(model);
+      if (!availableFormats.includes(format)) {
+        return null;
+      }
+      
+      // For now, we only have the original file
+      // In a real implementation, you'd have separate files for each format
+      if (model.src && (format === 'gltf' || format === 'glb')) {
+        return model.src;
+      }
+      
+      return null;
+    }
 
     // --- On page load, ensure modelPage is hidden to prevent flash ---
     window.addEventListener('DOMContentLoaded', () => {
