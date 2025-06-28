@@ -916,7 +916,7 @@
       { 
         id:8, 
         title:'Astronaut', 
-        price:0, 
+        price:1, 
         thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTg0MS5wbmc=/250x600/lZnMKc.png', 
         desc:'Futuristic soldier rigged for animation.',
         src: 'AS1.gltf',
@@ -960,6 +960,9 @@
 
     // Track last opened model for context-aware back
     let lastOpenedModel = null;
+    
+    // Track if we're coming from homepage (for suggestion randomization)
+    let comingFromHomepage = true;
 
     // --- Gallery ---
     function renderGallery(list){
@@ -973,7 +976,7 @@
             <h3>${m.title}</h3>
             <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>
           </div>`;
-        card.onclick=()=>openModelPage(m);
+        card.onclick=()=>openModelPage(m, true);
         gallery.appendChild(card);
       });
     }
@@ -1035,7 +1038,7 @@
     });
 
     // --- Model detail & checkout navigation ---
-    function openModelPage(m){
+    function openModelPage(m, fromHomepage = true){
       // Hide hero search, show navbar search
       heroSearch.parentElement.classList.add('hide');
       navbarSearchContainer.style.display = 'flex';
@@ -1058,8 +1061,13 @@
       modelViewer.style.display = 'block';
       viewToggle.style.display = 'none';
       window.scrollTo(0,0);
-      // Render suggested models (exclude current)
-      renderSuggestedModels(m.id);
+      
+      // Only randomize suggestions when coming from homepage
+      if (fromHomepage) {
+        renderSuggestedModels(m.id);
+        comingFromHomepage = false;
+      }
+      
       // Remember last opened model for checkout back
       lastOpenedModel = m;
       
@@ -1097,7 +1105,7 @@
             <span class="suggested-meta">Free Model</span>
           </div>
         `;
-        card.onclick = () => openModelPage(mod);
+        card.onclick = () => openModelPage(mod, false);
         suggestedModels.appendChild(card);
       });
     }
@@ -1135,6 +1143,8 @@
       heroSearch.parentElement.classList.remove('hide');
       // Show hero banner
       if(heroBanner) heroBanner.style.display = '';
+      // Reset the flag when returning to homepage
+      comingFromHomepage = true;
       window.scrollTo(0,0);
     };
     buyNowBtn.onclick=()=>{
