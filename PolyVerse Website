@@ -685,6 +685,15 @@
         max-width: 100%;
       }
     }
+
+    /* Add card appear animation */
+    .card-appear {
+      animation: cardFadeInUp 0.5s cubic-bezier(.23,1.02,.47,.98);
+    }
+    @keyframes cardFadeInUp {
+      from { opacity: 0; transform: translateY(30px);}
+      to   { opacity: 1; transform: translateY(0);}
+    }
   </style>
 </head>
 <body>
@@ -692,7 +701,7 @@
   <!-- NAVBAR -->
   <nav id="navbar">
     <div class="logo">
-     <img src="https://img.itch.zone/aW1hZ2UvMzY2NTA1MS8yMTgwOTEzNC5wbmc=/250x600/Q5BHfP.png"
+     <img src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTkyODkzOS5wbmc=/250x600/IxSF%2Fe.png"
      alt="  polyVerse logo"
      
 
@@ -964,8 +973,16 @@
     // Track if we're coming from homepage (for suggestion randomization)
     let comingFromHomepage = true;
 
+    // Track currently rendered model IDs
+    let lastRenderedIds = new Set();
+
     // --- Gallery ---
     function renderGallery(list){
+      // Get IDs of new results
+      const newIds = new Set(list.map(m => m.id));
+      // Cards that are new (not in lastRenderedIds)
+      const newlyAddedIds = list.filter(m => !lastRenderedIds.has(m.id)).map(m => m.id);
+
       gallery.innerHTML='';
       list.forEach(m=>{
         const card=document.createElement('div');
@@ -977,8 +994,21 @@
             <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>
           </div>`;
         card.onclick=()=>openModelPage(m, true);
+
+        // Only animate if this card is newly added
+        if (newlyAddedIds.includes(m.id)) {
+          card.classList.add('card-appear');
+          // Remove the animation class after animation ends
+          card.addEventListener('animationend', () => {
+            card.classList.remove('card-appear');
+          }, { once: true });
+        }
+
         gallery.appendChild(card);
       });
+
+      // Update the set for next render
+      lastRenderedIds = newIds;
     }
     renderGallery(models);
 
