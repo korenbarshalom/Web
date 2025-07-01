@@ -1371,8 +1371,7 @@
     // --- Fake checkout ---
     document.getElementById('checkoutForm').addEventListener('submit',e=>{
       e.preventDefault();
-      alert('Redirecting to PayPal…');
-      // implement real PayPal redirect here
+      window.open('https://www.paypal.com/paypalme/korenbar1', '_blank', 'noopener');
     });
 
     // --- Download functionality ---
