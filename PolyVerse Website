@@ -767,6 +767,107 @@
       margin-top: 20px;
       margin-left: 2vw;
     }
+
+    /* ---------- Form Validation & Error Styling ---------- */
+    .input-error {
+      border: 2px solid #ff4444 !important;
+      background: rgba(255, 68, 68, 0.1) !important;
+    }
+    
+    .input-success {
+      border: 2px solid #4CAF50 !important;
+      background: rgba(76, 175, 80, 0.1) !important;
+    }
+    
+    .error-message {
+      color: #ff4444;
+      font-size: 0.8rem;
+      margin-top: -1rem;
+      margin-bottom: 1rem;
+      display: none;
+      animation: fadeIn 0.3s ease-in;
+    }
+    
+    .error-message.show {
+      display: block;
+    }
+    
+    .success-message {
+      color: #4CAF50;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+      text-align: center;
+      display: none;
+      animation: fadeIn 0.3s ease-in;
+    }
+    
+    .success-message.show {
+      display: block;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+    
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin: -10px 0 0 -10px;
+      border: 2px solid transparent;
+      border-top: 2px solid #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .password-strength {
+      margin-top: -1rem;
+      margin-bottom: 1rem;
+      font-size: 0.8rem;
+    }
+    
+    .password-strength-bar {
+      height: 4px;
+      background: #333;
+      border-radius: 2px;
+      margin-top: 0.5rem;
+      overflow: hidden;
+    }
+    
+    .password-strength-fill {
+      height: 100%;
+      transition: all 0.3s ease;
+      border-radius: 2px;
+    }
+    
+    .strength-weak { background: #ff4444; width: 25%; }
+    .strength-fair { background: #ffa726; width: 50%; }
+    .strength-good { background: #ffeb3b; width: 75%; }
+    .strength-strong { background: #4CAF50; width: 100%; }
+    
+    .strength-text {
+      margin-top: 0.25rem;
+      font-size: 0.75rem;
+    }
+    
+    .strength-weak-text { color: #ff4444; }
+    .strength-fair-text { color: #ffa726; }
+    .strength-good-text { color: #ffeb3b; }
+    .strength-strong-text { color: #4CAF50; }
   </style>
 </head>
 <body>
@@ -911,15 +1012,19 @@
       <!-- ===== LOGIN VIEW ===== -->
       <div id="loginView">
         <label>Email</label>
-        <input type="email" class="login-input" placeholder="you@example.com" required>
+        <input type="email" class="login-input" id="loginEmail" placeholder="you@example.com" required>
+        <div class="error-message" id="loginEmailError"></div>
 
         <label>Password</label>
-        <input type="password" class="login-input" placeholder="Your password" required>
+        <input type="password" class="login-input" id="loginPassword" placeholder="Your password" required>
+        <div class="error-message" id="loginPasswordError"></div>
 
         <div class="action-row">
-          <button class="login-btn">Continue</button>
+          <button class="login-btn" id="loginSubmitBtn">Continue</button>
           <button class="btn" id="createAccountBtn">Create&nbsp;Account</button>
         </div>
+
+        <div class="success-message" id="loginSuccess"></div>
 
         <button class="google-btn">Log in with Google</button>
         <p>Auth backend coming soon.</p>
@@ -928,15 +1033,25 @@
       <!-- ===== REGISTER VIEW ===== -->
       <div id="registerView">
         <label>Full Name</label>
-        <input type="text" class="login-input" placeholder="Your Name" required>
+        <input type="text" class="login-input" id="registerName" placeholder="Your Name" required>
+        <div class="error-message" id="nameError"></div>
 
         <label>Email</label>
-        <input type="email" class="login-input" placeholder="you@example.com" required>
+        <input type="email" class="login-input" id="registerEmail" placeholder="you@example.com" required>
+        <div class="error-message" id="emailError"></div>
 
         <label>Password</label>
-        <input type="password" class="login-input" placeholder="Choose a strong password" required>
+        <input type="password" class="login-input" id="registerPassword" placeholder="Choose a strong password" required>
+        <div class="password-strength" id="passwordStrength">
+          <div class="password-strength-bar">
+            <div class="password-strength-fill" id="strengthFill"></div>
+          </div>
+          <div class="strength-text" id="strengthText"></div>
+        </div>
+        <div class="error-message" id="passwordError"></div>
 
-        <button class="register-submit">Create Account</button>
+        <button class="register-submit" id="registerSubmitBtn">Create Account</button>
+        <div class="success-message" id="registerSuccess"></div>
 
         <button class="google-btn">Sign up with Google</button>
         <p style="margin-top:.75rem;">Already have an account? <a href="#" id="backToLogin" style="color:var(--accent);">Log In</a></p>
@@ -1337,12 +1452,210 @@
       }
     };
 
-    // --- Login / Register modal logic ---
+    // === SIMULATED AUTHENTICATION SYSTEM ===
+    // User state management
+    let currentUser = null;
+    
+    // DOM refs for auth
+    const registerName = document.getElementById('registerName');
+    const registerEmail = document.getElementById('registerEmail');
+    const registerPassword = document.getElementById('registerPassword');
+    const registerSubmitBtn = document.getElementById('registerSubmitBtn');
+    const loginEmail = document.getElementById('loginEmail');
+    const loginPassword = document.getElementById('loginPassword');
+    const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+    
+    // Error message elements
+    const nameError = document.getElementById('nameError');
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+    const loginEmailError = document.getElementById('loginEmailError');
+    const loginPasswordError = document.getElementById('loginPasswordError');
+    const registerSuccess = document.getElementById('registerSuccess');
+    const loginSuccess = document.getElementById('loginSuccess');
+    
+    // Password strength elements
+    const passwordStrength = document.getElementById('passwordStrength');
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthText = document.getElementById('strengthText');
+    
+    // === VALIDATION FUNCTIONS ===
+    function validateName(name) {
+      if (!name.trim()) return 'Full name is required';
+      if (name.trim().length < 2) return 'Name must be at least 2 characters';
+      if (name.trim().length > 50) return 'Name must be less than 50 characters';
+      if (!/^[a-zA-Z\s]+$/.test(name.trim())) return 'Name can only contain letters and spaces';
+      return null;
+    }
+    function validateEmail(email) {
+      if (!email.trim()) return 'Email is required';
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email.trim())) return 'Please enter a valid email address';
+      return null;
+    }
+    function validatePassword(password) {
+      if (!password) return 'Password is required';
+      if (password.length < 8) return 'Password must be at least 8 characters';
+      if (!/(?=.*[a-z])/.test(password)) return 'Password must contain at least one lowercase letter';
+      if (!/(?=.*[A-Z])/.test(password)) return 'Password must contain at least one uppercase letter';
+      if (!/(?=.*\d)/.test(password)) return 'Password must contain at least one number';
+      if (!/(?=.*[@$!%*?&])/.test(password)) return 'Password must contain at least one special character (@$!%*?&)';
+      return null;
+    }
+    function getPasswordStrength(password) {
+      let score = 0;
+      let feedback = [];
+      if (password.length >= 8) score += 1;
+      if (password.length >= 12) score += 1;
+      if (/[a-z]/.test(password)) score += 1;
+      if (/[A-Z]/.test(password)) score += 1;
+      if (/\d/.test(password)) score += 1;
+      if (/[@$!%*?&]/.test(password)) score += 1;
+      if (password.length > 0) {
+        if (password.length < 8) feedback.push('Too short');
+        if (!/[a-z]/.test(password)) feedback.push('Add lowercase');
+        if (!/[A-Z]/.test(password)) feedback.push('Add uppercase');
+        if (!/\d/.test(password)) feedback.push('Add number');
+        if (!/[@$!%*?&]/.test(password)) feedback.push('Add symbol');
+      }
+      return { score, feedback };
+    }
+    function updatePasswordStrength(password) {
+      const strength = getPasswordStrength(password);
+      const strengthClasses = ['strength-weak', 'strength-fair', 'strength-good', 'strength-strong'];
+      const strengthTexts = ['Weak', 'Fair', 'Good', 'Strong'];
+      const strengthTextClasses = ['strength-weak-text', 'strength-fair-text', 'strength-good-text', 'strength-strong-text'];
+      if (password.length === 0) {
+        passwordStrength.style.display = 'none';
+        return;
+      }
+      passwordStrength.style.display = 'block';
+      const index = Math.min(Math.floor(strength.score / 2), 3);
+      strengthFill.className = `password-strength-fill ${strengthClasses[index]}`;
+      strengthText.className = `strength-text ${strengthTextClasses[index]}`;
+      strengthText.textContent = strengthTexts[index];
+    }
+    // === ERROR HANDLING ===
+    function showError(element, message) {
+      element.textContent = message;
+      element.classList.add('show');
+      element.previousElementSibling.classList.add('input-error');
+      element.previousElementSibling.classList.remove('input-success');
+    }
+    function hideError(element) {
+      element.classList.remove('show');
+      element.previousElementSibling.classList.remove('input-error');
+    }
+    function showSuccess(element, message) {
+      element.textContent = message;
+      element.classList.add('show');
+      setTimeout(() => element.classList.remove('show'), 3000);
+    }
+    function clearAllErrors() {
+      [nameError, emailError, passwordError, loginEmailError, loginPasswordError].forEach(el => {
+        hideError(el);
+      });
+      [registerName, registerEmail, registerPassword, loginEmail, loginPassword].forEach(el => {
+        el.classList.remove('input-error', 'input-success');
+      });
+    }
+    // === LOCALSTORAGE USER DB ===
+    function getUsers() {
+      return JSON.parse(localStorage.getItem('users') || '[]');
+    }
+    function saveUsers(users) {
+      localStorage.setItem('users', JSON.stringify(users));
+    }
+    // === EVENT LISTENERS ===
+    // Password strength indicator
+    registerPassword.addEventListener('input', (e) => {
+      updatePasswordStrength(e.target.value);
+      hideError(passwordError);
+    });
+    // Registration form submission
+    registerSubmitBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      clearAllErrors();
+      const name = registerName.value.trim();
+      const email = registerEmail.value.trim().toLowerCase();
+      const password = registerPassword.value;
+      // Validate inputs
+      const nameErrorMsg = validateName(name);
+      const emailErrorMsg = validateEmail(email);
+      const passwordErrorMsg = validatePassword(password);
+      if (nameErrorMsg) showError(nameError, nameErrorMsg);
+      if (emailErrorMsg) showError(emailError, emailErrorMsg);
+      if (passwordErrorMsg) showError(passwordError, passwordErrorMsg);
+      if (nameErrorMsg || emailErrorMsg || passwordErrorMsg) {
+        return;
+      }
+      // Simulate backend: check for duplicate email
+      const users = getUsers();
+      if (users.some(u => u.email === email)) {
+        showError(emailError, 'An account with this email already exists.');
+        return;
+      }
+      // Simulate user creation
+      users.push({ name, email, password });
+      saveUsers(users);
+      showSuccess(registerSuccess, 'Account created successfully! Redirecting to login...');
+      registerName.value = '';
+      registerEmail.value = '';
+      registerPassword.value = '';
+      passwordStrength.style.display = 'none';
+      setTimeout(() => {
+        showLogin();
+        clearAllErrors();
+      }, 2000);
+    });
+    // Login form submission
+    loginSubmitBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      clearAllErrors();
+      const email = loginEmail.value.trim().toLowerCase();
+      const password = loginPassword.value;
+      const emailErrorMsg = validateEmail(email);
+      if (!password) {
+        showError(loginPasswordError, 'Password is required');
+        return;
+      }
+      if (emailErrorMsg) {
+        showError(loginEmailError, emailErrorMsg);
+        return;
+      }
+      const users = getUsers();
+      const user = users.find(u => u.email === email && u.password === password);
+      if (!user) {
+        showError(loginPasswordError, 'Invalid email or password.');
+        return;
+      }
+      currentUser = user;
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      showSuccess(loginSuccess, 'Login successful! Welcome back!');
+      setTimeout(() => {
+        closeModal(loginModal);
+        updateAuthUI();
+        clearAllErrors();
+      }, 1500);
+    });
+    // Clear errors on input
+    [registerName, registerEmail, registerPassword, loginEmail, loginPassword].forEach(input => {
+      input.addEventListener('input', () => {
+        const errorElement = document.getElementById(input.id.replace('register', '').replace('login', '') + 'Error');
+        if (errorElement) hideError(errorElement);
+        input.classList.remove('input-error');
+      });
+    });
+    // === MODAL MANAGEMENT ===
     function openModal(m){ 
       m.classList.add('active'); 
-      showLogin();               // always default to login view
+      showLogin();
+      clearAllErrors();
     }
-    function closeModal(m){ m.classList.remove('active'); }
+    function closeModal(m){ 
+      m.classList.remove('active'); 
+      clearAllErrors();
+    }
     document.querySelectorAll('[data-close]').forEach(btn=>{
       btn.onclick=()=>closeModal(btn.closest('.modal'));
     });
@@ -1350,23 +1663,80 @@
     window.addEventListener('keydown',e=>{
       if(e.key==='Escape') document.querySelectorAll('.modal.active').forEach(closeModal);
     });
-
-    // toggle helpers
+    // Toggle helpers
     function showLogin(){
       loginView.style.display='block';
       registerView.style.display='none';
       modalTitle.textContent='Log In';
+      clearAllErrors();
     }
     function showRegister(){
       loginView.style.display='none';
       registerView.style.display='block';
       modalTitle.textContent='Create Account';
+      clearAllErrors();
     }
     createAccBtn.onclick=showRegister;
     backToLogin.onclick=e=>{
       e.preventDefault();
       showLogin();
     };
+    // === INITIALIZATION ===
+    window.addEventListener('DOMContentLoaded', () => {
+      // Simulate session
+      const user = localStorage.getItem('currentUser');
+      if (user) {
+        currentUser = JSON.parse(user);
+      }
+      updateAuthUI();
+    });
+    // === UI UPDATES ===
+    function updateAuthUI() {
+      if (currentUser) {
+        document.getElementById('loginBtn').textContent = currentUser.name || 'Account';
+        document.getElementById('signupBtn').style.display = 'none';
+        document.getElementById('loginBtn').onclick = () => showUserMenu();
+      } else {
+        document.getElementById('loginBtn').textContent = 'Log In';
+        document.getElementById('signupBtn').style.display = 'block';
+        document.getElementById('loginBtn').onclick = () => openModal(loginModal);
+      }
+    }
+    function showUserMenu() {
+      const menu = document.createElement('div');
+      menu.style.cssText = `
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        padding: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 1000;
+        min-width: 150px;
+      `;
+      menu.innerHTML = `
+        <div style="padding: 0.5rem; border-bottom: 1px solid #444;">${currentUser.name}</div>
+        <button id="logoutBtn" style="width: 100%; padding: 0.5rem; background: none; border: none; color: #fff; cursor: pointer; text-align: left;">Logout</button>
+      `;
+      const loginBtn = document.getElementById('loginBtn');
+      loginBtn.style.position = 'relative';
+      loginBtn.appendChild(menu);
+      setTimeout(() => {
+        document.addEventListener('click', function closeMenu(e) {
+          if (!loginBtn.contains(e.target)) {
+            menu.remove();
+            document.removeEventListener('click', closeMenu);
+          }
+        });
+      }, 0);
+      document.getElementById('logoutBtn').onclick = () => {
+        localStorage.removeItem('currentUser');
+        currentUser = null;
+        updateAuthUI();
+        menu.remove();
+      };
+    }
 
     // --- Fake checkout ---
     document.getElementById('checkoutForm').addEventListener('submit',e=>{
