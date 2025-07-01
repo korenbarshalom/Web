@@ -1264,6 +1264,10 @@
       // Reset the flag when returning to homepage
       comingFromHomepage = true;
       window.scrollTo(0,0);
+      // --- Reset homepage state ---
+      heroSearch.value = '';
+      lastSearchQuery = '';
+      renderGallery(models, true);
     };
     buyNowBtn.onclick=()=>{
       modelPage.style.display='none';
