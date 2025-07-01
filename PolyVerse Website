@@ -1400,6 +1400,12 @@
       modelDesc.textContent = m.desc;
       if (m.src) {
         modelViewer.src = m.src;
+        // Reset camera orbit after model loads
+        modelViewer.removeEventListener('load', modelViewer._resetCameraOrbitHandler);
+        modelViewer._resetCameraOrbitHandler = function() {
+          modelViewer.cameraOrbit = '0deg 90deg auto';
+        };
+        modelViewer.addEventListener('load', modelViewer._resetCameraOrbitHandler, { once: true });
       }
       // Show 3D model by default, hide image and toggle
       modelImg.style.display = 'none';
