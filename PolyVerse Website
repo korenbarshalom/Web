@@ -752,7 +752,17 @@
             <line x1="16.2" y1="16.2" x2="21" y2="21" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
           </svg>
         </span>
-        <input id="navbarSearch" type="search" placeholder="Search" class="navbar-search styled-search">
+        <input
+          id="navbarSearch"
+          name="nohistory"
+          type="search"
+          placeholder="Search"
+          class="navbar-search styled-search"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+        />
       </div>
     </div>
     <ul>
@@ -765,7 +775,15 @@
     <h1>Any low-poly character you could ever need</h1>
     <p>Build something beautiful with 10+ free models</p>
     <div class="hero-search">
-      <input id="heroSearch" type="search" placeholder="Search for anything">
+      <input
+        id="heroSearch"
+        type="search"
+        placeholder="Search for anything"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+      />
     </div>
   </section>
 
@@ -1219,6 +1237,7 @@
       // Hide navbar search, show hero search
       navbarSearch.value = '';
       heroSearch.parentElement.classList.remove('hide');
+      topSearchbar.style.display = 'none';
       // Show hero banner
       if(homepageBanner) homepageBanner.style.display = '';
       // Reset the flag when returning to homepage
@@ -1247,6 +1266,7 @@
         mainContent.style.display = 'block';
         navbarSearch.value = '';
         heroSearch.parentElement.classList.remove('hide');
+        topSearchbar.style.display = 'none';
         if(homepageBanner) homepageBanner.style.display = '';
         window.scrollTo(0,0);
       }
