@@ -732,6 +732,26 @@
       from { opacity: 0; transform: translateY(30px);}
       to   { opacity: 1; transform: translateY(0);}
     }
+
+    .btn-outline, .btn.btn-outline, #loginBtn.btn {
+      background: transparent;
+      color: var(--accent);
+      border: 2px solid var(--accent);
+      box-shadow: none;
+      font-weight: 600;
+      border-radius: var(--radius);
+      transition: all 0.2s ease-in-out;
+    }
+    .btn-outline:hover, .btn-outline:focus,
+    #loginBtn.btn:hover, #loginBtn.btn:focus {
+      background: rgba(255,153,0,0.10);
+      color: #ffa833;
+      border-color: #ffa833;
+      box-shadow: none;
+    }
+    @media (max-width:600px) {
+      nav ul { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -766,7 +786,8 @@
       </div>
     </div>
     <ul>
-      <li><button class="btn" id="loginBtn">Log In</button></li>
+      <li><button class="btn btn-outline" id="signupBtn">Sign Up</button></li>
+      <li><button class="btn btn-outline" id="loginBtn">Log In</button></li>
     </ul>
   </nav>
 
@@ -1414,6 +1435,12 @@
       homepageBanner.style.display = '';
       heroSearch.value = '';
     });
+
+    const signupBtn = document.getElementById('signupBtn');
+    signupBtn.onclick = () => {
+      openModal(loginModal);
+      showRegister();
+    };
   </script>
 </body>
 </html>
