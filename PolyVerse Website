@@ -547,33 +547,71 @@
     /* --- Navbar Search Bar --- */
     .navbar-search-container {
       flex: 1;
-      display: flex;
+      display: none; /* hidden by default */
       justify-content: center;
       align-items: center;
-      display: none; /* hidden by default */
-    }
-    .navbar-search {
-      width: 100%;
-      max-width: 300px;
-      min-width: 120px;
-      padding: 0.5rem 1rem;
+      background: none;
+      box-shadow: none;
       border: none;
-      border-radius: var(--radius);
-      font-size: 1rem;
-      background: #232326;
-      color: #fff;
-      margin: 0 auto;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-      outline: none;
-      transition: box-shadow .2s;
-      text-align: center;
     }
-    .navbar-search::placeholder {
+    .searchbar-wrapper {
+      background: #232326;
+      border: 2px solid #ff9900;
+      transition: border-color 0.2s ease-in-out, background 0.2s ease-in-out;
+      display: flex;
+      align-items: center;
+      border-radius: 12px;
+      padding: 0 0.5rem;
+      width: 100%;
+      max-width: 420px;
+      min-width: 120px;
+      box-shadow: none;
+      height: 44px;
+    }
+    .searchbar-wrapper:hover {
+      border-color: #ffae33;
+      background: #3a3a3a;
+    }
+    .searchbar-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      margin-right: 0.5rem;
+      margin-left: 0.25rem;
+      user-select: none;
+      pointer-events: none;
+    }
+    .searchbar-icon svg {
+      width: 22px;
+      height: 22px;
+      display: block;
+      fill: #fff;
+      stroke: #fff;
+      stroke-width: 2.2;
+    }
+    .styled-search {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 1rem;
+      padding: 0.7rem 0 0.7rem 0;
+      border-radius: 12px;
+      box-shadow: none;
+      margin: 0;
+      min-width: 0;
+    }
+    .styled-search::placeholder {
       color: #aaa;
+      opacity: 1;
+      font-weight: 400;
     }
     @media (max-width: 600px) {
-      .navbar-search {
-        max-width: 80vw;
+      .searchbar-wrapper {
+        max-width: 90vw;
       }
     }
     /* --- Hide hero search on model page --- */
@@ -707,7 +745,15 @@
       <span style="font-weight:600;font-size:1.1rem">polyVerse</span>
     </div>
     <div class="navbar-search-container" id="top-searchbar">
-      <input id="navbarSearch" type="search" placeholder="Search for anything" class="navbar-search">
+      <div class="searchbar-wrapper">
+        <span class="searchbar-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" stroke="#fff" stroke-width="2.2" fill="none"/>
+            <line x1="16.2" y1="16.2" x2="21" y2="21" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <input id="navbarSearch" type="search" placeholder="Search" class="navbar-search styled-search">
+      </div>
     </div>
     <ul>
       <li><button class="btn" id="loginBtn">Log In</button></li>
@@ -1056,12 +1102,13 @@
         // Hide top searchbar, show homepage banner
         topSearchbar.style.display = 'none';
         homepageBanner.style.display = '';
+        // Show main search bar in banner
+        heroSearch.parentElement.classList.remove('hide');
+        heroSearch.value = '';
         // Hide model/checkout, show gallery
         modelPage.style.display = 'none';
         checkoutPage.style.display = 'none';
         mainContent.style.display = 'block';
-        // Clear hero search
-        heroSearch.value = '';
         // Clear results
         renderGallery(models, true);
         lastSearchQuery = '';
@@ -1072,7 +1119,8 @@
     function openModelPage(m, fromHomepage = true){
       // Hide hero search, show navbar search
       heroSearch.parentElement.classList.add('hide');
-      navbarSearch.value = '';
+      topSearchbar.style.display = 'flex';
+      navbarSearch.value = lastSearchQuery || '';
       // Hide main content, show model page
       mainContent.style.display = 'none';
       checkoutPage.style.display = 'none';
