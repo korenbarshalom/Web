@@ -975,9 +975,11 @@
 
     // Track currently rendered model IDs
     let lastRenderedIds = new Set();
+    // Track last search query to control animation
+    let lastSearchQuery = '';
 
     // --- Gallery ---
-    function renderGallery(list){
+    function renderGallery(list, animateAll = false){
       // Get IDs of new results
       const newIds = new Set(list.map(m => m.id));
       // Cards that are new (not in lastRenderedIds)
@@ -995,10 +997,9 @@
           </div>`;
         card.onclick=()=>openModelPage(m, true);
 
-        // Only animate if this card is newly added
-        if (newlyAddedIds.includes(m.id)) {
+        // Animate all cards if requested (e.g. on new search or homepage reset)
+        if (animateAll || newlyAddedIds.includes(m.id)) {
           card.classList.add('card-appear');
-          // Remove the animation class after animation ends
           card.addEventListener('animationend', () => {
             card.classList.remove('card-appear');
           }, { once: true });
@@ -1010,23 +1011,26 @@
       // Update the set for next render
       lastRenderedIds = newIds;
     }
-    renderGallery(models);
+    // Initial homepage render with animation
+    renderGallery(models, true);
 
     // --- Search Bar Logic ---
-    function doSearch(q) {
+    function doSearch(q, animate = false) {
       const query = q.toLowerCase();
-      renderGallery(models.filter(m =>
+      const filtered = models.filter(m =>
         m.title.toLowerCase().includes(query) ||
         (m.desc && m.desc.toLowerCase().includes(query))
-      ));
+      );
+      renderGallery(filtered, animate);
     }
+    // Remove input event listeners for search (disable live search)
+    // Only keep input for syncing values and reset logic
     heroSearch.addEventListener('input', e => {
-      doSearch(e.target.value);
       // Keep navbar search in sync if visible
       if (navbarSearchContainer.style.display === 'flex') {
         navbarSearch.value = e.target.value;
       }
-      // Smart reset: if cleared, return to Home Page and show all models
+      // Smart reset: if cleared, return to Home Page and show all models with animation
       if (e.target.value.trim() === '') {
         modelPage.style.display = 'none';
         checkoutPage.style.display = 'none';
@@ -1034,16 +1038,16 @@
         heroSearch.parentElement.classList.remove('hide');
         navbarSearchContainer.style.display = 'none';
         if(heroBanner) heroBanner.style.display = '';
-        renderGallery(models);
+        lastSearchQuery = '';
+        renderGallery(models, true); // Animate all cards
       }
     });
     navbarSearch.addEventListener('input', e => {
-      doSearch(e.target.value);
       // Keep hero search in sync if visible
       if (!heroSearch.parentElement.classList.contains('hide')) {
         heroSearch.value = e.target.value;
       }
-      // Smart reset: if cleared, return to Home Page and show all models
+      // Smart reset: if cleared, return to Home Page and show all models with animation
       if (e.target.value.trim() === '') {
         modelPage.style.display = 'none';
         checkoutPage.style.display = 'none';
@@ -1051,21 +1055,29 @@
         heroSearch.parentElement.classList.remove('hide');
         navbarSearchContainer.style.display = 'none';
         if(heroBanner) heroBanner.style.display = '';
-        renderGallery(models);
+        lastSearchQuery = '';
+        renderGallery(models, true); // Animate all cards
       }
     });
-    navbarSearch.addEventListener('keydown', e => {
+    // Only trigger search on Enter
+    function handleSearchEnter(e, inputEl) {
       if (e.key === 'Enter') {
+        const value = inputEl.value.trim();
         // Always show gallery and hide model/checkout pages on Enter
         modelPage.style.display = 'none';
         checkoutPage.style.display = 'none';
         mainContent.style.display = 'block';
         heroSearch.parentElement.classList.remove('hide');
         navbarSearchContainer.style.display = 'flex';
-        doSearch(navbarSearch.value);
         window.scrollTo(0,0);
+        // Only animate if query changed or was empty before
+        const shouldAnimate = value !== lastSearchQuery || lastSearchQuery === '';
+        doSearch(value, shouldAnimate);
+        lastSearchQuery = value;
       }
-    });
+    }
+    heroSearch.addEventListener('keydown', e => handleSearchEnter(e, heroSearch));
+    navbarSearch.addEventListener('keydown', e => handleSearchEnter(e, navbarSearch));
 
     // --- Model detail & checkout navigation ---
     function openModelPage(m, fromHomepage = true){
