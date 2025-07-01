@@ -703,12 +703,10 @@
     <div class="logo">
      <img src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTkyODkzOS5wbmc=/250x600/IxSF%2Fe.png"
      alt="  polyVerse logo"
-     
-
            alt="polyVerse logo" style="height:32px;width:32px;border-radius:6px">
       <span style="font-weight:600;font-size:1.1rem">polyVerse</span>
     </div>
-    <div class="navbar-search-container" id="navbarSearchContainer">
+    <div class="navbar-search-container" id="top-searchbar">
       <input id="navbarSearch" type="search" placeholder="Search for anything" class="navbar-search">
     </div>
     <ul>
@@ -717,7 +715,7 @@
   </nav>
 
   <!-- HERO -->
-  <section class="hero">
+  <section class="hero" id="homepage-banner">
     <h1>Any low-poly character you could ever need</h1>
     <p>Build something beautiful with 10+ free models</p>
     <div class="hero-search">
@@ -935,7 +933,9 @@
 
     // DOM refs
     const gallery      = document.getElementById('gallery');
-    const heroSearch   = document.getElementById('heroSearch');
+    const homepageBanner = document.getElementById('homepage-banner');
+    const topSearchbar   = document.getElementById('top-searchbar');
+    const heroSearch     = document.getElementById('heroSearch');
     const loginBtn     = document.getElementById('loginBtn');
     const loginModal   = document.getElementById('loginModal');
     const modelPage    = document.getElementById('modelPage');
@@ -957,11 +957,8 @@
     const createAccBtn= document.getElementById('createAccountBtn');
     const backToLogin = document.getElementById('backToLogin');
 
-    const navbarSearchContainer = document.getElementById('navbarSearchContainer');
-    const navbarSearch = document.getElementById('navbarSearch');
+    const navbarSearch   = document.getElementById('navbarSearch');
     const suggestedModels = document.getElementById('suggestedModels');
-
-    const heroBanner = document.querySelector('.hero');
 
     // NEW refs for download functionality
     const downloadBtn = document.getElementById('downloadBtn');
@@ -1023,74 +1020,65 @@
       );
       renderGallery(filtered, animate);
     }
-    // Remove input event listeners for search (disable live search)
-    // Only keep input for syncing values and reset logic
-    heroSearch.addEventListener('input', e => {
-      // Keep navbar search in sync if visible
-      if (navbarSearchContainer.style.display === 'flex') {
-        navbarSearch.value = e.target.value;
-      }
-      // Smart reset: if cleared, return to Home Page and show all models with animation
-      if (e.target.value.trim() === '') {
-        modelPage.style.display = 'none';
-        checkoutPage.style.display = 'none';
-        mainContent.style.display = 'block';
-        heroSearch.parentElement.classList.remove('hide');
-        navbarSearchContainer.style.display = 'none';
-        if(heroBanner) heroBanner.style.display = '';
-        lastSearchQuery = '';
-        renderGallery(models, true); // Animate all cards
-      }
-    });
-    navbarSearch.addEventListener('input', e => {
-      // Keep hero search in sync if visible
-      if (!heroSearch.parentElement.classList.contains('hide')) {
-        heroSearch.value = e.target.value;
-      }
-      // Smart reset: if cleared, return to Home Page and show all models with animation
-      if (e.target.value.trim() === '') {
-        modelPage.style.display = 'none';
-        checkoutPage.style.display = 'none';
-        mainContent.style.display = 'block';
-        heroSearch.parentElement.classList.remove('hide');
-        navbarSearchContainer.style.display = 'none';
-        if(heroBanner) heroBanner.style.display = '';
-        lastSearchQuery = '';
-        renderGallery(models, true); // Animate all cards
-      }
-    });
-    // Only trigger search on Enter
-    function handleSearchEnter(e, inputEl) {
+    // Only trigger search on Enter for homepage search
+    heroSearch.addEventListener('keydown', e => {
       if (e.key === 'Enter') {
-        const value = inputEl.value.trim();
-        // Always show gallery and hide model/checkout pages on Enter
+        const value = heroSearch.value.trim();
+        // Hide homepage banner, show top searchbar
+        homepageBanner.style.display = 'none';
+        topSearchbar.style.display = 'flex';
+        navbarSearch.value = value;
+        // Show gallery, hide model/checkout pages
         modelPage.style.display = 'none';
         checkoutPage.style.display = 'none';
         mainContent.style.display = 'block';
-        heroSearch.parentElement.classList.remove('hide');
-        navbarSearchContainer.style.display = 'flex';
         window.scrollTo(0,0);
-        // Only animate if query changed or was empty before
-        const shouldAnimate = value !== lastSearchQuery || lastSearchQuery === '';
-        doSearch(value, shouldAnimate);
+        doSearch(value, true);
         lastSearchQuery = value;
       }
-    }
-    heroSearch.addEventListener('keydown', e => handleSearchEnter(e, heroSearch));
-    navbarSearch.addEventListener('keydown', e => handleSearchEnter(e, navbarSearch));
+    });
+    // Only trigger search on Enter for top searchbar
+    navbarSearch.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const value = navbarSearch.value.trim();
+        // Show gallery, hide model/checkout pages
+        modelPage.style.display = 'none';
+        checkoutPage.style.display = 'none';
+        mainContent.style.display = 'block';
+        window.scrollTo(0,0);
+        doSearch(value, true);
+        lastSearchQuery = value;
+      }
+    });
+    // Clear search logic for top searchbar
+    navbarSearch.addEventListener('input', e => {
+      if (e.target.value.trim() === '') {
+        // Hide top searchbar, show homepage banner
+        topSearchbar.style.display = 'none';
+        homepageBanner.style.display = '';
+        // Hide model/checkout, show gallery
+        modelPage.style.display = 'none';
+        checkoutPage.style.display = 'none';
+        mainContent.style.display = 'block';
+        // Clear hero search
+        heroSearch.value = '';
+        // Clear results
+        renderGallery(models, true);
+        lastSearchQuery = '';
+      }
+    });
 
     // --- Model detail & checkout navigation ---
     function openModelPage(m, fromHomepage = true){
       // Hide hero search, show navbar search
       heroSearch.parentElement.classList.add('hide');
-      navbarSearchContainer.style.display = 'flex';
       navbarSearch.value = '';
       // Hide main content, show model page
       mainContent.style.display = 'none';
       checkoutPage.style.display = 'none';
       modelPage.style.display = 'block';
       // Hide hero banner
-      if(heroBanner) heroBanner.style.display = 'none';
+      if(homepageBanner) homepageBanner.style.display = 'none';
       // Set model details
       modelImg.src = m.thumb;
       modelTitle.textContent = m.title;
@@ -1181,10 +1169,10 @@
       modelPage.style.display='none';
       mainContent.style.display='block';
       // Hide navbar search, show hero search
-      navbarSearchContainer.style.display = 'none';
+      navbarSearch.value = '';
       heroSearch.parentElement.classList.remove('hide');
       // Show hero banner
-      if(heroBanner) heroBanner.style.display = '';
+      if(homepageBanner) homepageBanner.style.display = '';
       // Reset the flag when returning to homepage
       comingFromHomepage = true;
       window.scrollTo(0,0);
@@ -1194,9 +1182,9 @@
       mainContent.style.display='none';
       checkoutPage.style.display='block';
       // Show navbar search, hide hero search and hero banner
-      navbarSearchContainer.style.display = 'flex';
+      navbarSearch.value = '';
       heroSearch.parentElement.classList.add('hide');
-      if(heroBanner) heroBanner.style.display = 'none';
+      if(homepageBanner) homepageBanner.style.display = 'none';
       window.scrollTo(0,0);
     };
     backCheckout.onclick=()=>{
@@ -1209,9 +1197,9 @@
         checkoutPage.style.display = 'none';
         modelPage.style.display = 'none';
         mainContent.style.display = 'block';
-        navbarSearchContainer.style.display = 'none';
+        navbarSearch.value = '';
         heroSearch.parentElement.classList.remove('hide');
-        if(heroBanner) heroBanner.style.display = '';
+        if(homepageBanner) homepageBanner.style.display = '';
         window.scrollTo(0,0);
       }
     };
@@ -1354,10 +1342,9 @@
     // --- On page load, ensure modelPage is hidden to prevent flash ---
     window.addEventListener('DOMContentLoaded', () => {
       modelPage.style.display = 'none';
-      navbarSearchContainer.style.display = 'none';
-      heroSearch.parentElement.classList.remove('hide');
-      // Show hero banner
-      if(heroBanner) heroBanner.style.display = '';
+      topSearchbar.style.display = 'none';
+      homepageBanner.style.display = '';
+      heroSearch.value = '';
     });
   </script>
 </body>
