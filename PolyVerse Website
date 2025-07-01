@@ -752,6 +752,21 @@
     @media (max-width:600px) {
       nav ul { display: none; }
     }
+
+    /* --- No Results Message --- */
+    #no-results-message {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 32px;
+      font-weight: bold;
+      height: 60vh;
+      color: white;
+      margin-top: 20px;
+      margin-left: 2vw;
+    }
   </style>
 </head>
 <body>
@@ -1068,6 +1083,17 @@
       const newlyAddedIds = list.filter(m => !lastRenderedIds.has(m.id)).map(m => m.id);
 
       gallery.innerHTML='';
+      if (list.length === 0) {
+        // Show centered no-results message with correct structure and style
+        gallery.innerHTML = `
+          <div id="no-results-message">
+            <div>¯\\_(ツ)_/¯</div>
+            <div>No results</div>
+          </div>
+        `;
+        lastRenderedIds = newIds;
+        return;
+      }
       list.forEach(m=>{
         const card=document.createElement('div');
         card.className='card';
