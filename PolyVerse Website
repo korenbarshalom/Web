@@ -868,6 +868,89 @@
     .strength-fair-text { color: #ffa726; }
     .strength-good-text { color: #ffeb3b; }
     .strength-strong-text { color: #4CAF50; }
+
+    .profile-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 0.5em;
+      background: #232326;
+      display: inline-block;
+      vertical-align: middle;
+      /* Remove any scaling on hover */
+      transition: none;
+    }
+    .profile-btn-combo {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      /* Inherit all sizing, padding, font, border, etc. from .btn and .btn-outline */
+      /* No custom padding, font-size, or border overrides here */
+    }
+    .profile-btn-combo:hover, .profile-btn-combo:focus {
+      /* Only color/outline changes, no transform or custom padding */
+      background: rgba(255,153,0,0.10);
+      color: #ffa833;
+      border-color: #ffa833;
+      outline: none;
+      transform: none;
+    }
+    .profile-btn-combo .profile-name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: inherit;
+      margin: 0;
+      padding: 0;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+      /* Remove scaling on hover */
+      transition: none;
+    }
+    .user-menu-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6em;
+      padding: 0.5rem 0.2rem 0.5rem 0.2rem;
+      border-bottom: 1px solid #444;
+      margin-bottom: 0.2rem;
+      /* Remove scaling on hover */
+      transition: none;
+    }
+    .user-menu-header .profile-avatar {
+      width: 32px;
+      height: 32px;
+      margin-right: 0.5em;
+      transition: none;
+    }
+    .user-menu-header .profile-name {
+      font-size: 1.08rem;
+      font-weight: 600;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      transition: none;
+    }
+    /* Dropdown menu option hover highlight */
+    .user-menu-option {
+      width: 100%;
+      padding: 0.5rem;
+      background: none;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      text-align: left;
+      font-size: 1rem;
+      border-radius: 8px;
+      transition: background 0.16s;
+      margin-bottom: 2px;
+    }
+    .user-menu-option:hover, .user-menu-option:focus {
+      background: #29292d;
+      color: #ffb74d;
+      outline: none;
+    }
   </style>
 </head>
 <body>
@@ -903,7 +986,7 @@
     </div>
     <ul>
       <li><button class="btn btn-outline" id="signupBtn">Sign Up</button></li>
-      <li><button class="btn btn-outline" id="loginBtn">Log In</button></li>
+      <li><button class="btn btn-outline profile-btn-combo" id="loginBtn"><!-- Avatar+Name injected by JS --></button></li>
     </ul>
   </nav>
 
@@ -1771,14 +1854,28 @@
     });
     // === UI UPDATES ===
     function updateAuthUI() {
+      const loginBtn = document.getElementById('loginBtn');
       if (currentUser) {
-        document.getElementById('loginBtn').textContent = currentUser.name || 'Account';
+        // Remove all children
+        loginBtn.innerHTML = '';
+        // Get image (fallback if not set)
+        const imgSrc = currentUser.image || 'https://static.itch.io/images/cover.svg';
+        // Create avatar+name row
+        const avatar = document.createElement('img');
+        avatar.src = imgSrc;
+        avatar.alt = 'Profile';
+        avatar.className = 'profile-avatar';
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'profile-name';
+        nameSpan.textContent = currentUser.name || 'Account';
+        loginBtn.appendChild(avatar);
+        loginBtn.appendChild(nameSpan);
         document.getElementById('signupBtn').style.display = 'none';
-        document.getElementById('loginBtn').onclick = () => showUserMenu();
+        loginBtn.onclick = () => showUserMenu();
       } else {
-        document.getElementById('loginBtn').textContent = 'Log In';
+        loginBtn.innerHTML = 'Log In';
         document.getElementById('signupBtn').style.display = 'block';
-        document.getElementById('loginBtn').onclick = () => openModal(loginModal);
+        loginBtn.onclick = () => openModal(loginModal);
       }
     }
     function showUserMenu() {
@@ -1792,11 +1889,18 @@
         padding: 0.5rem;
         box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         z-index: 1000;
-        min-width: 150px;
+        min-width: 180px;
       `;
+      // Avatar + name row
+      const imgSrc = currentUser.image || 'https://static.itch.io/images/cover.svg';
       menu.innerHTML = `
-        <div style="padding: 0.5rem; border-bottom: 1px solid #444;">${currentUser.name}</div>
-        <button id="logoutBtn" style="width: 100%; padding: 0.5rem; background: none; border: none; color: #fff; cursor: pointer; text-align: left;">Logout</button>
+        <div class="user-menu-header">
+          <img class="profile-avatar" src="${imgSrc}" alt="Profile">
+          <span class="profile-name">${currentUser.name}</span>
+        </div>
+        <button id="homeBtn" class="user-menu-option">Home</button>
+        <button id="profileBtn" class="user-menu-option">Profile</button>
+        <button id="logoutBtn" class="user-menu-option">Logout</button>
       `;
       const loginBtn = document.getElementById('loginBtn');
       loginBtn.style.position = 'relative';
@@ -1814,6 +1918,15 @@
         currentUser = null;
         updateAuthUI();
         menu.remove();
+      };
+      document.getElementById('profileBtn').onclick = () => {
+        menu.remove();
+        openProfilePage();
+      };
+      document.getElementById('homeBtn').onclick = () => {
+        menu.remove();
+        // Redirect to homepage
+        window.location.href = '/';
       };
     }
 
@@ -1917,6 +2030,212 @@
       openModal(loginModal);
       showRegister();
     };
+
+    // --- Profile Page ---
+    // Add profile page HTML after checkoutPage
+    if (!document.getElementById('profilePage')) {
+      const profileSection = document.createElement('section');
+      profileSection.id = 'profilePage';
+      profileSection.style.display = 'none';
+      profileSection.innerHTML = `
+        <div class="profile-container">
+          <button class="btn back-btn" id="backProfile">← Back</button>
+          <div class="profile-card">
+            <div class="profile-image-wrapper">
+              <img id="profileImage" src="" alt="Profile Image" class="profile-image">
+              <input type="file" id="profileImageInput" accept="image/*" style="display:none;">
+              <button class="btn profile-img-btn" id="changeImageBtn">Change Image</button>
+            </div>
+            <div class="profile-fields">
+              <label for="profileUsername" class="profile-label">Username</label>
+              <input type="text" id="profileUsername" class="profile-input" maxlength="50">
+              <button class="btn profile-save-btn" id="saveProfileBtn">Save</button>
+              <div class="success-message" id="profileSaveSuccess"></div>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(profileSection);
+    }
+    // Add profile page styles
+    if (!document.getElementById('profilePageStyles')) {
+      const style = document.createElement('style');
+      style.id = 'profilePageStyles';
+      style.textContent = `
+        #profilePage {
+          min-height: 100vh;
+          background: var(--bg);
+          color: var(--text);
+          display: none;
+          padding: 2.5rem 0 2.5rem 0;
+        }
+        .profile-container {
+          max-width: 520px;
+          margin: 0 auto;
+          background: var(--card-bg);
+          border-radius: 18px;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+          padding: 2.5rem 2rem 2.5rem 2rem;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        .profile-card {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 2.5rem;
+          width: 100%;
+        }
+        .profile-image-wrapper {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+        }
+        .profile-image {
+          width: 120px;
+          height: 120px;
+          object-fit: cover;
+          border-radius: 18px;
+          background: #232326;
+          box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+          border: 2px solid #ff9800;
+        }
+        .profile-img-btn {
+          background: #232326;
+          color: #ff9800;
+          border: 2px solid #ff9800;
+          font-size: 0.95rem;
+          padding: 0.5rem 1.2rem;
+          border-radius: 8px;
+          margin-top: 0.2rem;
+          transition: background 0.18s, color 0.18s;
+        }
+        .profile-img-btn:hover {
+          background: #ff9800;
+          color: #fff;
+        }
+        .profile-fields {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+          gap: 1.2rem;
+        }
+        .profile-label {
+          font-size: 1.1rem;
+          font-weight: 600;
+          margin-bottom: 0.3rem;
+        }
+        .profile-input {
+          padding: 0.8rem 1rem;
+          border-radius: 10px;
+          border: 2px solid #232326;
+          background: #232326;
+          color: #fff;
+          font-size: 1.05rem;
+          margin-bottom: 0.5rem;
+          outline: none;
+          transition: border 0.18s;
+        }
+        .profile-input:focus {
+          border: 2px solid #ff9800;
+        }
+        .profile-save-btn {
+          margin-top: 0.5rem;
+          width: 100%;
+          justify-content: center;
+        }
+        @media (max-width: 600px) {
+          .profile-container {
+            padding: 1.2rem 0.5rem;
+          }
+          .profile-card {
+            gap: 1.5rem;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    // --- Profile Page Logic ---
+    function openProfilePage() {
+      // Hide all other pages
+      modelPage.style.display = 'none';
+      mainContent.style.display = 'none';
+      checkoutPage.style.display = 'none';
+      homepageBanner.style.display = 'none';
+      topSearchbar.style.display = 'none';
+      // Show profile page
+      const profilePage = document.getElementById('profilePage');
+      profilePage.style.display = 'block';
+      window.scrollTo(0,0);
+      // Load current user data (from localStorage, not yet saved changes)
+      let user = JSON.parse(localStorage.getItem('currentUser'));
+      // Use a temp state for unsaved changes
+      let tempProfile = {
+        name: user.name,
+        image: user.image || ''
+      };
+      // Set username field
+      const usernameInput = document.getElementById('profileUsername');
+      usernameInput.value = tempProfile.name;
+      // Set profile image
+      const profileImage = document.getElementById('profileImage');
+      if (tempProfile.image) {
+        profileImage.src = tempProfile.image;
+      } else {
+        profileImage.src = 'https://static.itch.io/images/cover.svg'; // fallback avatar
+      }
+      // Change image logic
+      const imageInput = document.getElementById('profileImageInput');
+      const changeImageBtn = document.getElementById('changeImageBtn');
+      changeImageBtn.onclick = () => imageInput.click();
+      imageInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function(ev) {
+            profileImage.src = ev.target.result;
+            tempProfile.image = ev.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+      // Username edit
+      usernameInput.oninput = (e) => {
+        tempProfile.name = e.target.value;
+      };
+      // Save logic
+      const saveBtn = document.getElementById('saveProfileBtn');
+      const saveSuccess = document.getElementById('profileSaveSuccess');
+      saveBtn.onclick = () => {
+        // Save to localStorage and update UI
+        user.name = tempProfile.name;
+        user.image = tempProfile.image;
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        // Also update in users DB
+        let users = JSON.parse(localStorage.getItem('users') || '[]');
+        users = users.map(u => u.email === user.email ? { ...u, name: user.name, image: user.image } : u);
+        localStorage.setItem('users', JSON.stringify(users));
+        // Show success
+        saveSuccess.textContent = 'Profile updated!';
+        saveSuccess.classList.add('show');
+        setTimeout(() => saveSuccess.classList.remove('show'), 2000);
+        // Update UI (navbar, etc)
+        currentUser = user;
+        updateAuthUI();
+      };
+      // Back button
+      document.getElementById('backProfile').onclick = () => {
+        profilePage.style.display = 'none';
+        mainContent.style.display = 'block';
+        homepageBanner.style.display = '';
+        topSearchbar.style.display = 'none';
+        window.scrollTo(0,0);
+      };
+    }
   </script>
 </body>
 </html>
