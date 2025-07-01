@@ -860,16 +860,6 @@
                   <span class="format-name">FBX</span>
                   <span class="format-ext">.fbx</span>
                 </a>
-                <a href="#" class="download-option" data-format="glb">
-                  <span class="format-icon">🎮</span>
-                  <span class="format-name">GLB</span>
-                  <span class="format-ext">.glb</span>
-                </a>
-                <a href="#" class="download-option" data-format="gltf">
-                  <span class="format-icon">🌐</span>
-                  <span class="format-name">GLTF</span>
-                  <span class="format-ext">.gltf</span>
-                </a>
               </div>
             </div>
           </div>
@@ -964,7 +954,10 @@
         thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQwMy5wbmc=/250x600/vaWBiI.png', 
         desc:'A versatile low-poly human base mesh, ready for your animations and rigs.',
         src: 'A20.glb',  // Your existing .gltf file
-        availableFormats: ['gltf'] // Only GLTF is currently available
+        availableFormats: ['gltf', 'fbx', 'glb'],
+        fbx: '3DHumanfbx1.fbx',
+        glb: 'A20.glb',
+        gltf: 'A20.gltf'
       },
       { 
         id:2, 
@@ -973,7 +966,10 @@
         thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTM1NS5wbmc=/250x600/iV5gql.png', 
         desc:'Alternate low-poly human model optimized for mobile and VR.',
         src: '3DHuman11.gltf',
-        availableFormats: ['gltf']
+        availableFormats: ['gltf', 'fbx', 'glb'],
+        fbx: '3DHumanfbx.fbx',
+        glb: '3DHuman11.glb',
+        gltf: '3DHuman11.gltf'
       },
       { 
         id:3, 
@@ -982,7 +978,10 @@
         thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQ4NC5wbmc=/250x600/FAM6Ft.png', 
         desc:'A stylized player avatar with simple topology for game characters.',
         src: 'A19.glb',
-        availableFormats: ['glb']
+        availableFormats: ['glb', 'fbx', 'gltf'],
+        fbx: '3DHumanfbx5.fbx',
+        glb: 'A19.glb',
+        gltf: 'A19.gltf'
       },
       { 
         id:4, 
@@ -991,7 +990,10 @@
         thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzNy5wbmc=/250x600/xUXRMO.png', 
         desc:'A medieval knight in low-poly style.',
         src: 'AFramer.gltf',
-        availableFormats: ['gltf']
+        availableFormats: ['gltf', 'fbx', 'glb'],
+        fbx: '3DHumanfbx6.fbx',
+        glb: 'AFramer.glb',
+        gltf: 'AFramer.gltf'
       },
       { 
         id:5, 
@@ -1000,7 +1002,10 @@
         thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzOC5wbmc=/250x600/ATA380.png', 
         desc:'A ready-to-animate archer character.',
         src: 'Aspacemarine.gltf',
-        availableFormats: ['gltf']
+        availableFormats: ['gltf', 'fbx', 'glb'],
+        fbx: '3DHumanfbx7.fbx',
+        glb: 'Aspacemarine.glb',
+        gltf: 'Aspacemarine.gltf'
       },
       { 
         id:6, 
@@ -1009,7 +1014,10 @@
         thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzOS5wbmc=/250x600/tht5cv.png', 
         desc:'Low-poly steampunk robot NPC.',
         src: 'Police.gltf',
-        availableFormats: ['gltf']
+        availableFormats: ['gltf', 'fbx', 'glb'],
+        fbx: '3DHumanfbx8.fbx',
+        glb: 'Police.glb',
+        gltf: 'Police.gltf'
       },
       { 
         id:7, 
@@ -1018,7 +1026,10 @@
         thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTg0MC5wbmc=/250x600/iZBPRT.png', 
         desc:'Blocky mage perfect for voxel games.',
         src: 'AS.gltf',
-        availableFormats: ['gltf']
+        availableFormats: ['gltf', 'fbx', 'glb'],
+        fbx: '3DHumanfbx9.fbx',
+        glb: 'AS.glb',
+        gltf: 'AS.gltf'
       },
       { 
         id:8, 
@@ -1027,7 +1038,10 @@
         thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTg0MS5wbmc=/250x600/lZnMKc.png', 
         desc:'Futuristic soldier rigged for animation.',
         src: 'AS1.gltf',
-        availableFormats: ['gltf']
+        availableFormats: ['gltf', 'fbx', 'glb'],
+        fbx: '3DHumanfbx10.fbx',
+        glb: 'AS1.glb',
+        gltf: 'AS1.gltf'
       },
     ];
 
@@ -1423,38 +1437,22 @@
     function getAvailableFormats(model) {
       if (!model) return [];
       
-      // Use the availableFormats property if it exists
-      if (model.availableFormats && Array.isArray(model.availableFormats)) {
-        return model.availableFormats;
-      }
-      
-      // Fallback: check the file extension
-      if (model.src) {
-        const extension = model.src.split('.').pop().toLowerCase();
-        if (extension === 'gltf' || extension === 'glb') {
-          return [extension];
-        }
-      }
-      
-      return [];
+      // Only FBX is available now
+      return ['fbx'];
     }
 
     // Helper function to get the correct file URL for a format
     function getFileUrlForFormat(model, format) {
       if (!model) return null;
-      
       // Check if this format is available for this model
       const availableFormats = getAvailableFormats(model);
       if (!availableFormats.includes(format)) {
         return null;
       }
-      
-      // For now, we only have the original file
-      // In a real implementation, you'd have separate files for each format
-      if (model.src && (format === 'gltf' || format === 'glb')) {
-        return model.src;
+      // Only FBX is available now
+      if (model.fbx) {
+        return model.fbx;
       }
-      
       return null;
     }
 
