@@ -951,6 +951,108 @@
       color: #ffb74d;
       outline: none;
     }
+
+    /* --- Like/List Buttons --- */
+    .like-btn, .list-btn {
+      background: #232326;
+      color: #ff9800;
+      border: 2px solid #ff9800;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 0.5rem 1.25rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+      transition: background 0.18s, box-shadow 0.18s, color 0.18s, border 0.18s, transform 0.15s;
+      min-width: 110px;
+      max-width: 160px;
+      text-align: center;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .like-btn:hover, .list-btn:hover {
+      background: #ff9800;
+      color: #fff;
+      border: 2px solid #ffb74d;
+      transform: translateY(-2px) scale(1.03);
+    }
+    .like-btn.liked, .list-btn.listed {
+      background: #ff9800;
+      color: #fff;
+      border: 2px solid #ffb74d;
+    }
+    .like-btn.liked #likeIcon {
+      color: #fff;
+      font-weight: bold;
+      font-size: 1.2em;
+      text-shadow: 0 2px 8px rgba(255,152,0,0.18);
+    }
+    .list-btn.listed #listIcon {
+      color: #fff;
+      font-weight: bold;
+      font-size: 1.2em;
+      text-shadow: 0 2px 8px rgba(255,152,0,0.18);
+    }
+    .like-btn #likeIcon {
+      font-size: 1.2em;
+      color: #ff9800;
+      transition: color 0.18s;
+    }
+    .list-btn #listIcon {
+      font-size: 1.2em;
+      color: #ff9800;
+      transition: color 0.18s;
+    }
+
+    /* --- Likes/List Page Layout --- */
+    #likesListPage {
+      min-height: 80vh;
+      background: var(--bg);
+      color: var(--text);
+      display: none;
+      padding: 2.5rem 0 2.5rem 0;
+      width: 100%;
+    }
+    .likes-list-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+    #backLikesList {
+      align-self: flex-start;
+      margin-left: 2rem;
+      margin-bottom: 1.5rem;
+      margin-top: 0;
+    }
+    @media (max-width: 700px) {
+      #backLikesList {
+        margin-left: 1rem;
+      }
+    }
+    #likesListTitle {
+      text-align: center;
+      margin-bottom: 2rem;
+      width: 100%;
+    }
+    #likesListGallery.gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      justify-content: center;
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    @media (max-width: 700px) {
+      #likesListGallery.gallery {
+        grid-template-columns: 1fr;
+        max-width: 98vw;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1034,6 +1136,14 @@
             <div style="flex:1 1 200px; min-width:0;">
               <h2 id="modelTitle"></h2>
               <p id="modelDesc"></p>
+              <div id="modelActions" style="display:none; margin-top: 1rem; gap: 0.5rem; flex-wrap: wrap;">
+                <button class="btn like-btn" id="likeBtn" title="Like this model" style="display:inline-flex;align-items:center;gap:0.5rem;">
+                  <span id="likeIcon">♡</span> <span>Like</span>
+                </button>
+                <button class="btn list-btn" id="listBtn" title="Add to My List" style="display:inline-flex;align-items:center;gap:0.5rem;">
+                  <span id="listIcon">＋</span> <span>Add to List</span>
+                </button>
+              </div>
             </div>
             <div class="download-container">
               <button class="btn buy-btn" id="buyNowBtn">Buy Now</button>
@@ -1145,175 +1255,20 @@
   <script type="module">
     // === DATA & HOOKS ===
     const models = [
-      { 
-        id:1, 
-        title:'Human Character Base', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQwMy5wbmc=/250x600/vaWBiI.png', 
-        desc:'A versatile low-poly human base mesh, ready for your animations and rigs.',
-        src: 'A20.glb',  // Your existing .gltf file
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3DHumanfbx1.fbx',
-        glb: 'A20.glb',
-        gltf: 'A20.gltf'
-      },
-      { 
-        id:2, 
-        title:'Human Character Base', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTM1NS5wbmc=/250x600/iV5gql.png', 
-        desc:'Alternate low-poly human model optimized for mobile and VR.',
-        src: '3DHuman11.gltf',
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3DHumanfbx.fbx',
-        glb: '3DHuman11.glb',
-        gltf: '3DHuman11.gltf'
-      },
-      { 
-        id:3, 
-        title:'Player Model', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQ4NC5wbmc=/250x600/FAM6Ft.png', 
-        desc:'A stylized player avatar with simple topology for game characters.',
-        src: 'A19.glb',
-        availableFormats: ['glb', 'fbx', 'gltf'],
-        fbx: '3DHumanfbx5.fbx',
-        glb: 'A19.glb',
-        gltf: 'A19.gltf'
-      },
-      { 
-        id:4, 
-        title:'Farmer', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzNy5wbmc=/250x600/xUXRMO.png', 
-        desc:'A medieval knight in low-poly style.',
-        src: 'AFramer.gltf',
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3DHumanfbx6.fbx',
-        glb: 'AFramer.glb',
-        gltf: 'AFramer.gltf'
-      },
-      { 
-        id:5, 
-        title:'Space Marine', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzOC5wbmc=/250x600/ATA380.png', 
-        desc:'A ready-to-animate archer character.',
-        src: 'Aspacemarine.gltf',
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3DHumanfbx7.fbx',
-        glb: 'Aspacemarine.glb',
-        gltf: 'Aspacemarine.gltf'
-      },
-      { 
-        id:6, 
-        title:'Police Officer', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzOS5wbmc=/250x600/tht5cv.png', 
-        desc:'Low-poly steampunk robot NPC.',
-        src: 'Police.gltf',
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3DHumanfbx8.fbx',
-        glb: 'Police.glb',
-        gltf: 'Police.gltf'
-      },
-      { 
-        id:7, 
-        title:'Scientist', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTg0MC5wbmc=/250x600/iZBPRT.png', 
-        desc:'Blocky mage perfect for voxel games.',
-        src: '3Dcharcter4.gltf',
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3D1characterfbx4.fbx',
-        glb: 'AS.glb',
-        gltf: 'AS.gltf'
-      },
-      { 
-        id:8, 
-        title:'Astronaut', 
-        price:1, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTg0MS5wbmc=/250x600/lZnMKc.png', 
-        desc:'Futuristic soldier rigged for animation.',
-        src: 'AS1.gltf',
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3DHumanfbx10.fbx',
-        glb: 'AS1.glb',
-        gltf: 'AS1.gltf'
-      },
-       { 
-        id:8, 
-        title:'Chef', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE4MC5wbmc=/250x600/89K1oc.png', 
-        desc:'Futuristic soldier rigged for animation.',
-        src: '3Dcharcter9.gltf',
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3DLowPolyCharacter9.fbx',
-        glb: 'AS1.glb',
-        gltf: 'AS1.gltf'
-      },
-       { 
-        id:8, 
-        title:'Samurai', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3OC5wbmc=/250x600/0DKTnv.png', 
-        desc:'Futuristic soldier rigged for animation.',
-        src: '3Dcharcter6.gltf',
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3DLowPolyCharacter6.fbx',
-        glb: 'AS1.glb',
-        gltf: 'AS1.gltf'
-      },
-       { 
-        id:8, 
-        title:'Builder', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE4MS5wbmc=/250x600/%2BXIu8o.png', 
-        desc:'Futuristic soldier rigged for animation.',
-        src: '3Dcharcter111.gltf',
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3DLowPolyCharacter3.fbx',
-        glb: 'AS1.glb',
-        gltf: 'AS1.gltf'
-      },
-       { 
-        id:8, 
-        title:'Medic', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3OS5wbmc=/250x600/yLs1Oq.png', 
-        desc:'Futuristic soldier rigged for animation.',
-        src: '3Dcharcter1.gltf',
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3DLowPolyCharacter1.fbx',
-        glb: 'AS1.glb',
-        gltf: 'AS1.gltf'
-      },
-       { 
-        id:8, 
-        title:'Human Model', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3Ni5wbmc=/250x600/YWf1vV.png', 
-        desc:'Futuristic soldier rigged for animation.',
-        src: '3Dcharcter10.gltf',
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3DLowPolyCharacter10.fbx',
-        glb: 'AS1.glb',
-        gltf: 'AS1.gltf'
-      },
-       { 
-        id:8, 
-        title:'Fire Fighter', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3Ny5wbmc=/250x600/S%2FDg5u.png', 
-        desc:'Futuristic soldier rigged for animation.',
-        src: '3Dcharcter5.gltf',
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3DLowPolyCharacter5.fbx',
-        glb: 'AS1.glb',
-        gltf: 'AS1.gltf'
-      },
-       
+      { id: 1, title: 'Human Character Base', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQwMy5wbmc=/250x600/vaWBiI.png', desc: 'A versatile low-poly human base mesh, ready for your animations and rigs.', src: 'A20.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx1.fbx', glb: 'A20.glb', gltf: 'A20.gltf' },
+      { id: 2, title: 'Human Character Base', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTM1NS5wbmc=/250x600/iV5gql.png', desc: 'Alternate low-poly human model optimized for mobile and VR.', src: '3DHuman11.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx.fbx', glb: '3DHuman11.glb', gltf: '3DHuman11.gltf' },
+      { id: 3, title: 'Player Model', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQ4NC5wbmc=/250x600/FAM6Ft.png', desc: 'A stylized player avatar with simple topology for game characters.', src: 'A19.glb', availableFormats: ['glb', 'fbx', 'gltf'], fbx: '3DHumanfbx5.fbx', glb: 'A19.glb', gltf: 'A19.gltf' },
+      { id: 4, title: 'Farmer', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzNy5wbmc=/250x600/xUXRMO.png', desc: 'A medieval knight in low-poly style.', src: 'AFramer.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx6.fbx', glb: 'AFramer.glb', gltf: 'AFramer.gltf' },
+      { id: 5, title: 'Space Marine', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzOC5wbmc=/250x600/ATA380.png', desc: 'A ready-to-animate archer character.', src: 'Aspacemarine.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx7.fbx', glb: 'Aspacemarine.glb', gltf: 'Aspacemarine.gltf' },
+      { id: 6, title: 'Police Officer', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzOS5wbmc=/250x600/tht5cv.png', desc: 'Low-poly steampunk robot NPC.', src: 'Police.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx8.fbx', glb: 'Police.glb', gltf: 'Police.gltf' },
+      { id: 7, title: 'Scientist', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTg0MC5wbmc=/250x600/iZBPRT.png', desc: 'Blocky mage perfect for voxel games.', src: '3Dcharcter4.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3D1characterfbx4.fbx', glb: 'AS.glb', gltf: 'AS.gltf' },
+      { id: 8, title: 'Astronaut', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTg0MS5wbmc=/250x600/lZnMKc.png', desc: 'Futuristic soldier rigged for animation.', src: 'AS1.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx10.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 9, title: 'Chef', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE4MC5wbmc=/250x600/89K1oc.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter9.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter9.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 10, title: 'Samurai', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3OC5wbmc=/250x600/0DKTnv.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter6.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter6.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 11, title: 'Builder', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE4MS5wbmc=/250x600/%2BXIu8o.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter111.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter3.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 12, title: 'Medic', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3OS5wbmc=/250x600/yLs1Oq.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter1.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter1.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 13, title: 'Human Model', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3Ni5wbmc=/250x600/YWf1vV.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter10.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter10.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 14, title: 'Fire Fighter', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3Ny5wbmc=/250x600/S%2FDg5u.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter5.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter5.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
     ];
 
     // DOM refs
@@ -1334,6 +1289,12 @@
     const mainContent  = document.getElementById('mainContent');
     const checkoutPage = document.getElementById('checkoutPage');
     const backCheckout = document.getElementById('backCheckout');
+    // NEW: Like/List buttons
+    const modelActions = document.getElementById('modelActions');
+    const likeBtn = document.getElementById('likeBtn');
+    const listBtn = document.getElementById('listBtn');
+    const likeIcon = document.getElementById('likeIcon');
+    const listIcon = document.getElementById('listIcon');
 
     // NEW refs for login/register toggle
     const loginView   = document.getElementById('loginView');
@@ -1514,6 +1475,16 @@
         // Paid model - show buy button
         buyNowBtn.style.display = 'block';
         downloadBtn.style.display = 'none';
+      }
+      // Show Like/List buttons only if logged in
+      if (currentUser) {
+        modelActions.style.display = 'flex';
+        // Store the current model's ID on the buttons
+        likeBtn.setAttribute('data-model-id', m.id);
+        listBtn.setAttribute('data-model-id', m.id);
+        updateLikeListUI(m);
+      } else {
+        modelActions.style.display = 'none';
       }
     }
 
@@ -1872,6 +1843,8 @@
         loginBtn.appendChild(nameSpan);
         document.getElementById('signupBtn').style.display = 'none';
         loginBtn.onclick = () => showUserMenu();
+        if (!currentUser.likes) currentUser.likes = [];
+        if (!currentUser.myList) currentUser.myList = [];
       } else {
         loginBtn.innerHTML = 'Log In';
         document.getElementById('signupBtn').style.display = 'block';
@@ -1900,6 +1873,8 @@
         </div>
         <button id="homeBtn" class="user-menu-option">Home</button>
         <button id="profileBtn" class="user-menu-option">Profile</button>
+        <button id="myLikesBtn" class="user-menu-option">My Likes</button>
+        <button id="myListBtn" class="user-menu-option">My List</button>
         <button id="logoutBtn" class="user-menu-option">Logout</button>
       `;
       const loginBtn = document.getElementById('loginBtn');
@@ -1927,6 +1902,15 @@
         menu.remove();
         // Redirect to homepage
         window.location.href = '/';
+      };
+      // NEW: My Likes and My List
+      document.getElementById('myLikesBtn').onclick = () => {
+        menu.remove();
+        openLikesOrListPage('likes');
+      };
+      document.getElementById('myListBtn').onclick = () => {
+        menu.remove();
+        openLikesOrListPage('list');
       };
     }
 
@@ -2230,6 +2214,142 @@
       // Back button
       document.getElementById('backProfile').onclick = () => {
         profilePage.style.display = 'none';
+        mainContent.style.display = 'block';
+        homepageBanner.style.display = '';
+        topSearchbar.style.display = 'none';
+        window.scrollTo(0,0);
+      };
+    }
+
+    // --- Like/List logic ---
+    function getUserLikes() {
+      if (!currentUser) return [];
+      return (currentUser.likes || []);
+    }
+    function getUserList() {
+      if (!currentUser) return [];
+      return (currentUser.myList || []);
+    }
+    function saveUserLikes(likes) {
+      if (!currentUser) return;
+      currentUser.likes = likes;
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      // Also update in users DB
+      let users = JSON.parse(localStorage.getItem('users') || '[]');
+      users = users.map(u => u.email === currentUser.email ? { ...u, likes } : u);
+      localStorage.setItem('users', JSON.stringify(users));
+    }
+    function saveUserList(myList) {
+      if (!currentUser) return;
+      currentUser.myList = myList;
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      // Also update in users DB
+      let users = JSON.parse(localStorage.getItem('users') || '[]');
+      users = users.map(u => u.email === currentUser.email ? { ...u, myList } : u);
+      localStorage.setItem('users', JSON.stringify(users));
+    }
+    function updateLikeListUI(model) {
+      // Like state
+      const likes = getUserLikes();
+      const liked = likes && likes.includes(model.id);
+      likeIcon.textContent = liked ? '♥' : '♡';
+      likeBtn.classList.toggle('liked', liked);
+      likeBtn.querySelector('span:last-child').textContent = liked ? 'Liked' : 'Like';
+      // List state
+      const myList = getUserList();
+      const listed = myList && myList.includes(model.id);
+      listIcon.textContent = listed ? '✔' : '＋';
+      listBtn.classList.toggle('listed', listed);
+      listBtn.querySelector('span:last-child').textContent = listed ? 'Added' : 'Add to List';
+    }
+    likeBtn.addEventListener('click', () => {
+      if (!currentUser) return;
+      const modelId = parseInt(likeBtn.getAttribute('data-model-id'), 10);
+      if (!modelId) return;
+      let likes = getUserLikes();
+      if (!likes.includes(modelId)) {
+        likes.push(modelId);
+      } else {
+        likes = likes.filter(id => id !== modelId);
+      }
+      saveUserLikes(likes);
+      // Find the model by ID and update UI
+      const model = models.find(m => m.id === modelId);
+      if (model) updateLikeListUI(model);
+    });
+    listBtn.addEventListener('click', () => {
+      if (!currentUser) return;
+      const modelId = parseInt(listBtn.getAttribute('data-model-id'), 10);
+      if (!modelId) return;
+      let myList = getUserList();
+      if (!myList.includes(modelId)) {
+        myList.push(modelId);
+      } else {
+        myList = myList.filter(id => id !== modelId);
+      }
+      saveUserList(myList);
+      // Find the model by ID and update UI
+      const model = models.find(m => m.id === modelId);
+      if (model) updateLikeListUI(model);
+    });
+
+    // --- Add Likes/List pages HTML if not present ---
+    if (!document.getElementById('likesListPage')) {
+      const likesListSection = document.createElement('section');
+      likesListSection.id = 'likesListPage';
+      likesListSection.style.display = 'none';
+      likesListSection.innerHTML = `
+        <div class="likes-list-container">
+          <button class="btn back-btn" id="backLikesList">← Back</button>
+          <h2 id="likesListTitle"></h2>
+          <div id="likesListGallery" class="gallery"></div>
+        </div>
+      `;
+      document.body.appendChild(likesListSection);
+    }
+    // --- Likes/List page logic ---
+    function openLikesOrListPage(type) {
+      // Hide all other pages
+      modelPage.style.display = 'none';
+      mainContent.style.display = 'none';
+      checkoutPage.style.display = 'none';
+      homepageBanner.style.display = 'none';
+      topSearchbar.style.display = 'none';
+      // Show likes/list page
+      const likesListPage = document.getElementById('likesListPage');
+      likesListPage.style.display = 'block';
+      window.scrollTo(0,0);
+      // Set title
+      const title = type === 'likes' ? 'My Likes' : 'My List';
+      document.getElementById('likesListTitle').textContent = title;
+      // Get model IDs
+      let ids = [];
+      if (type === 'likes') ids = getUserLikes();
+      else ids = getUserList();
+      // Get models
+      const filtered = models.filter(m => ids.includes(m.id));
+      // Render
+      const galleryDiv = document.getElementById('likesListGallery');
+      if (filtered.length === 0) {
+        galleryDiv.innerHTML = `<div id="no-results-message"><div>¯\\_(ツ)_/¯</div><div>No models yet</div></div>`;
+      } else {
+        galleryDiv.innerHTML = '';
+        filtered.forEach(m => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <img src="${m.thumb}" alt="${m.title}">
+            <div class="info">
+              <h3>${m.title}</h3>
+              <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>
+            </div>`;
+          card.onclick = () => openModelPage(m, false);
+          galleryDiv.appendChild(card);
+        });
+      }
+      // Back button
+      document.getElementById('backLikesList').onclick = () => {
+        likesListPage.style.display = 'none';
         mainContent.style.display = 'block';
         homepageBanner.style.display = '';
         topSearchbar.style.display = 'none';
