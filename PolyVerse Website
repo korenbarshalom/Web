@@ -1252,6 +1252,17 @@
     </div>
   </div>
 
+  <!-- Add a login-required modal if not present -->
+  <div class="modal" id="loginRequiredModal">
+    <div class="modal-content" style="max-width:340px;text-align:center;">
+      <div style="font-size:2.2rem;margin-bottom:0.5rem;">🔒</div>
+      <h2 style="margin-bottom:0.5rem;">Login Required</h2>
+      <p style="margin-bottom:1.5rem;">You need to log in to like models or add them to your list.</p>
+      <button class="btn" id="loginRequiredBtn">Log In</button>
+      <button class="btn btn-outline" id="loginRequiredClose" style="margin-top:0.7rem;">Cancel</button>
+    </div>
+  </div>
+
   <script type="module">
     // === DATA & HOOKS ===
     const models = [
@@ -1476,16 +1487,12 @@
         buyNowBtn.style.display = 'block';
         downloadBtn.style.display = 'none';
       }
-      // Show Like/List buttons only if logged in
-      if (currentUser) {
-        modelActions.style.display = 'flex';
-        // Store the current model's ID on the buttons
-        likeBtn.setAttribute('data-model-id', m.id);
-        listBtn.setAttribute('data-model-id', m.id);
-        updateLikeListUI(m);
-      } else {
-        modelActions.style.display = 'none';
-      }
+      // Always show Like/List buttons
+      modelActions.style.display = 'flex';
+      // Store the current model's ID on the buttons
+      likeBtn.setAttribute('data-model-id', m.id);
+      listBtn.setAttribute('data-model-id', m.id);
+      updateLikeListUI(m);
     }
 
     // --- Suggested Models Logic ---
@@ -1549,6 +1556,10 @@
       topSearchbar.style.display = 'none';
       // Show hero banner
       if(homepageBanner) homepageBanner.style.display = '';
+      // Hide likes/list page and clear gallery
+      const likesListPage = document.getElementById('likesListPage');
+      likesListPage.style.display = 'none';
+      document.getElementById('likesListGallery').innerHTML = '';
       // Reset the flag when returning to homepage
       comingFromHomepage = true;
       window.scrollTo(0,0);
@@ -2262,10 +2273,13 @@
       listBtn.classList.toggle('listed', listed);
       listBtn.querySelector('span:last-child').textContent = listed ? 'Added' : 'Add to List';
     }
-    likeBtn.addEventListener('click', () => {
-      if (!currentUser) return;
+    likeBtn.addEventListener('click', (e) => {
       const modelId = parseInt(likeBtn.getAttribute('data-model-id'), 10);
       if (!modelId) return;
+      if (!currentUser) {
+        showLoginRequiredModal(() => likeBtn.click());
+        return;
+      }
       let likes = getUserLikes();
       if (!likes.includes(modelId)) {
         likes.push(modelId);
@@ -2277,10 +2291,13 @@
       const model = models.find(m => m.id === modelId);
       if (model) updateLikeListUI(model);
     });
-    listBtn.addEventListener('click', () => {
-      if (!currentUser) return;
+    listBtn.addEventListener('click', (e) => {
       const modelId = parseInt(listBtn.getAttribute('data-model-id'), 10);
       if (!modelId) return;
+      if (!currentUser) {
+        showLoginRequiredModal(() => listBtn.click());
+        return;
+      }
       let myList = getUserList();
       if (!myList.includes(modelId)) {
         myList.push(modelId);
@@ -2331,15 +2348,15 @@
       // Render
       const galleryDiv = document.getElementById('likesListGallery');
       if (filtered.length === 0) {
-        galleryDiv.innerHTML = `<div id="no-results-message"><div>¯\\_(ツ)_/¯</div><div>No models yet</div></div>`;
+        galleryDiv.innerHTML = `<div id=\"no-results-message\"><div>¯\\_(ツ)_/¯</div><div>No models yet</div></div>`;
       } else {
         galleryDiv.innerHTML = '';
         filtered.forEach(m => {
           const card = document.createElement('div');
           card.className = 'card';
           card.innerHTML = `
-            <img src="${m.thumb}" alt="${m.title}">
-            <div class="info">
+            <img src=\"${m.thumb}\" alt=\"${m.title}\">
+            <div class=\"info\">
               <h3>${m.title}</h3>
               <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>
             </div>`;
@@ -2350,10 +2367,53 @@
       // Back button
       document.getElementById('backLikesList').onclick = () => {
         likesListPage.style.display = 'none';
+        // Clear the gallery content to prevent bleed-through
+        document.getElementById('likesListGallery').innerHTML = '';
         mainContent.style.display = 'block';
         homepageBanner.style.display = '';
         topSearchbar.style.display = 'none';
         window.scrollTo(0,0);
+      };
+    }
+
+    // Modal logic for login required
+    function showLoginRequiredModal(afterLoginAction) {
+      const modal = document.getElementById('loginRequiredModal');
+      modal.classList.add('active');
+      // Focus Log In button
+      setTimeout(() => document.getElementById('loginRequiredBtn').focus(), 100);
+      // Log In button opens login modal, then runs afterLoginAction after successful login
+      document.getElementById('loginRequiredBtn').onclick = () => {
+        modal.classList.remove('active');
+        openModal(loginModal);
+        // After login, run the action
+        const loginHandler = () => {
+          if (currentUser) {
+            setTimeout(() => afterLoginAction && afterLoginAction(), 200);
+            window.removeEventListener('storage', loginHandler);
+          }
+        };
+        // Listen for login (localStorage change)
+        window.addEventListener('storage', loginHandler);
+        // Also check after login modal closes
+        const closeCheck = setInterval(() => {
+          if (currentUser) {
+            afterLoginAction && afterLoginAction();
+            clearInterval(closeCheck);
+          }
+        }, 300);
+        // Remove listeners after 10s
+        setTimeout(() => {
+          window.removeEventListener('storage', loginHandler);
+          clearInterval(closeCheck);
+        }, 10000);
+      };
+      document.getElementById('loginRequiredClose').onclick = () => {
+        modal.classList.remove('active');
+      };
+      // Also close on outside click
+      modal.onclick = (e) => {
+        if (e.target === modal) modal.classList.remove('active');
       };
     }
   </script>
