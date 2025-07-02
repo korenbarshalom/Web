@@ -1217,17 +1217,19 @@
 
       <!-- ===== LOGIN VIEW ===== -->
       <div id="loginView">
-        <label>Email</label>
-        <input type="email" class="login-input" id="loginEmail" placeholder="you@example.com" required>
-        <div class="error-message" id="loginEmailError"></div>
+        <label>Username</label>
+        <input type="text" class="login-input" id="loginUsername" placeholder="Your username" required>
+        <div class="error-message" id="loginUsernameError"></div>
 
         <label>Password</label>
         <input type="password" class="login-input" id="loginPassword" placeholder="Your password" required>
         <div class="error-message" id="loginPasswordError"></div>
 
-        <div class="action-row">
+        <div class="action-row" id="loginActionRow">
           <button class="login-btn" id="loginSubmitBtn">Continue</button>
-          <button class="btn" id="createAccountBtn">Create&nbsp;Account</button>
+        </div>
+        <div id="loginSignupText" style="text-align:center; margin-bottom:1rem; font-size:0.93rem; color:#aaa;">
+          Not have an account yet? <a href="#" id="loginToSignup" style="color:var(--accent); font-weight:600;">Sign up</a>
         </div>
 
         <div class="success-message" id="loginSuccess"></div>
@@ -1242,9 +1244,9 @@
         <input type="text" class="login-input" id="registerName" placeholder="Your Name" required>
         <div class="error-message" id="nameError"></div>
 
-        <label>Email</label>
-        <input type="email" class="login-input" id="registerEmail" placeholder="you@example.com" required>
-        <div class="error-message" id="emailError"></div>
+        <label>Username</label>
+        <input type="text" class="login-input" id="registerUsername" placeholder="Choose a username" required>
+        <div class="error-message" id="usernameError"></div>
 
         <label>Password</label>
         <input type="password" class="login-input" id="registerPassword" placeholder="Choose a strong password" required>
@@ -1280,6 +1282,7 @@
 
   <script type="module">
     // === DATA & HOOKS ===
+    const DEFAULT_PROFILE_IMAGE = 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk1ODQ0MS5wbmc=/250x600/j0omjw.png';
     const models = [
       { id: 1, title: 'Human Character Base', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQwMy5wbmc=/250x600/vaWBiI.png', desc: 'A versatile low-poly human base mesh, ready for your animations and rigs.', src: 'A20.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx1.fbx', glb: 'A20.glb', gltf: 'A20.gltf' },
       { id: 2, title: 'Human Character Base', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTM1NS5wbmc=/250x600/iV5gql.png', desc: 'Alternate low-poly human model optimized for mobile and VR.', src: '3DHuman11.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx.fbx', glb: '3DHuman11.glb', gltf: '3DHuman11.gltf' },
@@ -1328,6 +1331,7 @@
     const modalTitle  = document.getElementById('modalTitle');
     const createAccBtn= document.getElementById('createAccountBtn');
     const backToLogin = document.getElementById('backToLogin');
+    const loginToSignup = document.getElementById('loginToSignup');
 
     const navbarSearch   = document.getElementById('navbarSearch');
     const suggestedModels = document.getElementById('suggestedModels');
@@ -1617,18 +1621,18 @@
     
     // DOM refs for auth
     const registerName = document.getElementById('registerName');
-    const registerEmail = document.getElementById('registerEmail');
+    const registerUsername = document.getElementById('registerUsername');
     const registerPassword = document.getElementById('registerPassword');
     const registerSubmitBtn = document.getElementById('registerSubmitBtn');
-    const loginEmail = document.getElementById('loginEmail');
+    const loginUsername = document.getElementById('loginUsername');
     const loginPassword = document.getElementById('loginPassword');
     const loginSubmitBtn = document.getElementById('loginSubmitBtn');
     
     // Error message elements
     const nameError = document.getElementById('nameError');
-    const emailError = document.getElementById('emailError');
+    const usernameError = document.getElementById('usernameError');
     const passwordError = document.getElementById('passwordError');
-    const loginEmailError = document.getElementById('loginEmailError');
+    const loginUsernameError = document.getElementById('loginUsernameError');
     const loginPasswordError = document.getElementById('loginPasswordError');
     const registerSuccess = document.getElementById('registerSuccess');
     const loginSuccess = document.getElementById('loginSuccess');
@@ -1646,10 +1650,11 @@
       if (!/^[a-zA-Z\s]+$/.test(name.trim())) return 'Name can only contain letters and spaces';
       return null;
     }
-    function validateEmail(email) {
-      if (!email.trim()) return 'Email is required';
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email.trim())) return 'Please enter a valid email address';
+    function validateUsername(username) {
+      if (!username.trim()) return 'Username is required';
+      if (username.trim().length < 3) return 'Username must be at least 3 characters';
+      if (username.trim().length > 20) return 'Username must be less than 20 characters';
+      if (!/^[a-zA-Z0-9_]+$/.test(username.trim())) return 'Username can only contain letters, numbers, and underscores';
       return null;
     }
     function validatePassword(password) {
@@ -1711,10 +1716,10 @@
       setTimeout(() => element.classList.remove('show'), 3000);
     }
     function clearAllErrors() {
-      [nameError, emailError, passwordError, loginEmailError, loginPasswordError].forEach(el => {
+      [nameError, usernameError, passwordError, loginUsernameError, loginPasswordError].forEach(el => {
         hideError(el);
       });
-      [registerName, registerEmail, registerPassword, loginEmail, loginPassword].forEach(el => {
+      [registerName, registerUsername, registerPassword, loginUsername, loginPassword].forEach(el => {
         el.classList.remove('input-error', 'input-success');
       });
     }
@@ -1736,30 +1741,30 @@
       e.preventDefault();
       clearAllErrors();
       const name = registerName.value.trim();
-      const email = registerEmail.value.trim().toLowerCase();
+      const username = registerUsername.value.trim();
       const password = registerPassword.value;
       // Validate inputs
       const nameErrorMsg = validateName(name);
-      const emailErrorMsg = validateEmail(email);
+      const usernameErrorMsg = validateUsername(username);
       const passwordErrorMsg = validatePassword(password);
       if (nameErrorMsg) showError(nameError, nameErrorMsg);
-      if (emailErrorMsg) showError(emailError, emailErrorMsg);
+      if (usernameErrorMsg) showError(usernameError, usernameErrorMsg);
       if (passwordErrorMsg) showError(passwordError, passwordErrorMsg);
-      if (nameErrorMsg || emailErrorMsg || passwordErrorMsg) {
+      if (nameErrorMsg || usernameErrorMsg || passwordErrorMsg) {
         return;
       }
-      // Simulate backend: check for duplicate email
+      // Simulate backend: check for duplicate username
       const users = getUsers();
-      if (users.some(u => u.email === email)) {
-        showError(emailError, 'An account with this email already exists.');
+      if (users.some(u => u.username === username)) {
+        showError(usernameError, 'An account with this username already exists.');
         return;
       }
       // Simulate user creation
-      users.push({ name, email, password });
+      users.push({ name, username, password });
       saveUsers(users);
       showSuccess(registerSuccess, 'Account created successfully! Redirecting to login...');
       registerName.value = '';
-      registerEmail.value = '';
+      registerUsername.value = '';
       registerPassword.value = '';
       passwordStrength.style.display = 'none';
       setTimeout(() => {
@@ -1771,21 +1776,21 @@
     loginSubmitBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       clearAllErrors();
-      const email = loginEmail.value.trim().toLowerCase();
+      const username = loginUsername.value.trim();
       const password = loginPassword.value;
-      const emailErrorMsg = validateEmail(email);
+      const usernameErrorMsg = validateUsername(username);
       if (!password) {
         showError(loginPasswordError, 'Password is required');
         return;
       }
-      if (emailErrorMsg) {
-        showError(loginEmailError, emailErrorMsg);
+      if (usernameErrorMsg) {
+        showError(loginUsernameError, usernameErrorMsg);
         return;
       }
       const users = getUsers();
-      const user = users.find(u => u.email === email && u.password === password);
+      const user = users.find(u => u.username === username && u.password === password);
       if (!user) {
-        showError(loginPasswordError, 'Invalid email or password.');
+        showError(loginPasswordError, 'Invalid username or password.');
         return;
       }
       currentUser = user;
@@ -1798,9 +1803,14 @@
       }, 1500);
     });
     // Clear errors on input
-    [registerName, registerEmail, registerPassword, loginEmail, loginPassword].forEach(input => {
+    [registerName, registerUsername, registerPassword, loginUsername, loginPassword].forEach(input => {
       input.addEventListener('input', () => {
-        const errorElement = document.getElementById(input.id.replace('register', '').replace('login', '') + 'Error');
+        let errorElement = null;
+        if (input.id === 'registerName') errorElement = nameError;
+        else if (input.id === 'registerUsername') errorElement = usernameError;
+        else if (input.id === 'registerPassword') errorElement = passwordError;
+        else if (input.id === 'loginUsername') errorElement = loginUsernameError;
+        else if (input.id === 'loginPassword') errorElement = loginPasswordError;
         if (errorElement) hideError(errorElement);
         input.classList.remove('input-error');
       });
@@ -1828,18 +1838,36 @@
       registerView.style.display='none';
       modalTitle.textContent='Log In';
       clearAllErrors();
+      // Hide create account button if present
+      const createAccBtn = document.getElementById('createAccountBtn');
+      if (createAccBtn) createAccBtn.style.display = 'none';
+      // Show the login-signup text
+      const loginSignupText = document.getElementById('loginSignupText');
+      if (loginSignupText) loginSignupText.style.display = 'block';
     }
     function showRegister(){
       loginView.style.display='none';
       registerView.style.display='block';
       modalTitle.textContent='Create Account';
       clearAllErrors();
+      // Attach event listener for 'Log In' link in register view
+      setTimeout(() => {
+        const backToLogin = document.getElementById('backToLogin');
+        if (backToLogin) {
+          backToLogin.onclick = function(e) {
+            e.preventDefault();
+            showLogin();
+          };
+        }
+      }, 0);
     }
-    createAccBtn.onclick=showRegister;
-    backToLogin.onclick=e=>{
-      e.preventDefault();
-      showLogin();
-    };
+    // Remove createAccBtn event (now handled by link below Continue)
+    if (loginToSignup) {
+      loginToSignup.onclick = function(e) {
+        e.preventDefault();
+        showRegister();
+      };
+    }
     // === INITIALIZATION ===
     window.addEventListener('DOMContentLoaded', () => {
       // Simulate session
@@ -1856,7 +1884,7 @@
         // Remove all children
         loginBtn.innerHTML = '';
         // Get image (fallback if not set)
-        const imgSrc = currentUser.image || 'https://static.itch.io/images/cover.svg';
+        const imgSrc = currentUser.image || DEFAULT_PROFILE_IMAGE;
         // Create avatar+name row
         const avatar = document.createElement('img');
         avatar.src = imgSrc;
@@ -1891,7 +1919,7 @@
         min-width: 180px;
       `;
       // Avatar + name row
-      const imgSrc = currentUser.image || 'https://static.itch.io/images/cover.svg';
+      const imgSrc = currentUser.image || DEFAULT_PROFILE_IMAGE;
       menu.innerHTML = `
         <div class="user-menu-header">
           <img class="profile-avatar" src="${imgSrc}" alt="Profile">
@@ -2196,7 +2224,7 @@
       if (tempProfile.image) {
         profileImage.src = tempProfile.image;
       } else {
-        profileImage.src = 'https://static.itch.io/images/cover.svg'; // fallback avatar
+        profileImage.src = DEFAULT_PROFILE_IMAGE;
       }
       // Change image logic
       const imageInput = document.getElementById('profileImageInput');
@@ -2227,7 +2255,7 @@
         localStorage.setItem('currentUser', JSON.stringify(user));
         // Also update in users DB
         let users = JSON.parse(localStorage.getItem('users') || '[]');
-        users = users.map(u => u.email === user.email ? { ...u, name: user.name, image: user.image } : u);
+        users = users.map(u => u.username === user.username ? { ...u, name: user.name, image: user.image } : u);
         localStorage.setItem('users', JSON.stringify(users));
         // Show success
         saveSuccess.textContent = 'Profile updated!';
@@ -2262,7 +2290,7 @@
       localStorage.setItem('currentUser', JSON.stringify(currentUser));
       // Also update in users DB
       let users = JSON.parse(localStorage.getItem('users') || '[]');
-      users = users.map(u => u.email === currentUser.email ? { ...u, likes } : u);
+      users = users.map(u => u.username === currentUser.username ? { ...u, likes } : u);
       localStorage.setItem('users', JSON.stringify(users));
     }
     function saveUserList(myList) {
@@ -2271,7 +2299,7 @@
       localStorage.setItem('currentUser', JSON.stringify(currentUser));
       // Also update in users DB
       let users = JSON.parse(localStorage.getItem('users') || '[]');
-      users = users.map(u => u.email === currentUser.email ? { ...u, myList } : u);
+      users = users.map(u => u.username === currentUser.username ? { ...u, myList } : u);
       localStorage.setItem('users', JSON.stringify(users));
     }
     function updateLikeListUI(model) {
