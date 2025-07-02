@@ -1196,8 +1196,10 @@
         Billing Address
         <input type="text" required placeholder="Street, City, Country">
       </label>
-      <button type="submit" class="btn" style="justify-content:center;">Pay with PayPal</button>
     </form>
+    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=korenbarshalom@gmail.com&item_name=Low+Poly+Character&amount=1.00&currency_code=USD&return=https://mywebsite.com/thank-you.html" target="_blank" style="display:block;text-align:center;margin-top:1.5rem;">
+      <button class="btn" style="justify-content:center;min-width:180px;">Pay with PayPal</button>
+    </a>
   </section>
 
   <!-- CONTACT INFO FOOTER -->
@@ -1284,20 +1286,20 @@
     // === DATA & HOOKS ===
     const DEFAULT_PROFILE_IMAGE = 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk1ODQ0MS5wbmc=/250x600/j0omjw.png';
     const models = [
-      { id: 1, title: 'Human Character Base', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQwMy5wbmc=/250x600/vaWBiI.png', desc: 'A versatile low-poly human base mesh, ready for your animations and rigs.', src: 'A20.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx1.fbx', glb: 'A20.glb', gltf: 'A20.gltf' },
-      { id: 2, title: 'Human Character Base', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTM1NS5wbmc=/250x600/iV5gql.png', desc: 'Alternate low-poly human model optimized for mobile and VR.', src: '3DHuman11.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx.fbx', glb: '3DHuman11.glb', gltf: '3DHuman11.gltf' },
-      { id: 3, title: 'Player Model', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQ4NC5wbmc=/250x600/FAM6Ft.png', desc: 'A stylized player avatar with simple topology for game characters.', src: 'A19.glb', availableFormats: ['glb', 'fbx', 'gltf'], fbx: '3DHumanfbx5.fbx', glb: 'A19.glb', gltf: 'A19.gltf' },
-      { id: 4, title: 'Farmer', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzNy5wbmc=/250x600/xUXRMO.png', desc: 'A medieval knight in low-poly style.', src: 'AFramer.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx6.fbx', glb: 'AFramer.glb', gltf: 'AFramer.gltf' },
-      { id: 5, title: 'Space Marine', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzOC5wbmc=/250x600/ATA380.png', desc: 'A ready-to-animate archer character.', src: 'Aspacemarine.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx7.fbx', glb: 'Aspacemarine.glb', gltf: 'Aspacemarine.gltf' },
-      { id: 6, title: 'Police Officer', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzOS5wbmc=/250x600/tht5cv.png', desc: 'Low-poly steampunk robot NPC.', src: 'Police.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx8.fbx', glb: 'Police.glb', gltf: 'Police.gltf' },
-      { id: 7, title: 'Scientist', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTg0MC5wbmc=/250x600/iZBPRT.png', desc: 'Blocky mage perfect for voxel games.', src: '3Dcharcter4.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3D1characterfbx4.fbx', glb: 'AS.glb', gltf: 'AS.gltf' },
+      { id: 1, title: 'Human Character Base', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQwMy5wbmc=/250x600/vaWBiI.png', desc: 'A versatile low-poly human base mesh, ready for your animations and rigs.', src: 'A20.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx1.fbx', glb: 'A20.glb', gltf: 'A20.gltf' },
+      { id: 2, title: 'Human Character Base', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTM1NS5wbmc=/250x600/iV5gql.png', desc: 'Alternate low-poly human model optimized for mobile and VR.', src: '3DHuman11.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx.fbx', glb: '3DHuman11.glb', gltf: '3DHuman11.gltf' },
+      { id: 3, title: 'Player Model', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQ4NC5wbmc=/250x600/FAM6Ft.png', desc: 'A stylized player avatar with simple topology for game characters.', src: 'A19.glb', availableFormats: ['glb', 'fbx', 'gltf'], fbx: '3DHumanfbx5.fbx', glb: 'A19.glb', gltf: 'A19.gltf' },
+      { id: 4, title: 'Farmer', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzNy5wbmc=/250x600/xUXRMO.png', desc: 'A medieval knight in low-poly style.', src: 'AFramer.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx6.fbx', glb: 'AFramer.glb', gltf: 'AFramer.gltf' },
+      { id: 5, title: 'Space Marine', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzOC5wbmc=/250x600/ATA380.png', desc: 'A ready-to-animate archer character.', src: 'Aspacemarine.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx7.fbx', glb: 'Aspacemarine.glb', gltf: 'Aspacemarine.gltf' },
+      { id: 6, title: 'Police Officer', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzOS5wbmc=/250x600/tht5cv.png', desc: 'Low-poly steampunk robot NPC.', src: 'Police.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx8.fbx', glb: 'Police.glb', gltf: 'Police.gltf' },
+      { id: 7, title: 'Scientist', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTg0MC5wbmc=/250x600/iZBPRT.png', desc: 'Blocky mage perfect for voxel games.', src: '3Dcharcter4.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3D1characterfbx4.fbx', glb: 'AS.glb', gltf: 'AS.gltf' },
       { id: 8, title: 'Astronaut', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTg0MS5wbmc=/250x600/lZnMKc.png', desc: 'Futuristic soldier rigged for animation.', src: 'AS1.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx10.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
-      { id: 9, title: 'Chef', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE4MC5wbmc=/250x600/89K1oc.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter9.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter9.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
-      { id: 10, title: 'Samurai', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3OC5wbmc=/250x600/0DKTnv.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter6.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter6.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
-      { id: 11, title: 'Builder', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE4MS5wbmc=/250x600/%2BXIu8o.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter111.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter3.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
-      { id: 12, title: 'Medic', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3OS5wbmc=/250x600/yLs1Oq.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter1.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter1.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
-      { id: 13, title: 'Human Model', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3Ni5wbmc=/250x600/YWf1vV.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter10.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter10.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
-      { id: 14, title: 'Fire Fighter', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3Ny5wbmc=/250x600/S%2FDg5u.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter5.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter5.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 9, title: 'Chef', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE4MC5wbmc=/250x600/89K1oc.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter9.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter9.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 10, title: 'Samurai', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3OC5wbmc=/250x600/0DKTnv.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter6.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter6.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 11, title: 'Builder', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE4MS5wbmc=/250x600/%2BXIu8o.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter111.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter3.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 12, title: 'Medic', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3OS5wbmc=/250x600/yLs1Oq.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter1.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter1.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 13, title: 'Human Model', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3Ni5wbmc=/250x600/YWf1vV.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter10.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter10.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 14, title: 'Fire Fighter', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3Ny5wbmc=/250x600/S%2FDg5u.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter5.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter5.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
     ];
 
     // DOM refs
@@ -1969,10 +1971,10 @@
     }
 
     // --- Fake checkout ---
-    document.getElementById('checkoutForm').addEventListener('submit',e=>{
-      e.preventDefault();
-      window.open('https://www.paypal.com/paypalme/korenbar1', '_blank', 'noopener');
-    });
+    // document.getElementById('checkoutForm').addEventListener('submit',e=>{
+    //   e.preventDefault();
+    //   window.open('https://www.paypal.com/paypalme/korenbar1', '_blank', 'noopener');
+    // });
 
     // --- Download functionality ---
     downloadBtn.addEventListener('click', (e) => {
