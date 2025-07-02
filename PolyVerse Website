@@ -2070,7 +2070,7 @@
     };
 
     // --- Profile Page ---
-    // Add profile page HTML after checkoutPage
+    // Add profile page HTML before footer if not present
     if (!document.getElementById('profilePage')) {
       const profileSection = document.createElement('section');
       profileSection.id = 'profilePage';
@@ -2093,7 +2093,9 @@
           </div>
         </div>
       `;
-      document.body.appendChild(profileSection);
+      // Insert before footer
+      const footer = document.querySelector('footer');
+      document.body.insertBefore(profileSection, footer);
     }
     // Add profile page styles
     if (!document.getElementById('profilePageStyles')) {
@@ -2205,6 +2207,13 @@
       checkoutPage.style.display = 'none';
       homepageBanner.style.display = 'none';
       topSearchbar.style.display = 'none';
+      // Hide likes/list page and clear gallery
+      const likesListPage = document.getElementById('likesListPage');
+      if (likesListPage) {
+        likesListPage.style.display = 'none';
+        const likesListGallery = document.getElementById('likesListGallery');
+        if (likesListGallery) likesListGallery.innerHTML = '';
+      }
       // Show profile page
       const profilePage = document.getElementById('profilePage');
       profilePage.style.display = 'block';
@@ -2365,7 +2374,9 @@
           <div id="likesListGallery" class="gallery"></div>
         </div>
       `;
-      document.body.appendChild(likesListSection);
+      // Insert before footer
+      const footer = document.querySelector('footer');
+      document.body.insertBefore(likesListSection, footer);
     }
     // --- Likes/List page logic ---
     function openLikesOrListPage(type) {
@@ -2375,6 +2386,9 @@
       checkoutPage.style.display = 'none';
       homepageBanner.style.display = 'none';
       topSearchbar.style.display = 'none';
+      // Hide profile page if present
+      const profilePage = document.getElementById('profilePage');
+      if (profilePage) profilePage.style.display = 'none';
       // Show likes/list page
       const likesListPage = document.getElementById('likesListPage');
       likesListPage.style.display = 'block';
