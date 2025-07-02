@@ -143,6 +143,11 @@
     }
     .modal.active { display:flex }
 
+    /* Remove overlay for loginRequiredModal only */
+    #loginRequiredModal {
+      background: none !important;
+    }
+
     .modal-content {
       background:var(--card-bg);
       transform:scale(0.8); opacity:0;
@@ -1053,6 +1058,14 @@
         max-width: 98vw;
       }
     }
+
+    .login-required-btn-group {
+      margin-top: 0.2rem !important;
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
   </style>
 </head>
 <body>
@@ -1256,10 +1269,12 @@
   <div class="modal" id="loginRequiredModal">
     <div class="modal-content" style="max-width:340px;text-align:center;">
       <div style="font-size:2.2rem;margin-bottom:0.5rem;">🔒</div>
-      <h2 style="margin-bottom:0.5rem;">Login Required</h2>
-      <p style="margin-bottom:1.5rem;">You need to log in to like models or add them to your list.</p>
-      <button class="btn" id="loginRequiredBtn">Log In</button>
-      <button class="btn btn-outline" id="loginRequiredClose" style="margin-top:0.7rem;">Cancel</button>
+      <h2 style="margin-bottom:0.1rem;">Login Required</h2>
+      <p style="margin-bottom:0.5rem;">You need to log in to like models or add them to your list.</p>
+      <div class="login-required-btn-group" style="margin-top:0.2rem; display:flex; justify-content:center; gap:0.75rem; flex-wrap:wrap;">
+        <button class="btn" id="loginRequiredBtn">Log In</button>
+        <button class="btn btn-outline" id="loginRequiredClose">Cancel</button>
+      </div>
     </div>
   </div>
 
@@ -2372,6 +2387,8 @@
         mainContent.style.display = 'block';
         homepageBanner.style.display = '';
         topSearchbar.style.display = 'none';
+        // Ensure the hero search bar is visible again
+        heroSearch.parentElement.classList.remove('hide');
         window.scrollTo(0,0);
       };
     }
