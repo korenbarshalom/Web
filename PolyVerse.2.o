@@ -1,0 +1,2505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Model Viewer -->
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>polyVerse – Low-Poly Rigged Models</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    html, body {
+      overflow-x: hidden;
+    }
+    /* ---------- Reset ---------- */
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0 }
+    body { font-family:"Inter",sans-serif; line-height:1.6; background:#1e1e20; color:#fff }
+    a { text-decoration:none; color:inherit }
+    section, footer { opacity:0; animation:fadeInUp 0.6s ease-out forwards }
+
+    /* ---------- Design Tokens & Keyframes ---------- */
+    :root {
+      --bg:#1e1e20;
+      --text:#ffffff;
+      --card-bg:#2a2a2d;
+      --accent:#ff9800;
+      --radius:12px;
+    }
+    @keyframes fadeInUp {
+      from { opacity:0; transform:translateY(20px) }
+      to   { opacity:1; transform:translateY(0) }
+    }
+    @keyframes pulse {
+      0%,100% { transform:scale(1) }
+      50%     { transform:scale(1.05) }
+    }
+
+    /* ---------- Buttons ---------- */
+    .btn {
+      display:inline-flex; align-items:center; gap:.5rem;
+      padding:.75rem 1.5rem; border:none; border-radius:var(--radius);
+      font-weight:600; cursor:pointer; background:var(--accent);
+      color:#fff; transition:transform .2s, box-shadow .2s;
+    }
+    .btn:hover { transform:scale(1.05); box-shadow:0 6px 14px rgba(0,0,0,.4) }
+    .btn:active { transform:scale(.97) }
+    .back-btn { margin-bottom:1rem; }
+
+    /* ---------- Buy-Now Button ---------- */
+    .buy-btn {
+      background: var(--accent);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 0.5rem 1.25rem;
+      border: none;
+      border-radius: 8px;
+      margin-left: auto;
+      margin-top: 0.5rem;
+      margin-bottom: 0;
+      display: block;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+      transition: background 0.18s, box-shadow 0.18s, transform 0.15s;
+      min-width: 110px;
+      max-width: 160px;
+      text-align: center;
+    }
+    .buy-btn:hover {
+      background: #ffb74d;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+      transform: translateY(-2px) scale(1.03);
+    }
+    @media (max-width: 700px) {
+      .buy-btn {
+        margin-left: 0;
+        width: 100%;
+        max-width: 100%;
+      }
+    }
+
+    /* ---------- Navbar ---------- */
+    nav {
+      position:sticky; top:0; z-index:10;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:.75rem 1rem; background:var(--card-bg);
+      box-shadow:0 1px 3px rgba(0,0,0,.5);
+    }
+    .logo { display:flex; align-items:center; gap:.5rem }
+    nav ul { display:flex; gap:1rem; list-style:none }
+    @media(max-width:600px){ nav ul{ display:none } }
+
+    /* ---------- Hero Section (blue gradient) ---------- */
+    .hero {
+      background:linear-gradient(135deg,#2196F3,#1E88E5);
+      padding:4rem 1rem; text-align:center;
+    }
+    .hero h1 { font-size:2.5rem; margin-bottom:1rem }
+    .hero p  { font-size:1.125rem; margin-bottom:2rem; color:rgba(255,255,255,0.85) }
+
+    /* ---------- Search Bar Styling ---------- */
+    .hero-search { margin-top:1rem }
+    .hero-search input {
+      width:100%; max-width:600px;
+      padding:1rem 1.5rem;
+      border:none; border-radius:var(--radius);
+      outline:none; font-size:1rem;
+    }
+    .hero-search input::placeholder { color:#ccc }
+
+    /* ---------- Gallery ---------- */
+    main { max-width:1280px; margin:2rem auto; padding:0 1rem }
+    .gallery {
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+      gap:1.5rem;
+    }
+    .card {
+      background:var(--card-bg); border-radius:var(--radius);
+      overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,.3);
+      transition:transform .3s, box-shadow .3s;
+      display:flex; flex-direction:column;
+      cursor:pointer;
+    }
+    .card:hover {
+      transform:scale(1.05);
+      box-shadow:0 8px 24px rgba(255,152,0,0.5);
+    }
+    .card img { width:100% }
+    .card .info { padding:1rem; flex-grow:1; display:flex; flex-direction:column }
+    .card h3 { font-size:1rem; margin-bottom:.5rem }
+    .card p  { font-size:.875rem; color:#aaa }
+
+    /* ---------- Modals (overlay stays global) ---------- */
+    .modal {
+      position:fixed; inset:0;
+      background:rgba(0,0,0,0.6);   /* semi-transparent dark overlay */
+      display:none;
+      align-items:center; justify-content:center;
+      z-index:1000;
+    }
+    .modal.active { display:flex }
+
+    .modal-content {
+      background:var(--card-bg);
+      transform:scale(0.8); opacity:0;
+      transition:.3s ease-out;
+    }
+    .modal.active .modal-content {
+      transform:scale(1); opacity:1;
+    }
+
+    /* ---------- Model Detail Page ---------- */
+    #modelPage {
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+      padding: 2rem 0 2rem 0;
+      background: var(--bg);
+      min-height: 100vh;
+      display: none;
+      color: #fff;
+    }
+    #modelPage .model-detail {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      position: relative;
+    }
+    @media (min-width: 900px) {
+      #modelPage .model-detail {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 3rem;
+      }
+    }
+    #modelPage .model-viewer-container {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1 1 0%;
+    }
+    #modelPage model-viewer, #modelPage img {
+      width: 100%;
+      max-width: 900px;
+      height: min(70vh, 600px);
+      margin: 0 auto;
+      display: block;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      object-fit: contain;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+    }
+    #modelPage .desc {
+      width: 100%;
+      max-width: 500px;
+      margin: 2.5rem auto 0 auto;
+      padding: 1.5rem 0 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    #modelPage .desc h2 {
+      margin-bottom: 0.5rem;
+    }
+    #modelPage .desc p {
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+    /* Back to Shop button at top */
+    #modelPage .back-btn {
+      margin-bottom: 2rem;
+      margin-top: 0;
+      margin-left: 2rem;
+      align-self: flex-start;
+    }
+    @media (max-width: 700px) {
+      #modelPage .model-detail {
+        flex-direction: column;
+        align-items: center;
+      }
+      #modelPage .desc {
+        max-width: 100vw;
+        margin-left: 0;
+      }
+      #modelPage .back-btn {
+        margin-left: 1rem;
+      }
+    }
+    /* --- Suggested/Related Models Sidebar --- */
+    #modelPage .suggested {
+      flex: 1 1 0%;
+      min-width: 420px;
+      max-width: 600px;
+      margin-left: 0;
+      background: var(--card-bg);
+      border-radius: 28px;
+      padding: 2.5rem 2rem 2.5rem 2rem;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      align-items: center;
+      /* Remove overflow and max-height to prevent scrollbars */
+    }
+    #modelPage .suggested::-webkit-scrollbar {
+      width: 8px;
+      background: #18181a;
+    }
+    #modelPage .suggested::-webkit-scrollbar-thumb {
+      background: #232326;
+      border-radius: 10px;
+    }
+    #modelPage .suggested h4 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      position: relative;
+      padding-bottom: 0.8rem;
+      text-align: left;
+      width: 100%;
+    }
+    #modelPage .suggested h4::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 48px;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+    #modelPage .suggested .suggested-card {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      background: #232326;
+      border-radius: 20px;
+      padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+      cursor: pointer;
+      transition: box-shadow 0.25s, transform 0.22s, background 0.22s;
+      min-height: 140px;
+      height: 150px;
+      width: 100%;
+      max-width: 480px;
+      margin-bottom: 0;
+      box-shadow: 0 6px 32px rgba(0,0,0,0.22);
+      border: 2px solid transparent;
+      position: relative;
+    }
+    #modelPage .suggested .suggested-card:hover {
+      background: #29292d;
+      box-shadow: 0 16px 48px rgba(255,152,0,0.10), 0 8px 32px rgba(0,0,0,0.32);
+      transform: translateY(-4px) scale(1.025);
+      border: 2px solid #ff9800;
+    }
+    #modelPage .suggested .suggested-card.active {
+      background: linear-gradient(135deg, #ff9800 60%, #ffb74d 100%);
+      border: 2px solid #ff9800;
+      box-shadow: 0 12px 40px rgba(255,152,0,0.18), 0 8px 32px rgba(0,0,0,0.32);
+      cursor: default;
+      transform: translateY(-4px) scale(1.03);
+    }
+    #modelPage .suggested .suggested-card.active::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(135deg, #ff9800, #ffb74d);
+      border-radius: 22px;
+      z-index: -1;
+      opacity: 0.18;
+      filter: blur(10px);
+    }
+    #modelPage .suggested .suggested-thumb {
+      width: 100px;
+      height: 100px;
+      border-radius: 16px;
+      object-fit: cover;
+      background: #18181a;
+      flex-shrink: 0;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.22);
+      border: 2px solid #232326;
+      transition: border 0.2s;
+    }
+    #modelPage .suggested .suggested-card:hover .suggested-thumb {
+      border: 2px solid #ff9800;
+    }
+    #modelPage .suggested .suggested-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      min-width: 0;
+      flex: 1 1 0%;
+      gap: 0.5rem;
+    }
+    #modelPage .suggested .suggested-title {
+      font-size: 1.3rem;
+      color: #fff;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 0.2rem;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      hyphens: auto;
+      letter-spacing: -0.01em;
+    }
+    #modelPage .suggested .suggested-meta {
+      font-size: 0.95rem;
+      color: #ffb74d;
+      font-weight: 500;
+      line-height: 1.3;
+      opacity: 0.82;
+      letter-spacing: 0.01em;
+    }
+    @media (max-width: 900px) {
+      #modelPage .suggested {
+        min-width: 100vw;
+        max-width: 100vw;
+        border-radius: 0;
+        padding: 1.5rem 0.5rem;
+      }
+      #modelPage .suggested .suggested-card {
+        max-width: 98vw;
+        min-height: 120px;
+        height: 130px;
+        padding: 1rem 1rem;
+        border-radius: 16px;
+      }
+      #modelPage .suggested .suggested-thumb {
+        width: 70px;
+        height: 70px;
+        border-radius: 10px;
+      }
+    }
+    @media (max-width: 600px) {
+      #modelPage .suggested {
+        display: none;
+      }
+    }
+
+    /* ---------- Model Viewer Styling ---------- */
+    model-viewer {
+      width:100%;
+      height:400px;
+      border-radius:var(--radius);
+      background:var(--card-bg);
+      --poster-color: transparent;
+    }
+
+    .model-viewer-container {
+      position:relative;
+      border-radius:var(--radius);
+      overflow:hidden;
+    }
+
+    .view-toggle {
+      position:absolute;
+      top:10px;
+      right:10px;
+      background:rgba(0,0,0,0.7);
+      color:white;
+      border:none;
+      padding:8px 12px;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:12px;
+      z-index:10;
+    }
+
+    .view-toggle:hover {
+      background:rgba(0,0,0,0.9);
+    }
+
+    /* ---------- Checkout Page ---------- */
+    #checkoutPage {
+      display:none; padding:2rem; min-height:100vh;
+      background:var(--bg); color:var(--text);
+    }
+    #checkoutPage form {
+      max-width:500px; margin:auto; display:flex; flex-direction:column; gap:1rem;
+    }
+    #checkoutPage label { display:flex; flex-direction:column; font-weight:600 }
+    #checkoutPage input {
+      padding:.75rem 1rem; border:none; border-radius:var(--radius);
+      background:var(--card-bg); color:#fff; outline:none;
+    }
+
+    /* ---------- Contact Footer ---------- */
+    footer {
+      padding:2rem 1rem; text-align:center; background:#111;
+      margin-top:2rem;
+    }
+    footer p { margin:.5rem 0 }
+
+    /* ---------- Redesigned Login / Register Modal ---------- */
+    #loginModal .modal-content {
+      position:relative;
+      width:100%; max-width:380px;
+      padding:2rem 2rem 2.5rem;
+      border-radius:var(--radius);
+      background:var(--card-bg);
+      box-shadow:0 8px 24px rgba(0,0,0,0.4);
+    }
+    #loginModal .modal-header {
+      position:relative;
+      display:flex; justify-content:center; align-items:center;
+      margin-bottom:1.5rem;
+    }
+    #loginModal .modal-header h2 {
+      font-size:2rem; font-weight:600; color:var(--text);
+    }
+    #loginModal .modal-header .close {
+      position:absolute; top:-0.5rem; right:-0.5rem;
+      width:32px; height:32px;
+      border:none; border-radius:50%;
+      background:transparent;
+      color:var(--text); font-size:1.5rem; line-height:1;
+      cursor:pointer;
+      transition:background .2s;
+    }
+    #loginModal .modal-header .close:hover {
+      background:rgba(255,255,255,0.08);
+    }
+
+    #loginModal label {
+      width:100%; display:block; font-size:.85rem; font-weight:600;
+      margin-bottom:.25rem; color:#ccc;
+    }
+    #loginModal input.login-input {
+      width:100%;
+      padding:.75rem 1rem;
+      border:none; border-radius:var(--radius);
+      background:#202024;
+      color:#fff;
+      box-shadow:0 2px 6px rgba(0,0,0,0.3);
+      margin-bottom:1.25rem;
+      outline:none;
+    }
+    #loginModal input.login-input::placeholder { color:#888 }
+
+    /* row that holds Continue + Create Account */
+    #loginModal .action-row{
+      display:flex; gap:1rem; margin-bottom:1rem;
+    }
+    #loginModal .action-row .btn{
+      flex:1; justify-content:center;
+    }
+
+    #loginModal .login-btn,
+    #loginModal .register-submit{
+      width:100%;
+      display:block;
+      padding:.75rem 1rem;
+      border:none; border-radius:var(--radius);
+      background:var(--accent);
+      color:#fff; font-weight:600; text-align:center;
+      cursor:pointer;
+      transition:background-color .2s,transform .2s;
+    }
+    #loginModal .login-btn:hover,
+    #loginModal .register-submit:hover {
+      background:#ffb74d;
+      transform:translateY(-1px);
+    }
+
+    .google-btn {
+      width:100%; display:block;
+      margin-top:1rem;
+      padding:.75rem 1rem;
+      border:none; border-radius:var(--radius);
+      background:#fff; color:#444; font-weight:600; text-align:center;
+      cursor:pointer;
+      box-shadow:0 2px 6px rgba(0,0,0,0.25);
+      transition:background-color .2s,transform .2s;
+    }
+    .google-btn:hover {
+      background:#f1f1f1;
+      transform:translateY(-1px);
+    }
+
+    #loginModal p {
+      margin-top:1.25rem;
+      font-size:.825rem;
+      color:#999;
+      text-align:center;
+    }
+
+    /* hide register view by default */
+    #registerView{ display:none; }
+
+    /* --- Navbar Search Bar --- */
+    .navbar-search-container {
+      flex: 1;
+      display: none; /* hidden by default */
+      justify-content: center;
+      align-items: center;
+      background: none;
+      box-shadow: none;
+      border: none;
+    }
+    .searchbar-wrapper {
+      background: #232326;
+      border: 2px solid #ff9900;
+      transition: border-color 0.2s ease-in-out, background 0.2s ease-in-out;
+      display: flex;
+      align-items: center;
+      border-radius: 12px;
+      padding: 0 0.5rem;
+      width: 100%;
+      max-width: 420px;
+      min-width: 120px;
+      box-shadow: none;
+      height: 44px;
+    }
+    .searchbar-wrapper:hover {
+      border-color: #ffae33;
+      background: #3a3a3a;
+    }
+    .searchbar-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      margin-right: 0.5rem;
+      margin-left: 0.25rem;
+      user-select: none;
+      pointer-events: none;
+    }
+    .searchbar-icon svg {
+      width: 22px;
+      height: 22px;
+      display: block;
+      fill: #fff;
+      stroke: #fff;
+      stroke-width: 2.2;
+    }
+    .styled-search {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 1rem;
+      padding: 0.7rem 0 0.7rem 0;
+      border-radius: 12px;
+      box-shadow: none;
+      margin: 0;
+      min-width: 0;
+    }
+    .styled-search::placeholder {
+      color: #aaa;
+      opacity: 1;
+      font-weight: 400;
+    }
+    @media (max-width: 600px) {
+      .searchbar-wrapper {
+        max-width: 90vw;
+      }
+    }
+    /* --- Hide hero search on model page --- */
+    .hero-search.hide { display: none !important; }
+
+    /* ---------- Download Dropdown Panel ---------- */
+    .download-dropdown {
+      position: absolute;
+      bottom: 100%;
+      right: 0;
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.1);
+      display: none;
+      flex-direction: column;
+      gap: 0.5rem;
+      min-width: 140px;
+      z-index: 100;
+      margin-bottom: 0.5rem;
+      backdrop-filter: blur(10px);
+    }
+    .download-dropdown.active {
+      display: flex;
+      animation: fadeInUp 0.2s ease-out;
+    }
+    .download-dropdown::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      right: 20px;
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 6px solid var(--card-bg);
+    }
+    .download-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: #232326;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .download-option:hover {
+      background: #2a2a2d;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .download-option:active {
+      transform: translateY(0);
+    }
+    .download-option .format-icon {
+      font-size: 1.1rem;
+      opacity: 0.8;
+    }
+    .download-option .format-name {
+      font-weight: 600;
+    }
+    .download-option .format-ext {
+      opacity: 0.6;
+      font-size: 0.8rem;
+    }
+
+    /* Position the download button container */
+    .download-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    /* Update buy button to be download button for free models */
+    .download-btn {
+      background: var(--accent);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 0.5rem 1.25rem;
+      border: none;
+      border-radius: 8px;
+      margin-left: auto;
+      margin-top: 0.5rem;
+      margin-bottom: 0;
+      display: block;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+      transition: background 0.18s, box-shadow 0.18s, transform 0.15s;
+      min-width: 110px;
+      max-width: 160px;
+      text-align: center;
+      cursor: pointer;
+    }
+    .download-btn:hover {
+      background: #ffb74d;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+      transform: translateY(-2px) scale(1.03);
+    }
+    @media (max-width: 700px) {
+      .download-btn {
+        margin-left: 0;
+        width: 100%;
+        max-width: 100%;
+      }
+    }
+
+    /* Add card appear animation */
+    .card-appear {
+      animation: cardFadeInUp 0.5s cubic-bezier(.23,1.02,.47,.98);
+    }
+    @keyframes cardFadeInUp {
+      from { opacity: 0; transform: translateY(30px);}
+      to   { opacity: 1; transform: translateY(0);}
+    }
+
+    .btn-outline, .btn.btn-outline, #loginBtn.btn {
+      background: transparent;
+      color: var(--accent);
+      border: 2px solid var(--accent);
+      box-shadow: none;
+      font-weight: 600;
+      border-radius: var(--radius);
+      transition: all 0.2s ease-in-out;
+    }
+    .btn-outline:hover, .btn-outline:focus,
+    #loginBtn.btn:hover, #loginBtn.btn:focus {
+      background: rgba(255,153,0,0.10);
+      color: #ffa833;
+      border-color: #ffa833;
+      box-shadow: none;
+    }
+    @media (max-width:600px) {
+      nav ul { display: none; }
+    }
+
+    /* --- No Results Message --- */
+    #no-results-message {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 32px;
+      font-weight: bold;
+      height: 60vh;
+      color: white;
+      margin-top: 20px;
+      margin-left: 2vw;
+    }
+
+    /* ---------- Form Validation & Error Styling ---------- */
+    .input-error {
+      border: 2px solid #ff4444 !important;
+      background: rgba(255, 68, 68, 0.1) !important;
+    }
+    
+    .input-success {
+      border: 2px solid #4CAF50 !important;
+      background: rgba(76, 175, 80, 0.1) !important;
+    }
+    
+    .error-message {
+      color: #ff4444;
+      font-size: 0.8rem;
+      margin-top: -1rem;
+      margin-bottom: 1rem;
+      display: none;
+      animation: fadeIn 0.3s ease-in;
+    }
+    
+    .error-message.show {
+      display: block;
+    }
+    
+    .success-message {
+      color: #4CAF50;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+      text-align: center;
+      display: none;
+      animation: fadeIn 0.3s ease-in;
+    }
+    
+    .success-message.show {
+      display: block;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+    
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin: -10px 0 0 -10px;
+      border: 2px solid transparent;
+      border-top: 2px solid #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .password-strength {
+      margin-top: -1rem;
+      margin-bottom: 1rem;
+      font-size: 0.8rem;
+    }
+    
+    .password-strength-bar {
+      height: 4px;
+      background: #333;
+      border-radius: 2px;
+      margin-top: 0.5rem;
+      overflow: hidden;
+    }
+    
+    .password-strength-fill {
+      height: 100%;
+      transition: all 0.3s ease;
+      border-radius: 2px;
+    }
+    
+    .strength-weak { background: #ff4444; width: 25%; }
+    .strength-fair { background: #ffa726; width: 50%; }
+    .strength-good { background: #ffeb3b; width: 75%; }
+    .strength-strong { background: #4CAF50; width: 100%; }
+    
+    .strength-text {
+      margin-top: 0.25rem;
+      font-size: 0.75rem;
+    }
+    
+    .strength-weak-text { color: #ff4444; }
+    .strength-fair-text { color: #ffa726; }
+    .strength-good-text { color: #ffeb3b; }
+    .strength-strong-text { color: #4CAF50; }
+
+    .profile-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 0.5em;
+      background: #232326;
+      display: inline-block;
+      vertical-align: middle;
+      /* Remove any scaling on hover */
+      transition: none;
+    }
+    .profile-btn-combo {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      /* Inherit all sizing, padding, font, border, etc. from .btn and .btn-outline */
+      /* No custom padding, font-size, or border overrides here */
+    }
+    .profile-btn-combo:hover, .profile-btn-combo:focus {
+      /* Only color/outline changes, no transform or custom padding */
+      background: rgba(255,153,0,0.10);
+      color: #ffa833;
+      border-color: #ffa833;
+      outline: none;
+      transform: none;
+    }
+    .profile-btn-combo .profile-name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: inherit;
+      margin: 0;
+      padding: 0;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+      /* Remove scaling on hover */
+      transition: none;
+    }
+    .user-menu-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6em;
+      padding: 0.5rem 0.2rem 0.5rem 0.2rem;
+      border-bottom: 1px solid #444;
+      margin-bottom: 0.2rem;
+      /* Remove scaling on hover */
+      transition: none;
+    }
+    .user-menu-header .profile-avatar {
+      width: 32px;
+      height: 32px;
+      margin-right: 0.5em;
+      transition: none;
+    }
+    .user-menu-header .profile-name {
+      font-size: 1.08rem;
+      font-weight: 600;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      transition: none;
+    }
+    /* Dropdown menu option hover highlight */
+    .user-menu-option {
+      width: 100%;
+      padding: 0.5rem;
+      background: none;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      text-align: left;
+      font-size: 1rem;
+      border-radius: 8px;
+      transition: background 0.16s;
+      margin-bottom: 2px;
+    }
+    .user-menu-option:hover, .user-menu-option:focus {
+      background: #29292d;
+      color: #ffb74d;
+      outline: none;
+    }
+
+    /* --- Like/List Buttons --- */
+    .like-btn, .list-btn {
+      background: #232326;
+      color: #ff9800;
+      border: 2px solid #ff9800;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 0.5rem 1.25rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+      transition: background 0.18s, box-shadow 0.18s, color 0.18s, border 0.18s, transform 0.15s;
+      min-width: 110px;
+      max-width: 160px;
+      text-align: center;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .like-btn:hover, .list-btn:hover {
+      background: #ff9800;
+      color: #fff;
+      border: 2px solid #ffb74d;
+      transform: translateY(-2px) scale(1.03);
+    }
+    .like-btn.liked, .list-btn.listed {
+      background: #ff9800;
+      color: #fff;
+      border: 2px solid #ffb74d;
+    }
+    .like-btn.liked #likeIcon {
+      color: #fff;
+      font-weight: bold;
+      font-size: 1.2em;
+      text-shadow: 0 2px 8px rgba(255,152,0,0.18);
+    }
+    .list-btn.listed #listIcon {
+      color: #fff;
+      font-weight: bold;
+      font-size: 1.2em;
+      text-shadow: 0 2px 8px rgba(255,152,0,0.18);
+    }
+    .like-btn #likeIcon {
+      font-size: 1.2em;
+      color: #ff9800;
+      transition: color 0.18s;
+    }
+    .list-btn #listIcon {
+      font-size: 1.2em;
+      color: #ff9800;
+      transition: color 0.18s;
+    }
+
+    /* --- Likes/List Page Layout --- */
+    #likesListPage {
+      min-height: 80vh;
+      background: var(--bg);
+      color: var(--text);
+      display: none;
+      padding: 2.5rem 0 2.5rem 0;
+      width: 100%;
+    }
+    .likes-list-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+    #backLikesList {
+      align-self: flex-start;
+      margin-left: 2rem;
+      margin-bottom: 1.5rem;
+      margin-top: 0;
+    }
+    @media (max-width: 700px) {
+      #backLikesList {
+        margin-left: 1rem;
+      }
+    }
+    #likesListTitle {
+      text-align: center;
+      margin-bottom: 2rem;
+      width: 100%;
+    }
+    #likesListGallery.gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      justify-content: center;
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    @media (max-width: 700px) {
+      #likesListGallery.gallery {
+        grid-template-columns: 1fr;
+        max-width: 98vw;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav id="navbar">
+    <div class="logo">
+     <img src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTkyODkzOS5wbmc=/250x600/IxSF%2Fe.png"
+     alt="  polyVerse logo"
+           alt="polyVerse logo" style="height:32px;width:32px;border-radius:6px">
+      <span style="font-weight:600;font-size:1.1rem">polyVerse</span>
+    </div>
+    <div class="navbar-search-container" id="top-searchbar">
+      <div class="searchbar-wrapper">
+        <span class="searchbar-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" stroke="#fff" stroke-width="2.2" fill="none"/>
+            <line x1="16.2" y1="16.2" x2="21" y2="21" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <input
+          id="navbarSearch"
+          name="nohistory"
+          type="search"
+          placeholder="Search"
+          class="navbar-search styled-search"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+        />
+      </div>
+    </div>
+    <ul>
+      <li><button class="btn btn-outline" id="signupBtn">Sign Up</button></li>
+      <li><button class="btn btn-outline profile-btn-combo" id="loginBtn"><!-- Avatar+Name injected by JS --></button></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="homepage-banner">
+    <h1>Any low-poly character you could ever need</h1>
+    <p>Build something beautiful with 20+ free Rigged characters</p>
+    <div class="hero-search">
+      <input
+        id="heroSearch"
+        type="search"
+        placeholder="Search for anything"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+      />
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <main id="mainContent">
+    <section class="gallery" id="gallery"></section>
+  </main>
+
+  <!-- MODEL DETAIL PAGE -->
+  <section id="modelPage">
+    <button class="btn back-btn" id="backModel">← Back to Shop</button>
+    <div class="model-detail">
+      <div class="model-viewer-container">
+        <button class="view-toggle" id="viewToggle">3D View</button>
+        <img id="modelImg" src="" alt="Model preview">
+        <model-viewer 
+          id="modelViewer"
+          camera-controls 
+          auto-rotate 
+          shadow-intensity="1"
+          environment-image="neutral"
+          exposure="0.5"
+          shadow-softness="0.5"
+          style="display:none;">
+        </model-viewer>
+        <div class="desc">
+          <div style="display: flex; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+            <div style="flex:1 1 200px; min-width:0;">
+              <h2 id="modelTitle"></h2>
+              <p id="modelDesc"></p>
+              <div id="modelActions" style="display:none; margin-top: 1rem; gap: 0.5rem; flex-wrap: wrap;">
+                <button class="btn like-btn" id="likeBtn" title="Like this model" style="display:inline-flex;align-items:center;gap:0.5rem;">
+                  <span id="likeIcon">♡</span> <span>Like</span>
+                </button>
+                <button class="btn list-btn" id="listBtn" title="Add to My List" style="display:inline-flex;align-items:center;gap:0.5rem;">
+                  <span id="listIcon">＋</span> <span>Add to List</span>
+                </button>
+              </div>
+            </div>
+            <div class="download-container">
+              <button class="btn buy-btn" id="buyNowBtn">Buy Now</button>
+              <button class="download-btn" id="downloadBtn" style="display:none;">Download</button>
+              <div class="download-dropdown" id="downloadDropdown">
+                <a href="#" class="download-option" data-format="fbx">
+                  <span class="format-icon">📦</span>
+                  <span class="format-name">FBX</span>
+                  <span class="format-ext">.fbx</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <aside class="suggested" id="suggestedModels">
+        <h4>Suggested Models</h4>
+        <!-- Suggested models will be rendered here -->
+      </aside>
+    </div>
+  </section>
+
+  <!-- CHECKOUT PAGE -->
+  <section id="checkoutPage">
+    <button class="btn back-btn" id="backCheckout">← Back</button>
+    <h2 style="text-align:center;margin-bottom:1rem;">Checkout</h2>
+    <form id="checkoutForm">
+      <label>
+        Full Name
+        <input type="text" required placeholder="Your Name">
+      </label>
+      <label>
+        Email Address
+        <input type="email" required placeholder="you@example.com">
+      </label>
+      <label>
+        Billing Address
+        <input type="text" required placeholder="Street, City, Country">
+      </label>
+      <button type="submit" class="btn" style="justify-content:center;">Pay with PayPal</button>
+    </form>
+  </section>
+
+  <!-- CONTACT INFO FOOTER -->
+  <footer>
+    <h3>Contact Us</h3>
+    <p>Email: korenbarshalom@gmail.com</p>
+    <p>Phone: 052-221-5113</p>
+  </footer>
+
+  <!-- LOGIN / REGISTER MODAL -->
+  <div class="modal" id="loginModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Log In</h2>
+        <button class="close" data-close>&times;</button>
+      </div>
+
+      <!-- ===== LOGIN VIEW ===== -->
+      <div id="loginView">
+        <label>Email</label>
+        <input type="email" class="login-input" id="loginEmail" placeholder="you@example.com" required>
+        <div class="error-message" id="loginEmailError"></div>
+
+        <label>Password</label>
+        <input type="password" class="login-input" id="loginPassword" placeholder="Your password" required>
+        <div class="error-message" id="loginPasswordError"></div>
+
+        <div class="action-row">
+          <button class="login-btn" id="loginSubmitBtn">Continue</button>
+          <button class="btn" id="createAccountBtn">Create&nbsp;Account</button>
+        </div>
+
+        <div class="success-message" id="loginSuccess"></div>
+
+        <button class="google-btn">Log in with Google</button>
+        <p>Auth backend coming soon.</p>
+      </div>
+
+      <!-- ===== REGISTER VIEW ===== -->
+      <div id="registerView">
+        <label>Full Name</label>
+        <input type="text" class="login-input" id="registerName" placeholder="Your Name" required>
+        <div class="error-message" id="nameError"></div>
+
+        <label>Email</label>
+        <input type="email" class="login-input" id="registerEmail" placeholder="you@example.com" required>
+        <div class="error-message" id="emailError"></div>
+
+        <label>Password</label>
+        <input type="password" class="login-input" id="registerPassword" placeholder="Choose a strong password" required>
+        <div class="password-strength" id="passwordStrength">
+          <div class="password-strength-bar">
+            <div class="password-strength-fill" id="strengthFill"></div>
+          </div>
+          <div class="strength-text" id="strengthText"></div>
+        </div>
+        <div class="error-message" id="passwordError"></div>
+
+        <button class="register-submit" id="registerSubmitBtn">Create Account</button>
+        <div class="success-message" id="registerSuccess"></div>
+
+        <button class="google-btn">Sign up with Google</button>
+        <p style="margin-top:.75rem;">Already have an account? <a href="#" id="backToLogin" style="color:var(--accent);">Log In</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    // === DATA & HOOKS ===
+    const models = [
+      { 
+        id:1, 
+        title:'Human Character Base', 
+        price:0, 
+        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQwMy5wbmc=/250x600/vaWBiI.png', 
+        desc:'A versatile low-poly human base mesh, ready for your animations and rigs.',
+        src: 'A20.glb',  // Your existing .gltf file
+        availableFormats: ['gltf', 'fbx', 'glb'],
+        fbx: '3DHumanfbx1.fbx',
+        glb: 'A20.glb',
+        gltf: 'A20.gltf'
+      },
+      { 
+        id:2, 
+        title:'Human Character Base', 
+        price:0, 
+        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTM1NS5wbmc=/250x600/iV5gql.png', 
+        desc:'Alternate low-poly human model optimized for mobile and VR.',
+        src: '3DHuman11.gltf',
+        availableFormats: ['gltf', 'fbx', 'glb'],
+        fbx: '3DHumanfbx.fbx',
+        glb: '3DHuman11.glb',
+        gltf: '3DHuman11.gltf'
+      },
+      { 
+        id:3, 
+        title:'Player Model', 
+        price:0, 
+        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQ4NC5wbmc=/250x600/FAM6Ft.png', 
+        desc:'A stylized player avatar with simple topology for game characters.',
+        src: 'A19.glb',
+        availableFormats: ['glb', 'fbx', 'gltf'],
+        fbx: '3DHumanfbx5.fbx',
+        glb: 'A19.glb',
+        gltf: 'A19.gltf'
+      },
+      { 
+        id:4, 
+        title:'Farmer', 
+        price:0, 
+        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzNy5wbmc=/250x600/xUXRMO.png', 
+        desc:'A medieval knight in low-poly style.',
+        src: 'AFramer.gltf',
+        availableFormats: ['gltf', 'fbx', 'glb'],
+        fbx: '3DHumanfbx6.fbx',
+        glb: 'AFramer.glb',
+        gltf: 'AFramer.gltf'
+      },
+      { 
+        id:5, 
+        title:'Space Marine', 
+        price:0, 
+        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzOC5wbmc=/250x600/ATA380.png', 
+        desc:'A ready-to-animate archer character.',
+        src: 'Aspacemarine.gltf',
+        availableFormats: ['gltf', 'fbx', 'glb'],
+        fbx: '3DHumanfbx7.fbx',
+        glb: 'Aspacemarine.glb',
+        gltf: 'Aspacemarine.gltf'
+      },
+      { 
+        id:6, 
+        title:'Police Officer', 
+        price:0, 
+        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzOS5wbmc=/250x600/tht5cv.png', 
+        desc:'Low-poly steampunk robot NPC.',
+        src: 'Police.gltf',
+        availableFormats: ['gltf', 'fbx', 'glb'],
+        fbx: '3DHumanfbx8.fbx',
+        glb: 'Police.glb',
+        gltf: 'Police.gltf'
+      },
+      { 
+        id:7, 
+        title:'Scientist', 
+        price:0, 
+        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTg0MC5wbmc=/250x600/iZBPRT.png', 
+        desc:'Blocky mage perfect for voxel games.',
+        src: '3Dcharcter4.gltf',
+        availableFormats: ['gltf', 'fbx', 'glb'],
+        fbx: '3D1characterfbx4.fbx',
+        glb: 'AS.glb',
+        gltf: 'AS.gltf'
+      },
+      { 
+        id:8, 
+        title:'Astronaut', 
+        price:1, 
+        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTg0MS5wbmc=/250x600/lZnMKc.png', 
+        desc:'Futuristic soldier rigged for animation.',
+        src: 'AS1.gltf',
+        availableFormats: ['gltf', 'fbx', 'glb'],
+        fbx: '3DHumanfbx10.fbx',
+        glb: 'AS1.glb',
+        gltf: 'AS1.gltf'
+      },
+       { 
+        id:8, 
+        title:'Chef', 
+        price:0, 
+        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE4MC5wbmc=/250x600/89K1oc.png', 
+        desc:'Futuristic soldier rigged for animation.',
+        src: '3Dcharcter9.gltf',
+        availableFormats: ['gltf', 'fbx', 'glb'],
+        fbx: '3DLowPolyCharacter9.fbx',
+        glb: 'AS1.glb',
+        gltf: 'AS1.gltf'
+      },
+       { 
+        id:8, 
+        title:'Samurai', 
+        price:0, 
+        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3OC5wbmc=/250x600/0DKTnv.png', 
+        desc:'Futuristic soldier rigged for animation.',
+        src: '3Dcharcter6.gltf',
+        availableFormats: ['gltf', 'fbx', 'glb'],
+        fbx: '3DLowPolyCharacter6.fbx',
+        glb: 'AS1.glb',
+        gltf: 'AS1.gltf'
+      },
+       { 
+        id:8, 
+        title:'Builder', 
+        price:0, 
+        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE4MS5wbmc=/250x600/%2BXIu8o.png', 
+        desc:'Futuristic soldier rigged for animation.',
+        src: '3Dcharcter111.gltf',
+        availableFormats: ['gltf', 'fbx', 'glb'],
+        fbx: '3DLowPolyCharacter3.fbx',
+        glb: 'AS1.glb',
+        gltf: 'AS1.gltf'
+      },
+       { 
+        id:8, 
+        title:'Medic', 
+        price:0, 
+        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3OS5wbmc=/250x600/yLs1Oq.png', 
+        desc:'Futuristic soldier rigged for animation.',
+        src: '3Dcharcter1.gltf',
+        availableFormats: ['gltf', 'fbx', 'glb'],
+        fbx: '3DLowPolyCharacter1.fbx',
+        glb: 'AS1.glb',
+        gltf: 'AS1.gltf'
+      },
+       { 
+        id:8, 
+        title:'Human Model', 
+        price:0, 
+        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3Ni5wbmc=/250x600/YWf1vV.png', 
+        desc:'Futuristic soldier rigged for animation.',
+        src: '3Dcharcter10.gltf',
+        availableFormats: ['gltf', 'fbx', 'glb'],
+        fbx: '3DLowPolyCharacter10.fbx',
+        glb: 'AS1.glb',
+        gltf: 'AS1.gltf'
+      },
+       { 
+        id:8, 
+        title:'Fire Fighter', 
+        price:0, 
+        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3Ny5wbmc=/250x600/S%2FDg5u.png', 
+        desc:'Futuristic soldier rigged for animation.',
+        src: '3Dcharcter5.gltf',
+        availableFormats: ['gltf', 'fbx', 'glb'],
+        fbx: '3DLowPolyCharacter5.fbx',
+        glb: 'AS1.glb',
+        gltf: 'AS1.gltf'
+      },
+       
+    ];
+
+    // DOM refs
+    const gallery      = document.getElementById('gallery');
+    const homepageBanner = document.getElementById('homepage-banner');
+    const topSearchbar   = document.getElementById('top-searchbar');
+    const heroSearch     = document.getElementById('heroSearch');
+    const loginBtn     = document.getElementById('loginBtn');
+    const loginModal   = document.getElementById('loginModal');
+    const modelPage    = document.getElementById('modelPage');
+    const modelImg     = document.getElementById('modelImg');
+    const modelTitle   = document.getElementById('modelTitle');
+    const modelDesc    = document.getElementById('modelDesc');
+    const modelViewer  = document.getElementById('modelViewer');
+    const viewToggle   = document.getElementById('viewToggle');
+    const backModel    = document.getElementById('backModel');
+    const buyNowBtn    = document.getElementById('buyNowBtn');
+    const mainContent  = document.getElementById('mainContent');
+    const checkoutPage = document.getElementById('checkoutPage');
+    const backCheckout = document.getElementById('backCheckout');
+    // NEW: Like/List buttons
+    const modelActions = document.getElementById('modelActions');
+    const likeBtn = document.getElementById('likeBtn');
+    const listBtn = document.getElementById('listBtn');
+    const likeIcon = document.getElementById('likeIcon');
+    const listIcon = document.getElementById('listIcon');
+
+    // NEW refs for login/register toggle
+    const loginView   = document.getElementById('loginView');
+    const registerView= document.getElementById('registerView');
+    const modalTitle  = document.getElementById('modalTitle');
+    const createAccBtn= document.getElementById('createAccountBtn');
+    const backToLogin = document.getElementById('backToLogin');
+
+    const navbarSearch   = document.getElementById('navbarSearch');
+    const suggestedModels = document.getElementById('suggestedModels');
+
+    // NEW refs for download functionality
+    const downloadBtn = document.getElementById('downloadBtn');
+    const downloadDropdown = document.getElementById('downloadDropdown');
+
+    // Track last opened model for context-aware back
+    let lastOpenedModel = null;
+    
+    // Track if we're coming from homepage (for suggestion randomization)
+    let comingFromHomepage = true;
+
+    // Track currently rendered model IDs
+    let lastRenderedIds = new Set();
+    // Track last search query to control animation
+    let lastSearchQuery = '';
+
+    // --- Gallery ---
+    function renderGallery(list, animateAll = false){
+      // Get IDs of new results
+      const newIds = new Set(list.map(m => m.id));
+      // Cards that are new (not in lastRenderedIds)
+      const newlyAddedIds = list.filter(m => !lastRenderedIds.has(m.id)).map(m => m.id);
+
+      gallery.innerHTML='';
+      if (list.length === 0) {
+        // Show centered no-results message with correct structure and style
+        gallery.innerHTML = `
+          <div id="no-results-message">
+            <div>¯\\_(ツ)_/¯</div>
+            <div>No results</div>
+          </div>
+        `;
+        lastRenderedIds = newIds;
+        return;
+      }
+      list.forEach(m=>{
+        const card=document.createElement('div');
+        card.className='card';
+        card.innerHTML=`
+          <img src="${m.thumb}" alt="${m.title}">
+          <div class="info">
+            <h3>${m.title}</h3>
+            <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>
+          </div>`;
+        card.onclick=()=>openModelPage(m, true);
+
+        // Animate all cards if requested (e.g. on new search or homepage reset)
+        if (animateAll || newlyAddedIds.includes(m.id)) {
+          card.classList.add('card-appear');
+          card.addEventListener('animationend', () => {
+            card.classList.remove('card-appear');
+          }, { once: true });
+        }
+
+        gallery.appendChild(card);
+      });
+
+      // Update the set for next render
+      lastRenderedIds = newIds;
+    }
+    // Initial homepage render with animation
+    renderGallery(models, true);
+
+    // --- Search Bar Logic ---
+    function doSearch(q, animate = false) {
+      const query = q.toLowerCase();
+      const filtered = models.filter(m =>
+        m.title.toLowerCase().includes(query) ||
+        (m.desc && m.desc.toLowerCase().includes(query))
+      );
+      renderGallery(filtered, animate);
+    }
+    // Only trigger search on Enter for homepage search
+    heroSearch.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const value = heroSearch.value.trim();
+        // Hide homepage banner, show top searchbar
+        homepageBanner.style.display = 'none';
+        topSearchbar.style.display = 'flex';
+        navbarSearch.value = value;
+        // Show gallery, hide model/checkout pages
+        modelPage.style.display = 'none';
+        checkoutPage.style.display = 'none';
+        mainContent.style.display = 'block';
+        window.scrollTo(0,0);
+        doSearch(value, true);
+        lastSearchQuery = value;
+      }
+    });
+    // Only trigger search on Enter for top searchbar
+    navbarSearch.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const value = navbarSearch.value.trim();
+        // Show gallery, hide model/checkout pages
+        modelPage.style.display = 'none';
+        checkoutPage.style.display = 'none';
+        mainContent.style.display = 'block';
+        window.scrollTo(0,0);
+        doSearch(value, true);
+        lastSearchQuery = value;
+      }
+    });
+    // Clear search logic for top searchbar
+    navbarSearch.addEventListener('input', e => {
+      if (e.target.value.trim() === '') {
+        // Hide top searchbar, show homepage banner
+        topSearchbar.style.display = 'none';
+        homepageBanner.style.display = '';
+        // Show main search bar in banner
+        heroSearch.parentElement.classList.remove('hide');
+        heroSearch.value = '';
+        // Hide model/checkout, show gallery
+        modelPage.style.display = 'none';
+        checkoutPage.style.display = 'none';
+        mainContent.style.display = 'block';
+        // Clear results
+        renderGallery(models, true);
+        lastSearchQuery = '';
+      }
+    });
+
+    // --- Model detail & checkout navigation ---
+    function openModelPage(m, fromHomepage = true){
+      // Hide hero search, show navbar search
+      heroSearch.parentElement.classList.add('hide');
+      topSearchbar.style.display = 'flex';
+      navbarSearch.value = lastSearchQuery || '';
+      // Hide main content, show model page
+      mainContent.style.display = 'none';
+      checkoutPage.style.display = 'none';
+      modelPage.style.display = 'block';
+      // Hide hero banner
+      if(homepageBanner) homepageBanner.style.display = 'none';
+      // Set model details
+      modelImg.src = m.thumb;
+      modelTitle.textContent = m.title;
+      modelDesc.textContent = m.desc;
+      if (m.src) {
+        modelViewer.src = m.src;
+        // Reset camera orbit after model loads
+        modelViewer.removeEventListener('load', modelViewer._resetCameraOrbitHandler);
+        modelViewer._resetCameraOrbitHandler = function() {
+          modelViewer.cameraOrbit = '0deg 90deg auto';
+        };
+        modelViewer.addEventListener('load', modelViewer._resetCameraOrbitHandler, { once: true });
+      }
+      // Show 3D model by default, hide image and toggle
+      modelImg.style.display = 'none';
+      modelViewer.style.display = 'block';
+      viewToggle.style.display = 'none';
+      window.scrollTo(0,0);
+      
+      // Only randomize suggestions when coming from homepage
+      if (fromHomepage) {
+        renderSuggestedModels(m.id);
+        comingFromHomepage = false;
+      }
+      
+      // Remember last opened model for checkout back
+      lastOpenedModel = m;
+      
+      // Handle free vs paid models
+      if (m.price === 0) {
+        // Free model - show download button
+        buyNowBtn.style.display = 'none';
+        downloadBtn.style.display = 'block';
+      } else {
+        // Paid model - show buy button
+        buyNowBtn.style.display = 'block';
+        downloadBtn.style.display = 'none';
+      }
+      // Show Like/List buttons only if logged in
+      if (currentUser) {
+        modelActions.style.display = 'flex';
+        updateLikeListUI(m);
+      } else {
+        modelActions.style.display = 'none';
+      }
+    }
+
+    // --- Suggested Models Logic ---
+    function renderSuggestedModels(currentId) {
+      if (!suggestedModels) return;
+      suggestedModels.innerHTML = '<h4>Suggested Models</h4>';
+      
+      // Filter out the current model and create a shuffled array
+      const availableModels = models.filter(mod => mod.id !== currentId);
+      const shuffledModels = shuffleArray([...availableModels]);
+      
+      // Show up to 3 random models
+      const modelsToShow = shuffledModels.slice(0, 3);
+      
+      modelsToShow.forEach(mod => {
+        const card = document.createElement('div');
+        card.className = 'suggested-card';
+        card.innerHTML = `
+          <img class="suggested-thumb" src="${mod.thumb}" alt="${mod.title}">
+          <div class="suggested-info">
+            <span class="suggested-title">${mod.title}</span>
+            <span class="suggested-meta">Free Model</span>
+          </div>
+        `;
+        card.onclick = () => openModelPage(mod, false);
+        suggestedModels.appendChild(card);
+      });
+    }
+
+    // Helper function to shuffle array (Fisher-Yates algorithm)
+    function shuffleArray(array) {
+      const shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    }
+
+    // Toggle between image and 3D view
+    viewToggle.addEventListener('click', () => {
+      if (modelImg.style.display === 'none') {
+        // Switch to image view
+        modelImg.style.display = 'block';
+        modelViewer.style.display = 'none';
+        viewToggle.textContent = '3D View';
+      } else {
+        // Switch to 3D view
+        modelImg.style.display = 'none';
+        modelViewer.style.display = 'block';
+        viewToggle.textContent = 'Image View';
+      }
+    });
+    
+    backModel.onclick=()=>{
+      modelPage.style.display='none';
+      mainContent.style.display='block';
+      // Hide navbar search, show hero search
+      navbarSearch.value = '';
+      heroSearch.parentElement.classList.remove('hide');
+      topSearchbar.style.display = 'none';
+      // Show hero banner
+      if(homepageBanner) homepageBanner.style.display = '';
+      // Reset the flag when returning to homepage
+      comingFromHomepage = true;
+      window.scrollTo(0,0);
+      // --- Reset homepage state ---
+      heroSearch.value = '';
+      lastSearchQuery = '';
+      renderGallery(models, true);
+    };
+    buyNowBtn.onclick=()=>{
+      modelPage.style.display='none';
+      mainContent.style.display='none';
+      checkoutPage.style.display='block';
+      // Show navbar search, hide hero search and hero banner
+      navbarSearch.value = '';
+      heroSearch.parentElement.classList.add('hide');
+      if(homepageBanner) homepageBanner.style.display = 'none';
+      window.scrollTo(0,0);
+    };
+    backCheckout.onclick=()=>{
+      // Return to previous model page if available
+      if (lastOpenedModel) {
+        checkoutPage.style.display = 'none';
+        openModelPage(lastOpenedModel);
+      } else {
+        // Fallback: go to home/shop
+        checkoutPage.style.display = 'none';
+        modelPage.style.display = 'none';
+        mainContent.style.display = 'block';
+        navbarSearch.value = '';
+        heroSearch.parentElement.classList.remove('hide');
+        topSearchbar.style.display = 'none';
+        if(homepageBanner) homepageBanner.style.display = '';
+        window.scrollTo(0,0);
+      }
+    };
+
+    // === SIMULATED AUTHENTICATION SYSTEM ===
+    // User state management
+    let currentUser = null;
+    
+    // DOM refs for auth
+    const registerName = document.getElementById('registerName');
+    const registerEmail = document.getElementById('registerEmail');
+    const registerPassword = document.getElementById('registerPassword');
+    const registerSubmitBtn = document.getElementById('registerSubmitBtn');
+    const loginEmail = document.getElementById('loginEmail');
+    const loginPassword = document.getElementById('loginPassword');
+    const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+    
+    // Error message elements
+    const nameError = document.getElementById('nameError');
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+    const loginEmailError = document.getElementById('loginEmailError');
+    const loginPasswordError = document.getElementById('loginPasswordError');
+    const registerSuccess = document.getElementById('registerSuccess');
+    const loginSuccess = document.getElementById('loginSuccess');
+    
+    // Password strength elements
+    const passwordStrength = document.getElementById('passwordStrength');
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthText = document.getElementById('strengthText');
+    
+    // === VALIDATION FUNCTIONS ===
+    function validateName(name) {
+      if (!name.trim()) return 'Full name is required';
+      if (name.trim().length < 2) return 'Name must be at least 2 characters';
+      if (name.trim().length > 50) return 'Name must be less than 50 characters';
+      if (!/^[a-zA-Z\s]+$/.test(name.trim())) return 'Name can only contain letters and spaces';
+      return null;
+    }
+    function validateEmail(email) {
+      if (!email.trim()) return 'Email is required';
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email.trim())) return 'Please enter a valid email address';
+      return null;
+    }
+    function validatePassword(password) {
+      if (!password) return 'Password is required';
+      if (password.length < 8) return 'Password must be at least 8 characters';
+      if (!/(?=.*[a-z])/.test(password)) return 'Password must contain at least one lowercase letter';
+      if (!/(?=.*[A-Z])/.test(password)) return 'Password must contain at least one uppercase letter';
+      if (!/(?=.*\d)/.test(password)) return 'Password must contain at least one number';
+      if (!/(?=.*[@$!%*?&])/.test(password)) return 'Password must contain at least one special character (@$!%*?&)';
+      return null;
+    }
+    function getPasswordStrength(password) {
+      let score = 0;
+      let feedback = [];
+      if (password.length >= 8) score += 1;
+      if (password.length >= 12) score += 1;
+      if (/[a-z]/.test(password)) score += 1;
+      if (/[A-Z]/.test(password)) score += 1;
+      if (/\d/.test(password)) score += 1;
+      if (/[@$!%*?&]/.test(password)) score += 1;
+      if (password.length > 0) {
+        if (password.length < 8) feedback.push('Too short');
+        if (!/[a-z]/.test(password)) feedback.push('Add lowercase');
+        if (!/[A-Z]/.test(password)) feedback.push('Add uppercase');
+        if (!/\d/.test(password)) feedback.push('Add number');
+        if (!/[@$!%*?&]/.test(password)) feedback.push('Add symbol');
+      }
+      return { score, feedback };
+    }
+    function updatePasswordStrength(password) {
+      const strength = getPasswordStrength(password);
+      const strengthClasses = ['strength-weak', 'strength-fair', 'strength-good', 'strength-strong'];
+      const strengthTexts = ['Weak', 'Fair', 'Good', 'Strong'];
+      const strengthTextClasses = ['strength-weak-text', 'strength-fair-text', 'strength-good-text', 'strength-strong-text'];
+      if (password.length === 0) {
+        passwordStrength.style.display = 'none';
+        return;
+      }
+      passwordStrength.style.display = 'block';
+      const index = Math.min(Math.floor(strength.score / 2), 3);
+      strengthFill.className = `password-strength-fill ${strengthClasses[index]}`;
+      strengthText.className = `strength-text ${strengthTextClasses[index]}`;
+      strengthText.textContent = strengthTexts[index];
+    }
+    // === ERROR HANDLING ===
+    function showError(element, message) {
+      element.textContent = message;
+      element.classList.add('show');
+      element.previousElementSibling.classList.add('input-error');
+      element.previousElementSibling.classList.remove('input-success');
+    }
+    function hideError(element) {
+      element.classList.remove('show');
+      element.previousElementSibling.classList.remove('input-error');
+    }
+    function showSuccess(element, message) {
+      element.textContent = message;
+      element.classList.add('show');
+      setTimeout(() => element.classList.remove('show'), 3000);
+    }
+    function clearAllErrors() {
+      [nameError, emailError, passwordError, loginEmailError, loginPasswordError].forEach(el => {
+        hideError(el);
+      });
+      [registerName, registerEmail, registerPassword, loginEmail, loginPassword].forEach(el => {
+        el.classList.remove('input-error', 'input-success');
+      });
+    }
+    // === LOCALSTORAGE USER DB ===
+    function getUsers() {
+      return JSON.parse(localStorage.getItem('users') || '[]');
+    }
+    function saveUsers(users) {
+      localStorage.setItem('users', JSON.stringify(users));
+    }
+    // === EVENT LISTENERS ===
+    // Password strength indicator
+    registerPassword.addEventListener('input', (e) => {
+      updatePasswordStrength(e.target.value);
+      hideError(passwordError);
+    });
+    // Registration form submission
+    registerSubmitBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      clearAllErrors();
+      const name = registerName.value.trim();
+      const email = registerEmail.value.trim().toLowerCase();
+      const password = registerPassword.value;
+      // Validate inputs
+      const nameErrorMsg = validateName(name);
+      const emailErrorMsg = validateEmail(email);
+      const passwordErrorMsg = validatePassword(password);
+      if (nameErrorMsg) showError(nameError, nameErrorMsg);
+      if (emailErrorMsg) showError(emailError, emailErrorMsg);
+      if (passwordErrorMsg) showError(passwordError, passwordErrorMsg);
+      if (nameErrorMsg || emailErrorMsg || passwordErrorMsg) {
+        return;
+      }
+      // Simulate backend: check for duplicate email
+      const users = getUsers();
+      if (users.some(u => u.email === email)) {
+        showError(emailError, 'An account with this email already exists.');
+        return;
+      }
+      // Simulate user creation
+      users.push({ name, email, password });
+      saveUsers(users);
+      showSuccess(registerSuccess, 'Account created successfully! Redirecting to login...');
+      registerName.value = '';
+      registerEmail.value = '';
+      registerPassword.value = '';
+      passwordStrength.style.display = 'none';
+      setTimeout(() => {
+        showLogin();
+        clearAllErrors();
+      }, 2000);
+    });
+    // Login form submission
+    loginSubmitBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      clearAllErrors();
+      const email = loginEmail.value.trim().toLowerCase();
+      const password = loginPassword.value;
+      const emailErrorMsg = validateEmail(email);
+      if (!password) {
+        showError(loginPasswordError, 'Password is required');
+        return;
+      }
+      if (emailErrorMsg) {
+        showError(loginEmailError, emailErrorMsg);
+        return;
+      }
+      const users = getUsers();
+      const user = users.find(u => u.email === email && u.password === password);
+      if (!user) {
+        showError(loginPasswordError, 'Invalid email or password.');
+        return;
+      }
+      currentUser = user;
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      showSuccess(loginSuccess, 'Login successful! Welcome back!');
+      setTimeout(() => {
+        closeModal(loginModal);
+        updateAuthUI();
+        clearAllErrors();
+      }, 1500);
+    });
+    // Clear errors on input
+    [registerName, registerEmail, registerPassword, loginEmail, loginPassword].forEach(input => {
+      input.addEventListener('input', () => {
+        const errorElement = document.getElementById(input.id.replace('register', '').replace('login', '') + 'Error');
+        if (errorElement) hideError(errorElement);
+        input.classList.remove('input-error');
+      });
+    });
+    // === MODAL MANAGEMENT ===
+    function openModal(m){ 
+      m.classList.add('active'); 
+      showLogin();
+      clearAllErrors();
+    }
+    function closeModal(m){ 
+      m.classList.remove('active'); 
+      clearAllErrors();
+    }
+    document.querySelectorAll('[data-close]').forEach(btn=>{
+      btn.onclick=()=>closeModal(btn.closest('.modal'));
+    });
+    loginBtn.onclick=()=>openModal(loginModal);
+    window.addEventListener('keydown',e=>{
+      if(e.key==='Escape') document.querySelectorAll('.modal.active').forEach(closeModal);
+    });
+    // Toggle helpers
+    function showLogin(){
+      loginView.style.display='block';
+      registerView.style.display='none';
+      modalTitle.textContent='Log In';
+      clearAllErrors();
+    }
+    function showRegister(){
+      loginView.style.display='none';
+      registerView.style.display='block';
+      modalTitle.textContent='Create Account';
+      clearAllErrors();
+    }
+    createAccBtn.onclick=showRegister;
+    backToLogin.onclick=e=>{
+      e.preventDefault();
+      showLogin();
+    };
+    // === INITIALIZATION ===
+    window.addEventListener('DOMContentLoaded', () => {
+      // Simulate session
+      const user = localStorage.getItem('currentUser');
+      if (user) {
+        currentUser = JSON.parse(user);
+      }
+      updateAuthUI();
+    });
+    // === UI UPDATES ===
+    function updateAuthUI() {
+      const loginBtn = document.getElementById('loginBtn');
+      if (currentUser) {
+        // Remove all children
+        loginBtn.innerHTML = '';
+        // Get image (fallback if not set)
+        const imgSrc = currentUser.image || 'https://static.itch.io/images/cover.svg';
+        // Create avatar+name row
+        const avatar = document.createElement('img');
+        avatar.src = imgSrc;
+        avatar.alt = 'Profile';
+        avatar.className = 'profile-avatar';
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'profile-name';
+        nameSpan.textContent = currentUser.name || 'Account';
+        loginBtn.appendChild(avatar);
+        loginBtn.appendChild(nameSpan);
+        document.getElementById('signupBtn').style.display = 'none';
+        loginBtn.onclick = () => showUserMenu();
+        if (!currentUser.likes) currentUser.likes = [];
+        if (!currentUser.myList) currentUser.myList = [];
+      } else {
+        loginBtn.innerHTML = 'Log In';
+        document.getElementById('signupBtn').style.display = 'block';
+        loginBtn.onclick = () => openModal(loginModal);
+      }
+    }
+    function showUserMenu() {
+      const menu = document.createElement('div');
+      menu.style.cssText = `
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        padding: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 1000;
+        min-width: 180px;
+      `;
+      // Avatar + name row
+      const imgSrc = currentUser.image || 'https://static.itch.io/images/cover.svg';
+      menu.innerHTML = `
+        <div class="user-menu-header">
+          <img class="profile-avatar" src="${imgSrc}" alt="Profile">
+          <span class="profile-name">${currentUser.name}</span>
+        </div>
+        <button id="homeBtn" class="user-menu-option">Home</button>
+        <button id="profileBtn" class="user-menu-option">Profile</button>
+        <button id="myLikesBtn" class="user-menu-option">My Likes</button>
+        <button id="myListBtn" class="user-menu-option">My List</button>
+        <button id="logoutBtn" class="user-menu-option">Logout</button>
+      `;
+      const loginBtn = document.getElementById('loginBtn');
+      loginBtn.style.position = 'relative';
+      loginBtn.appendChild(menu);
+      setTimeout(() => {
+        document.addEventListener('click', function closeMenu(e) {
+          if (!loginBtn.contains(e.target)) {
+            menu.remove();
+            document.removeEventListener('click', closeMenu);
+          }
+        });
+      }, 0);
+      document.getElementById('logoutBtn').onclick = () => {
+        localStorage.removeItem('currentUser');
+        currentUser = null;
+        updateAuthUI();
+        menu.remove();
+      };
+      document.getElementById('profileBtn').onclick = () => {
+        menu.remove();
+        openProfilePage();
+      };
+      document.getElementById('homeBtn').onclick = () => {
+        menu.remove();
+        // Redirect to homepage
+        window.location.href = '/';
+      };
+      // NEW: My Likes and My List
+      document.getElementById('myLikesBtn').onclick = () => {
+        menu.remove();
+        openLikesOrListPage('likes');
+      };
+      document.getElementById('myListBtn').onclick = () => {
+        menu.remove();
+        openLikesOrListPage('list');
+      };
+    }
+
+    // --- Fake checkout ---
+    document.getElementById('checkoutForm').addEventListener('submit',e=>{
+      e.preventDefault();
+      window.open('https://www.paypal.com/paypalme/korenbar1', '_blank', 'noopener');
+    });
+
+    // --- Download functionality ---
+    downloadBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      downloadDropdown.classList.toggle('active');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!downloadBtn.contains(e.target) && !downloadDropdown.contains(e.target)) {
+        downloadDropdown.classList.remove('active');
+      }
+    });
+
+    // Handle format downloads
+    document.querySelectorAll('.download-option').forEach(option => {
+      option.addEventListener('click', (e) => {
+        e.preventDefault();
+        const format = e.currentTarget.dataset.format;
+        const modelName = lastOpenedModel ? lastOpenedModel.title.replace(/\s+/g, '_') : 'model';
+        
+        // Check what formats are actually available for this model
+        const availableFormats = getAvailableFormats(lastOpenedModel);
+        
+        if (!availableFormats.includes(format)) {
+          // Format not available - show message
+          alert(`Sorry, ${format.toUpperCase()} format is not available for this model yet.\n\nAvailable formats: ${availableFormats.map(f => f.toUpperCase()).join(', ')}`);
+          downloadDropdown.classList.remove('active');
+          return;
+        }
+        
+        // Get the correct file URL for this format
+        const fileUrl = getFileUrlForFormat(lastOpenedModel, format);
+        
+        if (!fileUrl) {
+          alert(`Download not available for ${format.toUpperCase()} format.`);
+          downloadDropdown.classList.remove('active');
+          return;
+        }
+        
+        // Create download link
+        const link = document.createElement('a');
+        link.href = fileUrl;
+        link.download = `${modelName}.${format}`;
+        link.style.display = 'none';
+        
+        // Trigger download
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Close dropdown
+        downloadDropdown.classList.remove('active');
+        
+        // Show success message
+        alert(`Downloading ${modelName}.${format}...`);
+      });
+    });
+
+    // Helper function to get available formats for a model
+    function getAvailableFormats(model) {
+      if (!model) return [];
+      
+      // Only FBX is available now
+      return ['fbx'];
+    }
+
+    // Helper function to get the correct file URL for a format
+    function getFileUrlForFormat(model, format) {
+      if (!model) return null;
+      // Check if this format is available for this model
+      const availableFormats = getAvailableFormats(model);
+      if (!availableFormats.includes(format)) {
+        return null;
+      }
+      // Only FBX is available now
+      if (model.fbx) {
+        return model.fbx;
+      }
+      return null;
+    }
+
+    // --- On page load, ensure modelPage is hidden to prevent flash ---
+    window.addEventListener('DOMContentLoaded', () => {
+      modelPage.style.display = 'none';
+      topSearchbar.style.display = 'none';
+      homepageBanner.style.display = '';
+      heroSearch.value = '';
+    });
+
+    const signupBtn = document.getElementById('signupBtn');
+    signupBtn.onclick = () => {
+      openModal(loginModal);
+      showRegister();
+    };
+
+    // --- Profile Page ---
+    // Add profile page HTML after checkoutPage
+    if (!document.getElementById('profilePage')) {
+      const profileSection = document.createElement('section');
+      profileSection.id = 'profilePage';
+      profileSection.style.display = 'none';
+      profileSection.innerHTML = `
+        <div class="profile-container">
+          <button class="btn back-btn" id="backProfile">← Back</button>
+          <div class="profile-card">
+            <div class="profile-image-wrapper">
+              <img id="profileImage" src="" alt="Profile Image" class="profile-image">
+              <input type="file" id="profileImageInput" accept="image/*" style="display:none;">
+              <button class="btn profile-img-btn" id="changeImageBtn">Change Image</button>
+            </div>
+            <div class="profile-fields">
+              <label for="profileUsername" class="profile-label">Username</label>
+              <input type="text" id="profileUsername" class="profile-input" maxlength="50">
+              <button class="btn profile-save-btn" id="saveProfileBtn">Save</button>
+              <div class="success-message" id="profileSaveSuccess"></div>
+            </div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(profileSection);
+    }
+    // Add profile page styles
+    if (!document.getElementById('profilePageStyles')) {
+      const style = document.createElement('style');
+      style.id = 'profilePageStyles';
+      style.textContent = `
+        #profilePage {
+          min-height: 100vh;
+          background: var(--bg);
+          color: var(--text);
+          display: none;
+          padding: 2.5rem 0 2.5rem 0;
+        }
+        .profile-container {
+          max-width: 520px;
+          margin: 0 auto;
+          background: var(--card-bg);
+          border-radius: 18px;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+          padding: 2.5rem 2rem 2.5rem 2rem;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        .profile-card {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 2.5rem;
+          width: 100%;
+        }
+        .profile-image-wrapper {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+        }
+        .profile-image {
+          width: 120px;
+          height: 120px;
+          object-fit: cover;
+          border-radius: 18px;
+          background: #232326;
+          box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+          border: 2px solid #ff9800;
+        }
+        .profile-img-btn {
+          background: #232326;
+          color: #ff9800;
+          border: 2px solid #ff9800;
+          font-size: 0.95rem;
+          padding: 0.5rem 1.2rem;
+          border-radius: 8px;
+          margin-top: 0.2rem;
+          transition: background 0.18s, color 0.18s;
+        }
+        .profile-img-btn:hover {
+          background: #ff9800;
+          color: #fff;
+        }
+        .profile-fields {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+          gap: 1.2rem;
+        }
+        .profile-label {
+          font-size: 1.1rem;
+          font-weight: 600;
+          margin-bottom: 0.3rem;
+        }
+        .profile-input {
+          padding: 0.8rem 1rem;
+          border-radius: 10px;
+          border: 2px solid #232326;
+          background: #232326;
+          color: #fff;
+          font-size: 1.05rem;
+          margin-bottom: 0.5rem;
+          outline: none;
+          transition: border 0.18s;
+        }
+        .profile-input:focus {
+          border: 2px solid #ff9800;
+        }
+        .profile-save-btn {
+          margin-top: 0.5rem;
+          width: 100%;
+          justify-content: center;
+        }
+        @media (max-width: 600px) {
+          .profile-container {
+            padding: 1.2rem 0.5rem;
+          }
+          .profile-card {
+            gap: 1.5rem;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    // --- Profile Page Logic ---
+    function openProfilePage() {
+      // Hide all other pages
+      modelPage.style.display = 'none';
+      mainContent.style.display = 'none';
+      checkoutPage.style.display = 'none';
+      homepageBanner.style.display = 'none';
+      topSearchbar.style.display = 'none';
+      // Show profile page
+      const profilePage = document.getElementById('profilePage');
+      profilePage.style.display = 'block';
+      window.scrollTo(0,0);
+      // Load current user data (from localStorage, not yet saved changes)
+      let user = JSON.parse(localStorage.getItem('currentUser'));
+      // Use a temp state for unsaved changes
+      let tempProfile = {
+        name: user.name,
+        image: user.image || ''
+      };
+      // Set username field
+      const usernameInput = document.getElementById('profileUsername');
+      usernameInput.value = tempProfile.name;
+      // Set profile image
+      const profileImage = document.getElementById('profileImage');
+      if (tempProfile.image) {
+        profileImage.src = tempProfile.image;
+      } else {
+        profileImage.src = 'https://static.itch.io/images/cover.svg'; // fallback avatar
+      }
+      // Change image logic
+      const imageInput = document.getElementById('profileImageInput');
+      const changeImageBtn = document.getElementById('changeImageBtn');
+      changeImageBtn.onclick = () => imageInput.click();
+      imageInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function(ev) {
+            profileImage.src = ev.target.result;
+            tempProfile.image = ev.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+      // Username edit
+      usernameInput.oninput = (e) => {
+        tempProfile.name = e.target.value;
+      };
+      // Save logic
+      const saveBtn = document.getElementById('saveProfileBtn');
+      const saveSuccess = document.getElementById('profileSaveSuccess');
+      saveBtn.onclick = () => {
+        // Save to localStorage and update UI
+        user.name = tempProfile.name;
+        user.image = tempProfile.image;
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        // Also update in users DB
+        let users = JSON.parse(localStorage.getItem('users') || '[]');
+        users = users.map(u => u.email === user.email ? { ...u, name: user.name, image: user.image } : u);
+        localStorage.setItem('users', JSON.stringify(users));
+        // Show success
+        saveSuccess.textContent = 'Profile updated!';
+        saveSuccess.classList.add('show');
+        setTimeout(() => saveSuccess.classList.remove('show'), 2000);
+        // Update UI (navbar, etc)
+        currentUser = user;
+        updateAuthUI();
+      };
+      // Back button
+      document.getElementById('backProfile').onclick = () => {
+        profilePage.style.display = 'none';
+        mainContent.style.display = 'block';
+        homepageBanner.style.display = '';
+        topSearchbar.style.display = 'none';
+        window.scrollTo(0,0);
+      };
+    }
+
+    // --- Like/List logic ---
+    function getUserLikes() {
+      if (!currentUser) return [];
+      return (currentUser.likes || []);
+    }
+    function getUserList() {
+      if (!currentUser) return [];
+      return (currentUser.myList || []);
+    }
+    function saveUserLikes(likes) {
+      if (!currentUser) return;
+      currentUser.likes = likes;
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      // Also update in users DB
+      let users = JSON.parse(localStorage.getItem('users') || '[]');
+      users = users.map(u => u.email === currentUser.email ? { ...u, likes } : u);
+      localStorage.setItem('users', JSON.stringify(users));
+    }
+    function saveUserList(myList) {
+      if (!currentUser) return;
+      currentUser.myList = myList;
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      // Also update in users DB
+      let users = JSON.parse(localStorage.getItem('users') || '[]');
+      users = users.map(u => u.email === currentUser.email ? { ...u, myList } : u);
+      localStorage.setItem('users', JSON.stringify(users));
+    }
+    function updateLikeListUI(model) {
+      // Like state
+      const likes = getUserLikes();
+      const liked = likes && likes.includes(model.id);
+      likeIcon.textContent = liked ? '♥' : '♡';
+      likeBtn.classList.toggle('liked', liked);
+      likeBtn.querySelector('span:last-child').textContent = liked ? 'Liked' : 'Like';
+      // List state
+      const myList = getUserList();
+      const listed = myList && myList.includes(model.id);
+      listIcon.textContent = listed ? '✔' : '＋';
+      listBtn.classList.toggle('listed', listed);
+      listBtn.querySelector('span:last-child').textContent = listed ? 'Added' : 'Add to List';
+    }
+    likeBtn.addEventListener('click', () => {
+      if (!lastOpenedModel || !currentUser) return;
+      let likes = getUserLikes();
+      if (!likes.includes(lastOpenedModel.id)) {
+        likes.push(lastOpenedModel.id);
+      } else {
+        likes = likes.filter(id => id !== lastOpenedModel.id);
+      }
+      saveUserLikes(likes);
+      updateLikeListUI(lastOpenedModel);
+    });
+    listBtn.addEventListener('click', () => {
+      if (!lastOpenedModel || !currentUser) return;
+      let myList = getUserList();
+      if (!myList.includes(lastOpenedModel.id)) {
+        myList.push(lastOpenedModel.id);
+      } else {
+        myList = myList.filter(id => id !== lastOpenedModel.id);
+      }
+      saveUserList(myList);
+      updateLikeListUI(lastOpenedModel);
+    });
+
+    // --- Add Likes/List pages HTML if not present ---
+    if (!document.getElementById('likesListPage')) {
+      const likesListSection = document.createElement('section');
+      likesListSection.id = 'likesListPage';
+      likesListSection.style.display = 'none';
+      likesListSection.innerHTML = `
+        <div class="likes-list-container">
+          <button class="btn back-btn" id="backLikesList">← Back</button>
+          <h2 id="likesListTitle"></h2>
+          <div id="likesListGallery" class="gallery"></div>
+        </div>
+      `;
+      document.body.appendChild(likesListSection);
+    }
+    // --- Likes/List page logic ---
+    function openLikesOrListPage(type) {
+      // Hide all other pages
+      modelPage.style.display = 'none';
+      mainContent.style.display = 'none';
+      checkoutPage.style.display = 'none';
+      homepageBanner.style.display = 'none';
+      topSearchbar.style.display = 'none';
+      // Show likes/list page
+      const likesListPage = document.getElementById('likesListPage');
+      likesListPage.style.display = 'block';
+      window.scrollTo(0,0);
+      // Set title
+      const title = type === 'likes' ? 'My Likes' : 'My List';
+      document.getElementById('likesListTitle').textContent = title;
+      // Get model IDs
+      let ids = [];
+      if (type === 'likes') ids = getUserLikes();
+      else ids = getUserList();
+      // Get models
+      const filtered = models.filter(m => ids.includes(m.id));
+      // Render
+      const galleryDiv = document.getElementById('likesListGallery');
+      if (filtered.length === 0) {
+        galleryDiv.innerHTML = `<div id="no-results-message"><div>¯\\_(ツ)_/¯</div><div>No models yet</div></div>`;
+      } else {
+        galleryDiv.innerHTML = '';
+        filtered.forEach(m => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <img src="${m.thumb}" alt="${m.title}">
+            <div class="info">
+              <h3>${m.title}</h3>
+              <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>
+            </div>`;
+          card.onclick = () => openModelPage(m, false);
+          galleryDiv.appendChild(card);
+        });
+      }
+      // Back button
+      document.getElementById('backLikesList').onclick = () => {
+        likesListPage.style.display = 'none';
+        mainContent.style.display = 'block';
+        homepageBanner.style.display = '';
+        topSearchbar.style.display = 'none';
+        window.scrollTo(0,0);
+      };
+    }
+  </script>
+</body>
+</html>
