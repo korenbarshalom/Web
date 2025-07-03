@@ -1184,6 +1184,7 @@
     <button class="btn back-btn" id="backCheckout">← Back</button>
     <h2 style="text-align:center;margin-bottom:1rem;">Checkout</h2>
     <div id="paypal-button-container" style="max-width:400px;margin:2rem auto 0 auto;"></div>
+    <button class="btn" id="paidDownloadBtn" style="display:none;background:#ff9800;color:#fff;font-weight:600;font-size:1.1rem;margin:2rem auto 0 auto;max-width:400px;width:100%;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.10);padding:0.85rem 0;">Download FBX Model</button>
   </section>
 
   <!-- CONTACT INFO FOOTER -->
@@ -2474,8 +2475,39 @@
     // --- PayPal Smart Payment Button Integration ---
     function renderPayPalButton(model) {
       const container = document.getElementById('paypal-button-container');
+      const paidDownloadBtn = document.getElementById('paidDownloadBtn');
       if (!container) return;
       container.innerHTML = '';
+      paidDownloadBtn.style.display = 'none'; // Hide by default
+      // Use the same logic as the free download (dropdown) button
+      paidDownloadBtn.onclick = function() {
+        // Always use the current model (from payment context)
+        const format = 'fbx';
+        const modelName = model ? model.title.replace(/\s+/g, '_') : 'model';
+        // Check what formats are actually available for this model
+        const availableFormats = getAvailableFormats(model);
+        if (!availableFormats.includes(format)) {
+          alert(`Sorry, ${format.toUpperCase()} format is not available for this model yet.\n\nAvailable formats: ${availableFormats.map(f => f.toUpperCase()).join(', ')}`);
+          return;
+        }
+        // Get the correct file URL for this format
+        const fileUrl = getFileUrlForFormat(model, format);
+        if (!fileUrl) {
+          alert(`Download not available for ${format.toUpperCase()} format.`);
+          return;
+        }
+        // Create download link
+        const link = document.createElement('a');
+        link.href = fileUrl;
+        link.download = `${modelName}.${format}`;
+        link.style.display = 'none';
+        // Trigger download
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        // Show success message (same as free download)
+        alert(`Downloading ${modelName}.${format}...`);
+      };
       // Remove any previous PayPal button if present
       if (window.paypal && container) {
         window.paypal.Buttons({
@@ -2503,20 +2535,12 @@
           },
           onApprove: function(data, actions) {
             return actions.order.capture().then(function(details) {
-              // After successful payment, provide instant access to the FBX file
+              // After successful payment, show the download button
               if (model && model.fbx) {
-                // Option 1: Redirect to the FBX file (triggers download in most browsers)
-                window.location.href = model.fbx;
-                // Option 2: To force download, you could use the following instead:
-                // const link = document.createElement('a');
-                // link.href = model.fbx;
-                // link.download = (model.title.replace(/\s+/g, '_') || 'model') + '.fbx';
-                // document.body.appendChild(link);
-                // link.click();
-                // document.body.removeChild(link);
+                paidDownloadBtn.style.display = 'block';
               } else {
-                // Fallback: show thank you page
-                window.location.href = 'thank-you.html';
+                paidDownloadBtn.style.display = 'none';
+                alert('No FBX file available for this model.');
               }
             });
           },
