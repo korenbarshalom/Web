@@ -1823,6 +1823,26 @@
     function saveUsers(users) {
       localStorage.setItem('users', JSON.stringify(users));
     }
+    // Helper: find user by username (regular) or google sub/email (Google)
+    function findUser({ provider, username, sub, email }) {
+      const users = getUsers();
+      if (provider === 'google') {
+        // Prefer sub (Google ID), fallback to email
+        return users.find(u => u.provider === 'google' && (u.sub === sub || u.email === email));
+      } else {
+        return users.find(u => u.username === username && !u.provider);
+      }
+    }
+    // Helper: update user in users array
+    function updateUserInUsers(user) {
+      let users = getUsers();
+      if (user.provider === 'google') {
+        users = users.map(u => (u.provider === 'google' && (u.sub === user.sub || u.email === user.email)) ? user : u);
+      } else {
+        users = users.map(u => (u.username === user.username && !u.provider) ? user : u);
+      }
+      saveUsers(users);
+    }
     // === EVENT LISTENERS ===
     // Password strength indicator
     registerPassword.addEventListener('input', (e) => {
@@ -2362,9 +2382,7 @@
         user.image = tempProfile.image;
         localStorage.setItem('currentUser', JSON.stringify(user));
         // Also update in users DB
-        let users = JSON.parse(localStorage.getItem('users') || '[]');
-        users = users.map(u => u.username === user.username ? { ...u, name: user.name, image: user.image } : u);
-        localStorage.setItem('users', JSON.stringify(users));
+        updateUserInUsers(user);
         // Show success
         saveSuccess.textContent = 'Profile updated!';
         saveSuccess.classList.add('show');
@@ -2397,18 +2415,14 @@
       currentUser.likes = likes;
       localStorage.setItem('currentUser', JSON.stringify(currentUser));
       // Also update in users DB
-      let users = JSON.parse(localStorage.getItem('users') || '[]');
-      users = users.map(u => u.username === currentUser.username ? { ...u, likes } : u);
-      localStorage.setItem('users', JSON.stringify(users));
+      updateUserInUsers(currentUser);
     }
     function saveUserList(myList) {
       if (!currentUser) return;
       currentUser.myList = myList;
       localStorage.setItem('currentUser', JSON.stringify(currentUser));
       // Also update in users DB
-      let users = JSON.parse(localStorage.getItem('users') || '[]');
-      users = users.map(u => u.username === currentUser.username ? { ...u, myList } : u);
-      localStorage.setItem('users', JSON.stringify(users));
+      updateUserInUsers(currentUser);
     }
     function updateLikeListUI(model) {
       // Like state
@@ -2544,9 +2558,7 @@
       currentUser.purchased = purchased;
       localStorage.setItem('currentUser', JSON.stringify(currentUser));
       // Also update in users DB
-      let users = JSON.parse(localStorage.getItem('users') || '[]');
-      users = users.map(u => u.username === currentUser.username ? { ...u, purchased } : u);
-      localStorage.setItem('users', JSON.stringify(users));
+      updateUserInUsers(currentUser);
     }
     function openPurchasedPage() {
       if (!currentUser) {
@@ -2965,14 +2977,24 @@
     function handleGoogleCredentialResponse(response) {
       try {
         const decoded = jwt_decode(response.credential);
-        // Extract user info
-        const user = {
-          name: decoded.name,
-          email: decoded.email,
-          image: decoded.picture,
-          sub: decoded.sub,
-          provider: 'google',
-        };
+        // Try to find existing Google user in users DB
+        let users = getUsers();
+        let user = users.find(u => u.provider === 'google' && (u.sub === decoded.sub || u.email === decoded.email));
+        if (!user) {
+          // New Google user: create user object
+          user = {
+            name: decoded.name,
+            email: decoded.email,
+            image: decoded.picture,
+            sub: decoded.sub,
+            provider: 'google',
+            likes: [],
+            myList: [],
+            purchased: []
+          };
+          users.push(user);
+          saveUsers(users);
+        }
         // Store in localStorage
         localStorage.setItem('user', JSON.stringify(user));
         // Also set as currentUser for app logic
