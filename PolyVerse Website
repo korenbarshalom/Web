@@ -2497,7 +2497,27 @@
       if (!container) return;
       container.innerHTML = '';
       paidDownloadBtn.style.display = 'none'; // Hide by default
-      // Use the same logic as the free download (dropdown) button
+
+      // --- SESSION PURCHASE STATE ---
+      // Use a session variable to track purchased model IDs (not persistent)
+      window._sessionPurchasedModels = window._sessionPurchasedModels || {};
+      // Helper to check if purchased in this session
+      function isModelPurchasedSession(id) {
+        return !!window._sessionPurchasedModels[id];
+      }
+      // Helper to set purchased in this session
+      function setModelPurchasedSession(id) {
+        window._sessionPurchasedModels[id] = true;
+      }
+
+      // If already purchased in this session, show download button immediately
+      if (isModelPurchasedSession(model.id)) {
+        paidDownloadBtn.style.display = 'block';
+        // Hide PayPal button
+        container.innerHTML = '<div style="color:#4CAF50;font-weight:600;font-size:1.1rem;text-align:center;margin:1.5rem 0;">Purchased ✔</div>';
+        return;
+      }
+
       paidDownloadBtn.onclick = function() {
         // Always use the current model (from payment context)
         const format = 'fbx';
@@ -2553,9 +2573,12 @@
           },
           onApprove: function(data, actions) {
             return actions.order.capture().then(function(details) {
-              // After successful payment, show the download button
+              // After successful payment, show the download button and mark as purchased in session
               if (model && model.fbx) {
+                setModelPurchasedSession(model.id);
                 paidDownloadBtn.style.display = 'block';
+                // Hide PayPal button and show Purchased label
+                container.innerHTML = '<div style="color:#4CAF50;font-weight:600;font-size:1.1rem;text-align:center;margin:1.5rem 0;">Purchased ✔</div>';
               } else {
                 paidDownloadBtn.style.display = 'none';
                 alert('No FBX file available for this model.');
@@ -2568,6 +2591,77 @@
         }).render('#paypal-button-container');
       }
     }
+
+    // --- Update Buy Now button on model page for session-purchased state ---
+    function updateModelPagePurchaseUI(model) {
+      // Only for paid models
+      if (!model || !model.price || model.price === 0) return;
+      window._sessionPurchasedModels = window._sessionPurchasedModels || {};
+      const purchased = !!window._sessionPurchasedModels[model.id];
+      if (purchased) {
+        buyNowBtn.style.display = 'none';
+        // Insert or show a Purchased label in the same place
+        let purchasedLabel = document.getElementById('purchasedLabel');
+        if (!purchasedLabel) {
+          purchasedLabel = document.createElement('span');
+          purchasedLabel.id = 'purchasedLabel';
+          purchasedLabel.textContent = 'Purchased';
+          purchasedLabel.style.cssText = buyNowBtn.style.cssText + ';background:#4CAF50;opacity:0.95;cursor:default;pointer-events:none;display:block;text-align:center;font-weight:600;font-size:1rem;border-radius:8px;margin-left:auto;margin-top:0.5rem;min-width:110px;max-width:160px;padding:0.5rem 1.25rem;box-shadow:0 2px 8px rgba(0,0,0,0.10);';
+          buyNowBtn.parentNode.insertBefore(purchasedLabel, buyNowBtn);
+        } else {
+          purchasedLabel.style.display = 'block';
+        }
+        // Show Download FBX button
+        downloadBtn.style.display = 'block';
+        priceLabel.style.display = 'none';
+      } else {
+        // Not purchased: restore normal state
+        buyNowBtn.style.display = 'block';
+        let purchasedLabel = document.getElementById('purchasedLabel');
+        if (purchasedLabel) purchasedLabel.style.display = 'none';
+        downloadBtn.style.display = 'none';
+        priceLabel.style.display = 'inline-block';
+        priceLabel.textContent = `$${Number(model.price).toFixed(2)} USD`;
+      }
+    }
+
+    // Patch openModelPage to call updateModelPagePurchaseUI
+    const _originalOpenModelPage = openModelPage;
+    openModelPage = function(m, fromHomepage = true) {
+      _originalOpenModelPage(m, fromHomepage);
+      updateModelPagePurchaseUI(m);
+    };
+
+    // Patch buyNowBtn.onclick to also update model page UI after purchase
+    const _originalRenderPayPalButton = renderPayPalButton;
+    renderPayPalButton = function(model) {
+      _originalRenderPayPalButton(model);
+      // After rendering PayPal, also update model page UI if returning
+      updateModelPagePurchaseUI(model);
+    };
+
+    // When returning to checkout page, update UI for session-purchased state
+    const _originalBackCheckout = backCheckout.onclick;
+    backCheckout.onclick = function() {
+      if (lastOpenedModel) {
+        checkoutPage.style.display = 'none';
+        openModelPage(lastOpenedModel);
+        // If purchased, and user goes back to checkout, show download button and purchased label
+        if (window._sessionPurchasedModels && window._sessionPurchasedModels[lastOpenedModel.id]) {
+          renderPayPalButton(lastOpenedModel);
+        }
+      } else {
+        // Fallback: go to home/shop
+        checkoutPage.style.display = 'none';
+        modelPage.style.display = 'none';
+        mainContent.style.display = 'block';
+        navbarSearch.value = '';
+        heroSearch.parentElement.classList.remove('hide');
+        topSearchbar.style.display = 'none';
+        if(homepageBanner) homepageBanner.style.display = '';
+        window.scrollTo(0,0);
+      }
+    };
 
     // --- Comments Logic ---
     function renderComments(modelId) {
