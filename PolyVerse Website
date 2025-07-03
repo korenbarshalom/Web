@@ -1157,6 +1157,8 @@
                   <span id="listIcon">＋</span> <span>Add to List</span>
                 </button>
               </div>
+              <!-- Comment Box UI -->
+              <div id="commentsSection" style="margin-top:1.5rem;"></div>
             </div>
             <div class="download-container">
               <button class="btn buy-btn" id="buyNowBtn">Buy Now</button>
@@ -2550,6 +2552,84 @@
         }).render('#paypal-button-container');
       }
     }
+
+    // --- Comments Logic ---
+    function renderComments(modelId) {
+      const section = document.getElementById('commentsSection');
+      if (!section) return;
+      section.innerHTML = '';
+      // Get comments from localStorage (per model)
+      const comments = JSON.parse(localStorage.getItem('comments_' + modelId) || '[]');
+      // Comments header
+      const header = document.createElement('div');
+      header.style = 'font-weight:600;font-size:1.08rem;margin-bottom:0.7rem;color:#fff;';
+      header.textContent = `${comments.length} Comment${comments.length === 1 ? '' : 's'}`;
+      section.appendChild(header);
+      // Comments list
+      const list = document.createElement('div');
+      list.id = 'commentsList';
+      comments.forEach(c => {
+        const item = document.createElement('div');
+        item.style = 'display:flex;align-items:flex-start;gap:0.7rem;margin-bottom:1.1rem;';
+        item.innerHTML = `
+          <div style="width:38px;height:38px;border-radius:50%;background:#232326;display:flex;align-items:center;justify-content:center;">
+            <img src="${c.avatar || DEFAULT_PROFILE_IMAGE}" alt="avatar" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
+          </div>
+          <div style="flex:1;">
+            <div style="font-weight:600;font-size:1rem;color:#ffb74d;">${c.name || 'User'}</div>
+            <div style="color:#fff;font-size:0.98rem;margin-top:0.1rem;">${c.text}</div>
+            <div style="color:#aaa;font-size:0.78rem;margin-top:0.2rem;">${new Date(c.time).toLocaleString()}</div>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+      section.appendChild(list);
+      // Only show comment box if logged in
+      if (currentUser) {
+        const box = document.createElement('div');
+        box.style = 'display:flex;align-items:flex-start;gap:0.7rem;margin-top:0.5rem;';
+        box.innerHTML = `
+          <div style="width:38px;height:38px;border-radius:50%;background:#232326;display:flex;align-items:center;justify-content:center;">
+            <img src="${currentUser.image || DEFAULT_PROFILE_IMAGE}" alt="avatar" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
+          </div>
+          <form id="commentForm" style="flex:1;display:flex;align-items:center;gap:0.7rem;">
+            <input id="commentInput" type="text" maxlength="300" placeholder="Like this model? Let the creator know!" style="flex:1;padding:0.7rem 1rem;border-radius:8px;border:1.5px solid #444;background:#232326;color:#fff;font-size:1.05rem;outline:none;transition:border 0.18s;" required />
+            <button class="btn" style="padding:0.6rem 1.2rem;font-size:1rem;" type="submit">Send</button>
+          </form>
+        `;
+        section.appendChild(box);
+        // Add submit handler
+        box.querySelector('#commentForm').onsubmit = function(e) {
+          e.preventDefault();
+          const input = box.querySelector('#commentInput');
+          const text = input.value.trim();
+          if (!text) return;
+          // Save comment
+          const newComment = {
+            name: currentUser.name || 'User',
+            avatar: currentUser.image || DEFAULT_PROFILE_IMAGE,
+            text,
+            time: Date.now()
+          };
+          comments.push(newComment);
+          localStorage.setItem('comments_' + modelId, JSON.stringify(comments));
+          input.value = '';
+          renderComments(modelId);
+        };
+      }
+    }
+    // Call renderComments when opening a model page
+    const originalOpenModelPage = openModelPage;
+    openModelPage = function(m, fromHomepage = true) {
+      originalOpenModelPage(m, fromHomepage);
+      renderComments(m.id);
+    };
+    // Also update comments when login/logout
+    const originalUpdateAuthUI = updateAuthUI;
+    updateAuthUI = function() {
+      originalUpdateAuthUI();
+      if (lastOpenedModel) renderComments(lastOpenedModel.id);
+    };
   </script>
 </body>
 </html>
