@@ -1266,7 +1266,7 @@
     </div>
   </div>
 
-  <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=USD"></script>
+  <script src="https://www.paypal.com/sdk/js?client-id=AWOtXB5c_Nnjr1Um-H3SWsgG3M5yaRAjK3uWrNU5WpkBFW7XoN9G_3USs5dpDEWyRJRne1sqPh9giL_J&currency=USD"></script>
   <script type="module">
     // === DATA & HOOKS ===
     const DEFAULT_PROFILE_IMAGE = 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk1ODQ0MS5wbmc=/250x600/j0omjw.png';
@@ -2515,4 +2515,4 @@
     }
   </script>
 </body>
-</html
+</html>
