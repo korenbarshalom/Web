@@ -1066,6 +1066,16 @@
       gap: 0.75rem;
       flex-wrap: wrap;
     }
+
+    /* Responsive style for price label */
+    @media (max-width: 700px) {
+      #priceLabel {
+        display: block !important;
+        margin-left: 0;
+        margin-top: 0.5rem;
+        font-size: 1rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1160,8 +1170,9 @@
               <!-- Comment Box UI -->
               <div id="commentsSection" style="margin-top:1.5rem;"></div>
             </div>
-            <div class="download-container">
+            <div class="download-container" style="display: flex; align-items: center; gap: 1.1rem; min-height: 48px;">
               <button class="btn buy-btn" id="buyNowBtn">Buy Now</button>
+              <span id="priceLabel" style="display:none;font-weight:700;color:#fff;white-space:nowrap;font-size:1.08rem;vertical-align:middle;line-height:1;"> </span>
               <button class="download-btn" id="downloadBtn" style="display:none;">Download</button>
               <div class="download-dropdown" id="downloadDropdown">
                 <a href="#" class="download-option" data-format="fbx">
@@ -1488,13 +1499,14 @@
       
       // Handle free vs paid models
       if (m.price === 0) {
-        // Free model - show download button
         buyNowBtn.style.display = 'none';
         downloadBtn.style.display = 'block';
+        priceLabel.style.display = 'none';
       } else {
-        // Paid model - show buy button
         buyNowBtn.style.display = 'block';
         downloadBtn.style.display = 'none';
+        priceLabel.style.display = 'inline-block';
+        priceLabel.textContent = `$${Number(m.price).toFixed(2)} USD`;
       }
       // Always show Like/List buttons
       modelActions.style.display = 'flex';
@@ -1508,22 +1520,26 @@
     function renderSuggestedModels(currentId) {
       if (!suggestedModels) return;
       suggestedModels.innerHTML = '<h4>Suggested Models</h4>';
-      
       // Filter out the current model and create a shuffled array
       const availableModels = models.filter(mod => mod.id !== currentId);
       const shuffledModels = shuffleArray([...availableModels]);
-      
       // Show up to 3 random models
       const modelsToShow = shuffledModels.slice(0, 3);
-      
       modelsToShow.forEach(mod => {
         const card = document.createElement('div');
         card.className = 'suggested-card';
+        // Determine price label
+        let priceLabel = '';
+        if (mod.price === 0) {
+          priceLabel = '<span class="suggested-meta">Free Model</span>';
+        } else {
+          priceLabel = '<span class="suggested-meta" style="color:#fff;font-weight:600;">$' + Number(mod.price).toFixed(2) + ' USD</span>';
+        }
         card.innerHTML = `
           <img class="suggested-thumb" src="${mod.thumb}" alt="${mod.title}">
           <div class="suggested-info">
             <span class="suggested-title">${mod.title}</span>
-            <span class="suggested-meta">Free Model</span>
+            ${priceLabel}
           </div>
         `;
         card.onclick = () => openModelPage(mod, false);
