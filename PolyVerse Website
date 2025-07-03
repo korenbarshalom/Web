@@ -1273,7 +1273,7 @@
     const models = [
       { id: 1, title: 'Human Character Base', price: 0.01, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQwMy5wbmc=/250x600/vaWBiI.png', desc: 'A versatile low-poly human base mesh, ready for your animations and rigs.', src: 'A20.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx1.fbx', glb: 'A20.glb', gltf: 'A20.gltf' },
       { id: 2, title: 'Human Character Base', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTM1NS5wbmc=/250x600/iV5gql.png', desc: 'Alternate low-poly human model optimized for mobile and VR.', src: '3DHuman11.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx.fbx', glb: '3DHuman11.glb', gltf: '3DHuman11.gltf' },
-      { id: 3, title: 'Player Model', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQ4NC5wbmc=/250x600/FAM6Ft.png', desc: 'A stylized player avatar with simple topology for game characters.', src: 'A19.glb', availableFormats: ['glb', 'fbx', 'gltf'], fbx: '3DHumanfbx5.fbx', glb: 'A19.glb', gltf: 'A19.gltf' },
+      { id: 3, title: 'Player Model', price: 0.01, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQ4NC5wbmc=/250x600/FAM6Ft.png', desc: 'A stylized player avatar with simple topology for game characters.', src: 'A19.glb', availableFormats: ['glb', 'fbx', 'gltf'], fbx: '3DHumanfbx5.fbx', glb: 'A19.glb', gltf: 'A19.gltf' },
       { id: 4, title: 'Farmer', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzNy5wbmc=/250x600/xUXRMO.png', desc: 'A medieval knight in low-poly style.', src: 'AFramer.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx6.fbx', glb: 'AFramer.glb', gltf: 'AFramer.gltf' },
       { id: 5, title: 'Space Marine', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzOC5wbmc=/250x600/ATA380.png', desc: 'A ready-to-animate archer character.', src: 'Aspacemarine.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx7.fbx', glb: 'Aspacemarine.glb', gltf: 'Aspacemarine.gltf' },
       { id: 6, title: 'Police Officer', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzOS5wbmc=/250x600/tht5cv.png', desc: 'Low-poly steampunk robot NPC.', src: 'Police.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx8.fbx', glb: 'Police.glb', gltf: 'Police.gltf' },
@@ -2503,8 +2503,21 @@
           },
           onApprove: function(data, actions) {
             return actions.order.capture().then(function(details) {
-              // Show a thank you message or redirect
-              window.location.href = 'thank-you.html';
+              // After successful payment, provide instant access to the FBX file
+              if (model && model.fbx) {
+                // Option 1: Redirect to the FBX file (triggers download in most browsers)
+                window.location.href = model.fbx;
+                // Option 2: To force download, you could use the following instead:
+                // const link = document.createElement('a');
+                // link.href = model.fbx;
+                // link.download = (model.title.replace(/\s+/g, '_') || 'model') + '.fbx';
+                // document.body.appendChild(link);
+                // link.click();
+                // document.body.removeChild(link);
+              } else {
+                // Fallback: show thank you page
+                window.location.href = 'thank-you.html';
+              }
             });
           },
           onError: function(err) {
