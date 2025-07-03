@@ -1306,8 +1306,9 @@
 
         <div class="success-message" id="loginSuccess"></div>
 
-        <button class="google-btn">Log in with Google</button>
-        <p>Auth backend coming soon.</p>
+        <!-- Google Sign-In button container -->
+        <div id="g_id_signin" style="display:flex;justify-content:center;margin-top:1.2rem;margin-bottom:0.5rem;"></div>
+        <p id="googleLoginMsg" style="text-align:center;font-size:0.92rem;color:#888;margin-top:0.5rem;">Or sign in with Google</p>
       </div>
 
       <!-- ===== REGISTER VIEW ===== -->
@@ -1333,7 +1334,9 @@
         <button class="register-submit" id="registerSubmitBtn">Create Account</button>
         <div class="success-message" id="registerSuccess"></div>
 
-        <button class="google-btn">Sign up with Google</button>
+        <!-- Google Sign-Up button container -->
+        <div id="g_id_signup" style="display:flex;justify-content:center;margin-top:1.2rem;margin-bottom:0.5rem;"></div>
+        <p id="googleSignupMsg" style="text-align:center;font-size:0.92rem;color:#888;margin-top:0.5rem;">Or sign up with Google</p>
         <p style="margin-top:.75rem;">Already have an account? <a href="#" id="backToLogin" style="color:var(--accent);">Log In</a></p>
       </div>
     </div>
@@ -1353,6 +1356,10 @@
   </div>
 
   <script src="https://www.paypal.com/sdk/js?client-id=AWOtXB5c_Nnjr1Um-H3SWsgG3M5yaRAjK3uWrNU5WpkBFW7XoN9G_3USs5dpDEWyRJRne1sqPh9giL_J&currency=USD"></script>
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <!-- jwt-decode for Google login -->
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
   <script type="module">
     // === DATA & HOOKS ===
     const DEFAULT_PROFILE_IMAGE = 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk1ODQ0MS5wbmc=/250x600/j0omjw.png';
@@ -2953,6 +2960,65 @@
       originalUpdateAuthUI();
       if (lastOpenedModel) renderComments(lastOpenedModel.id);
     };
+
+    // --- Google Identity Services Login ---
+    function handleGoogleCredentialResponse(response) {
+      try {
+        const decoded = jwt_decode(response.credential);
+        // Extract user info
+        const user = {
+          name: decoded.name,
+          email: decoded.email,
+          image: decoded.picture,
+          sub: decoded.sub,
+          provider: 'google',
+        };
+        // Store in localStorage
+        localStorage.setItem('user', JSON.stringify(user));
+        // Also set as currentUser for app logic
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        // Redirect to homepage
+        window.location.href = 'index.html';
+      } catch (err) {
+        alert('Google login failed: ' + (err && err.message ? err.message : err));
+      }
+    }
+
+    // Render Google Sign-In button after DOM is ready
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.google && window.google.accounts && window.google.accounts.id) {
+        window.google.accounts.id.initialize({
+          client_id: '665196132587-cbo8bflq7cstp7mjjcudoa1k5fu1ftss.apps.googleusercontent.com',
+          callback: handleGoogleCredentialResponse,
+          ux_mode: 'popup',
+        });
+        window.google.accounts.id.renderButton(
+          document.getElementById('g_id_signin'),
+          {
+            theme: 'outline',
+            size: 'large',
+            width: 280,
+            text: 'signin_with',
+            shape: 'rectangular',
+            logo_alignment: 'left',
+          }
+        );
+        // Sign Up modal button (same config, different container)
+        window.google.accounts.id.renderButton(
+          document.getElementById('g_id_signup'),
+          {
+            theme: 'outline',
+            size: 'large',
+            width: 280,
+            text: 'signup_with',
+            shape: 'rectangular',
+            logo_alignment: 'left',
+          }
+        );
+        // Optionally, prompt automatically
+        // window.google.accounts.id.prompt();
+      }
+    });
   </script>
 </body>
 </html>
