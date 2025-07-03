@@ -1197,7 +1197,7 @@
         <input type="text" required placeholder="Street, City, Country">
       </label>
     </form>
-    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=korenbarshalom@gmail.com&item_name=Low+Poly+Character&amount=1.00&currency_code=USD&return=https://mywebsite.com/thank-you.html" target="_blank" style="display:block;text-align:center;margin-top:1.5rem;">
+    <a id="paypalLink" href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=korenbarshalom@gmail.com&item_name=Low+Poly+Character&amount=1.00&currency_code=USD&return=https://mywebsite.com/thank-you.html" target="_blank" style="display:block;text-align:center;margin-top:1.5rem;">
       <button class="btn" style="justify-content:center;min-width:180px;">Pay with PayPal</button>
     </a>
   </section>
@@ -1288,7 +1288,7 @@
     const models = [
       { id: 1, title: 'Human Character Base', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQwMy5wbmc=/250x600/vaWBiI.png', desc: 'A versatile low-poly human base mesh, ready for your animations and rigs.', src: 'A20.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx1.fbx', glb: 'A20.glb', gltf: 'A20.gltf' },
       { id: 2, title: 'Human Character Base', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTM1NS5wbmc=/250x600/iV5gql.png', desc: 'Alternate low-poly human model optimized for mobile and VR.', src: '3DHuman11.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx.fbx', glb: '3DHuman11.glb', gltf: '3DHuman11.gltf' },
-      { id: 3, title: 'Player Model', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQ4NC5wbmc=/250x600/FAM6Ft.png', desc: 'A stylized player avatar with simple topology for game characters.', src: 'A19.glb', availableFormats: ['glb', 'fbx', 'gltf'], fbx: '3DHumanfbx5.fbx', glb: 'A19.glb', gltf: 'A19.gltf' },
+      { id: 3, title: 'Player Model', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQ4NC5wbmc=/250x600/FAM6Ft.png', desc: 'A stylized player avatar with simple topology for game characters.', src: 'A19.glb', availableFormats: ['glb', 'fbx', 'gltf'], fbx: '3DHumanfbx5.fbx', glb: 'A19.glb', gltf: 'A19.gltf' },
       { id: 4, title: 'Farmer', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzNy5wbmc=/250x600/xUXRMO.png', desc: 'A medieval knight in low-poly style.', src: 'AFramer.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx6.fbx', glb: 'AFramer.glb', gltf: 'AFramer.gltf' },
       { id: 5, title: 'Space Marine', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzOC5wbmc=/250x600/ATA380.png', desc: 'A ready-to-animate archer character.', src: 'Aspacemarine.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx7.fbx', glb: 'Aspacemarine.glb', gltf: 'Aspacemarine.gltf' },
       { id: 6, title: 'Police Officer', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzOS5wbmc=/250x600/tht5cv.png', desc: 'Low-poly steampunk robot NPC.', src: 'Police.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx8.fbx', glb: 'Police.glb', gltf: 'Police.gltf' },
@@ -1590,6 +1590,10 @@
       renderGallery(models, true);
     };
     buyNowBtn.onclick=()=>{
+      // Store paid model ID in sessionStorage for post-payment download (optional, for legacy support)
+      if (lastOpenedModel) {
+        sessionStorage.setItem('paidModelId', lastOpenedModel.id);
+      }
       modelPage.style.display='none';
       mainContent.style.display='none';
       checkoutPage.style.display='block';
@@ -1598,6 +1602,18 @@
       heroSearch.parentElement.classList.add('hide');
       if(homepageBanner) homepageBanner.style.display = 'none';
       window.scrollTo(0,0);
+      // --- Update PayPal link dynamically with model info in return URL ---
+      if (lastOpenedModel) {
+        const paypalLink = document.getElementById('paypalLink');
+        if (paypalLink) {
+          const itemName = encodeURIComponent(lastOpenedModel.title.replace(/\s+/g, '+'));
+          const amount = Number(lastOpenedModel.price).toFixed(2);
+          // Add model id and paid=1 to return URL
+          const returnUrl = encodeURIComponent(`https://mywebsite.com/thank-you.html?paid=1&id=${lastOpenedModel.id}`);
+          const baseUrl = 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=korenbarshalom@gmail.com';
+          paypalLink.href = `${baseUrl}&item_name=${itemName}&amount=${amount}&currency_code=USD&return=${returnUrl}`;
+        }
+      }
     };
     backCheckout.onclick=()=>{
       // Return to previous model page if available
@@ -2476,6 +2492,17 @@
       modal.onclick = (e) => {
         if (e.target === modal) modal.classList.remove('active');
       };
+    }
+
+    const modelFiles = {
+      1: { name: 'Human Character Base', file: '3DHumanfbx1.fbx' },
+      // ... (other models)
+    };
+    const paidModelId = sessionStorage.getItem('paidModelId');
+    if (paidModelId && modelFiles[paidModelId]) {
+      // Show download button for the purchased model
+      // ...
+      sessionStorage.removeItem('paidModelId');
     }
   </script>
 </body>
