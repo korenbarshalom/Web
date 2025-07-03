@@ -1076,6 +1076,78 @@
         font-size: 1rem;
       }
     }
+
+    /* --- Purchased Page Custom Styles --- */
+    #purchasedListPage {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      display: none;
+      padding: 2.5rem 0 2.5rem 0;
+    }
+    .purchased-list-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      position: relative;
+    }
+    #backPurchasedList {
+      position: absolute;
+      top: 1.5rem;
+      left: 1.5rem;
+      margin: 0;
+      z-index: 2;
+      padding: 0.7rem 1.4rem;
+      font-size: 1.08rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    }
+    #purchasedListTitle {
+      font-size: 2.1rem;
+      font-weight: 700;
+      text-align: center;
+      margin-top: 0.7rem;
+      margin-bottom: 2.2rem;
+      letter-spacing: -0.01em;
+    }
+    @media (max-width: 700px) {
+      .purchased-list-container {
+        padding: 0 0.5rem;
+      }
+      #backPurchasedList {
+        top: 1rem;
+        left: 1rem;
+        font-size: 1rem;
+        padding: 0.6rem 1.1rem;
+      }
+      #purchasedListTitle {
+        font-size: 1.35rem;
+        margin-top: 0.5rem;
+        margin-bottom: 1.3rem;
+      }
+    }
+    @media (max-width: 500px) {
+      #purchasedListTitle {
+        font-size: 1.1rem;
+        margin-top: 0.3rem;
+        margin-bottom: 1rem;
+      }
+      #backPurchasedList {
+        top: 0.5rem;
+        left: 0.5rem;
+        padding: 0.5rem 0.8rem;
+      }
+    }
+    /* Add responsive style for download-btn on purchased page */
+    @media (max-width: 700px) {
+      .download-btn {
+        width: 100%;
+        max-width: 100%;
+        margin-left: 0;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1287,7 +1359,7 @@
     const models = [
       { id: 1, title: 'Human Character Base', price: 0.01, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQwMy5wbmc=/250x600/vaWBiI.png', desc: 'A versatile low-poly human base mesh, ready for your animations and rigs.', src: 'A20.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx1.fbx', glb: 'A20.glb', gltf: 'A20.gltf' },
       { id: 2, title: 'Human Character Base', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTM1NS5wbmc=/250x600/iV5gql.png', desc: 'Alternate low-poly human model optimized for mobile and VR.', src: '3DHuman11.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx.fbx', glb: '3DHuman11.glb', gltf: '3DHuman11.gltf' },
-      { id: 3, title: 'Player Model', price: 0.01, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQ4NC5wbmc=/250x600/FAM6Ft.png', desc: 'A stylized player avatar with simple topology for game characters.', src: 'A19.glb', availableFormats: ['glb', 'fbx', 'gltf'], fbx: '3DHumanfbx5.fbx', glb: 'A19.glb', gltf: 'A19.gltf' },
+      { id: 3, title: 'Player Model', price: 0.01, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQ4NC5wbmc=/250x600/FAM6Ft.png', desc: 'A stylized player avatar with simple topology for game characters.', src: 'A19.glb', availableFormats: ['glb', 'fbx', 'gltf'], fbx: '3DCustomBean.fbx', glb: 'A19.glb', gltf: 'A19.gltf' },
       { id: 4, title: 'Farmer', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzNy5wbmc=/250x600/xUXRMO.png', desc: 'A medieval knight in low-poly style.', src: 'AFramer.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx6.fbx', glb: 'AFramer.glb', gltf: 'AFramer.gltf' },
       { id: 5, title: 'Space Marine', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzOC5wbmc=/250x600/ATA380.png', desc: 'A ready-to-animate archer character.', src: 'Aspacemarine.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx7.fbx', glb: 'Aspacemarine.glb', gltf: 'Aspacemarine.gltf' },
       { id: 6, title: 'Police Officer', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzOS5wbmc=/250x600/tht5cv.png', desc: 'Low-poly steampunk robot NPC.', src: 'Police.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx8.fbx', glb: 'Police.glb', gltf: 'Police.gltf' },
@@ -1943,6 +2015,7 @@
         <button id="profileBtn" class="user-menu-option">Profile</button>
         <button id="myLikesBtn" class="user-menu-option">My Likes</button>
         <button id="myListBtn" class="user-menu-option">My List</button>
+        <button id="myPurchasedBtn" class="user-menu-option">My Purchased</button>
         <button id="logoutBtn" class="user-menu-option">Logout</button>
       `;
       const loginBtn = document.getElementById('loginBtn');
@@ -1979,6 +2052,11 @@
       document.getElementById('myListBtn').onclick = () => {
         menu.remove();
         openLikesOrListPage('list');
+      };
+      // My Purchased
+      document.getElementById('myPurchasedBtn').onclick = () => {
+        menu.remove();
+        openPurchasedPage();
       };
     }
 
@@ -2449,6 +2527,133 @@
       };
     }
 
+    // --- Purchased logic ---
+    function getUserPurchased() {
+      if (!currentUser) return [];
+      return (currentUser.purchased || []);
+    }
+    function saveUserPurchased(purchased) {
+      if (!currentUser) return;
+      currentUser.purchased = purchased;
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      // Also update in users DB
+      let users = JSON.parse(localStorage.getItem('users') || '[]');
+      users = users.map(u => u.username === currentUser.username ? { ...u, purchased } : u);
+      localStorage.setItem('users', JSON.stringify(users));
+    }
+    function openPurchasedPage() {
+      if (!currentUser) {
+        showLoginRequiredModal(() => openPurchasedPage());
+        return;
+      }
+      // Hide all other pages
+      modelPage.style.display = 'none';
+      mainContent.style.display = 'none';
+      checkoutPage.style.display = 'none';
+      homepageBanner.style.display = 'none';
+      topSearchbar.style.display = 'none';
+      // Hide profile page if present
+      const profilePage = document.getElementById('profilePage');
+      if (profilePage) profilePage.style.display = 'none';
+      // Hide likes/list page if present
+      const likesListPage = document.getElementById('likesListPage');
+      if (likesListPage) likesListPage.style.display = 'none';
+      // Show purchased page
+      const purchasedListPage = document.getElementById('purchasedListPage');
+      purchasedListPage.style.display = 'block';
+      window.scrollTo(0,0);
+      // Get purchased model IDs
+      let ids = getUserPurchased();
+      // Get models
+      const filtered = models.filter(m => ids.includes(m.id));
+      // Render
+      const galleryDiv = document.getElementById('purchasedListGallery');
+      if (filtered.length === 0) {
+        galleryDiv.innerHTML = `<div id=\"no-results-message\"><div>¯\\_(ツ)_/¯</div><div>No purchased models yet</div></div>`;
+      } else {
+        galleryDiv.innerHTML = '';
+        filtered.forEach(m => {
+          const cardWrapper = document.createElement('div');
+          cardWrapper.style.display = 'flex';
+          cardWrapper.style.flexDirection = 'column';
+          cardWrapper.style.alignItems = 'center';
+          cardWrapper.style.marginBottom = '2.5rem';
+
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <img src=\"${m.thumb}\" alt=\"${m.title}\">
+            <div class=\"info\">
+              <h3>${m.title}</h3>
+              <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>
+            </div>`;
+          card.onclick = () => openModelPage(m, false);
+          cardWrapper.appendChild(card);
+
+          // Download button below card
+          const downloadBtn = document.createElement('button');
+          downloadBtn.className = 'download-btn';
+          downloadBtn.style.marginTop = '20px';
+          downloadBtn.style.display = 'block';
+          downloadBtn.style.alignSelf = 'center';
+          downloadBtn.textContent = 'Download';
+          downloadBtn.onclick = (e) => {
+            e.stopPropagation();
+            const format = 'fbx';
+            const modelName = m.title.replace(/\s+/g, '_');
+            const availableFormats = getAvailableFormats(m);
+            if (!availableFormats.includes(format)) {
+              alert(`Sorry, ${format.toUpperCase()} format is not available for this model yet.\n\nAvailable formats: ${availableFormats.map(f => f.toUpperCase()).join(', ')}`);
+              return;
+            }
+            const fileUrl = getFileUrlForFormat(m, format);
+            if (!fileUrl) {
+              alert(`Download not available for ${format.toUpperCase()} format.`);
+              return;
+            }
+            const link = document.createElement('a');
+            link.href = fileUrl;
+            link.download = `${modelName}.${format}`;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            alert(`Downloading ${modelName}.${format}...`);
+          };
+          cardWrapper.appendChild(downloadBtn);
+
+          galleryDiv.appendChild(cardWrapper);
+        });
+      }
+      // Back button
+      document.getElementById('backPurchasedList').onclick = () => {
+        purchasedListPage.style.display = 'none';
+        document.getElementById('purchasedListGallery').innerHTML = '';
+        mainContent.style.display = 'block';
+        homepageBanner.style.display = '';
+        topSearchbar.style.display = 'none';
+        heroSearch.parentElement.classList.remove('hide');
+        window.scrollTo(0,0);
+      };
+    }
+
+    // --- Add Purchased page HTML if not present ---
+    if (!document.getElementById('purchasedListPage')) {
+      const purchasedListSection = document.createElement('section');
+      purchasedListSection.id = 'purchasedListPage';
+      purchasedListSection.style.display = 'none';
+      purchasedListSection.innerHTML = `
+        <div class="likes-list-container purchased-list-container">
+          <button class="btn back-btn" id="backPurchasedList">← Back</button>
+          <h2 id="purchasedListTitle">My Purchased</h2>
+          <div id="purchasedListGallery" class="gallery"></div>
+        </div>
+      `;
+      // Insert before footer
+      const footer = document.querySelector('footer');
+      document.body.insertBefore(purchasedListSection, footer);
+    }
+
     // Modal logic for login required
     function showLoginRequiredModal(afterLoginAction) {
       const modal = document.getElementById('loginRequiredModal');
@@ -2508,6 +2713,14 @@
       // Helper to set purchased in this session
       function setModelPurchasedSession(id) {
         window._sessionPurchasedModels[id] = true;
+        // Also save to user purchase history if logged in
+        if (currentUser) {
+          let purchased = getUserPurchased();
+          if (!purchased.includes(id)) {
+            purchased.push(id);
+            saveUserPurchased(purchased);
+          }
+        }
       }
 
       // If already purchased in this session, show download button immediately
