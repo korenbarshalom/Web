@@ -621,6 +621,130 @@
       opacity: 1;
       color: var(--accent-pink-dark);
     }
+    /* Product Details Modal Styles */
+    #product-details-modal {
+      display: none;
+      position: fixed;
+      z-index: 3000;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      background: rgba(24, 20, 28, 0.18);
+      justify-content: center;
+      align-items: center;
+      transition: opacity .3s;
+    }
+    #product-details-modal.active {
+      display: flex;
+    }
+    .product-details-modal-content {
+      background: #fff;
+      border-radius: 22px;
+      box-shadow: 0 12px 48px rgba(184, 111, 167, 0.18), 0 2px 12px rgba(24, 20, 28, 0.08);
+      width: 600px;
+      max-width: 98vw;
+      min-height: 420px;
+      padding: 2.5rem 2.2rem 2.2rem 2.2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      font-family: 'Lato', sans-serif;
+      justify-content: flex-start;
+      border: 1.5px solid #f7e6f2;
+      animation: fadeInUp .32s cubic-bezier(.4,0,.2,1);
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .product-details-modal-layout {
+      display: flex;
+      flex-direction: row;
+      gap: 2.2rem;
+      width: 100%;
+      align-items: flex-start;
+    }
+    .product-details-image-wrap {
+      flex: 1 1 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+    }
+    #product-details-img {
+      width: 100%;
+      max-width: 220px;
+      border-radius: var(--radius);
+      box-shadow: 0 4px 24px rgba(184, 111, 167, 0.13);
+      background: var(--accent-pink);
+      object-fit: cover;
+      aspect-ratio: 1.2/1;
+    }
+    .product-details-info {
+      flex: 1 1 50%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      gap: 1.1rem;
+      min-width: 0;
+    }
+    .product-details-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 0.2rem;
+      letter-spacing: 0.04em;
+      text-shadow: 0 1.5px 6px rgba(184, 111, 167, 0.08);
+    }
+    .product-details-price {
+      color: var(--accent-gold);
+      font-size: 1.18rem;
+      font-weight: 800;
+      margin-bottom: 0.7rem;
+      letter-spacing: 1.2px;
+    }
+    .product-details-desc {
+      font-size: 1.08rem;
+      color: var(--text-dark);
+      margin-bottom: 1.1rem;
+      line-height: 1.7;
+      opacity: 0.92;
+      font-weight: 500;
+      max-width: 28rem;
+    }
+    #product-details-add-to-cart {
+      display: inline-block;
+      padding: 0.8rem 2.2rem;
+      background: linear-gradient(90deg, var(--accent-pink-dark) 0%, var(--accent-gold) 100%);
+      color: #fff;
+      border-radius: 999px;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      font-size: 1.08rem;
+      box-shadow: 0 2px 12px rgba(184, 111, 167, 0.13);
+      border: none;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      margin-top: 0.7rem;
+    }
+    #product-details-add-to-cart:hover, #product-details-add-to-cart:focus {
+      background: linear-gradient(90deg, var(--accent-gold) 0%, var(--accent-pink-dark) 100%);
+      color: #fff;
+      box-shadow: 0 6px 24px rgba(184, 111, 167, 0.18);
+      transform: translateY(-2px) scale(1.04);
+    }
+    @media (max-width: 700px) {
+      .product-details-modal-layout {
+        flex-direction: column;
+        gap: 1.2rem;
+        align-items: center;
+      }
+      .product-details-image-wrap { justify-content: center; }
+      #product-details-img { max-width: 90vw; }
+    }
   </style>
 </head>
 <body>
@@ -654,46 +778,40 @@
     <section class="categories">
       <div class="categories-grid">
         <div class="category-card">
-          <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80" alt="Rings">
-          <div class="label">Rings</div>
+          <img src="https://img.freepik.com/premium-photo/gold-jewelry-white-background_237502-490.jpg" alt="Jewelry">
+          <div class="label">Jewelry</div>
         </div>
         <div class="category-card">
-          <img src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80" alt="Earrings">
-          <div class="label">Earrings</div>
+          <img src="https://media.istockphoto.com/id/1363767151/photo/yellow-leather-bag-of-isolated-woman-on-white-background.jpg?s=612x612&w=0&k=20&c=X7PcXbPp99t0xAFbWLV7Yfm3YzsFSugtfEGZ0x2aCjo=" alt="Bags">
+          <div class="label">Bags</div>
         </div>
         <div class="category-card">
-          <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80" alt="Necklaces">
-          <div class="label">Necklaces</div>
+          <img src="https://img.freepik.com/premium-photo/elegant-women-s-summer-suede-red-stilettos-new-pair-shoes-white-background_400928-1689.jpg?w=360" alt="Shoes">
+          <div class="label">Shoes</div>
         </div>
-        <div class="category-card">
-          <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80" alt="Bracelets">
-          <div class="label">Bracelets</div>
-        </div>
-        <div class="category-card">
-          <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80" alt="Charms">
-          <div class="label">Charms</div>
-        </div>
+       
+      
       </div>
     </section>
     <section class="featured">
       <h2>Our Most Loved Items:</h2>
       <div class="products-grid">
-        <div class="product-card">
+        <div class="product-card" data-title="Diamond Ring" data-price="$335" data-img="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80" data-desc="A dazzling diamond ring that captures the light and the heart. Crafted for timeless elegance and everyday luxury. Perfect for special occasions or daily wear.">
           <img src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80" alt="Diamond Ring">
           <h4>Diamond Ring</h4>
           <span>$335</span>
         </div>
-        <div class="product-card">
+        <div class="product-card" data-title="Silver Bracelet" data-price="$389" data-img="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80" data-desc="A sleek silver bracelet with a modern twist. Its minimal design makes it a versatile piece for any outfit, day or night.">
           <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80" alt="Silver Bracelet">
           <h4>Silver Bracelet</h4>
           <span>$389</span>
         </div>
-        <div class="product-card">
+        <div class="product-card" data-title="Infinity Necklace" data-price="$335" data-img="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80" data-desc="An elegant infinity necklace symbolizing endless love and beauty. Delicate, refined, and perfect for layering.">
           <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80" alt="Infinity Necklace">
           <h4>Infinity Necklace</h4>
           <span>$335</span>
         </div>
-        <div class="product-card">
+        <div class="product-card" data-title="Stud Earrings" data-price="$195" data-img="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80" data-desc="Classic stud earrings that add a touch of sparkle to any look. Lightweight, comfortable, and always in style.">
           <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80" alt="Stud Earrings">
           <h4>Stud Earrings</h4>
           <span>$195</span>
@@ -737,6 +855,23 @@
       <button class="modal-close" id="modal-close-btn">&times;</button>
     </div>
   </div>
+  <!-- Product Details Modal (hidden by default) -->
+  <div id="product-details-modal" class="modal-overlay">
+    <div class="modal-content product-details-modal-content">
+      <button class="modal-close" id="product-details-close">&times;</button>
+      <div class="product-details-modal-layout">
+        <div class="product-details-image-wrap">
+          <img id="product-details-img" src="" alt="Product Image" />
+        </div>
+        <div class="product-details-info">
+          <div class="product-details-title" id="product-details-title"></div>
+          <div class="product-details-price" id="product-details-price"></div>
+          <div class="product-details-desc" id="product-details-desc"></div>
+          <button class="add-to-cart-btn" id="product-details-add-to-cart"><i class="fa fa-shopping-cart"></i> Add to Cart</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <script>
     // Modal logic
     const loginBtn = document.querySelector('.login-btn');
@@ -757,6 +892,44 @@
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
         modal.classList.remove('active');
+      }
+    });
+
+    // Product card click logic (update to show modal)
+    const productCards = document.querySelectorAll('.product-card');
+    const productDetailsModal = document.getElementById('product-details-modal');
+    const productDetailsClose = document.getElementById('product-details-close');
+    const productDetailsImg = document.getElementById('product-details-img');
+    const productDetailsTitle = document.getElementById('product-details-title');
+    const productDetailsPrice = document.getElementById('product-details-price');
+    const productDetailsDesc = document.getElementById('product-details-desc');
+
+    productCards.forEach(card => {
+      card.style.cursor = 'pointer';
+      card.addEventListener('click', function() {
+        productDetailsTitle.textContent = card.getAttribute('data-title');
+        productDetailsPrice.textContent = card.getAttribute('data-price');
+        productDetailsImg.src = card.getAttribute('data-img');
+        productDetailsImg.alt = card.getAttribute('data-title');
+        productDetailsDesc.textContent = card.getAttribute('data-desc');
+        productDetailsModal.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent background scroll
+      });
+    });
+    productDetailsClose.addEventListener('click', function() {
+      productDetailsModal.classList.remove('active');
+      document.body.style.overflow = '';
+    });
+    productDetailsModal.addEventListener('click', function(e) {
+      if (e.target === productDetailsModal) {
+        productDetailsModal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    });
+    document.addEventListener('keydown', function(e) {
+      if (productDetailsModal.classList.contains('active') && e.key === 'Escape') {
+        productDetailsModal.classList.remove('active');
+        document.body.style.overflow = '';
       }
     });
   </script>
