@@ -776,6 +776,7 @@
       align-items: center;
       justify-content: flex-start;
       width: 100vw;
+      overflow-x: hidden;
     }
     .product-detail-container {
       background: #fff;
@@ -788,6 +789,8 @@
       display: flex;
       flex-direction: column;
       align-items: flex-start;
+      min-height: 80vh;
+      overflow: visible;
     }
     .back-btn {
       margin-bottom: 1.5rem;
@@ -801,6 +804,7 @@
       align-items: center;
       gap: 0.5em;
       transition: color .2s;
+      z-index: 2;
     }
     .back-btn:hover, .back-btn:focus {
       color: var(--accent-gold);
@@ -812,14 +816,17 @@
       width: 100%;
       align-items: flex-start;
       justify-content: center;
+      flex-wrap: wrap;
+      overflow: visible;
     }
     .product-gallery {
-      flex: 1 1 45%;
+      flex: 1 1 340px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-width: 0;
+      min-width: 240px;
       max-width: 420px;
+      overflow: visible;
     }
     .product-main-img {
       width: 100%;
@@ -830,28 +837,33 @@
       object-fit: cover;
       aspect-ratio: 1.2/1;
       margin-bottom: 1.2em;
+      display: block;
     }
     .product-thumbnails {
       display: flex;
       flex-direction: row;
       margin-top: 0.5em;
       gap: 0.5em;
+      flex-wrap: wrap;
+      overflow: visible;
     }
     .product-thumb {
       border: 2px solid transparent;
       transition: border-color .2s, box-shadow .2s;
+      background: #fff;
     }
     .product-thumb.active, .product-thumb:hover {
       border: 2px solid var(--accent-gold);
       box-shadow: 0 2px 8px rgba(191, 160, 90, 0.13);
     }
     .product-info {
-      flex: 1 1 55%;
+      flex: 1 1 320px;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      min-width: 0;
+      min-width: 220px;
       max-width: 480px;
+      overflow: visible;
     }
     .product-detail-title {
       font-family: 'Playfair Display', serif;
@@ -861,6 +873,7 @@
       margin-bottom: 0.5rem;
       letter-spacing: 0.04em;
       text-shadow: 0 1.5px 6px rgba(184, 111, 167, 0.08);
+      word-break: break-word;
     }
     .product-detail-price {
       color: var(--accent-gold);
@@ -878,6 +891,7 @@
       flex-direction: row;
       gap: 0.7em;
       margin-top: 0.5em;
+      flex-wrap: wrap;
     }
     .color-dot {
       width: 32px;
@@ -899,6 +913,7 @@
       flex-direction: row;
       gap: 0.7em;
       margin-top: 0.5em;
+      flex-wrap: wrap;
     }
     .size-btn {
       padding: 0.5em 1.3em;
@@ -911,6 +926,7 @@
       cursor: pointer;
       transition: border-color .2s, color .2s, background .2s;
       outline: none;
+      margin-bottom: 0.3em;
     }
     .size-btn.active, .size-btn:focus {
       border-color: var(--accent-gold);
@@ -922,40 +938,32 @@
       width: 100%;
       max-width: 320px;
     }
-    .product-accordion {
+    /* Product Info Sections (expanded, not accordion) */
+    .product-info-sections {
       width: 100%;
-      margin-top: 1.2em;
+      margin-top: 1.5em;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2em;
     }
-    .accordion-item {
-      border-bottom: 1px solid #eee;
+    .info-block {
+      background: var(--soft-gray);
+      border-radius: 12px;
+      padding: 1.1em 1.3em 1.1em 1.3em;
+      box-shadow: 0 1.5px 6px rgba(184, 111, 167, 0.06);
     }
-    .accordion-toggle {
-      width: 100%;
-      background: none;
-      border: none;
-      text-align: left;
-      font-size: 1.08rem;
-      font-weight: 700;
+    .info-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.13rem;
       color: var(--accent-pink-dark);
-      padding: 1em 0;
-      cursor: pointer;
-      transition: color .2s;
-      outline: none;
-      position: relative;
+      font-weight: 700;
+      margin-bottom: 0.5em;
+      letter-spacing: 0.5px;
     }
-    .accordion-toggle.open, .accordion-toggle:hover, .accordion-toggle:focus {
-      color: var(--accent-gold);
-    }
-    .accordion-content {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height .32s cubic-bezier(.4,0,.2,1);
+    .info-content {
       font-size: 1.05rem;
       color: var(--text-dark);
-      padding: 0 0 0.7em 0;
-    }
-    .accordion-toggle.open + .accordion-content {
-      padding: 0.7em 0 1.1em 0;
+      line-height: 1.7;
     }
     @media (max-width: 900px) {
       .product-detail-layout {
@@ -984,50 +992,118 @@
       .product-main-img {
         max-width: 90vw;
       }
+      .product-info {
+        min-width: 0;
+        max-width: 100vw;
+      }
+      .product-info-sections {
+        gap: 0.7em;
+      }
+      .info-block {
+        padding: 0.7em 0.7em 0.7em 0.7em;
+      }
+      .info-title {
+        font-size: 1rem;
+      }
+    }
+    /* All Products Section Styles */
+    #all-products-section {
+      background: var(--soft-gray);
+      min-height: 100vh;
+      padding: 2.5rem 0 2.5rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100vw;
+      overflow-x: hidden;
+    }
+    .all-products-container {
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      max-width: 1100px;
+      width: 97vw;
+      margin: 0 auto;
+      padding: 2.5rem 2.2rem 2.2rem 2.2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      min-height: 80vh;
+      overflow: visible;
+    }
+    .all-products-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--accent-pink-dark);
+      font-weight: 700;
+      margin-bottom: 2rem;
+      letter-spacing: 1.5px;
+      margin-top: 0.2rem;
+      text-align: left;
+      width: 100%;
+    }
+    #all-products-grid {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 2.2rem;
+      margin-top: 0.5rem;
+    }
+    @media (max-width: 900px) {
+      .all-products-container {
+        padding: 1.2rem 0.5rem 0.7rem 0.5rem;
+      }
+      .all-products-title {
+        font-size: 1.3rem;
+      }
+      #all-products-grid {
+        gap: 1.1rem;
+      }
     }
   </style>
 </head>
 <body>
-  <div id="homepage-content">
-    <header>
-      <div class="container navbar">
-        <div class="logo">
-          <span class="logo-text">Shiny<span class="logo-accent">Belle</span></span>
-          <span class="logo-underline"></span>
-        </div>
-        <nav>
-          <a href="#">Home</a>
-          <a href="#rings">Rings</a>
-          <a href="#earrings">Earrings</a>
-          <a href="#necklaces">Necklaces</a>
-          <a href="#bracelets">Bracelets</a>
-          <a href="#charms">Charms</a>
-          <a href="#new">New Collection</a>
-        </nav>
-        <div class="navbar-action">
-          <a href="#login" class="login-btn">Log In</a>
-        </div>
+  <header>
+    <div class="container navbar">
+      <div class="logo">
+        <span class="logo-text">Shiny<span class="logo-accent">Belle</span></span>
+        <span class="logo-underline"></span>
       </div>
-    </header>
+      <nav>
+        <a href="#">Home</a>
+        <a href="#rings">Rings</a>
+        <a href="#earrings">Earrings</a>
+        <a href="#necklaces">Necklaces</a>
+        <a href="#bracelets">Bracelets</a>
+        <a href="#charms">Charms</a>
+        <a href="#new">New Collection</a>
+      </nav>
+      <div class="navbar-action">
+        <a href="#login" class="login-btn">Log In</a>
+      </div>
+    </div>
+  </header>
+  <div id="homepage-content">
     <section class="hero">
       <div class="hero-content">
         <h1>Timeless Elegance<br/>Effortless Style</h1>
-        <a href="#shop" class="btn">Shop Now</a>
+        <a href="#shop" class="btn" id="shop-now-btn">Shop Now</a>
       </div>
     </section>
     <div class="container">
       <section class="categories">
         <h2 class="categories-section-title">Categories</h2>
         <div class="categories-grid">
-          <div class="category-card">
+          <div class="category-card" data-category="Jewelry">
             <img src="https://img.freepik.com/premium-photo/gold-jewelry-white-background_237502-490.jpg" alt="Jewelry">
             <div class="label">Jewelry</div>
           </div>
-          <div class="category-card">
+          <div class="category-card" data-category="Bags">
             <img src="https://media.istockphoto.com/id/1363767151/photo/yellow-leather-bag-of-isolated-woman-on-white-background.jpg?s=612x612&w=0&k=20&c=X7PcXbPp99t0xAFbWLV7Yfm3YzsFSugtfEGZ0x2aCjo=" alt="Bags">
             <div class="label">Bags</div>
           </div>
-          <div class="category-card">
+          <div class="category-card" data-category="Shoes">
             <img src="https://img.freepik.com/premium-photo/elegant-women-s-summer-suede-red-stilettos-new-pair-shoes-white-background_400928-1689.jpg?w=360" alt="Shoes">
             <div class="label">Shoes</div>
           </div>
@@ -1036,22 +1112,22 @@
       <section class="featured">
         <h2>Our Most Loved Items:</h2>
         <div class="products-grid">
-          <div class="product-card" data-title="Golden Leaf Earrings" data-price="$335" data-img="https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg" data-desc="Delicate gold-plated earrings inspired by nature’s elegance.." data-gallery='["https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg","https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_2_lar.jpg","https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_3_lar.jpg","https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_4_lar.jpg"]' data-colors='["#bfa05a","#e5e5e5","#d6a4c2"]' data-sizes='["16 cm","17 cm","18 cm","19 cm","20 cm"]'>
+          <div class="product-card" data-category="Jewelry" data-title="Golden Leaf Earrings" data-price="$335" data-img="https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg" data-desc="Delicate gold-plated earrings inspired by nature’s elegance.." data-gallery='["https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg","https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_2_lar.jpg","https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_3_lar.jpg","https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_4_lar.jpg"]' data-colors='["#bfa05a","#e5e5e5","#d6a4c2"]' data-sizes='["16 cm","17 cm","18 cm","19 cm","20 cm"]'>
             <img src="https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg" alt="Golden Leaf Earrings">
             <h4>Golden Leaf Earrings</h4>
             <span>$245</span>
           </div>
-          <div class="product-card" data-title="Blush Pink Mini Bag" data-price="$389" data-img="https://assets.christiandior.com/is/image/diorprod/M0505ONGEM50P_E01?$default_GHC$&crop=487,646,919,1148&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85" data-desc="A compact and stylish handbag, perfect for day-to-night looks." data-gallery='["https://assets.christiandior.com/is/image/diorprod/M0505ONGEM50P_E01?$default_GHC$&crop=487,646,919,1148&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM50P_E02?$default_GHC$&crop=487,646,919,1148&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM50P_E03?$default_GHC$&crop=487,646,919,1148&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM50P_E04?$default_GHC$&crop=487,646,919,1148&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85"]' data-colors='["#e7b6d6","#e5e5e5","#bfa05a"]' data-sizes='["Small","Medium","Large"]'>
+          <div class="product-card" data-category="Bags" data-title="Blush Pink Mini Bag" data-price="$389" data-img="https://assets.christiandior.com/is/image/diorprod/M0505ONGEM50P_E01?$default_GHC$&crop=487,646,919,1148&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85" data-desc="A compact and stylish handbag, perfect for day-to-night looks." data-gallery='["https://assets.christiandior.com/is/image/diorprod/M0505ONGEM50P_E01?$default_GHC$&crop=487,646,919,1148&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM50P_E02?$default_GHC$&crop=487,646,919,1148&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM50P_E03?$default_GHC$&crop=487,646,919,1148&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM50P_E04?$default_GHC$&crop=487,646,919,1148&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85"]' data-colors='["#e7b6d6","#e5e5e5","#bfa05a"]' data-sizes='["Small","Medium","Large"]'>
             <img src="https://assets.christiandior.com/is/image/diorprod/M0505ONGEM50P_E01?$default_GHC$&crop=487,646,919,1148&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85" alt="Blush Pink Mini Bag">
             <h4>Blush Pink Mini Bag</h4>
             <span>$189</span>
           </div>
-          <div class="product-card" data-title="Luxe Pearl Necklace" data-price="$335" data-img="https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371" data-desc="Classic pearls reimagined with a modern, luxurious twist." data-gallery='["https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371","https://www.roseandleeco.com/cdn/shop/files/pearl2.webp","https://www.roseandleeco.com/cdn/shop/files/pearl3.webp","https://www.roseandleeco.com/cdn/shop/files/pearl4.webp"]' data-colors='["#fff","#e5e5e5","#bfa05a"]' data-sizes='["16 in","18 in","20 in"]'>
+          <div class="product-card" data-category="Jewelry" data-title="Luxe Pearl Necklace" data-price="$335" data-img="https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371" data-desc="Classic pearls reimagined with a modern, luxurious twist." data-gallery='["https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371","https://www.roseandleeco.com/cdn/shop/files/pearl2.webp","https://www.roseandleeco.com/cdn/shop/files/pearl3.webp","https://www.roseandleeco.com/cdn/shop/files/pearl4.webp"]' data-colors='["#fff","#e5e5e5","#bfa05a"]' data-sizes='["16 in","18 in","20 in"]'>
             <img src="https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371" alt="Luxe Pearl Necklace">
             <h4>Luxe Pearl Necklace</h4>
             <span>$309</span>
           </div>
-          <div class="product-card" data-title="Velvet Burgundy Heels" data-price="$195" data-img="https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png" data-desc="Bold and elegant heels crafted in soft burgundy velvet." data-gallery='["https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png","https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_221.png","https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_222.png","https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_223.png"]' data-colors='["#b86fa7","#e5e5e5","#bfa05a"]' data-sizes='["36","37","38","39","40"]'>
+          <div class="product-card" data-category="Shoes" data-title="Velvet Burgundy Heels" data-price="$195" data-img="https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png" data-desc="Bold and elegant heels crafted in soft burgundy velvet." data-gallery='["https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png","https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_221.png","https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_222.png","https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_223.png"]' data-colors='["#b86fa7","#e5e5e5","#bfa05a"]' data-sizes='["36","37","38","39","40"]'>
             <img src="https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png" alt="Velvet Burgundy Heels">
             <h4>Velvet Burgundy Heels</h4>
             <span>$179</span>
@@ -1069,10 +1145,18 @@
       </div>
     </footer>
   </div>
+  <!-- ALL PRODUCTS SECTION (hidden by default) -->
+  <section id="all-products-section" style="display:none;">
+    <div class="all-products-container">
+      <button class="back-btn" id="all-products-back"><i class="fa fa-arrow-left"></i> Back to Home</button>
+      <h2 class="all-products-title">All Products</h2>
+      <div class="products-grid" id="all-products-grid"></div>
+    </div>
+  </section>
   <!-- PRODUCT DETAIL SECTION (hidden by default) -->
   <section id="product-detail-section" style="display:none;">
     <div class="product-detail-container">
-      <button class="back-btn" id="back-to-home" style="margin-bottom:1.5rem;display:flex;align-items:center;background:none;border:none;font-size:1.1rem;font-weight:700;color:var(--accent-pink-dark);cursor:pointer;gap:0.5em;"><i class="fa fa-arrow-left"></i> Back</button>
+      <button class="back-btn" id="back-to-home"><i class="fa fa-arrow-left"></i> Back</button>
       <div class="product-detail-layout">
         <div class="product-gallery">
           <img id="product-main-img" class="product-main-img" src="" alt="Product Image" />
@@ -1091,19 +1175,19 @@
               <div id="size-options" class="size-options"></div>
             </div>
           </div>
-          <button class="btn add-to-cart-btn" id="add-to-cart-btn" style="margin:1.5em 0 1em 0;width:100%;max-width:320px;"><i class="fa fa-shopping-cart"></i> Add to Cart</button>
-          <div class="product-accordion">
-            <div class="accordion-item">
-              <button class="accordion-toggle">Product Description</button>
-              <div class="accordion-content" id="product-detail-desc"></div>
+          <button class="btn add-to-cart-btn" id="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> Add to Cart</button>
+          <div class="product-info-sections">
+            <div class="info-block">
+              <h3 class="info-title">Product Description</h3>
+              <div class="info-content" id="product-detail-desc"></div>
             </div>
-            <div class="accordion-item">
-              <button class="accordion-toggle">Sizing Guide</button>
-              <div class="accordion-content">See our <a href="#">sizing guide</a> for more details.</div>
+            <div class="info-block">
+              <h3 class="info-title">Sizing Guide</h3>
+              <div class="info-content">See our <a href="#">sizing guide</a> for more details.</div>
             </div>
-            <div class="accordion-item">
-              <button class="accordion-toggle">Shipping & Returns</button>
-              <div class="accordion-content">Free shipping on orders over $100. 30-day returns policy applies.</div>
+            <div class="info-block">
+              <h3 class="info-title">Shipping & Returns</h3>
+              <div class="info-content">Free shipping on orders over $100. 30-day returns policy applies.</div>
             </div>
           </div>
         </div>
@@ -1264,20 +1348,106 @@
       homepageContent.style.display = '';
       window.scrollTo({top:0,behavior:'smooth'});
     });
-    // Accordion logic
-    document.querySelectorAll('.accordion-toggle').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const content = btn.nextElementSibling;
-        if (content.style.maxHeight) {
-          content.style.maxHeight = null;
-          btn.classList.remove('open');
-        } else {
-          document.querySelectorAll('.accordion-content').forEach(c => c.style.maxHeight = null);
-          document.querySelectorAll('.accordion-toggle').forEach(b => b.classList.remove('open'));
-          content.style.maxHeight = content.scrollHeight + 'px';
-          btn.classList.add('open');
-        }
+    // Home link in navbar returns to homepage view
+    document.querySelectorAll('nav a').forEach(link => {
+      if (link.textContent.trim().toLowerCase() === 'home') {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          document.getElementById('product-detail-section').style.display = 'none';
+          document.getElementById('homepage-content').style.display = '';
+          window.scrollTo({top:0,behavior:'smooth'});
+        });
+      }
+    });
+    // ALL PRODUCTS SECTION LOGIC
+    const allProductsSection = document.getElementById('all-products-section');
+    const allProductsGrid = document.getElementById('all-products-grid');
+    const allProductsBack = document.getElementById('all-products-back');
+    const shopNowBtn = document.getElementById('shop-now-btn');
+    // Helper: get all product card data from homepage
+    function getAllProductData() {
+      return Array.from(document.querySelectorAll('.product-card')).map(card => ({
+        title: card.getAttribute('data-title'),
+        price: card.getAttribute('data-price'),
+        img: card.getAttribute('data-img'),
+        desc: card.getAttribute('data-desc'),
+        gallery: card.getAttribute('data-gallery'),
+        colors: card.getAttribute('data-colors'),
+        sizes: card.getAttribute('data-sizes'),
+        category: card.getAttribute('data-category')
+      }));
+    }
+    function renderAllProductsGrid(categoryFilter) {
+      const products = getAllProductData();
+      allProductsGrid.innerHTML = '';
+      let filtered = products;
+      if (categoryFilter) {
+        filtered = products.filter(p => (p.category || '').toLowerCase() === categoryFilter.toLowerCase());
+      }
+      filtered.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.setAttribute('data-title', product.title);
+        card.setAttribute('data-price', product.price);
+        card.setAttribute('data-img', product.img);
+        card.setAttribute('data-desc', product.desc);
+        card.setAttribute('data-gallery', product.gallery);
+        card.setAttribute('data-colors', product.colors);
+        card.setAttribute('data-sizes', product.sizes);
+        card.setAttribute('data-category', product.category);
+        card.innerHTML = `
+          <img src="${product.img}" alt="${product.title}">
+          <h4>${product.title}</h4>
+          <span>${product.price}</span>
+        `;
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', function() {
+          allProductsSection.style.display = 'none';
+          productDetailSection.style.display = 'block';
+          renderProductDetail(card);
+          window.scrollTo({top:0,behavior:'smooth'});
+        });
+        allProductsGrid.appendChild(card);
       });
+      // If no products, show a message
+      if (filtered.length === 0) {
+        allProductsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;font-size:1.1rem;color:#b86fa7;padding:2em 0;">No products found in this category.</div>';
+      }
+    }
+    shopNowBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      homepageContent.style.display = 'none';
+      allProductsSection.style.display = 'flex';
+      renderAllProductsGrid();
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+    // Category card click logic
+    document.querySelectorAll('.category-card').forEach(card => {
+      card.style.cursor = 'pointer';
+      card.addEventListener('click', function() {
+        const category = card.getAttribute('data-category');
+        homepageContent.style.display = 'none';
+        allProductsSection.style.display = 'flex';
+        renderAllProductsGrid(category);
+        window.scrollTo({top:0,behavior:'smooth'});
+      });
+    });
+    allProductsBack.addEventListener('click', function() {
+      allProductsSection.style.display = 'none';
+      homepageContent.style.display = '';
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+    // Home link in navbar returns to homepage view from any section
+    document.querySelectorAll('nav a').forEach(link => {
+      if (link.textContent.trim().toLowerCase() === 'home') {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          document.getElementById('product-detail-section').style.display = 'none';
+          document.getElementById('all-products-section').style.display = 'none';
+          document.getElementById('homepage-content').style.display = '';
+          window.scrollTo({top:0,behavior:'smooth'});
+        });
+      }
     });
     // Add to Cart (demo only)
     addToCartBtn.addEventListener('click', function() {
