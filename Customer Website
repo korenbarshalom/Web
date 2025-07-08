@@ -385,6 +385,16 @@
       line-height: 1.7;
       margin-bottom: 0.2rem;
     }
+    .categories-section-title {
+      text-align: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; /* 32px */
+      color: #e7b6d6; /* soft pastel pink, matches branding */
+      font-weight: 700;
+      margin-bottom: 2.2rem;
+      letter-spacing: 1.5px;
+      margin-top: 0.2rem;
+    }
     @media (max-width: 1024px) {
       .hero-content h1 { font-size: 2.2rem; }
       .container { width: 97%; }
@@ -400,6 +410,17 @@
       .login-btn { margin-left: 0; }
       .categories, .featured { padding: 1.5rem 0 1rem 0; }
       .footer-contact-minimal { padding: 1.2rem 0 1rem 0; }
+      .categories-section-title {
+        font-size: 1.4rem;
+        margin-bottom: 1.1rem;
+      }
+      .category-card {
+        min-height: 120px;
+        max-width: 120px;
+      }
+      .category-card img {
+        min-height: 60px;
+      }
     }
     @media (max-width: 480px) {
       .hero { min-height: 220px; }
@@ -776,6 +797,7 @@
   </section>
   <div class="container">
     <section class="categories">
+      <h2 class="categories-section-title">Categories</h2>
       <div class="categories-grid">
         <div class="category-card">
           <img src="https://img.freepik.com/premium-photo/gold-jewelry-white-background_237502-490.jpg" alt="Jewelry">
@@ -796,25 +818,25 @@
     <section class="featured">
       <h2>Our Most Loved Items:</h2>
       <div class="products-grid">
-        <div class="product-card" data-title="Diamond Ring" data-price="$335" data-img="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80" data-desc="A dazzling diamond ring that captures the light and the heart. Crafted for timeless elegance and everyday luxury. Perfect for special occasions or daily wear.">
-          <img src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80" alt="Diamond Ring">
-          <h4>Diamond Ring</h4>
-          <span>$335</span>
+        <div class="product-card" data-title="Golden Leaf Earrings" data-price="$335" data-img="https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg" data-desc="Delicate gold-plated earrings inspired by nature’s elegance..">
+          <img src="https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg" alt="Golden Leaf Earrings">
+          <h4>Golden Leaf Earrings</h4>
+          <span>$245</span>
         </div>
-        <div class="product-card" data-title="Silver Bracelet" data-price="$389" data-img="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80" data-desc="A sleek silver bracelet with a modern twist. Its minimal design makes it a versatile piece for any outfit, day or night.">
-          <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80" alt="Silver Bracelet">
-          <h4>Silver Bracelet</h4>
-          <span>$389</span>
+        <div class="product-card" data-title="Blush Pink Mini Bag" data-price="$389" data-img="https://assets.christiandior.com/is/image/diorprod/M0505ONGEM50P_E01?$default_GHC$&crop=487,646,919,1148&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85" data-desc="A compact and stylish handbag, perfect for day-to-night looks.">
+          <img src="https://assets.christiandior.com/is/image/diorprod/M0505ONGEM50P_E01?$default_GHC$&crop=487,646,919,1148&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85" alt="Blush Pink Mini Bag">
+          <h4>Blush Pink Mini Bag</h4>
+          <span>$189</span>
         </div>
-        <div class="product-card" data-title="Infinity Necklace" data-price="$335" data-img="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80" data-desc="An elegant infinity necklace symbolizing endless love and beauty. Delicate, refined, and perfect for layering.">
-          <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80" alt="Infinity Necklace">
-          <h4>Infinity Necklace</h4>
-          <span>$335</span>
+        <div class="product-card" data-title="Luxe Pearl Necklace" data-price="$335" data-img="https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371" data-desc="Classic pearls reimagined with a modern, luxurious twist.">
+          <img src="https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371" alt="Luxe Pearl Necklace">
+          <h4>Luxe Pearl Necklace</h4>
+          <span>$309</span>
         </div>
-        <div class="product-card" data-title="Stud Earrings" data-price="$195" data-img="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80" data-desc="Classic stud earrings that add a touch of sparkle to any look. Lightweight, comfortable, and always in style.">
-          <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80" alt="Stud Earrings">
-          <h4>Stud Earrings</h4>
-          <span>$195</span>
+        <div class="product-card" data-title="Velvet Burgundy Heels" data-price="$195" data-img="https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png" data-desc="Bold and elegant heels crafted in soft burgundy velvet.">
+          <img src="https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png" alt="Velvet Burgundy Heels">
+          <h4>Velvet Burgundy Heels</h4>
+          <span>$179</span>
         </div>
       </div>
     </section>
