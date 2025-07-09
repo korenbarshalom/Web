@@ -1725,27 +1725,35 @@
       </section>
       <section class="featured">
         <h2>Our Most Loved Items:</h2>
-        <div class="products-grid">
-          <div class="product-card" data-category="Jewelry" data-title="Golden Leaf Earrings" data-price="$335" data-img="https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg" data-desc="Delicate gold-plated earrings inspired by nature's elegance.." data-gallery='["https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg","https://www.jkjjewellers.in/_next/image?url=https%3A%2F%2Fres.cloudinary.com%2Fjkjjeweller%2Fproducts%2Fnthndtak3obvx8z2y2dg&w=1920&q=75","https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_3_lar.jpg"]' data-colors='["#bfa05a","#e5e5e5","#d6a4c2"]' data-sizes='["16 cm","17 cm","18 cm","19 cm","20 cm"]'>
-            <img src="https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg" alt="Golden Leaf Earrings">
-            <h4>Golden Leaf Earrings</h4>
-            <span>$245</span>
+        <div class="featured-carousel-wrap" style="position:relative;overflow:visible;">
+          <button class="carousel-arrow left" id="featured-left" aria-label="Previous" style="position:absolute;left:-2.2rem;top:50%;transform:translateY(-50%);background:none;border:none;font-size:2.1rem;color:var(--accent-pink-dark);z-index:2;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .2s;outline:none;">
+            <i class="fa fa-chevron-left"></i>
+          </button>
+          <div class="products-grid">
+            <div class="product-card" data-category="Jewelry" data-title="Golden Leaf Earrings" data-price="$335" data-img="https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg" data-desc="Delicate gold-plated earrings inspired by nature's elegance.." data-gallery='["https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg","https://www.jkjjewellers.in/_next/image?url=https%3A%2F%2Fres.cloudinary.com%2Fjkjjeweller%2Fproducts%2Fnthndtak3obvx8z2y2dg&w=1920&q=75","https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_3_lar.jpg"]' data-colors='["#bfa05a","#e5e5e5","#d6a4c2"]' data-sizes='["16 cm","17 cm","18 cm","19 cm","20 cm"]'>
+              <img src="https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg" alt="Golden Leaf Earrings">
+              <h4>Golden Leaf Earrings</h4>
+              <span>$245</span>
+            </div>
+            <div class="product-card" data-category="Bags" data-title="Blush Pink Mini Bag" data-price="$389" data-img="https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E01-1?$default_GHC$&crop=461,631,979,1169&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85" data-desc="A compact and stylish handbag, perfect for day-to-night looks." data-gallery='["https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E01-1?$default_GHC$&crop=461,631,979,1169&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E03-1?$default_GHC$&crop=561,642,849,1144&wid=1024&hei=1107&scale=0.4843&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E06-1?$default_GHC$&crop=727,555,483,897&wid=1024&hei=1107&scale=0.4843&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E07?$default_GHC$&crop=807,177,388,1599&wid=1024&hei=1107&scale=0.4843&bfc=on&qlt=85"]' data-colors='["#e7b6d6","#e5e5e5","#bfa05a"]' data-sizes='["Small","Medium","Large"]'>
+              <img src="https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E01-1?$default_GHC$&crop=461,631,979,1169&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85" alt="Blush Pink Mini Bag">
+              <h4>Blush Pink Mini Bag</h4>
+              <span>$189</span>
+            </div>
+            <div class="product-card" data-category="Jewelry" data-title="Luxe Pearl Necklace" data-price="$335" data-img="https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371" data-desc="Classic pearls reimagined with a modern, luxurious twist." data-gallery='["https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371","https://lockwoodshop.com/cdn/shop/files/4be5752cfreshwater_20pearl_20necklace_202_864x864.jpg?v=1747436091","https://lockwoodshop.com/cdn/shop/files/69b33e51freshwater_20pearl_20necklace_203_864x864.jpg?v=1747436091"]' data-colors='["#fff","#e5e5e5","#bfa05a"]' data-sizes='["16 in","18 in","20 in"]'>
+              <img src="https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371" alt="Luxe Pearl Necklace">
+              <h4>Luxe Pearl Necklace</h4>
+              <span>$309</span>
+            </div>
+            <div class="product-card" data-category="Shoes" data-title="Velvet Burgundy Heels" data-price="$195" data-img="https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png" data-desc="Bold and elegant heels crafted in soft burgundy velvet." data-gallery='["https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png","https://m.media-amazon.com/images/I/61tTjOUqcWL._AC_SY575_.jpg","https://m.media-amazon.com/images/I/61LjFsmzVpL._AC_SY575_.jpg","https://m.media-amazon.com/images/I/61hBxedRM+L._AC_SY575_.jpg"]' data-colors='["#b86fa7","#e5e5e5","#bfa05a"]' data-sizes='["36","37","38","39","40"]'>
+              <img src="https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png" alt="Velvet Burgundy Heels">
+              <h4>Velvet Burgundy Heels</h4>
+              <span>$179</span>
+            </div>
           </div>
-          <div class="product-card" data-category="Bags" data-title="Blush Pink Mini Bag" data-price="$389" data-img="https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E01-1?$default_GHC$&crop=461,631,979,1169&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85" data-desc="A compact and stylish handbag, perfect for day-to-night looks." data-gallery='["https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E01-1?$default_GHC$&crop=461,631,979,1169&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E03-1?$default_GHC$&crop=561,642,849,1144&wid=1024&hei=1107&scale=0.4843&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E06-1?$default_GHC$&crop=727,555,483,897&wid=1024&hei=1107&scale=0.4843&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E07?$default_GHC$&crop=807,177,388,1599&wid=1024&hei=1107&scale=0.4843&bfc=on&qlt=85"]' data-colors='["#e7b6d6","#e5e5e5","#bfa05a"]' data-sizes='["Small","Medium","Large"]'>
-            <img src="https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E01-1?$default_GHC$&crop=461,631,979,1169&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85" alt="Blush Pink Mini Bag">
-            <h4>Blush Pink Mini Bag</h4>
-            <span>$189</span>
-          </div>
-          <div class="product-card" data-category="Jewelry" data-title="Luxe Pearl Necklace" data-price="$335" data-img="https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371" data-desc="Classic pearls reimagined with a modern, luxurious twist." data-gallery='["https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371","https://lockwoodshop.com/cdn/shop/files/4be5752cfreshwater_20pearl_20necklace_202_864x864.jpg?v=1747436091","https://lockwoodshop.com/cdn/shop/files/69b33e51freshwater_20pearl_20necklace_203_864x864.jpg?v=1747436091"]' data-colors='["#fff","#e5e5e5","#bfa05a"]' data-sizes='["16 in","18 in","20 in"]'>
-            <img src="https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371" alt="Luxe Pearl Necklace">
-            <h4>Luxe Pearl Necklace</h4>
-            <span>$309</span>
-          </div>
-          <div class="product-card" data-category="Shoes" data-title="Velvet Burgundy Heels" data-price="$195" data-img="https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png" data-desc="Bold and elegant heels crafted in soft burgundy velvet." data-gallery='["https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png","https://m.media-amazon.com/images/I/61tTjOUqcWL._AC_SY575_.jpg","https://m.media-amazon.com/images/I/61LjFsmzVpL._AC_SY575_.jpg","https://m.media-amazon.com/images/I/61hBxedRM+L._AC_SY575_.jpg"]' data-colors='["#b86fa7","#e5e5e5","#bfa05a"]' data-sizes='["36","37","38","39","40"]'>
-            <img src="https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png" alt="Velvet Burgundy Heels">
-            <h4>Velvet Burgundy Heels</h4>
-            <span>$179</span>
-          </div>
+          <button class="carousel-arrow right" id="featured-right" aria-label="Next" style="position:absolute;right:-2.2rem;top:50%;transform:translateY(-50%);background:none;border:none;font-size:2.1rem;color:var(--accent-pink-dark);z-index:2;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .2s;outline:none;">
+            <i class="fa fa-chevron-right"></i>
+          </button>
         </div>
       </section>
       <!-- === PERFECT SETS FOR HER SECTION START === -->
@@ -2819,6 +2827,92 @@
     });
     // On load
     renderPerfectSetsCarousel();
+  </script>
+  <script>
+    // === OUR MOST LOVED ITEMS CAROUSEL FUNCTIONALITY ===
+    (function() {
+      const featuredWrap = document.querySelector('.featured-carousel-wrap');
+      const featuredGrid = featuredWrap ? featuredWrap.querySelector('.products-grid') : null;
+      const leftBtn = document.getElementById('featured-left');
+      const rightBtn = document.getElementById('featured-right');
+      if (!featuredGrid || !leftBtn || !rightBtn) return;
+      // Store original cards
+      const originalCards = Array.from(featuredGrid.children);
+      let startIdx = 0;
+      const visibleCount = 4;
+      function renderFeaturedCarousel() {
+        featuredGrid.innerHTML = '';
+        for (let i = 0; i < visibleCount; i++) {
+          const idx = (startIdx + i) % originalCards.length;
+          // Use cloneNode to preserve event listeners on original
+          featuredGrid.appendChild(originalCards[idx].cloneNode(true));
+        }
+        // Animate cards in (optional, for smoothness)
+        setTimeout(() => {
+          featuredGrid.querySelectorAll('.product-card').forEach((c, i) => {
+            c.classList.add('sb-inview');
+          });
+        }, 10);
+      }
+      leftBtn.addEventListener('click', function() {
+        startIdx = (startIdx - 1 + originalCards.length) % originalCards.length;
+        renderFeaturedCarousel();
+      });
+      rightBtn.addEventListener('click', function() {
+        startIdx = (startIdx + 1) % originalCards.length;
+        renderFeaturedCarousel();
+      });
+      // Responsive: recalculate visibleCount on resize (optional, for extra polish)
+      window.addEventListener('resize', function() {
+        // Optionally, you could recalculate visibleCount here for responsiveness
+        // For now, keep it at 4 for consistency
+      });
+      renderFeaturedCarousel();
+    })();
+  </script>
+  <script>
+    // === ENABLE PRODUCT CARD CLICK ON HOMEPAGE CAROUSELS ===
+    (function() {
+      // Helper to delegate click to product detail logic
+      function handleProductCardClick(card) {
+        var homepageContent = document.getElementById('homepage-content');
+        var productDetailSection = document.getElementById('product-detail-section');
+        if (typeof renderProductDetail === 'function') {
+          homepageContent.style.display = 'none';
+          productDetailSection.style.display = 'block';
+          renderProductDetail(card);
+          window.scrollTo({top:0,behavior:'smooth'});
+        }
+      }
+      // For static (non-carousel) product cards
+      document.querySelectorAll('.featured .product-card, #perfect-sets-carousel .product-card').forEach(function(card) {
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', function() {
+          handleProductCardClick(card);
+        });
+      });
+      // For dynamically rendered carousel cards (after arrow navigation)
+      // MutationObserver for featured
+      var featuredGrid = document.querySelector('.featured .products-grid');
+      if (featuredGrid) {
+        new MutationObserver(function() {
+          featuredGrid.querySelectorAll('.product-card').forEach(function(card) {
+            card.style.cursor = 'pointer';
+            card.onclick = function() { handleProductCardClick(card); };
+          });
+        }).observe(featuredGrid, {childList:true});
+      }
+      // MutationObserver for perfect sets
+      var perfectSetsCarousel = document.getElementById('perfect-sets-carousel');
+      if (perfectSetsCarousel) {
+        new MutationObserver(function() {
+          perfectSetsCarousel.querySelectorAll('.product-card').forEach(function(card) {
+            card.style.cursor = 'pointer';
+            card.onclick = function() { handleProductCardClick(card); };
+          });
+        }).observe(perfectSetsCarousel, {childList:true});
+      }
+    })();
   </script>
 </body>
 </html> 
