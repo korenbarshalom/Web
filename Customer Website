@@ -1670,6 +1670,82 @@
       width: 100vw;
       max-width: 100vw;
     }
+    /* --- Product Slider Arrow Improvements --- */
+    .carousel-arrow {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(247,230,242,0.55);
+      border: 1.5px solid #e7b6d6;
+      box-shadow: 0 2px 8px rgba(184,111,167,0.07);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem !important;
+      color: var(--accent-pink-dark) !important;
+      transition: background 0.22s, box-shadow 0.22s, color 0.22s, border-color 0.22s, transform 0.22s;
+      opacity: 0.82;
+      outline: none;
+      z-index: 2;
+      margin: 0;
+      padding: 0;
+    }
+    .carousel-arrow:focus, .carousel-arrow:hover {
+      background: #fff;
+      color: var(--accent-gold) !important;
+      border-color: var(--accent-gold);
+      box-shadow: 0 4px 16px rgba(191,160,90,0.10);
+      opacity: 1;
+      transform: scale(1.07);
+    }
+    .carousel-arrow i {
+      pointer-events: none;
+      font-size: 1.35rem;
+      margin: 0;
+    }
+    @media (max-width: 600px) {
+      .carousel-arrow {
+        width: 32px;
+        height: 32px;
+        font-size: 1.1rem !important;
+      }
+      .carousel-arrow i {
+        font-size: 1.1rem;
+      }
+    }
+    /* --- Product Slider Animation (Fade) --- */
+    .products-grid.slider-anim {
+      position: relative;
+      overflow: hidden;
+      min-height: 340px;
+    }
+    .products-grid .product-card {
+      transition: opacity 0.45s cubic-bezier(.4,0,.2,1), transform 0.45s cubic-bezier(.4,0,.2,1);
+      opacity: 1;
+      transform: none;
+    }
+    .products-grid.fade-out .product-card {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.98);
+    }
+    .products-grid.fade-in .product-card {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1);
+    }
+    .products-grid.slide-left .product-card {
+      transform: translateX(-60px);
+      opacity: 0;
+    }
+    .products-grid.slide-right .product-card {
+      transform: translateX(60px);
+      opacity: 0;
+    }
+    .products-grid.slide-reset .product-card {
+      transform: translateX(0);
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
@@ -1749,6 +1825,27 @@
               <img src="https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png" alt="Velvet Burgundy Heels">
               <h4>Velvet Burgundy Heels</h4>
               <span>$179</span>
+            </div>
+            <!-- Added products for the carousel -->
+            <div class="product-card" data-category="Shoes" data-title="Camel Luxe Pumps" data-price="$229" data-img="https://elliebelle.com/cdn/shop/files/4824942.jpg?height=871&v=1736956782" data-desc="Elegant ivory pumps in soft satin, perfect for weddings and special occasions." data-gallery='["https://elliebelle.com/cdn/shop/files/4824942.jpg?height=871&v=1736956782","https://elliebelle.com/cdn/shop/files/4824936.jpg?v=1736956782"]' data-colors='["#fff","#e5e5e5","#bfa05a"]' data-sizes='["36","37","38","39","40"]'>
+              <img src="https://elliebelle.com/cdn/shop/files/4824942.jpg?height=871&v=1736956782" alt="Camel Luxe Pumps">
+              <h4>Camel Luxe Pumps</h4>
+              <span>$229</span>
+            </div>
+            <div class="product-card" data-category="Shoes" data-title="Pearl Bow Ballet Flats" data-price="$199" data-img="https://image.made-in-china.com/202f0j00ceDlYbQsghop/Flat-Shoes-Hot-Selling-Women-Shoes-High-Quality-Casual-Shoes-Footwear-Leather-Shoes-Soft-2021.webp" data-desc="Chic rose gold sandals with delicate straps and a comfortable heel." data-gallery='["https://image.made-in-china.com/202f0j00ceDlYbQsghop/Flat-Shoes-Hot-Selling-Women-Shoes-High-Quality-Casual-Shoes-Footwear-Leather-Shoes-Soft-2021.webp"]' data-colors='["#e7b6d6","#bfa05a","#fff"]' data-sizes='["36","37","38","39","40"]'>
+              <img src="https://image.made-in-china.com/202f0j00ceDlYbQsghop/Flat-Shoes-Hot-Selling-Women-Shoes-High-Quality-Casual-Shoes-Footwear-Leather-Shoes-Soft-2021.webp" alt="Pearl Bow Ballet Flats">
+              <h4>Pearl Bow Ballet Flats</h4>
+              <span>$199</span>
+            </div>
+            <div class="product-card" data-category="Bags" data-title="Skyline Grace Bag" data-price="$259" data-img="https://media.istockphoto.com/id/1365118618/photo/blue-fashion-purse-handbag-on-white-background-isolated.jpg?s=612x612&w=0&k=20&c=VNszfC0cxenqZGhjlr3gqqvzHWREuhdY_H3CKF1B38g=" data-desc="Spacious and timeless black tote bag, crafted from premium leather." data-gallery='["https://media.istockphoto.com/id/1365118618/photo/blue-fashion-purse-handbag-on-white-background-isolated.jpg?s=612x612&w=0&k=20&c=VNszfC0cxenqZGhjlr3gqqvzHWREuhdY_H3CKF1B38g="]' data-colors='["#18141c","#e5e5e5","#bfa05a"]' data-sizes='["Medium","Large"]'>
+              <img src="https://media.istockphoto.com/id/1365118618/photo/blue-fashion-purse-handbag-on-white-background-isolated.jpg?s=612x612&w=0&k=20&c=VNszfC0cxenqZGhjlr3gqqvzHWREuhdY_H3CKF1B38g=" alt="Skyline Grace Bag">
+              <h4>Skyline Grace Bag</h4>
+              <span>$259</span>
+            </div>
+            <div class="product-card" data-category="Bags" data-title="Pastel Blue Satchel" data-price="$219" data-img="https://img.freepik.com/premium-photo/women-leather-bag-isolated-white-background-side-view-luxury-genuine-full-grain-leather-lady_709135-96.jpg" data-desc="Soft pastel blue satchel with gold hardware and adjustable strap." data-gallery='["https://img.freepik.com/premium-photo/women-leather-bag-isolated-white-background-side-view-luxury-genuine-full-grain-leather-lady_709135-96.jpg"]' data-colors='["#b6d6e7","#e5e5e5","#bfa05a"]' data-sizes='["Small","Medium"]'>
+              <img src="https://img.freepik.com/premium-photo/women-leather-bag-isolated-white-background-side-view-luxury-genuine-full-grain-leather-lady_709135-96.jpg" alt="Pastel Blue Satchel">
+              <h4>Pastel Blue Satchel</h4>
+              <span>$219</span>
             </div>
           </div>
           <button class="carousel-arrow right" id="featured-right" aria-label="Next" style="position:absolute;right:-2.2rem;top:50%;transform:translateY(-50%);background:none;border:none;font-size:2.1rem;color:var(--accent-pink-dark);z-index:2;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .2s;outline:none;">
@@ -2127,19 +2224,50 @@
     const shopNowBtn = document.getElementById('shop-now-btn');
     // Helper: get all product card data from homepage
     function getAllProductData() {
-      return Array.from(document.querySelectorAll('.product-card')).map(card => ({
-        title: card.getAttribute('data-title'),
-        price: card.getAttribute('data-price'),
-        img: card.getAttribute('data-img'),
-        desc: card.getAttribute('data-desc'),
-        gallery: card.getAttribute('data-gallery'),
-        colors: card.getAttribute('data-colors'),
-        sizes: card.getAttribute('data-sizes'),
-        category: card.getAttribute('data-category')
-      }))
-      // --- ADDITIONAL PRODUCTS ---
-      .concat([
-        // Shoes
+      // Define all products explicitly to ensure completeness and correct categories
+      const allProducts = [
+        // --- Most Loved Items (Featured) ---
+        {
+          title: "Golden Leaf Earrings",
+          price: "$245",
+          img: "https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg",
+          desc: "Delicate gold-plated earrings shaped like leaves, capturing the beauty of nature in a timeless accessory.",
+          gallery: '["https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg","https://www.jkjjewellers.in/_next/image?url=https%3A%2F%2Fres.cloudinary.com%2Fjkjjeweller%2Fproducts%2Fnthndtak3obvx8z2y2dg&w=1920&q=75","https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_3_lar.jpg"]',
+          colors: '["#bfa05a","#e5e5e5","#d6a4c2"]',
+          sizes: '["16 cm","17 cm","18 cm","19 cm","20 cm"]',
+          category: "Jewelry"
+        },
+        {
+          title: "Blush Pink Mini Bag",
+          price: "$189",
+          img: "https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E01-1?$default_GHC$&crop=461,631,979,1169&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85",
+          desc: "A compact blush pink handbag with a modern silhouette, ideal for carrying your essentials from day to night.",
+          gallery: '["https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E01-1?$default_GHC$&crop=461,631,979,1169&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E03-1?$default_GHC$&crop=561,642,849,1144&wid=1024&hei=1107&scale=0.4843&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E06-1?$default_GHC$&crop=727,555,483,897&wid=1024&hei=1107&scale=0.4843&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E07?$default_GHC$&crop=807,177,388,1599&wid=1024&hei=1107&scale=0.4843&bfc=on&qlt=85"]',
+          colors: '["#e7b6d6","#e5e5e5","#bfa05a"]',
+          sizes: '["Small","Medium","Large"]',
+          category: "Bags"
+        },
+        {
+          title: "Luxe Pearl Necklace",
+          price: "$309",
+          img: "https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371",
+          desc: "A strand of luminous pearls with a modern twist, this necklace brings classic sophistication to any look.",
+          gallery: '["https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371","https://lockwoodshop.com/cdn/shop/files/4be5752cfreshwater_20pearl_20necklace_202_864x864.jpg?v=1747436091","https://lockwoodshop.com/cdn/shop/files/69b33e51freshwater_20pearl_20necklace_203_864x864.jpg?v=1747436091"]',
+          colors: '["#fff","#e5e5e5","#bfa05a"]',
+          sizes: '["16 in","18 in","20 in"]',
+          category: "Jewelry"
+        },
+        {
+          title: "Velvet Burgundy Heels",
+          price: "$179",
+          img: "https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png",
+          desc: "Elegant high heels in plush burgundy velvet, designed for comfort and a bold, sophisticated statement.",
+          gallery: '["https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png","https://m.media-amazon.com/images/I/61tTjOUqcWL._AC_SY575_.jpg","https://m.media-amazon.com/images/I/61LjFsmzVpL._AC_SY575_.jpg","https://m.media-amazon.com/images/I/61hBxedRM+L._AC_SY575_.jpg"]',
+          colors: '["#b86fa7","#e5e5e5","#bfa05a"]',
+          sizes: '["36","37","38","39","40"]',
+          category: "Shoes"
+        },
+        // --- Newly Added Most Loved Items ---
         {
           title: "Camel Luxe Pumps",
           price: "$229",
@@ -2160,7 +2288,6 @@
           sizes: '["36","37","38","39","40"]',
           category: "Shoes"
         },
-        // Bags
         {
           title: "Skyline Grace Bag",
           price: "$259",
@@ -2180,8 +2307,50 @@
           colors: '["#b6d6e7","#e5e5e5","#bfa05a"]',
           sizes: '["Small","Medium"]',
           category: "Bags"
+        },
+        // --- Perfect Sets for Her ---
+        {
+          title: "Golden Heart Jewelry Set",
+          price: "$429",
+          img: "https://m.media-amazon.com/images/I/71OOtiBa76L._UY1000_.jpg",
+          desc: "A radiant gold-tone jewelry set featuring a heart pendant necklace, matching earrings, and a delicate bracelet for a romantic touch.",
+          gallery: '["https://m.media-amazon.com/images/I/71OOtiBa76L._UY1000_.jpg","https://m.media-amazon.com/images/I/71OOtiBa76L._UX679_.jpg","https://m.media-amazon.com/images/I/71OOtiBa76L._UY500_.jpg"]',
+          colors: '["#bfa05a","#e5e5e5","#d6a4c2"]',
+          sizes: '["16 in","18 in","20 in"]',
+          category: "Jewelry"
+        },
+        {
+          title: "Midnight Sparkle Set",
+          price: "$389",
+          img: "https://i.etsystatic.com/9665455/r/il/a3949d/2777754922/il_570xN.2777754922_rs3d.jpg",
+          desc: "A dazzling jewelry set with deep blue stones and shimmering accents, including a necklace, earrings, and ring for evening glamour.",
+          gallery: '["https://i.etsystatic.com/9665455/r/il/a3949d/2777754922/il_570xN.2777754922_rs3d.jpg","https://i.etsystatic.com/9665455/r/il/2b2e2d/2777754924/il_570xN.2777754924_rs3d.jpg"]',
+          colors: '["#18141c","#e5e5e5","#bfa05a"]',
+          sizes: '["Small","Medium","Large"]',
+          category: "Jewelry"
+        },
+        {
+          title: "Royal Elegance Collection",
+          price: "$349",
+          img: "https://www.deraahstore.com/dw/image/v2/BJFS_PRD/on/demandware.static/-/Sites-deraah-master/default/dwa599e9cb/images/10711151022000-1696-1.jpg?sw=2000&sh=2000",
+          desc: "A regal gold-plated jewelry collection with intricate details, featuring a necklace, bracelet, and earrings for a majestic look.",
+          gallery: '["https://www.deraahstore.com/dw/image/v2/BJFS_PRD/on/demandware.static/-/Sites-deraah-master/default/dwa599e9cb/images/10711151022000-1696-1.jpg?sw=2000&sh=2000"]',
+          colors: '["#bfa05a","#e5e5e5"]',
+          sizes: '["Standard"]',
+          category: "Jewelry"
+        },
+        {
+          title: "Silver Petal Elegance",
+          price: "$299",
+          img: "https://m.media-amazon.com/images/I/711E7-QpLdL._UY1000_.jpg",
+          desc: "A graceful silver jewelry set with petal motifs, including a necklace, earrings, and a matching ring for understated elegance.",
+          gallery: '["https://m.media-amazon.com/images/I/711E7-QpLdL._UY1000_.jpg","https://m.media-amazon.com/images/I/711E7-QpLdL._UX679_.jpg"]',
+          colors: '["#e5e5e5","#bfa05a"]',
+          sizes: '["16 in","18 in"]',
+          category: "Jewelry"
         }
-      ]);
+      ];
+      return allProducts;
     }
     // Helper to get all Perfect Sets data
     function getPerfectSetsData() {
@@ -2895,46 +3064,54 @@
     const perfectSetsLeft = document.getElementById('perfect-sets-left');
     const perfectSetsRight = document.getElementById('perfect-sets-right');
     let perfectSetsIndex = 0;
-    function renderPerfectSetsCarousel() {
-      perfectSetsCarousel.innerHTML = '';
-      for (let i = 0; i < 4; i++) {
-        const idx = (perfectSetsIndex + i) % perfectSetsData.length;
-        const product = perfectSetsData[idx];
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        card.setAttribute('data-title', product.title);
-        card.setAttribute('data-price', product.price);
-        card.setAttribute('data-img', product.img);
-        card.setAttribute('data-desc', product.desc || '');
-        card.setAttribute('data-gallery', product.gallery || '[]');
-        card.setAttribute('data-colors', product.colors || '[]');
-        card.setAttribute('data-sizes', product.sizes || '[]');
-        card.setAttribute('data-category', product.category || '');
-        card.innerHTML = `
-          <img src="${product.img}" alt="${product.title}">
-          <h4>${product.title}</h4>
-          <span>${product.price}</span>
-        `;
-        card.style.cursor = 'pointer';
-        card.addEventListener('click', function() {
-          // Optionally, show a modal or detail (not implemented for demo)
-        });
-        perfectSetsCarousel.appendChild(card);
+    function renderPerfectSetsCarousel(fadeDir) {
+      perfectSetsCarousel.classList.add('slider-anim');
+      if (fadeDir) {
+        perfectSetsCarousel.classList.remove('fade-in');
+        perfectSetsCarousel.classList.add('fade-out');
       }
-      // Animate cards in
       setTimeout(() => {
-        perfectSetsCarousel.querySelectorAll('.product-card').forEach((c, i) => {
-          c.classList.add('sb-inview');
-        });
-      }, 30);
+        perfectSetsCarousel.innerHTML = '';
+        for (let i = 0; i < 4; i++) {
+          const idx = (perfectSetsIndex + i) % perfectSetsData.length;
+          const product = perfectSetsData[idx];
+          const card = document.createElement('div');
+          card.className = 'product-card';
+          card.setAttribute('data-title', product.title);
+          card.setAttribute('data-price', product.price);
+          card.setAttribute('data-img', product.img);
+          card.setAttribute('data-desc', product.desc || '');
+          card.setAttribute('data-gallery', product.gallery || '[]');
+          card.setAttribute('data-colors', product.colors || '[]');
+          card.setAttribute('data-sizes', product.sizes || '[]');
+          card.setAttribute('data-category', product.category || '');
+          card.innerHTML = `
+            <img src="${product.img}" alt="${product.title}">
+            <h4>${product.title}</h4>
+            <span>${product.price}</span>
+          `;
+          card.style.cursor = 'pointer';
+          card.addEventListener('click', function() {
+            // Optionally, show a modal or detail (not implemented for demo)
+          });
+          perfectSetsCarousel.appendChild(card);
+        }
+        setTimeout(() => {
+          perfectSetsCarousel.classList.remove('fade-out');
+          perfectSetsCarousel.classList.add('fade-in');
+          perfectSetsCarousel.querySelectorAll('.product-card').forEach((c, i) => {
+            c.classList.add('sb-inview');
+          });
+        }, 10);
+      }, fadeDir ? 450 : 0);
     }
     perfectSetsLeft.addEventListener('click', function() {
       perfectSetsIndex = (perfectSetsIndex - 1 + perfectSetsData.length) % perfectSetsData.length;
-      renderPerfectSetsCarousel();
+      renderPerfectSetsCarousel('fade');
     });
     perfectSetsRight.addEventListener('click', function() {
       perfectSetsIndex = (perfectSetsIndex + 1) % perfectSetsData.length;
-      renderPerfectSetsCarousel();
+      renderPerfectSetsCarousel('fade');
     });
     // On load
     renderPerfectSetsCarousel();
@@ -2947,36 +3124,40 @@
       const leftBtn = document.getElementById('featured-left');
       const rightBtn = document.getElementById('featured-right');
       if (!featuredGrid || !leftBtn || !rightBtn) return;
-      // Store original cards
       const originalCards = Array.from(featuredGrid.children);
       let startIdx = 0;
       const visibleCount = 4;
-      function renderFeaturedCarousel() {
-        featuredGrid.innerHTML = '';
-        for (let i = 0; i < visibleCount; i++) {
-          const idx = (startIdx + i) % originalCards.length;
-          // Use cloneNode to preserve event listeners on original
-          featuredGrid.appendChild(originalCards[idx].cloneNode(true));
+      function renderFeaturedCarousel(fadeDir) {
+        featuredGrid.classList.add('slider-anim');
+        if (fadeDir) {
+          featuredGrid.classList.remove('fade-in');
+          featuredGrid.classList.add('fade-out');
         }
-        // Animate cards in (optional, for smoothness)
         setTimeout(() => {
-          featuredGrid.querySelectorAll('.product-card').forEach((c, i) => {
-            c.classList.add('sb-inview');
-          });
-        }, 10);
+          featuredGrid.innerHTML = '';
+          for (let i = 0; i < visibleCount; i++) {
+            const idx = (startIdx + i) % originalCards.length;
+            featuredGrid.appendChild(originalCards[idx].cloneNode(true));
+          }
+          setTimeout(() => {
+            featuredGrid.classList.remove('fade-out');
+            featuredGrid.classList.add('fade-in');
+            featuredGrid.querySelectorAll('.product-card').forEach((c, i) => {
+              c.classList.add('sb-inview');
+            });
+          }, 10);
+        }, fadeDir ? 450 : 0);
       }
       leftBtn.addEventListener('click', function() {
         startIdx = (startIdx - 1 + originalCards.length) % originalCards.length;
-        renderFeaturedCarousel();
+        renderFeaturedCarousel('fade');
       });
       rightBtn.addEventListener('click', function() {
         startIdx = (startIdx + 1) % originalCards.length;
-        renderFeaturedCarousel();
+        renderFeaturedCarousel('fade');
       });
-      // Responsive: recalculate visibleCount on resize (optional, for extra polish)
       window.addEventListener('resize', function() {
         // Optionally, you could recalculate visibleCount here for responsiveness
-        // For now, keep it at 4 for consistency
       });
       renderFeaturedCarousel();
     })();
