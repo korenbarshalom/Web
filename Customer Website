@@ -2209,6 +2209,8 @@
         const category = card.getAttribute('data-category');
         homepageContent.style.display = 'none';
         allProductsSection.style.display = 'flex';
+        // Clear the grid before rendering new products to prevent duplication
+        allProductsGrid.innerHTML = '';
         renderAllProductsGrid(category);
         window.scrollTo({top:0,behavior:'smooth'});
       });
