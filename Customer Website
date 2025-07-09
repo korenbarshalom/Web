@@ -1777,11 +1777,41 @@
             </p>
           </div>
           <div class="about-image" style="flex:1 1 52%;min-width:320px;max-width:600px;display:flex;justify-content:flex-end;align-items:center;">
-            <img src="https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg" alt="ShinyBelle Logo" style="width:100%;max-width:520px;min-width:320px;height:auto;aspect-ratio:1.6/1;border-radius:20px;box-shadow:0 4px 24px rgba(184,111,167,0.13);background:var(--accent-pink);object-fit:cover;display:block;"/>
+            <img src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjA2MjUxNy5wbmc=/250x600/baAFjG.png" alt="ShinyBelle Logo" style="width:100%;max-width:520px;min-width:320px;height:auto;aspect-ratio:1.6/1;border-radius:20px;box-shadow:0 4px 24px rgba(184,111,167,0.13);background:var(--accent-pink);object-fit:cover;display:block;"/>
           </div>
         </div>
       </section>
       <!-- === ABOUT US SECTION END === -->
+      
+      <!-- === WHY SHOP WITH US SECTION START === -->
+      <section class="why-shop-section" style="background:var(--soft-gray);padding:3.5rem 0 3.5rem 0;">
+        <div class="container" style="max-width:1200px;">
+          <h2 class="categories-section-title" style="text-align:center;margin-bottom:2.2rem;">Why Shop With Us?</h2>
+          <div class="why-shop-features" style="display:flex;flex-wrap:wrap;justify-content:center;gap:2.2rem;align-items:stretch;">
+            <div class="why-feature" style="flex:1 1 220px;min-width:220px;max-width:260px;background:var(--soft-gray);border-radius:22px;box-shadow:0 4px 24px rgba(184,111,167,0.10), 0 1.5px 6px rgba(0,0,0,0.06);padding:2.3rem 1.3rem 2.1rem 1.3rem;text-align:center;display:flex;flex-direction:column;align-items:center;transition:box-shadow .3s,transform .3s;border:1.5px solid #f7e6f2;">
+              <div style="font-size:2.5rem;margin-bottom:0.8em;color:var(--accent-pink-dark);background:var(--white);border-radius:50%;padding:0.5em 0.7em;box-shadow:0 2px 8px rgba(184,111,167,0.07);display:flex;align-items:center;justify-content:center;"><i class="fa fa-lock" aria-hidden="true"></i></div>
+              <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--accent-pink-dark);margin-bottom:0.5em;letter-spacing:0.5px;">Secure Checkout</div>
+              <div style="font-size:1.07rem;color:var(--text-dark);opacity:0.85;font-family:'Lato',sans-serif;font-weight:500;">Your payment details are protected</div>
+            </div>
+            <div class="why-feature" style="flex:1 1 220px;min-width:220px;max-width:260px;background:var(--soft-gray);border-radius:22px;box-shadow:0 4px 24px rgba(184,111,167,0.10), 0 1.5px 6px rgba(0,0,0,0.06);padding:2.3rem 1.3rem 2.1rem 1.3rem;text-align:center;display:flex;flex-direction:column;align-items:center;transition:box-shadow .3s,transform .3s;border:1.5px solid #f7e6f2;">
+              <div style="font-size:2.5rem;margin-bottom:0.8em;color:var(--accent-pink-dark);background:var(--white);border-radius:50%;padding:0.5em 0.7em;box-shadow:0 2px 8px rgba(184,111,167,0.07);display:flex;align-items:center;justify-content:center;"><i class="fa fa-retweet" aria-hidden="true"></i></div>
+              <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--accent-pink-dark);margin-bottom:0.5em;letter-spacing:0.5px;">Easy Returns</div>
+              <div style="font-size:1.07rem;color:var(--text-dark);opacity:0.85;font-family:'Lato',sans-serif;font-weight:500;">Returns and exchanges available at all locations</div>
+            </div>
+            <div class="why-feature" style="flex:1 1 220px;min-width:220px;max-width:260px;background:var(--soft-gray);border-radius:22px;box-shadow:0 4px 24px rgba(184,111,167,0.10), 0 1.5px 6px rgba(0,0,0,0.06);padding:2.3rem 1.3rem 2.1rem 1.3rem;text-align:center;display:flex;flex-direction:column;align-items:center;transition:box-shadow .3s,transform .3s;border:1.5px solid #f7e6f2;">
+              <div style="font-size:2.5rem;margin-bottom:0.8em;color:var(--accent-pink-dark);background:var(--white);border-radius:50%;padding:0.5em 0.7em;box-shadow:0 2px 8px rgba(184,111,167,0.07);display:flex;align-items:center;justify-content:center;"><i class="fa fa-truck" aria-hidden="true"></i></div>
+              <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--accent-pink-dark);margin-bottom:0.5em;letter-spacing:0.5px;">Free Shipping Over ₪199</div>
+              <div style="font-size:1.07rem;color:var(--text-dark);opacity:0.85;font-family:'Lato',sans-serif;font-weight:500;">Home delivery on orders above ₪199</div>
+            </div>
+            <div class="why-feature" style="flex:1 1 220px;min-width:220px;max-width:260px;background:var(--soft-gray);border-radius:22px;box-shadow:0 4px 24px rgba(184,111,167,0.10), 0 1.5px 6px rgba(0,0,0,0.06);padding:2.3rem 1.3rem 2.1rem 1.3rem;text-align:center;display:flex;flex-direction:column;align-items:center;transition:box-shadow .3s,transform .3s;border:1.5px solid #f7e6f2;">
+              <div style="font-size:2.5rem;margin-bottom:0.8em;color:var(--accent-pink-dark);background:var(--white);border-radius:50%;padding:0.5em 0.7em;box-shadow:0 2px 8px rgba(184,111,167,0.07);display:flex;align-items:center;justify-content:center;"><i class="fa fa-clock" aria-hidden="true"></i></div>
+              <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--accent-pink-dark);margin-bottom:0.5em;letter-spacing:0.5px;">Fast Delivery</div>
+              <div style="font-size:1.07rem;color:var(--text-dark);opacity:0.85;font-family:'Lato',sans-serif;font-weight:500;">Next-day delivery for orders placed by 14:00</div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- === WHY SHOP WITH US SECTION END === -->
     </div>
     <footer>
       <div class="footer-contact-minimal">
