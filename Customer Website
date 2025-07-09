@@ -2174,11 +2174,12 @@
       filtered.forEach(product => {
         const card = document.createElement('div');
         card.className = 'product-card';
-        card.setAttribute('data-title', product.title);
-        card.setAttribute('data-price', product.price);
-        card.setAttribute('data-img', product.img);
+        // Always set all required data-* attributes for detail page compatibility
+        card.setAttribute('data-title', product.title || '');
+        card.setAttribute('data-price', product.price || '');
+        card.setAttribute('data-img', product.img || '');
         card.setAttribute('data-desc', product.desc || '');
-        card.setAttribute('data-gallery', product.gallery || '[]');
+        card.setAttribute('data-gallery', product.gallery || `["${product.img || ''}"]`);
         card.setAttribute('data-colors', product.colors || '[]');
         card.setAttribute('data-sizes', product.sizes || '[]');
         card.setAttribute('data-category', product.category || '');
@@ -2748,24 +2749,42 @@
         title: "Golden Heart Jewelry Set",
         price: "$429",
         img: "https://m.media-amazon.com/images/I/71OOtiBa76L._UY1000_.jpg",
+        desc: "A radiant set featuring a heart-shaped pendant, matching earrings, and a delicate bracelet. Perfect for special occasions.",
+        gallery: '["https://m.media-amazon.com/images/I/71OOtiBa76L._UY1000_.jpg","https://m.media-amazon.com/images/I/71OOtiBa76L._UX679_.jpg","https://m.media-amazon.com/images/I/71OOtiBa76L._UY500_.jpg"]',
+        colors: '["#bfa05a","#e5e5e5","#d6a4c2"]',
+        sizes: '["16 in","18 in","20 in"]',
+        category: "Jewelry"
       },
       {
         title: "Midnight Sparkle Set",
         price: "$389",
         img: "https://i.etsystatic.com/9665455/r/il/a3949d/2777754922/il_570xN.2777754922_rs3d.jpg",
+        desc: "A dazzling set with deep blue stones and shimmering accents. Includes necklace, earrings, and ring.",
+        gallery: '["https://i.etsystatic.com/9665455/r/il/a3949d/2777754922/il_570xN.2777754922_rs3d.jpg","https://i.etsystatic.com/9665455/r/il/2b2e2d/2777754924/il_570xN.2777754924_rs3d.jpg"]',
+        colors: '["#18141c","#e5e5e5","#bfa05a"]',
+        sizes: '["Small","Medium","Large"]',
+        category: "Jewelry"
       },
       {
         title: "Royal Elegance Collection",
         price: "$349",
         img: "https://www.deraahstore.com/dw/image/v2/BJFS_PRD/on/demandware.static/-/Sites-deraah-master/default/dwa599e9cb/images/10711151022000-1696-1.jpg?sw=2000&sh=2000",
+        desc: "A regal set with gold-plated finishes and intricate details. Includes necklace, bracelet, and earrings.",
+        gallery: '["https://www.deraahstore.com/dw/image/v2/BJFS_PRD/on/demandware.static/-/Sites-deraah-master/default/dwa599e9cb/images/10711151022000-1696-1.jpg?sw=2000&sh=2000"]',
+        colors: '["#bfa05a","#e5e5e5"]',
+        sizes: '["Standard"]',
+        category: "Jewelry"
       },
       {
         title: "Silver Petal Elegance",
         price: "$299",
         img: "https://m.media-amazon.com/images/I/711E7-QpLdL._UY1000_.jpg",
+        desc: "A graceful silver set with petal motifs. Includes necklace, earrings, and a matching ring.",
+        gallery: '["https://m.media-amazon.com/images/I/711E7-QpLdL._UY1000_.jpg","https://m.media-amazon.com/images/I/711E7-QpLdL._UX679_.jpg"]',
+        colors: '["#e5e5e5","#bfa05a"]',
+        sizes: '["16 in","18 in"]',
+        category: "Jewelry"
       },
-     
-
     ];
     const perfectSetsCarousel = document.getElementById('perfect-sets-carousel');
     const perfectSetsLeft = document.getElementById('perfect-sets-left');
@@ -2778,6 +2797,14 @@
         const product = perfectSetsData[idx];
         const card = document.createElement('div');
         card.className = 'product-card';
+        card.setAttribute('data-title', product.title);
+        card.setAttribute('data-price', product.price);
+        card.setAttribute('data-img', product.img);
+        card.setAttribute('data-desc', product.desc || '');
+        card.setAttribute('data-gallery', product.gallery || '[]');
+        card.setAttribute('data-colors', product.colors || '[]');
+        card.setAttribute('data-sizes', product.sizes || '[]');
+        card.setAttribute('data-category', product.category || '');
         card.innerHTML = `
           <img src="${product.img}" alt="${product.title}">
           <h4>${product.title}</h4>
