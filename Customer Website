@@ -2216,7 +2216,55 @@
     });
     // Update renderAllProductsGrid to accept a data override
     function renderAllProductsGrid(categoryFilter, dataOverride) {
-      const products = dataOverride || getAllProductData();
+      // Define the 4 missing products to always include
+      const alwaysInclude = [
+        {
+          title: "Camel Luxe Pumps",
+          price: "$229",
+          img: "https://elliebelle.com/cdn/shop/files/4824942.jpg?height=871&v=1736956782",
+          desc: "Elegant ivory pumps in soft satin, perfect for weddings and special occasions.",
+          gallery: '["https://elliebelle.com/cdn/shop/files/4824942.jpg?height=871&v=1736956782","https://elliebelle.com/cdn/shop/files/4824936.jpg?v=1736956782"]',
+          colors: '["#fff","#e5e5e5","#bfa05a"]',
+          sizes: '["36","37","38","39","40"]',
+          category: "Shoes"
+        },
+        {
+          title: "Pearl Bow Ballet Flats",
+          price: "$199",
+          img: "https://image.made-in-china.com/202f0j00ceDlYbQsghop/Flat-Shoes-Hot-Selling-Women-Shoes-High-Quality-Casual-Shoes-Footwear-Leather-Shoes-Soft-2021.webp",
+          desc: "Chic rose gold sandals with delicate straps and a comfortable heel.",
+          gallery: '["https://image.made-in-china.com/202f0j00ceDlYbQsghop/Flat-Shoes-Hot-Selling-Women-Shoes-High-Quality-Casual-Shoes-Footwear-Leather-Shoes-Soft-2021.webp"]',
+          colors: '["#e7b6d6","#bfa05a","#fff"]',
+          sizes: '["36","37","38","39","40"]',
+          category: "Shoes"
+        },
+        {
+          title: "Skyline Grace Bag",
+          price: "$259",
+          img: "https://media.istockphoto.com/id/1365118618/photo/blue-fashion-purse-handbag-on-white-background-isolated.jpg?s=612x612&w=0&k=20&c=VNszfC0cxenqZGhjlr3gqqvzHWREuhdY_H3CKF1B38g=",
+          desc: "Spacious and timeless black tote bag, crafted from premium leather.",
+          gallery: '["https://media.istockphoto.com/id/1365118618/photo/blue-fashion-purse-handbag-on-white-background-isolated.jpg?s=612x612&w=0&k=20&c=VNszfC0cxenqZGhjlr3gqqvzHWREuhdY_H3CKF1B38g="]',
+          colors: '["#18141c","#e5e5e5","#bfa05a"]',
+          sizes: '["Medium","Large"]',
+          category: "Bags"
+        },
+        {
+          title: "Pastel Blue Satchel",
+          price: "$219",
+          img: "https://img.freepik.com/premium-photo/women-leather-bag-isolated-white-background-side-view-luxury-genuine-full-grain-leather-lady_709135-96.jpg",
+          desc: "Soft pastel blue satchel with gold hardware and adjustable strap.",
+          gallery: '["https://img.freepik.com/premium-photo/women-leather-bag-isolated-white-background-side-view-luxury-genuine-full-grain-leather-lady_709135-96.jpg"]',
+          colors: '["#b6d6e7","#e5e5e5","#bfa05a"]',
+          sizes: '["Small","Medium"]',
+          category: "Bags"
+        }
+      ];
+      // Combine products, ensuring no duplicates by title
+      const products = (dataOverride || getAllProductData());
+      const allTitles = new Set(products.map(p => p.title));
+      alwaysInclude.forEach(p => {
+        if (!allTitles.has(p.title)) products.push(p);
+      });
       allProductsGrid.innerHTML = '';
       let filtered = products;
       if (categoryFilter) {
@@ -2225,7 +2273,6 @@
       filtered.forEach(product => {
         const card = document.createElement('div');
         card.className = 'product-card';
-        // Always set all required data-* attributes for detail page compatibility
         card.setAttribute('data-title', product.title || '');
         card.setAttribute('data-price', product.price || '');
         card.setAttribute('data-img', product.img || '');
@@ -2245,11 +2292,10 @@
           productDetailSection.style.display = 'block';
           renderProductDetail(card);
           window.scrollTo({top:0,behavior:'smooth'});
-          cameFromAllProducts = true; // Set flag when coming from All Products
+          cameFromAllProducts = true;
         });
         allProductsGrid.appendChild(card);
       });
-      // If no products, show a message
       if (filtered.length === 0) {
         allProductsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;font-size:1.1rem;color:#b86fa7;padding:2em 0;">No products found in this category.</div>';
       }
