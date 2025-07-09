@@ -2136,17 +2136,57 @@
         colors: card.getAttribute('data-colors'),
         sizes: card.getAttribute('data-sizes'),
         category: card.getAttribute('data-category')
-      }));
+      }))
+      // --- ADDITIONAL PRODUCTS ---
+      .concat([
+        // Shoes
+        {
+          title: "Camel Luxe Pumps",
+          price: "$229",
+          img: "https://elliebelle.com/cdn/shop/files/4824942.jpg?height=871&v=1736956782",
+          desc: "Elegant ivory pumps in soft satin, perfect for weddings and special occasions.",
+          gallery: '["https://elliebelle.com/cdn/shop/files/4824942.jpg?height=871&v=1736956782","https://elliebelle.com/cdn/shop/files/4824936.jpg?v=1736956782"]',
+          colors: '["#fff","#e5e5e5","#bfa05a"]',
+          sizes: '["36","37","38","39","40"]',
+          category: "Shoes"
+        },
+        {
+          title: "Pearl Bow Ballet Flats",
+          price: "$199",
+          img: "https://image.made-in-china.com/202f0j00ceDlYbQsghop/Flat-Shoes-Hot-Selling-Women-Shoes-High-Quality-Casual-Shoes-Footwear-Leather-Shoes-Soft-2021.webp",
+          desc: "Chic rose gold sandals with delicate straps and a comfortable heel.",
+          gallery: '["https://image.made-in-china.com/202f0j00ceDlYbQsghop/Flat-Shoes-Hot-Selling-Women-Shoes-High-Quality-Casual-Shoes-Footwear-Leather-Shoes-Soft-2021.webp"]',
+          colors: '["#e7b6d6","#bfa05a","#fff"]',
+          sizes: '["36","37","38","39","40"]',
+          category: "Shoes"
+        },
+        // Bags
+        {
+          title: "Skyline Grace Bag",
+          price: "$259",
+          img: "https://media.istockphoto.com/id/1365118618/photo/blue-fashion-purse-handbag-on-white-background-isolated.jpg?s=612x612&w=0&k=20&c=VNszfC0cxenqZGhjlr3gqqvzHWREuhdY_H3CKF1B38g=",
+          desc: "Spacious and timeless black tote bag, crafted from premium leather.",
+          gallery: '["https://media.istockphoto.com/id/1365118618/photo/blue-fashion-purse-handbag-on-white-background-isolated.jpg?s=612x612&w=0&k=20&c=VNszfC0cxenqZGhjlr3gqqvzHWREuhdY_H3CKF1B38g="]',
+          colors: '["#18141c","#e5e5e5","#bfa05a"]',
+          sizes: '["Medium","Large"]',
+          category: "Bags"
+        },
+        {
+          title: "Pastel Blue Satchel",
+          price: "$219",
+          img: "https://img.freepik.com/premium-photo/women-leather-bag-isolated-white-background-side-view-luxury-genuine-full-grain-leather-lady_709135-96.jpg",
+          desc: "Soft pastel blue satchel with gold hardware and adjustable strap.",
+          gallery: '["https://img.freepik.com/premium-photo/women-leather-bag-isolated-white-background-side-view-luxury-genuine-full-grain-leather-lady_709135-96.jpg"]',
+          colors: '["#b6d6e7","#e5e5e5","#bfa05a"]',
+          sizes: '["Small","Medium"]',
+          category: "Bags"
+        }
+      ]);
     }
     // Helper to get all Perfect Sets data
     function getPerfectSetsData() {
-      return [
-        { title: "Golden Heart Jewelry Set", price: "$429", img: "https://m.media-amazon.com/images/I/71OOtiBa76L._UY1000_.jpg", gallery: '["https://m.media-amazon.com/images/I/71OOtiBa76L._UY1000_.jpg"]' },
-        { title: "Midnight Sparkle Set", price: "$389", img: "https://i.etsystatic.com/9665455/r/il/a3949d/2777754922/il_570xN.2777754922_rs3d.jpg" },
-        { title: "Royal Elegance Collection", price: "$349", img: "https://www.deraahstore.com/dw/image/v2/BJFS_PRD/on/demandware.static/-/Sites-deraah-master/default/dwa599e9cb/images/10711151022000-1696-1.jpg?sw=2000&sh=2000" },
-        { title: "Silver Petal Elegance", price: "$299", img: "https://m.media-amazon.com/images/I/711E7-QpLdL._UY1000_.jpg" },
-       
-      ];
+      // Return the full perfectSetsData array with all fields (desc, gallery, colors, sizes, etc.)
+      return perfectSetsData;
     }
     // Helper to get all Most Loved Items data
     function getMostLovedItemsData() {
