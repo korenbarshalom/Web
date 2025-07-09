@@ -309,6 +309,7 @@
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 2.2rem;
       padding: 0 1.5rem;
+      overflow: visible;
     }
     .product-card {
       background: #fff;
@@ -324,6 +325,7 @@
       flex-direction: column;
       align-items: center;
       min-height: 320px;
+      z-index: 1;
     }
     .product-card img {
       width: 100%;
@@ -337,6 +339,7 @@
       transform: translateY(-6px) scale(1.025);
       border-color: var(--accent-gold);
       background: linear-gradient(90deg, #fff 90%, var(--accent-pink) 100%);
+      z-index: 2;
     }
     .product-card h4 {
       margin: 1.2rem 0 .7rem 0;
@@ -1388,12 +1391,7 @@
       transition: box-shadow 0.38s cubic-bezier(.4,0,.2,1), transform 0.38s cubic-bezier(.4,0,.2,1), border-color 0.38s, background 0.38s;
       will-change: box-shadow, transform, border-color, background;
     }
-    .category-card:hover, .category-card:focus {
-      box-shadow: 0 8px 24px rgba(191, 160, 90, 0.13), 0 2px 12px rgba(184, 111, 167, 0.13);
-      transform: translateY(-6px) scale(1.025);
-      border-color: var(--accent-gold);
-      background: linear-gradient(90deg, #fff 90%, var(--accent-pink) 100%);
-    }
+    .category-card:hover, .category-card:focus,
     .product-card:hover, .product-card:focus {
       box-shadow: 0 8px 24px rgba(191, 160, 90, 0.13), 0 2px 12px rgba(184, 111, 167, 0.13);
       transform: translateY(-6px) scale(1.025);
@@ -1683,12 +1681,10 @@
       </div>
       <nav>
         <a href="#">Home</a>
-        <a href="#rings">Rings</a>
-        <a href="#earrings">Earrings</a>
-        <a href="#necklaces">Necklaces</a>
+        <a href="#rings">Jewelry</a>
+        <a href="#earrings">Bags</a>
+        <a href="#necklaces">Shoes</a>
         <a href="#bracelets">Bracelets</a>
-        <a href="#charms">Charms</a>
-        <a href="#new">New Collection</a>
       </nav>
       <div class="navbar-action">
         <a href="#login" class="login-btn">Log In</a>
@@ -1755,11 +1751,11 @@
       <!-- === PERFECT SETS FOR HER SECTION START === -->
       <section class="featured" id="perfect-sets-section" style="margin-top:2.5rem;">
         <h2 class="categories-section-title" style="margin-bottom:2.2rem;">Perfect Sets for Her</h2>
-        <div class="perfect-sets-carousel-wrap" style="position:relative;">
+        <div class="perfect-sets-carousel-wrap" style="position:relative;overflow:visible;">
           <button class="carousel-arrow left" id="perfect-sets-left" aria-label="Previous" style="position:absolute;left:-2.2rem;top:50%;transform:translateY(-50%);background:none;border:none;font-size:2.1rem;color:var(--accent-pink-dark);z-index:2;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .2s;outline:none;">
             <i class="fa fa-chevron-left"></i>
           </button>
-          <div class="products-grid" id="perfect-sets-carousel" style="overflow:hidden;min-height:340px;"></div>
+          <div class="products-grid" id="perfect-sets-carousel" style="overflow:visible;min-height:340px;"></div>
           <button class="carousel-arrow right" id="perfect-sets-right" aria-label="Next" style="position:absolute;right:-2.2rem;top:50%;transform:translateY(-50%);background:none;border:none;font-size:2.1rem;color:var(--accent-pink-dark);z-index:2;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .2s;outline:none;">
             <i class="fa fa-chevron-right"></i>
           </button>
@@ -2123,8 +2119,48 @@
         category: card.getAttribute('data-category')
       }));
     }
-    function renderAllProductsGrid(categoryFilter) {
-      const products = getAllProductData();
+    // Helper to get all Perfect Sets data
+    function getPerfectSetsData() {
+      return [
+        { title: "Rose Gold Jewelry Set", price: "$429", img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80" },
+        { title: "Classic Pearl Set", price: "$389", img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80" },
+        { title: "Elegant Silver Set", price: "$349", img: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80" },
+        { title: "Crystal Charm Set", price: "$299", img: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80" },
+        { title: "Minimalist Gold Set", price: "$319", img: "https://images.unsplash.com/photo-1526178613658-3f1622045557?auto=format&fit=crop&w=400&q=80" },
+        { title: "Vintage Glam Set", price: "$459", img: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80" },
+        { title: "Dainty Diamond Set", price: "$499", img: "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?auto=format&fit=crop&w=400&q=80" },
+        { title: "Chic Silver Set", price: "$279", img: "https://images.unsplash.com/photo-1465101178521-c1a9136a3c8b?auto=format&fit=crop&w=400&q=80" }
+      ];
+    }
+    // Helper to get all Most Loved Items data
+    function getMostLovedItemsData() {
+      // Only select product-cards from the 'Our Most Loved Items' section
+      const featuredSection = document.querySelector('.featured .products-grid');
+      if (!featuredSection) return [];
+      return Array.from(featuredSection.querySelectorAll('.product-card')).map(card => ({
+        title: card.getAttribute('data-title'),
+        price: card.getAttribute('data-price'),
+        img: card.getAttribute('data-img'),
+        desc: card.getAttribute('data-desc'),
+        gallery: card.getAttribute('data-gallery'),
+        colors: card.getAttribute('data-colors'),
+        sizes: card.getAttribute('data-sizes'),
+        category: card.getAttribute('data-category')
+      }));
+    }
+    // Update Shop Now button click to show both sections' products
+    shopNowBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      homepageContent.style.display = 'none';
+      allProductsSection.style.display = 'flex';
+      // Combine both arrays
+      const allProducts = getMostLovedItemsData().concat(getPerfectSetsData());
+      renderAllProductsGrid(null, allProducts);
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+    // Update renderAllProductsGrid to accept a data override
+    function renderAllProductsGrid(categoryFilter, dataOverride) {
+      const products = dataOverride || getAllProductData();
       allProductsGrid.innerHTML = '';
       let filtered = products;
       if (categoryFilter) {
@@ -2136,11 +2172,11 @@
         card.setAttribute('data-title', product.title);
         card.setAttribute('data-price', product.price);
         card.setAttribute('data-img', product.img);
-        card.setAttribute('data-desc', product.desc);
-        card.setAttribute('data-gallery', product.gallery);
-        card.setAttribute('data-colors', product.colors);
-        card.setAttribute('data-sizes', product.sizes);
-        card.setAttribute('data-category', product.category);
+        card.setAttribute('data-desc', product.desc || '');
+        card.setAttribute('data-gallery', product.gallery || '[]');
+        card.setAttribute('data-colors', product.colors || '[]');
+        card.setAttribute('data-sizes', product.sizes || '[]');
+        card.setAttribute('data-category', product.category || '');
         card.innerHTML = `
           <img src="${product.img}" alt="${product.title}">
           <h4>${product.title}</h4>
@@ -2160,13 +2196,6 @@
         allProductsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;font-size:1.1rem;color:#b86fa7;padding:2em 0;">No products found in this category.</div>';
       }
     }
-    shopNowBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      homepageContent.style.display = 'none';
-      allProductsSection.style.display = 'flex';
-      renderAllProductsGrid();
-      window.scrollTo({top:0,behavior:'smooth'});
-    });
     // Category card click logic
     document.querySelectorAll('.category-card').forEach(card => {
       card.style.cursor = 'pointer';
