@@ -2309,12 +2309,17 @@
       // Remove item logic
       miniCartPanel.querySelectorAll('.mini-cart-item-remove').forEach(btn => {
         btn.addEventListener('click', function(e) {
+          e.stopPropagation(); // Prevent closing the cart popup
+          e.preventDefault();
           const idx = parseInt(btn.getAttribute('data-idx'));
           const cart = getCart();
           cart.splice(idx, 1);
           setCart(cart);
           updateCartBadge();
           renderMiniCart();
+          // Ensure mini cart stays open and visible
+          miniCartPanel.style.display = 'flex';
+          miniCartPanel.classList.add('active');
         });
       });
       // Checkout button logic
@@ -2948,6 +2953,13 @@
           const category = text.charAt(0).toUpperCase() + text.slice(1);
           renderAllProductsGrid(category);
           window.scrollTo({top:0,behavior:'smooth'});
+          // Ensure product cards animate in immediately (fix for navbar category click)
+          setTimeout(function() {
+            allProductsSection.classList.add('sb-inview');
+            allProductsGrid.querySelectorAll('.product-card').forEach(function(card, i) {
+              card.classList.add('sb-inview');
+            });
+          }, 30);
         });
       }
     });
