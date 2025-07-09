@@ -2084,6 +2084,9 @@
       });
     }
 
+    // Track navigation source for product detail back button
+    let cameFromAllProducts = false;
+
     document.querySelectorAll('.product-card').forEach(card => {
       card.style.cursor = 'pointer';
       card.addEventListener('click', function() {
@@ -2091,12 +2094,20 @@
         productDetailSection.style.display = 'block';
         renderProductDetail(card);
         window.scrollTo({top:0,behavior:'smooth'});
+        cameFromAllProducts = false; // Default: not from All Products
       });
     });
     backToHomeBtn.addEventListener('click', function() {
-      productDetailSection.style.display = 'none';
-      homepageContent.style.display = '';
-      window.scrollTo({top:0,behavior:'smooth'});
+      if (cameFromAllProducts) {
+        productDetailSection.style.display = 'none';
+        allProductsSection.style.display = 'flex';
+        window.scrollTo({top:0,behavior:'smooth'});
+      } else {
+        productDetailSection.style.display = 'none';
+        homepageContent.style.display = '';
+        window.scrollTo({top:0,behavior:'smooth'});
+      }
+      cameFromAllProducts = false; // Reset after navigating back
     });
     // Home link in navbar returns to homepage view
     document.querySelectorAll('nav a').forEach(link => {
@@ -2194,6 +2205,7 @@
           productDetailSection.style.display = 'block';
           renderProductDetail(card);
           window.scrollTo({top:0,behavior:'smooth'});
+          cameFromAllProducts = true; // Set flag when coming from All Products
         });
         allProductsGrid.appendChild(card);
       });
