@@ -1730,22 +1730,22 @@
             <i class="fa fa-chevron-left"></i>
           </button>
           <div class="products-grid">
-            <div class="product-card" data-category="Jewelry" data-title="Golden Leaf Earrings" data-price="$335" data-img="https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg" data-desc="Delicate gold-plated earrings inspired by nature's elegance.." data-gallery='["https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg","https://www.jkjjewellers.in/_next/image?url=https%3A%2F%2Fres.cloudinary.com%2Fjkjjeweller%2Fproducts%2Fnthndtak3obvx8z2y2dg&w=1920&q=75","https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_3_lar.jpg"]' data-colors='["#bfa05a","#e5e5e5","#d6a4c2"]' data-sizes='["16 cm","17 cm","18 cm","19 cm","20 cm"]'>
+            <div class="product-card" data-category="Jewelry" data-title="Golden Leaf Earrings" data-price="$335" data-img="https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg" data-desc="Delicate gold-plated earrings shaped like leaves, capturing the beauty of nature in a timeless accessory." data-gallery='["https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg","https://www.jkjjewellers.in/_next/image?url=https%3A%2F%2Fres.cloudinary.com%2Fjkjjeweller%2Fproducts%2Fnthndtak3obvx8z2y2dg&w=1920&q=75","https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_3_lar.jpg"]' data-colors='["#bfa05a","#e5e5e5","#d6a4c2"]' data-sizes='["16 cm","17 cm","18 cm","19 cm","20 cm"]'>
               <img src="https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg" alt="Golden Leaf Earrings">
               <h4>Golden Leaf Earrings</h4>
               <span>$245</span>
             </div>
-            <div class="product-card" data-category="Bags" data-title="Blush Pink Mini Bag" data-price="$389" data-img="https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E01-1?$default_GHC$&crop=461,631,979,1169&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85" data-desc="A compact and stylish handbag, perfect for day-to-night looks." data-gallery='["https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E01-1?$default_GHC$&crop=461,631,979,1169&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E03-1?$default_GHC$&crop=561,642,849,1144&wid=1024&hei=1107&scale=0.4843&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E06-1?$default_GHC$&crop=727,555,483,897&wid=1024&hei=1107&scale=0.4843&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E07?$default_GHC$&crop=807,177,388,1599&wid=1024&hei=1107&scale=0.4843&bfc=on&qlt=85"]' data-colors='["#e7b6d6","#e5e5e5","#bfa05a"]' data-sizes='["Small","Medium","Large"]'>
+            <div class="product-card" data-category="Bags" data-title="Blush Pink Mini Bag" data-price="$389" data-img="https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E01-1?$default_GHC$&crop=461,631,979,1169&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85" data-desc="A compact blush pink handbag with a modern silhouette, ideal for carrying your essentials from day to night." data-gallery='["https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E01-1?$default_GHC$&crop=461,631,979,1169&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E03-1?$default_GHC$&crop=561,642,849,1144&wid=1024&hei=1107&scale=0.4843&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E06-1?$default_GHC$&crop=727,555,483,897&wid=1024&hei=1107&scale=0.4843&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E07?$default_GHC$&crop=807,177,388,1599&wid=1024&hei=1107&scale=0.4843&bfc=on&qlt=85"]' data-colors='["#e7b6d6","#e5e5e5","#bfa05a"]' data-sizes='["Small","Medium","Large"]'>
               <img src="https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E01-1?$default_GHC$&crop=461,631,979,1169&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85" alt="Blush Pink Mini Bag">
               <h4>Blush Pink Mini Bag</h4>
               <span>$189</span>
             </div>
-            <div class="product-card" data-category="Jewelry" data-title="Luxe Pearl Necklace" data-price="$335" data-img="https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371" data-desc="Classic pearls reimagined with a modern, luxurious twist." data-gallery='["https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371","https://lockwoodshop.com/cdn/shop/files/4be5752cfreshwater_20pearl_20necklace_202_864x864.jpg?v=1747436091","https://lockwoodshop.com/cdn/shop/files/69b33e51freshwater_20pearl_20necklace_203_864x864.jpg?v=1747436091"]' data-colors='["#fff","#e5e5e5","#bfa05a"]' data-sizes='["16 in","18 in","20 in"]'>
+            <div class="product-card" data-category="Jewelry" data-title="Luxe Pearl Necklace" data-price="$335" data-img="https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371" data-desc="A strand of luminous pearls with a modern twist, this necklace brings classic sophistication to any look." data-gallery='["https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371","https://lockwoodshop.com/cdn/shop/files/4be5752cfreshwater_20pearl_20necklace_202_864x864.jpg?v=1747436091","https://lockwoodshop.com/cdn/shop/files/69b33e51freshwater_20pearl_20necklace_203_864x864.jpg?v=1747436091"]' data-colors='["#fff","#e5e5e5","#bfa05a"]' data-sizes='["16 in","18 in","20 in"]'>
               <img src="https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371" alt="Luxe Pearl Necklace">
               <h4>Luxe Pearl Necklace</h4>
               <span>$309</span>
             </div>
-            <div class="product-card" data-category="Shoes" data-title="Velvet Burgundy Heels" data-price="$195" data-img="https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png" data-desc="Bold and elegant heels crafted in soft burgundy velvet." data-gallery='["https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png","https://m.media-amazon.com/images/I/61tTjOUqcWL._AC_SY575_.jpg","https://m.media-amazon.com/images/I/61LjFsmzVpL._AC_SY575_.jpg","https://m.media-amazon.com/images/I/61hBxedRM+L._AC_SY575_.jpg"]' data-colors='["#b86fa7","#e5e5e5","#bfa05a"]' data-sizes='["36","37","38","39","40"]'>
+            <div class="product-card" data-category="Shoes" data-title="Velvet Burgundy Heels" data-price="$195" data-img="https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png" data-desc="Elegant high heels in plush burgundy velvet, designed for comfort and a bold, sophisticated statement." data-gallery='["https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png","https://m.media-amazon.com/images/I/61tTjOUqcWL._AC_SY575_.jpg","https://m.media-amazon.com/images/I/61LjFsmzVpL._AC_SY575_.jpg","https://m.media-amazon.com/images/I/61hBxedRM+L._AC_SY575_.jpg"]' data-colors='["#b86fa7","#e5e5e5","#bfa05a"]' data-sizes='["36","37","38","39","40"]'>
               <img src="https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png" alt="Velvet Burgundy Heels">
               <h4>Velvet Burgundy Heels</h4>
               <span>$179</span>
@@ -2808,7 +2808,7 @@
         title: "Golden Heart Jewelry Set",
         price: "$429",
         img: "https://m.media-amazon.com/images/I/71OOtiBa76L._UY1000_.jpg",
-        desc: "A radiant set featuring a heart-shaped pendant, matching earrings, and a delicate bracelet. Perfect for special occasions.",
+        desc: "A radiant gold-tone jewelry set featuring a heart pendant necklace, matching earrings, and a delicate bracelet for a romantic touch.",
         gallery: '["https://m.media-amazon.com/images/I/71OOtiBa76L._UY1000_.jpg","https://m.media-amazon.com/images/I/71OOtiBa76L._UX679_.jpg","https://m.media-amazon.com/images/I/71OOtiBa76L._UY500_.jpg"]',
         colors: '["#bfa05a","#e5e5e5","#d6a4c2"]',
         sizes: '["16 in","18 in","20 in"]',
@@ -2818,7 +2818,7 @@
         title: "Midnight Sparkle Set",
         price: "$389",
         img: "https://i.etsystatic.com/9665455/r/il/a3949d/2777754922/il_570xN.2777754922_rs3d.jpg",
-        desc: "A dazzling set with deep blue stones and shimmering accents. Includes necklace, earrings, and ring.",
+        desc: "A dazzling jewelry set with deep blue stones and shimmering accents, including a necklace, earrings, and ring for evening glamour.",
         gallery: '["https://i.etsystatic.com/9665455/r/il/a3949d/2777754922/il_570xN.2777754922_rs3d.jpg","https://i.etsystatic.com/9665455/r/il/2b2e2d/2777754924/il_570xN.2777754924_rs3d.jpg"]',
         colors: '["#18141c","#e5e5e5","#bfa05a"]',
         sizes: '["Small","Medium","Large"]',
@@ -2828,7 +2828,7 @@
         title: "Royal Elegance Collection",
         price: "$349",
         img: "https://www.deraahstore.com/dw/image/v2/BJFS_PRD/on/demandware.static/-/Sites-deraah-master/default/dwa599e9cb/images/10711151022000-1696-1.jpg?sw=2000&sh=2000",
-        desc: "A regal set with gold-plated finishes and intricate details. Includes necklace, bracelet, and earrings.",
+        desc: "A regal gold-plated jewelry collection with intricate details, featuring a necklace, bracelet, and earrings for a majestic look.",
         gallery: '["https://www.deraahstore.com/dw/image/v2/BJFS_PRD/on/demandware.static/-/Sites-deraah-master/default/dwa599e9cb/images/10711151022000-1696-1.jpg?sw=2000&sh=2000"]',
         colors: '["#bfa05a","#e5e5e5"]',
         sizes: '["Standard"]',
@@ -2838,7 +2838,7 @@
         title: "Silver Petal Elegance",
         price: "$299",
         img: "https://m.media-amazon.com/images/I/711E7-QpLdL._UY1000_.jpg",
-        desc: "A graceful silver set with petal motifs. Includes necklace, earrings, and a matching ring.",
+        desc: "A graceful silver jewelry set with petal motifs, including a necklace, earrings, and a matching ring for understated elegance.",
         gallery: '["https://m.media-amazon.com/images/I/711E7-QpLdL._UY1000_.jpg","https://m.media-amazon.com/images/I/711E7-QpLdL._UX679_.jpg"]',
         colors: '["#e5e5e5","#bfa05a"]',
         sizes: '["16 in","18 in"]',
