@@ -2934,5 +2934,23 @@
       }
     })();
   </script>
+  <script>
+    // === NAVBAR CATEGORY LINKS CLICK LOGIC ===
+    document.querySelectorAll('nav a').forEach(link => {
+      const text = link.textContent.trim().toLowerCase();
+      if (["jewelry","bags","shoes","bracelets"].includes(text)) {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          homepageContent.style.display = 'none';
+          allProductsSection.style.display = 'flex';
+          allProductsGrid.innerHTML = '';
+          // Capitalize first letter for category match
+          const category = text.charAt(0).toUpperCase() + text.slice(1);
+          renderAllProductsGrid(category);
+          window.scrollTo({top:0,behavior:'smooth'});
+        });
+      }
+    });
+  </script>
 </body>
 </html> 
