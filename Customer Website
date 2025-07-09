@@ -2130,14 +2130,11 @@
     // Helper to get all Perfect Sets data
     function getPerfectSetsData() {
       return [
-        { title: "Rose Gold Jewelry Set", price: "$429", img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80" },
-        { title: "Classic Pearl Set", price: "$389", img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80" },
-        { title: "Elegant Silver Set", price: "$349", img: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80" },
-        { title: "Crystal Charm Set", price: "$299", img: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80" },
-        { title: "Minimalist Gold Set", price: "$319", img: "https://images.unsplash.com/photo-1526178613658-3f1622045557?auto=format&fit=crop&w=400&q=80" },
-        { title: "Vintage Glam Set", price: "$459", img: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80" },
-        { title: "Dainty Diamond Set", price: "$499", img: "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?auto=format&fit=crop&w=400&q=80" },
-        { title: "Chic Silver Set", price: "$279", img: "https://images.unsplash.com/photo-1465101178521-c1a9136a3c8b?auto=format&fit=crop&w=400&q=80" }
+        { title: "Golden Heart Jewelry Set", price: "$429", img: "https://m.media-amazon.com/images/I/71OOtiBa76L._UY1000_.jpg", gallery: '["https://m.media-amazon.com/images/I/71OOtiBa76L._UY1000_.jpg"]' },
+        { title: "Midnight Sparkle Set", price: "$389", img: "https://i.etsystatic.com/9665455/r/il/a3949d/2777754922/il_570xN.2777754922_rs3d.jpg" },
+        { title: "Royal Elegance Collection", price: "$349", img: "https://www.deraahstore.com/dw/image/v2/BJFS_PRD/on/demandware.static/-/Sites-deraah-master/default/dwa599e9cb/images/10711151022000-1696-1.jpg?sw=2000&sh=2000" },
+        { title: "Silver Petal Elegance", price: "$299", img: "https://m.media-amazon.com/images/I/711E7-QpLdL._UY1000_.jpg" },
+       
       ];
     }
     // Helper to get all Most Loved Items data
@@ -2748,45 +2745,27 @@
     // === PERFECT SETS FOR HER CAROUSEL LOGIC ===
     const perfectSetsData = [
       {
-        title: "Rose Gold Jewelry Set",
+        title: "Golden Heart Jewelry Set",
         price: "$429",
-        img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80",
+        img: "https://m.media-amazon.com/images/I/71OOtiBa76L._UY1000_.jpg",
       },
       {
-        title: "Classic Pearl Set",
+        title: "Midnight Sparkle Set",
         price: "$389",
-        img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80",
+        img: "https://i.etsystatic.com/9665455/r/il/a3949d/2777754922/il_570xN.2777754922_rs3d.jpg",
       },
       {
-        title: "Elegant Silver Set",
+        title: "Royal Elegance Collection",
         price: "$349",
-        img: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80",
+        img: "https://www.deraahstore.com/dw/image/v2/BJFS_PRD/on/demandware.static/-/Sites-deraah-master/default/dwa599e9cb/images/10711151022000-1696-1.jpg?sw=2000&sh=2000",
       },
       {
-        title: "Crystal Charm Set",
+        title: "Silver Petal Elegance",
         price: "$299",
-        img: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80",
+        img: "https://m.media-amazon.com/images/I/711E7-QpLdL._UY1000_.jpg",
       },
-      {
-        title: "Minimalist Gold Set",
-        price: "$319",
-        img: "https://images.unsplash.com/photo-1526178613658-3f1622045557?auto=format&fit=crop&w=400&q=80",
-      },
-      {
-        title: "Vintage Glam Set",
-        price: "$459",
-        img: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80",
-      },
-      {
-        title: "Dainty Diamond Set",
-        price: "$499",
-        img: "https://images.unsplash.com/photo-1512428559087-560fa5ceab42?auto=format&fit=crop&w=400&q=80",
-      },
-      {
-        title: "Chic Silver Set",
-        price: "$279",
-        img: "https://images.unsplash.com/photo-1465101178521-c1a9136a3c8b?auto=format&fit=crop&w=400&q=80",
-      },
+     
+
     ];
     const perfectSetsCarousel = document.getElementById('perfect-sets-carousel');
     const perfectSetsLeft = document.getElementById('perfect-sets-left');
