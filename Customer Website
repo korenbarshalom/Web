@@ -4045,60 +4045,6 @@
           payBtn.style.display = 'none';
         }
       }
-      ['custom-cc-name','custom-cc-number','custom-cc-exp','custom-cc-cvv'].forEach(function(id) {
-        document.getElementById(id).addEventListener('input', checkCCFields);
-      });
-      // Credit card form submit
-      document.getElementById('custom-cc-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        var payBtn = document.getElementById('custom-cc-pay-btn');
-        payBtn.disabled = true;
-        payBtn.innerHTML = '<span>Processing...</span>';
-        setTimeout(function() {
-          payBtn.disabled = false;
-          payBtn.innerHTML = 'Pay';
-          document.getElementById('custom-cc-form').style.display = 'none';
-          document.getElementById('custom-cc-success').style.display = 'block';
-          // Optionally clear cart
-          if (typeof setCart === 'function') setCart([]);
-          if (typeof updateCartBadge === 'function') updateCartBadge();
-        }, 1200);
-      });
-      // PayPal button click (simulate)
-      document.getElementById('custom-paypal-btn').addEventListener('click', function(e) {
-        e.preventDefault();
-        var btn = this;
-        btn.disabled = true;
-        btn.innerHTML = '<span>Processing...</span>';
-        setTimeout(function() {
-          btn.disabled = false;
-          btn.innerHTML = '<i class="fa fa-paypal"></i> Pay';
-          document.getElementById('custom-cc-form').style.display = 'none';
-          document.getElementById('custom-cc-success').style.display = 'block';
-          if (typeof setCart === 'function') setCart([]);
-          if (typeof updateCartBadge === 'function') updateCartBadge();
-        }, 1200);
-      });
-      // Success message click returns to homepage
-      document.getElementById('custom-cc-success').addEventListener('click', function() {
-        var checkoutSection = document.getElementById('checkout-section');
-        var homepageContent = document.getElementById('homepage-content');
-        if (checkoutSection) checkoutSection.style.display = 'none';
-        if (homepageContent) homepageContent.style.display = '';
-        window.scrollTo({top:0,behavior:'smooth'});
-        // Reset for next time
-        setTimeout(function() {
-          document.getElementById('custom-cc-form').style.display = '';
-          document.getElementById('custom-cc-success').style.display = 'none';
-          ccWrap.style.display = 'none';
-          if (paymentBtn) paymentBtn.style.display = '';
-          // Clear fields
-          ['custom-cc-name','custom-cc-number','custom-cc-exp','custom-cc-cvv'].forEach(function(id) {
-            var el = document.getElementById(id); if (el) el.value = '';
-          });
-          document.getElementById('custom-cc-pay-btn').style.display = 'none';
-        }, 800);
-      });
     }
   });
   </script>
