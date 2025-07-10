@@ -1284,28 +1284,6 @@
       align-items: center;
       margin-bottom: 0.7em;
     }
-    .checkout-continue-btn {
-      width: 100%;
-      background: linear-gradient(90deg, var(--accent-pink-dark) 0%, var(--accent-gold) 100%);
-      color: #fff;
-      border-radius: 999px;
-      text-transform: uppercase;
-      font-weight: 700;
-      letter-spacing: 1.2px;
-      font-size: 1.08rem;
-      border: none;
-      padding: 1em 0;
-      margin-top: 0.7em;
-      box-shadow: 0 2px 12px rgba(184,111,167,0.13);
-      transition: var(--transition);
-      cursor: pointer;
-    }
-    .checkout-continue-btn:hover, .checkout-continue-btn:focus {
-      background: linear-gradient(90deg, var(--accent-gold) 0%, var(--accent-pink-dark) 100%);
-      color: #fff;
-      box-shadow: 0 6px 24px rgba(184,111,167,0.18);
-      transform: translateY(-2px) scale(1.04);
-    }
     .checkout-summary-block {
       background: var(--soft-gray);
       border-radius: 14px;
@@ -1398,12 +1376,12 @@
       background: linear-gradient(90deg, #fff 90%, var(--accent-pink) 100%);
     }
     /* --- Button Enhanced Hover --- */
-    .btn, .add-to-cart-btn, .mini-cart-checkout-btn, .checkout-continue-btn {
+    .btn, .add-to-cart-btn, .mini-cart-checkout-btn {
       position: relative;
       overflow: hidden;
       z-index: 1;
     }
-    .btn::before, .add-to-cart-btn::before, .mini-cart-checkout-btn::before, .checkout-continue-btn::before {
+    .btn::before, .add-to-cart-btn::before, .mini-cart-checkout-btn::before {
       content: '';
       position: absolute;
       left: 50%;
@@ -1416,11 +1394,11 @@
       transition: width 0.5s cubic-bezier(.4,0,.2,1), height 0.5s cubic-bezier(.4,0,.2,1);
       z-index: 0;
     }
-    .btn:hover::before, .add-to-cart-btn:hover::before, .mini-cart-checkout-btn:hover::before, .checkout-continue-btn:hover::before {
+    .btn:hover::before, .add-to-cart-btn:hover::before, .mini-cart-checkout-btn:hover::before {
       width: 250%;
       height: 250%;
     }
-    .btn span, .add-to-cart-btn span, .mini-cart-checkout-btn span, .checkout-continue-btn span {
+    .btn span, .add-to-cart-btn span, .mini-cart-checkout-btn span {
       position: relative;
       z-index: 2;
     }
@@ -1959,6 +1937,224 @@
     /* If not present, add overlays in HTML for each .product-card: */
     /* <div class="lux-glow"></div><div class="lux-shadow"></div><div class="lux-border"></div><div class="lux-light"></div><div class="lux-tilt"></div> */
     /* For demo, overlays can be added via a MutationObserver in JS if needed. */
+
+    /* --- Payment Button Styles --- */
+    .checkout-payment-btn {
+      display: block;
+      width: 100%;
+      max-width: 340px;
+      margin: 2.2em auto 0 auto;
+      padding: 1.1em 0;
+      background: linear-gradient(90deg, var(--accent-pink-dark) 0%, var(--accent-gold) 100%);
+      color: #fff;
+      border-radius: 999px;
+      font-family: 'Lato', sans-serif;
+      font-size: 1.18rem;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      border: none;
+      box-shadow: 0 4px 16px rgba(184, 111, 167, 0.13);
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      z-index: 2;
+    }
+    .checkout-payment-btn:hover, .checkout-payment-btn:focus {
+      background: linear-gradient(90deg, var(--accent-gold) 0%, var(--accent-pink-dark) 100%);
+      color: #fff;
+      box-shadow: 0 8px 32px rgba(191,160,90,0.13), 0 2px 12px rgba(184,111,167,0.13);
+      transform: translateY(-2px) scale(1.04);
+    }
+    .checkout-payment-btn::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(191,160,90,0.13);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.5s cubic-bezier(.4,0,.2,1), height 0.5s cubic-bezier(.4,0,.2,1);
+      z-index: 0;
+    }
+    .checkout-payment-btn:hover::before, .checkout-payment-btn:focus::before {
+      width: 250%;
+      height: 250%;
+    }
+    .checkout-payment-btn span {
+      position: relative;
+      z-index: 2;
+    }
+    /* --- Payment Section Enhancements --- */
+    .checkout-payment-block {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1);
+      pointer-events: none;
+      max-height: 0;
+      overflow: hidden;
+    }
+    .checkout-payment-block.active {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+      max-height: 900px;
+      overflow: visible;
+      transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1), max-height 0.7s cubic-bezier(.4,0,.2,1);
+    }
+    .payment-methods-row {
+      display: flex;
+      flex-direction: row;
+      gap: 1.2em;
+      margin-bottom: 1.2em;
+      justify-content: center;
+    }
+    .payment-method-btn {
+      flex: 1 1 40%;
+      background: #fff;
+      border: 2px solid var(--accent-pink-dark);
+      border-radius: 12px;
+      padding: 1.1em 0.5em;
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: var(--accent-pink-dark);
+      cursor: pointer;
+      transition: border-color 0.3s, color 0.3s, background 0.3s, box-shadow 0.3s;
+      box-shadow: 0 2px 8px rgba(184,111,167,0.07);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.7em;
+      outline: none;
+      position: relative;
+      z-index: 1;
+    }
+    .payment-method-btn.selected, .payment-method-btn:focus {
+      border-color: var(--accent-gold);
+      color: var(--accent-gold);
+      background: var(--accent-pink);
+      box-shadow: 0 4px 16px rgba(191,160,90,0.10);
+    }
+    .payment-method-btn i {
+      font-size: 1.3em;
+      margin-right: 0.5em;
+      color: inherit;
+    }
+    .payment-form-section {
+      display: none;
+      margin-top: 1.2em;
+      animation: fadeInUp 0.5s cubic-bezier(.4,0,.2,1);
+    }
+    .payment-form-section.active {
+      display: block;
+    }
+    .credit-card-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+      margin-bottom: 1.2em;
+    }
+    .credit-card-row {
+      display: flex;
+      flex-direction: row;
+      gap: 1em;
+    }
+    .credit-card-input {
+      flex: 1 1 50%;
+      padding: 0.7em 1.2em;
+      border: 2px solid #bbb;
+      border-radius: 8px;
+      font-size: 1.08rem;
+      background: #fff;
+      color: var(--text-dark);
+      outline: none;
+      font-family: inherit;
+      transition: border-color .2s;
+    }
+    .credit-card-input:focus {
+      border-color: var(--accent-pink-dark);
+      box-shadow: 0 2px 8px rgba(184, 111, 167, 0.13);
+    }
+    .payment-submit-btn {
+      width: 100%;
+      background: linear-gradient(90deg, var(--accent-pink-dark) 0%, var(--accent-gold) 100%);
+      color: #fff;
+      border-radius: 999px;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      font-size: 1.08rem;
+      border: none;
+      padding: 0.9em 0;
+      margin-top: 0.2em;
+      box-shadow: 0 2px 12px rgba(184,111,167,0.13);
+      transition: var(--transition);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      z-index: 2;
+    }
+    .payment-submit-btn:hover, .payment-submit-btn:focus {
+      background: linear-gradient(90deg, var(--accent-gold) 0%, var(--accent-pink-dark) 100%);
+      color: #fff;
+      box-shadow: 0 6px 24px rgba(184,111,167,0.18);
+      transform: translateY(-2px) scale(1.04);
+    }
+    .payment-submit-btn::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(191,160,90,0.13);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.5s cubic-bezier(.4,0,.2,1), height 0.5s cubic-bezier(.4,0,.2,1);
+      z-index: 0;
+    }
+    .payment-submit-btn:hover::before, .payment-submit-btn:focus::before {
+      width: 250%;
+      height: 250%;
+    }
+    .payment-submit-btn span {
+      position: relative;
+      z-index: 2;
+    }
+    .payment-success-message {
+      text-align: center;
+      color: var(--accent-gold);
+      font-size: 1.25rem;
+      font-family: 'Playfair Display', serif;
+      margin-top: 2em;
+      background: var(--soft-gray);
+      border-radius: 14px;
+      padding: 1.5em 1em;
+      box-shadow: 0 1.5px 6px rgba(184,111,167,0.06);
+      display: none;
+      animation: fadeInUp 0.7s cubic-bezier(.4,0,.2,1);
+    }
+    .payment-success-message.active {
+      display: block;
+    }
+    @media (max-width: 600px) {
+      .checkout-payment-btn {
+        max-width: 98vw;
+        font-size: 1.05rem;
+        padding: 0.8em 0;
+      }
+      .payment-methods-row {
+        flex-direction: column;
+        gap: 0.7em;
+      }
+      .payment-method-btn {
+        font-size: 1.01rem;
+        padding: 0.7em 0.5em;
+      }
+    }
   </style>
 </head>
 <body>
@@ -2271,7 +2467,7 @@
               <label for="checkout-saveinfo" style="font-size:0.98rem;color:#888;">Save this information for next time</label>
             </div>
           </div>
-          <button class="checkout-continue-btn" id="checkout-continue-btn" type="button">Continue</button>
+          <!-- <button class="checkout-continue-btn" id="checkout-continue-btn" type="button">Continue</button> -->
         </form>
       </div>
       <div class="checkout-right">
@@ -3480,5 +3676,432 @@
       observer.observe(document.body, { childList: true, subtree: true });
     })();
   </script>
+  <!-- Payment Button at the bottom of checkout section -->
+  <script>
+    // Wait for DOMContentLoaded to ensure elements exist
+    window.addEventListener('DOMContentLoaded', function() {
+      // Add Payment button only if not already present
+      if (!document.getElementById('checkout-payment-btn')) {
+        var checkoutLeft = document.querySelector('.checkout-left');
+        var paymentBtn = document.createElement('button');
+        paymentBtn.className = 'checkout-payment-btn';
+        paymentBtn.id = 'checkout-payment-btn';
+        paymentBtn.innerHTML = '<span>Payment</span>';
+        // Insert after the checkout form
+        checkoutLeft.appendChild(paymentBtn);
+        // Payment button click logic
+        paymentBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          // Show payment section with smooth transition
+          var paymentBlock = document.getElementById('checkout-payment-block');
+          if (paymentBlock) {
+            paymentBlock.classList.add('active');
+            paymentBlock.scrollIntoView({behavior:'smooth', block:'center'});
+          }
+          // Hide form if needed
+          var checkoutForm = document.getElementById('checkout-form');
+          if (checkoutForm) checkoutForm.style.display = 'none';
+          // Hide confirmation if visible
+          var confirmationBlock = document.getElementById('checkout-confirmation-block');
+          if (confirmationBlock) confirmationBlock.style.display = 'none';
+          // Remove the Payment button itself so it is not visible during payment
+          paymentBtn.remove();
+        });
+      }
+    });
+  </script>
+  <!-- Enhanced Payment Section (credit card & PayPal) -->
+  <script>
+  window.addEventListener('DOMContentLoaded', function() {
+    var paymentBlock = document.getElementById('checkout-payment-block');
+    if (!paymentBlock) return;
+    // Only add if not already present
+    if (!document.getElementById('enhanced-payment-methods')) {
+      // Clear existing content
+      paymentBlock.innerHTML = '';
+      // Payment method selection
+      var methodsRow = document.createElement('div');
+      methodsRow.className = 'payment-methods-row';
+      methodsRow.id = 'enhanced-payment-methods';
+      // Credit Card button
+      var creditBtn = document.createElement('button');
+      creditBtn.className = 'payment-method-btn selected';
+      creditBtn.type = 'button';
+      creditBtn.id = 'payment-method-credit';
+      creditBtn.innerHTML = '<i class="fa fa-credit-card"></i>Credit Card';
+      // PayPal button
+      var paypalBtn = document.createElement('button');
+      paypalBtn.className = 'payment-method-btn';
+      paypalBtn.type = 'button';
+      paypalBtn.id = 'payment-method-paypal';
+      paypalBtn.innerHTML = '<i class="fa fa-paypal"></i>PayPal';
+      methodsRow.appendChild(creditBtn);
+      methodsRow.appendChild(paypalBtn);
+      paymentBlock.appendChild(methodsRow);
+      // Credit Card Form
+      var creditForm = document.createElement('form');
+      creditForm.className = 'payment-form-section credit-card-fields active';
+      creditForm.id = 'credit-card-form';
+      creditForm.autocomplete = 'off';
+      creditForm.innerHTML = `
+        <div class="credit-card-fields">
+          <input class="credit-card-input" id="cc-name" type="text" placeholder="Name on Card" required autocomplete="cc-name" />
+          <input class="credit-card-input" id="cc-number" type="text" placeholder="Card Number" maxlength="19" required autocomplete="cc-number" inputmode="numeric" pattern="[0-9 ]*" />
+          <div class="credit-card-row">
+            <input class="credit-card-input" id="cc-exp" type="text" placeholder="MM/YY" maxlength="5" required autocomplete="cc-exp" inputmode="numeric" pattern="[0-9/]*" />
+            <input class="credit-card-input" id="cc-cvc" type="text" placeholder="CVC" maxlength="4" required autocomplete="cc-csc" inputmode="numeric" pattern="[0-9]*" />
+          </div>
+        </div>
+        <button class="payment-submit-btn" type="submit"><span>Pay Now</span></button>
+      `;
+      // PayPal Form (simulated)
+      var paypalForm = document.createElement('form');
+      paypalForm.className = 'payment-form-section';
+      paypalForm.id = 'paypal-form';
+      paypalForm.autocomplete = 'off';
+      paypalForm.innerHTML = `
+        <div style="text-align:center;margin-bottom:1.2em;">
+          <i class="fa fa-paypal" style="font-size:2.2em;color:#bfa05a;"></i><br>
+          <span style="font-size:1.1em;color:var(--accent-pink-dark);font-weight:700;">Pay securely with PayPal</span>
+        </div>
+        <input class="credit-card-input" id="paypal-email" type="email" placeholder="PayPal Email" required autocomplete="email" />
+        <button class="payment-submit-btn" type="submit"><span>Pay with PayPal</span></button>
+      `;
+      paymentBlock.appendChild(creditForm);
+      paymentBlock.appendChild(paypalForm);
+      // Payment Success Message
+      var successMsg = document.createElement('div');
+      successMsg.className = 'payment-success-message';
+      successMsg.id = 'payment-success-message';
+      successMsg.innerHTML = `<i class='fa fa-check-circle' style='font-size:2.2rem;color:var(--accent-gold);'></i><br>Thank you for your payment!<br>Your order is confirmed.`;
+      paymentBlock.appendChild(successMsg);
+      // Payment method switching logic
+      creditBtn.addEventListener('click', function() {
+        creditBtn.classList.add('selected');
+        paypalBtn.classList.remove('selected');
+        creditForm.classList.add('active');
+        paypalForm.classList.remove('active');
+      });
+      paypalBtn.addEventListener('click', function() {
+        paypalBtn.classList.add('selected');
+        creditBtn.classList.remove('selected');
+        paypalForm.classList.add('active');
+        creditForm.classList.remove('active');
+      });
+      // Credit card form submit
+      creditForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        // Simple validation
+        var name = document.getElementById('cc-name').value.trim();
+        var number = document.getElementById('cc-number').value.replace(/\D/g, '');
+        var exp = document.getElementById('cc-exp').value.trim();
+        var cvc = document.getElementById('cc-cvc').value.trim();
+        if (!name || number.length < 13 || exp.length < 4 || cvc.length < 3) {
+          alert('Please enter valid credit card details.');
+          return;
+        }
+        // Simulate payment
+        creditForm.querySelector('button').disabled = true;
+        creditForm.querySelector('button').innerHTML = '<span>Processing...</span>';
+        setTimeout(function() {
+          creditForm.querySelector('button').disabled = false;
+          creditForm.querySelector('button').innerHTML = '<span>Pay Now</span>';
+          creditForm.classList.remove('active');
+          successMsg.classList.add('active');
+          // Optionally clear cart
+          if (typeof setCart === 'function') setCart([]);
+          if (typeof updateCartBadge === 'function') updateCartBadge();
+        }, 1200);
+      });
+      // PayPal form submit
+      paypalForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var email = document.getElementById('paypal-email').value.trim();
+        if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+          alert('Please enter a valid PayPal email.');
+          return;
+        }
+        paypalForm.querySelector('button').disabled = true;
+        paypalForm.querySelector('button').innerHTML = '<span>Processing...</span>';
+        setTimeout(function() {
+          paypalForm.querySelector('button').disabled = false;
+          paypalForm.querySelector('button').innerHTML = '<span>Pay with PayPal</span>';
+          paypalForm.classList.remove('active');
+          successMsg.classList.add('active');
+          if (typeof setCart === 'function') setCart([]);
+          if (typeof updateCartBadge === 'function') updateCartBadge();
+        }, 1200);
+      });
+      // Hide payment block and show homepage on success click
+      successMsg.addEventListener('click', function() {
+        var checkoutSection = document.getElementById('checkout-section');
+        var homepageContent = document.getElementById('homepage-content');
+        if (checkoutSection) checkoutSection.style.display = 'none';
+        if (homepageContent) homepageContent.style.display = '';
+        window.scrollTo({top:0,behavior:'smooth'});
+        // Reset payment block for next time
+        setTimeout(function() {
+          creditForm.classList.add('active');
+          paypalForm.classList.remove('active');
+          successMsg.classList.remove('active');
+          document.getElementById('checkout-form').style.display = '';
+          paymentBlock.classList.remove('active');
+        }, 800);
+      });
+    }
+  });
+  </script>
+  <!-- === CUSTOM CREDIT CARD PAYMENT FORM & PAYPAL BUTTON (ADDED) === -->
+  <script>
+  window.addEventListener('DOMContentLoaded', function() {
+    // Only add if not already present
+    if (!document.getElementById('custom-cc-payment-wrap')) {
+      // Find the Payment button
+      var paymentBtn = document.getElementById('checkout-payment-btn');
+      if (!paymentBtn) return;
+      // Create the payment form wrapper (hidden by default)
+      var ccWrap = document.createElement('div');
+      ccWrap.id = 'custom-cc-payment-wrap';
+      ccWrap.style.display = 'none';
+      ccWrap.innerHTML = `
+        <form id="custom-cc-form" autocomplete="off">
+          <div class="custom-cc-fields">
+            <label class="custom-cc-label" for="custom-cc-name">Cardholder Name</label>
+            <input class="custom-cc-input" id="custom-cc-name" type="text" placeholder="Name on Card" required autocomplete="cc-name" />
+            <label class="custom-cc-label" for="custom-cc-number">Card Number</label>
+            <input class="custom-cc-input" id="custom-cc-number" type="text" placeholder="Card Number" maxlength="19" required autocomplete="cc-number" inputmode="numeric" pattern="[0-9 ]*" />
+            <div class="custom-cc-row">
+              <div style="flex:1 1 50%;display:flex;flex-direction:column;">
+                <label class="custom-cc-label" for="custom-cc-exp">Expiration (MM/YY)</label>
+                <input class="custom-cc-input" id="custom-cc-exp" type="text" placeholder="MM/YY" maxlength="5" required autocomplete="cc-exp" inputmode="numeric" pattern="[0-9/]*" />
+              </div>
+              <div style="flex:1 1 50%;display:flex;flex-direction:column;margin-left:1.2em;">
+                <label class="custom-cc-label" for="custom-cc-cvv">CVV</label>
+                <input class="custom-cc-input" id="custom-cc-cvv" type="text" placeholder="CVV" maxlength="4" required autocomplete="cc-csc" inputmode="numeric" pattern="[0-9]*" />
+              </div>
+            </div>
+          </div>
+          <button type="button" id="custom-paypal-btn" class="custom-paypal-btn">Pay</button>
+          <button type="submit" id="custom-cc-pay-btn" class="custom-cc-pay-btn" style="display:none;">Pay</button>
+        </form>
+        <div id="custom-cc-success" class="custom-cc-success" style="display:none;">
+          <i class='fa fa-check-circle' style='font-size:2.2rem;color:var(--accent-gold);'></i><br>Thank you for your payment!<br>Your order is confirmed.
+        </div>
+      `;
+      // Insert after the Payment button
+      paymentBtn.parentNode.insertBefore(ccWrap, paymentBtn.nextSibling);
+      // Add styles for the new form
+      var style = document.createElement('style');
+      style.innerHTML = `
+        #custom-cc-payment-wrap {
+          margin-top: 2.2em;
+          width: 100%;
+          max-width: 420px;
+          background: #fff;
+          border-radius: 18px;
+          box-shadow: 0 4px 24px rgba(184,111,167,0.10), 0 1.5px 6px rgba(0,0,0,0.06);
+          padding: 2.2em 2em 2em 2em;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          border: 2px solid var(--accent-pink-dark);
+          animation: fadeInUp .32s cubic-bezier(.4,0,.2,1);
+        }
+        .custom-cc-fields {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          gap: 1.1em;
+          margin-bottom: 1.5em;
+        }
+        .custom-cc-label {
+          font-size: 1.05rem;
+          color: #888;
+          font-weight: 600;
+          margin-bottom: 0.2em;
+          text-align: left;
+          display: block;
+        }
+        .custom-cc-input {
+          width: 100%;
+          padding: 0.7rem 1.2rem;
+          border: 2px solid #bbb;
+          font-size: 1.08rem;
+          background: #fff;
+          color: var(--text-dark);
+          outline: none;
+          font-family: inherit;
+          border-radius: 8px;
+          transition: border-color .2s, box-shadow .2s;
+          margin-bottom: 0.7em;
+        }
+        .custom-cc-input:focus {
+          border-color: var(--accent-pink-dark);
+          box-shadow: 0 2px 8px rgba(184, 111, 167, 0.13);
+        }
+        .custom-cc-row {
+          display: flex;
+          flex-direction: row;
+          gap: 1.2em;
+          width: 100%;
+          margin-bottom: 0.7em;
+        }
+        .custom-paypal-btn {
+          width: 100%;
+          background: #fff;
+          border: 2px solid #bfa05a;
+          border-radius: 999px;
+          padding: 1.1em 0;
+          font-size: 1.13rem;
+          font-weight: 700;
+          color: #bfa05a;
+          cursor: pointer;
+          transition: border-color 0.3s, color 0.3s, background 0.3s, box-shadow 0.3s;
+          font-family: inherit;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.7em;
+          margin-bottom: 1.5em;
+          outline: none;
+          box-shadow: 0 2px 8px rgba(191,160,90,0.07);
+          letter-spacing: 1px;
+        }
+        .custom-paypal-btn:focus, .custom-paypal-btn:hover {
+          border-color: var(--accent-pink-dark);
+          color: var(--accent-pink-dark);
+          background: var(--accent-pink);
+          box-shadow: 0 4px 16px rgba(184,111,167,0.10);
+        }
+        .custom-paypal-btn i {
+          font-size: 1.3em;
+          margin-right: 0.5em;
+          color: inherit;
+        }
+        .custom-cc-pay-btn {
+          width: 100%;
+          background: linear-gradient(90deg, var(--accent-pink-dark) 0%, var(--accent-gold) 100%);
+          color: #fff;
+          border-radius: 999px;
+          text-transform: uppercase;
+          font-weight: 700;
+          letter-spacing: 1.2px;
+          font-size: 1.08rem;
+          border: none;
+          padding: 0.9em 0;
+          margin-top: 0.2em;
+          box-shadow: 0 2px 12px rgba(184,111,167,0.13);
+          transition: var(--transition);
+          cursor: pointer;
+          position: relative;
+          overflow: hidden;
+          z-index: 2;
+          display: block;
+          text-align: center;
+        }
+        .custom-cc-pay-btn:focus, .custom-cc-pay-btn:hover {
+          background: linear-gradient(90deg, var(--accent-gold) 0%, var(--accent-pink-dark) 100%);
+          color: #fff;
+          box-shadow: 0 6px 24px rgba(184,111,167,0.18);
+          transform: translateY(-2px) scale(1.04);
+        }
+        .custom-cc-success {
+          text-align: center;
+          color: var(--accent-gold);
+          font-size: 1.25rem;
+          font-family: 'Playfair Display', serif;
+          margin-top: 2em;
+          background: var(--soft-gray);
+          border-radius: 14px;
+          padding: 1.5em 1em;
+          box-shadow: 0 1.5px 6px rgba(184,111,167,0.06);
+          animation: fadeInUp 0.7s cubic-bezier(.4,0,.2,1);
+        }
+        @media (max-width: 600px) {
+          #custom-cc-payment-wrap {
+            max-width: 98vw;
+            padding: 1.2em 0.5em 0.7em 0.5em;
+          }
+          .custom-cc-row { flex-direction: column; gap: 0.7em; }
+        }
+      `;
+      document.head.appendChild(style);
+      // Payment button click logic
+      paymentBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        ccWrap.style.display = 'block';
+        paymentBtn.style.display = 'none';
+      });
+      // Show Pay button only when all fields are filled
+      function checkCCFields() {
+        var name = document.getElementById('custom-cc-name').value.trim();
+        var number = document.getElementById('custom-cc-number').value.replace(/\D/g, '');
+        var exp = document.getElementById('custom-cc-exp').value.trim();
+        var cvv = document.getElementById('custom-cc-cvv').value.trim();
+        var payBtn = document.getElementById('custom-cc-pay-btn');
+        if (name && number.length >= 13 && exp.length >= 4 && cvv.length >= 3) {
+          payBtn.style.display = 'block';
+        } else {
+          payBtn.style.display = 'none';
+        }
+      }
+      ['custom-cc-name','custom-cc-number','custom-cc-exp','custom-cc-cvv'].forEach(function(id) {
+        document.getElementById(id).addEventListener('input', checkCCFields);
+      });
+      // Credit card form submit
+      document.getElementById('custom-cc-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        var payBtn = document.getElementById('custom-cc-pay-btn');
+        payBtn.disabled = true;
+        payBtn.innerHTML = '<span>Processing...</span>';
+        setTimeout(function() {
+          payBtn.disabled = false;
+          payBtn.innerHTML = 'Pay';
+          document.getElementById('custom-cc-form').style.display = 'none';
+          document.getElementById('custom-cc-success').style.display = 'block';
+          // Optionally clear cart
+          if (typeof setCart === 'function') setCart([]);
+          if (typeof updateCartBadge === 'function') updateCartBadge();
+        }, 1200);
+      });
+      // PayPal button click (simulate)
+      document.getElementById('custom-paypal-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        var btn = this;
+        btn.disabled = true;
+        btn.innerHTML = '<span>Processing...</span>';
+        setTimeout(function() {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa fa-paypal"></i> Pay';
+          document.getElementById('custom-cc-form').style.display = 'none';
+          document.getElementById('custom-cc-success').style.display = 'block';
+          if (typeof setCart === 'function') setCart([]);
+          if (typeof updateCartBadge === 'function') updateCartBadge();
+        }, 1200);
+      });
+      // Success message click returns to homepage
+      document.getElementById('custom-cc-success').addEventListener('click', function() {
+        var checkoutSection = document.getElementById('checkout-section');
+        var homepageContent = document.getElementById('homepage-content');
+        if (checkoutSection) checkoutSection.style.display = 'none';
+        if (homepageContent) homepageContent.style.display = '';
+        window.scrollTo({top:0,behavior:'smooth'});
+        // Reset for next time
+        setTimeout(function() {
+          document.getElementById('custom-cc-form').style.display = '';
+          document.getElementById('custom-cc-success').style.display = 'none';
+          ccWrap.style.display = 'none';
+          if (paymentBtn) paymentBtn.style.display = '';
+          // Clear fields
+          ['custom-cc-name','custom-cc-number','custom-cc-exp','custom-cc-cvv'].forEach(function(id) {
+            var el = document.getElementById(id); if (el) el.value = '';
+          });
+          document.getElementById('custom-cc-pay-btn').style.display = 'none';
+        }, 800);
+      });
+    }
+  });
+  </script>
+  <!-- === END CUSTOM CREDIT CARD PAYMENT FORM & PAYPAL BUTTON (ADDED) === -->
 </body>
 </html> 
