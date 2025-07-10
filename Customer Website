@@ -3686,12 +3686,45 @@
         var paymentBtn = document.createElement('button');
         paymentBtn.className = 'checkout-payment-btn';
         paymentBtn.id = 'checkout-payment-btn';
-        paymentBtn.innerHTML = '<span>Payment</span>';
+        paymentBtn.innerHTML = '<span>Continue</span>';
+        paymentBtn.type = 'button';
+        paymentBtn.disabled = true;
+        paymentBtn.style.opacity = '0.6';
         // Insert after the checkout form
         checkoutLeft.appendChild(paymentBtn);
-        // Payment button click logic
+
+        // Validation logic
+        function validateCheckoutForm() {
+          var email = document.getElementById('checkout-email').value.trim();
+          var address = document.getElementById('checkout-address').value.trim();
+          var phone = document.getElementById('checkout-phone').value.trim();
+          var city = document.getElementById('checkout-city').value.trim();
+          var saveInfo = document.getElementById('checkout-saveinfo').checked;
+          // Basic email regex
+          var emailValid = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
+          var phoneValid = phone.length >= 6;
+          var addressValid = address.length > 2;
+          var cityValid = city.length > 1;
+          var allValid = emailValid && addressValid && phoneValid && cityValid && saveInfo;
+          paymentBtn.disabled = !allValid;
+          paymentBtn.style.opacity = allValid ? '1' : '0.6';
+          paymentBtn.style.cursor = allValid ? 'pointer' : 'not-allowed';
+        }
+        // Attach listeners
+        ['checkout-email','checkout-address','checkout-phone','checkout-city','checkout-saveinfo'].forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) {
+            el.addEventListener('input', validateCheckoutForm);
+            el.addEventListener('change', validateCheckoutForm);
+          }
+        });
+        // Initial validation
+        validateCheckoutForm();
+
+        // Continue button click logic
         paymentBtn.addEventListener('click', function(e) {
           e.preventDefault();
+          if (paymentBtn.disabled) return;
           // Show payment section with smooth transition
           var paymentBlock = document.getElementById('checkout-payment-block');
           if (paymentBlock) {
@@ -3704,7 +3737,7 @@
           // Hide confirmation if visible
           var confirmationBlock = document.getElementById('checkout-confirmation-block');
           if (confirmationBlock) confirmationBlock.style.display = 'none';
-          // Remove the Payment button itself so it is not visible during payment
+          // Remove the Continue button itself so it is not visible during payment
           paymentBtn.remove();
         });
       }
