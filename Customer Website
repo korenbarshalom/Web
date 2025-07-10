@@ -1747,6 +1747,218 @@
       transform: translateX(0);
       opacity: 1;
     }
+    /* === LUXURY PRODUCT CARD HOVER ENHANCEMENTS START === */
+    .product-card {
+      /* 3D context for child elements */
+      perspective: 900px;
+      will-change: transform, box-shadow, filter;
+      /* Layer for lighting effect */
+      position: relative;
+      overflow: visible;
+      /* For smoothness */
+      backface-visibility: hidden;
+    }
+    .product-card::before {
+      /* Soft light overlay for depth illusion */
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      border-radius: var(--radius);
+      background: radial-gradient(ellipse 80% 60% at 60% 30%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.04) 80%, transparent 100%);
+      opacity: 0;
+      transition: opacity 0.5s cubic-bezier(.4,0,.2,1);
+      z-index: 2;
+    }
+    .product-card:hover::before, .product-card:focus::before {
+      opacity: 1;
+    }
+    .product-card::after {
+      /* Subtle bottom highlight for lift */
+      content: '';
+      position: absolute;
+      left: 10%;
+      right: 10%;
+      bottom: -18px;
+      height: 32px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse 60% 60% at 50% 0%, rgba(191,160,90,0.10) 0%, rgba(184,111,167,0.08) 60%, transparent 100%);
+      opacity: 0;
+      filter: blur(2px);
+      transition: opacity 0.5s cubic-bezier(.4,0,.2,1);
+      z-index: 1;
+    }
+    .product-card:hover::after, .product-card:focus::after {
+      opacity: 1;
+    }
+    .product-card .lux-glow {
+      /* Extra highlight for luxury feel */
+      pointer-events: none;
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      border-radius: var(--radius);
+      background: radial-gradient(ellipse 60% 40% at 70% 20%, rgba(255,255,255,0.13) 0%, transparent 80%);
+      opacity: 0;
+      transition: opacity 0.5s cubic-bezier(.4,0,.2,1);
+      z-index: 3;
+    }
+    .product-card:hover .lux-glow, .product-card:focus .lux-glow {
+      opacity: 1;
+    }
+    .product-card .lux-shadow {
+      /* Animated shadow for depth */
+      pointer-events: none;
+      position: absolute;
+      left: 0; right: 0; bottom: -10px;
+      height: 40px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse 60% 60% at 50% 0%, rgba(191,160,90,0.13) 0%, rgba(184,111,167,0.10) 60%, transparent 100%);
+      opacity: 0;
+      filter: blur(3px);
+      transition: opacity 0.5s cubic-bezier(.4,0,.2,1);
+      z-index: 0;
+    }
+    .product-card:hover .lux-shadow, .product-card:focus .lux-shadow {
+      opacity: 1;
+    }
+    .product-card .lux-border {
+      /* Animated border for focus */
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius);
+      border: 2.5px solid transparent;
+      background: linear-gradient(120deg, var(--accent-pink-dark), var(--accent-gold), var(--accent-pink-dark));
+      background-size: 200% 200%;
+      background-clip: border-box;
+      opacity: 0;
+      transition: opacity 0.5s cubic-bezier(.4,0,.2,1), border-color 0.5s cubic-bezier(.4,0,.2,1);
+      z-index: 4;
+    }
+    .product-card:hover .lux-border, .product-card:focus .lux-border {
+      opacity: 0.7;
+      border-color: var(--accent-gold);
+      animation: lux-border-move 2.2s linear infinite;
+    }
+    @keyframes lux-border-move {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+    .product-card .lux-light {
+      /* Subtle moving light reflection */
+      pointer-events: none;
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      border-radius: var(--radius);
+      background: linear-gradient(120deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.18) 40%, transparent 100%);
+      opacity: 0;
+      transition: opacity 0.5s cubic-bezier(.4,0,.2,1);
+      z-index: 5;
+      mix-blend-mode: lighten;
+      animation: lux-light-move 2.8s cubic-bezier(.4,0,.2,1) infinite alternate;
+      animation-play-state: paused;
+    }
+    .product-card:hover .lux-light, .product-card:focus .lux-light {
+      opacity: 1;
+      animation-play-state: running;
+    }
+    @keyframes lux-light-move {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 100% 100%; }
+    }
+    .product-card .lux-tilt {
+      /* For 3D tilt effect (no JS, just on hover) */
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius);
+      z-index: 6;
+      opacity: 0;
+      transition: opacity 0.5s cubic-bezier(.4,0,.2,1);
+    }
+    .product-card:hover .lux-tilt, .product-card:focus .lux-tilt {
+      opacity: 1;
+    }
+    /* --- Enhanced Hover Animation --- */
+    .product-card:hover, .product-card:focus {
+      /* 3D lift, scale, and slight rotate for luxury feel */
+      transform: scale(1.045) rotate3d(1,0.5,0.1,7deg) translateY(-10px);
+      box-shadow:
+        0 12px 36px 0 rgba(191,160,90,0.16),
+        0 4px 24px 0 rgba(184,111,167,0.13),
+        0 1.5px 6px 0 rgba(0,0,0,0.08);
+      border-color: var(--accent-gold);
+      background: linear-gradient(120deg, #fff 80%, var(--accent-pink) 100%);
+      filter: brightness(1.04) saturate(1.07) drop-shadow(0 2px 12px rgba(191,160,90,0.08));
+      transition:
+        transform 0.55s cubic-bezier(.4,0,.2,1),
+        box-shadow 0.55s cubic-bezier(.4,0,.2,1),
+        border-color 0.55s cubic-bezier(.4,0,.2,1),
+        background 0.55s cubic-bezier(.4,0,.2,1),
+        filter 0.55s cubic-bezier(.4,0,.2,1);
+    }
+    .product-card img {
+      /* Animate image for pop effect */
+      transition: transform 0.7s cubic-bezier(.4,0,.2,1), filter 0.7s cubic-bezier(.4,0,.2,1), box-shadow 0.7s cubic-bezier(.4,0,.2,1);
+      will-change: transform, filter, box-shadow;
+      z-index: 10;
+      position: relative;
+    }
+    .product-card:hover img, .product-card:focus img {
+      transform: scale(1.11) rotate3d(0.1,0.2,0.1,5deg) translateY(-4px);
+      filter: brightness(1.11) saturate(1.13) drop-shadow(0 4px 16px rgba(191,160,90,0.10));
+      box-shadow: 0 8px 32px rgba(191,160,90,0.13), 0 2px 12px rgba(184,111,167,0.13);
+    }
+    .product-card h4, .product-card span {
+      transition: color 0.5s cubic-bezier(.4,0,.2,1), text-shadow 0.5s cubic-bezier(.4,0,.2,1);
+    }
+    .product-card:hover h4, .product-card:focus h4 {
+      color: var(--accent-gold);
+      text-shadow: 0 2px 12px rgba(191,160,90,0.13);
+    }
+    .product-card:hover span, .product-card:focus span {
+      color: var(--accent-pink-dark);
+      text-shadow: 0 2px 12px rgba(184,111,167,0.13);
+    }
+    /* --- Add luxury overlays to all product cards --- */
+    .product-card .lux-glow,
+    .product-card .lux-shadow,
+    .product-card .lux-border,
+    .product-card .lux-light,
+    .product-card .lux-tilt {
+      /* These are injected overlays for effect layering */
+      pointer-events: none;
+      user-select: none;
+    }
+    /* --- Responsive: reduce effect on mobile for performance --- */
+    @media (max-width: 700px) {
+      .product-card:hover, .product-card:focus {
+        transform: scale(1.025) translateY(-4px);
+        box-shadow: 0 4px 16px rgba(191,160,90,0.10), 0 2px 8px rgba(184,111,167,0.10);
+      }
+      .product-card:hover img, .product-card:focus img {
+        transform: scale(1.05) translateY(-2px);
+      }
+      .product-card .lux-glow,
+      .product-card .lux-shadow,
+      .product-card .lux-border,
+      .product-card .lux-light,
+      .product-card .lux-tilt {
+        display: none !important;
+      }
+    }
+    /* --- Accessibility: focus-visible for keyboard users --- */
+    .product-card:focus-visible {
+      outline: 2.5px solid var(--accent-gold);
+      outline-offset: 2px;
+    }
+    /* === LUXURY PRODUCT CARD HOVER ENHANCEMENTS END === */
+
+    /* --- Inject overlays into product cards via CSS only (no JS) --- */
+    /* This is a CSS trick: overlays are added in HTML for each card. */
+    /* If not present, add overlays in HTML for each .product-card: */
+    /* <div class="lux-glow"></div><div class="lux-shadow"></div><div class="lux-border"></div><div class="lux-light"></div><div class="lux-tilt"></div> */
+    /* For demo, overlays can be added via a MutationObserver in JS if needed. */
   </style>
 </head>
 <body>
@@ -1811,42 +2023,50 @@
               <img src="https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg" alt="Golden Leaf Earrings">
               <h4>Golden Leaf Earrings</h4>
               <span>$245</span>
+              <div class="lux-glow"></div><div class="lux-shadow"></div><div class="lux-border"></div><div class="lux-light"></div><div class="lux-tilt"></div>
             </div>
             <div class="product-card" data-category="Bags" data-title="Blush Pink Mini Bag" data-price="$389" data-img="https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E01-1?$default_GHC$&crop=461,631,979,1169&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85" data-desc="A compact blush pink handbag with a modern silhouette, ideal for carrying your essentials from day to night." data-gallery='["https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E01-1?$default_GHC$&crop=461,631,979,1169&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E03-1?$default_GHC$&crop=561,642,849,1144&wid=1024&hei=1107&scale=0.4843&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E06-1?$default_GHC$&crop=727,555,483,897&wid=1024&hei=1107&scale=0.4843&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E07?$default_GHC$&crop=807,177,388,1599&wid=1024&hei=1107&scale=0.4843&bfc=on&qlt=85"]' data-colors='["#e7b6d6","#e5e5e5","#bfa05a"]' data-sizes='["Small","Medium","Large"]'>
               <img src="https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E01-1?$default_GHC$&crop=461,631,979,1169&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85" alt="Blush Pink Mini Bag">
               <h4>Blush Pink Mini Bag</h4>
               <span>$189</span>
+              <div class="lux-glow"></div><div class="lux-shadow"></div><div class="lux-border"></div><div class="lux-light"></div><div class="lux-tilt"></div>
             </div>
             <div class="product-card" data-category="Jewelry" data-title="Luxe Pearl Necklace" data-price="$335" data-img="https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371" data-desc="A strand of luminous pearls with a modern twist, this necklace brings classic sophistication to any look." data-gallery='["https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371","https://lockwoodshop.com/cdn/shop/files/4be5752cfreshwater_20pearl_20necklace_202_864x864.jpg?v=1747436091","https://lockwoodshop.com/cdn/shop/files/69b33e51freshwater_20pearl_20necklace_203_864x864.jpg?v=1747436091"]' data-colors='["#fff","#e5e5e5","#bfa05a"]' data-sizes='["16 in","18 in","20 in"]'>
               <img src="https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371" alt="Luxe Pearl Necklace">
               <h4>Luxe Pearl Necklace</h4>
               <span>$309</span>
+              <div class="lux-glow"></div><div class="lux-shadow"></div><div class="lux-border"></div><div class="lux-light"></div><div class="lux-tilt"></div>
             </div>
             <div class="product-card" data-category="Shoes" data-title="Velvet Burgundy Heels" data-price="$195" data-img="https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png" data-desc="Elegant high heels in plush burgundy velvet, designed for comfort and a bold, sophisticated statement." data-gallery='["https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png","https://m.media-amazon.com/images/I/61tTjOUqcWL._AC_SY575_.jpg","https://m.media-amazon.com/images/I/61LjFsmzVpL._AC_SY575_.jpg","https://m.media-amazon.com/images/I/61hBxedRM+L._AC_SY575_.jpg"]' data-colors='["#b86fa7","#e5e5e5","#bfa05a"]' data-sizes='["36","37","38","39","40"]'>
               <img src="https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png" alt="Velvet Burgundy Heels">
               <h4>Velvet Burgundy Heels</h4>
               <span>$179</span>
+              <div class="lux-glow"></div><div class="lux-shadow"></div><div class="lux-border"></div><div class="lux-light"></div><div class="lux-tilt"></div>
             </div>
             <!-- Added products for the carousel -->
             <div class="product-card" data-category="Shoes" data-title="Camel Luxe Pumps" data-price="$229" data-img="https://elliebelle.com/cdn/shop/files/4824942.jpg?height=871&v=1736956782" data-desc="Elegant ivory pumps in soft satin, perfect for weddings and special occasions." data-gallery='["https://elliebelle.com/cdn/shop/files/4824942.jpg?height=871&v=1736956782","https://elliebelle.com/cdn/shop/files/4824936.jpg?v=1736956782"]' data-colors='["#fff","#e5e5e5","#bfa05a"]' data-sizes='["36","37","38","39","40"]'>
               <img src="https://elliebelle.com/cdn/shop/files/4824942.jpg?height=871&v=1736956782" alt="Camel Luxe Pumps">
               <h4>Camel Luxe Pumps</h4>
               <span>$229</span>
+              <div class="lux-glow"></div><div class="lux-shadow"></div><div class="lux-border"></div><div class="lux-light"></div><div class="lux-tilt"></div>
             </div>
             <div class="product-card" data-category="Shoes" data-title="Pearl Bow Ballet Flats" data-price="$199" data-img="https://image.made-in-china.com/202f0j00ceDlYbQsghop/Flat-Shoes-Hot-Selling-Women-Shoes-High-Quality-Casual-Shoes-Footwear-Leather-Shoes-Soft-2021.webp" data-desc="Chic rose gold sandals with delicate straps and a comfortable heel." data-gallery='["https://image.made-in-china.com/202f0j00ceDlYbQsghop/Flat-Shoes-Hot-Selling-Women-Shoes-High-Quality-Casual-Shoes-Footwear-Leather-Shoes-Soft-2021.webp"]' data-colors='["#e7b6d6","#bfa05a","#fff"]' data-sizes='["36","37","38","39","40"]'>
               <img src="https://image.made-in-china.com/202f0j00ceDlYbQsghop/Flat-Shoes-Hot-Selling-Women-Shoes-High-Quality-Casual-Shoes-Footwear-Leather-Shoes-Soft-2021.webp" alt="Pearl Bow Ballet Flats">
               <h4>Pearl Bow Ballet Flats</h4>
               <span>$199</span>
+              <div class="lux-glow"></div><div class="lux-shadow"></div><div class="lux-border"></div><div class="lux-light"></div><div class="lux-tilt"></div>
             </div>
             <div class="product-card" data-category="Bags" data-title="Skyline Grace Bag" data-price="$259" data-img="https://media.istockphoto.com/id/1365118618/photo/blue-fashion-purse-handbag-on-white-background-isolated.jpg?s=612x612&w=0&k=20&c=VNszfC0cxenqZGhjlr3gqqvzHWREuhdY_H3CKF1B38g=" data-desc="Spacious and timeless black tote bag, crafted from premium leather." data-gallery='["https://media.istockphoto.com/id/1365118618/photo/blue-fashion-purse-handbag-on-white-background-isolated.jpg?s=612x612&w=0&k=20&c=VNszfC0cxenqZGhjlr3gqqvzHWREuhdY_H3CKF1B38g="]' data-colors='["#18141c","#e5e5e5","#bfa05a"]' data-sizes='["Medium","Large"]'>
               <img src="https://media.istockphoto.com/id/1365118618/photo/blue-fashion-purse-handbag-on-white-background-isolated.jpg?s=612x612&w=0&k=20&c=VNszfC0cxenqZGhjlr3gqqvzHWREuhdY_H3CKF1B38g=" alt="Skyline Grace Bag">
               <h4>Skyline Grace Bag</h4>
               <span>$259</span>
+              <div class="lux-glow"></div><div class="lux-shadow"></div><div class="lux-border"></div><div class="lux-light"></div><div class="lux-tilt"></div>
             </div>
             <div class="product-card" data-category="Bags" data-title="Pastel Blue Satchel" data-price="$219" data-img="https://img.freepik.com/premium-photo/women-leather-bag-isolated-white-background-side-view-luxury-genuine-full-grain-leather-lady_709135-96.jpg" data-desc="Soft pastel blue satchel with gold hardware and adjustable strap." data-gallery='["https://img.freepik.com/premium-photo/women-leather-bag-isolated-white-background-side-view-luxury-genuine-full-grain-leather-lady_709135-96.jpg"]' data-colors='["#b6d6e7","#e5e5e5","#bfa05a"]' data-sizes='["Small","Medium"]'>
               <img src="https://img.freepik.com/premium-photo/women-leather-bag-isolated-white-background-side-view-luxury-genuine-full-grain-leather-lady_709135-96.jpg" alt="Pastel Blue Satchel">
               <h4>Pastel Blue Satchel</h4>
               <span>$219</span>
+              <div class="lux-glow"></div><div class="lux-shadow"></div><div class="lux-border"></div><div class="lux-light"></div><div class="lux-tilt"></div>
             </div>
           </div>
           <button class="carousel-arrow right" id="featured-right" aria-label="Next" style="position:absolute;right:-2.2rem;top:50%;transform:translateY(-50%);background:none;border:none;font-size:2.1rem;color:var(--accent-pink-dark);z-index:2;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .2s;outline:none;">
@@ -3090,6 +3310,7 @@
             <img src="${product.img}" alt="${product.title}">
             <h4>${product.title}</h4>
             <span>${product.price}</span>
+            <div class="lux-glow"></div><div class="lux-shadow"></div><div class="lux-border"></div><div class="lux-light"></div><div class="lux-tilt"></div>
           `;
           card.style.cursor = 'pointer';
           card.addEventListener('click', function() {
@@ -3231,6 +3452,33 @@
         });
       }
     });
+  </script>
+  <script>
+    // === ENSURE LUXURY OVERLAYS ON ALL PRODUCT CARDS (STATIC & DYNAMIC) ===
+    (function() {
+      function ensureLuxuryOverlays(card) {
+        if (!card.querySelector('.lux-glow')) {
+          card.insertAdjacentHTML('beforeend',
+            '<div class="lux-glow"></div><div class="lux-shadow"></div><div class="lux-border"></div><div class="lux-light"></div><div class="lux-tilt"></div>'
+          );
+        }
+      }
+      // For all static product cards on page load
+      document.querySelectorAll('.product-card').forEach(ensureLuxuryOverlays);
+      // For dynamically added product cards (e.g., all-products grid, carousels)
+      const observer = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+          mutation.addedNodes.forEach(node => {
+            if (node.nodeType === 1 && node.classList.contains('product-card')) {
+              ensureLuxuryOverlays(node);
+            } else if (node.nodeType === 1) {
+              node.querySelectorAll && node.querySelectorAll('.product-card').forEach(ensureLuxuryOverlays);
+            }
+          });
+        });
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+    })();
   </script>
 </body>
 </html> 
