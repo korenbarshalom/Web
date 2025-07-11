@@ -3741,7 +3741,12 @@
     const perfectSetsLeft = document.getElementById('perfect-sets-left');
     const perfectSetsRight = document.getElementById('perfect-sets-right');
     let perfectSetsIndex = 0;
+    function getPerfectSetsVisibleCount() {
+      if (window.innerWidth <= 700) return 2;
+      return 4;
+    }
     function renderPerfectSetsCarousel(fadeDir) {
+      const visibleCount = getPerfectSetsVisibleCount();
       perfectSetsCarousel.classList.add('slider-anim');
       if (fadeDir) {
         perfectSetsCarousel.classList.remove('fade-in');
@@ -3749,7 +3754,7 @@
       }
       setTimeout(() => {
         perfectSetsCarousel.innerHTML = '';
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < visibleCount; i++) {
           const idx = (perfectSetsIndex + i) % perfectSetsData.length;
           const product = perfectSetsData[idx];
           const card = document.createElement('div');
@@ -3783,15 +3788,18 @@
         }, 10);
       }, fadeDir ? 450 : 0);
     }
-    perfectSetsLeft.addEventListener('click', function() {
-      perfectSetsIndex = (perfectSetsIndex - 1 + perfectSetsData.length) % perfectSetsData.length;
+    function scrollPerfectSets(dir) {
+      const visibleCount = getPerfectSetsVisibleCount();
+      if (dir === 'left') {
+        perfectSetsIndex = (perfectSetsIndex - visibleCount + perfectSetsData.length) % perfectSetsData.length;
+      } else {
+        perfectSetsIndex = (perfectSetsIndex + visibleCount) % perfectSetsData.length;
+      }
       renderPerfectSetsCarousel('fade');
-    });
-    perfectSetsRight.addEventListener('click', function() {
-      perfectSetsIndex = (perfectSetsIndex + 1) % perfectSetsData.length;
-      renderPerfectSetsCarousel('fade');
-    });
-    // On load
+    }
+    perfectSetsLeft.addEventListener('click', function() { scrollPerfectSets('left'); });
+    perfectSetsRight.addEventListener('click', function() { scrollPerfectSets('right'); });
+    window.addEventListener('resize', function() { renderPerfectSetsCarousel(); });
     renderPerfectSetsCarousel();
   </script>
   <script>
@@ -3804,8 +3812,12 @@
       if (!featuredGrid || !leftBtn || !rightBtn) return;
       const originalCards = Array.from(featuredGrid.children);
       let startIdx = 0;
-      const visibleCount = 4;
+      function getFeaturedVisibleCount() {
+        if (window.innerWidth <= 700) return 2;
+        return 4;
+      }
       function renderFeaturedCarousel(fadeDir) {
+        const visibleCount = getFeaturedVisibleCount();
         featuredGrid.classList.add('slider-anim');
         if (fadeDir) {
           featuredGrid.classList.remove('fade-in');
@@ -3826,17 +3838,18 @@
           }, 10);
         }, fadeDir ? 450 : 0);
       }
-      leftBtn.addEventListener('click', function() {
-        startIdx = (startIdx - 1 + originalCards.length) % originalCards.length;
+      function scrollFeatured(dir) {
+        const visibleCount = getFeaturedVisibleCount();
+        if (dir === 'left') {
+          startIdx = (startIdx - visibleCount + originalCards.length) % originalCards.length;
+        } else {
+          startIdx = (startIdx + visibleCount) % originalCards.length;
+        }
         renderFeaturedCarousel('fade');
-      });
-      rightBtn.addEventListener('click', function() {
-        startIdx = (startIdx + 1) % originalCards.length;
-        renderFeaturedCarousel('fade');
-      });
-      window.addEventListener('resize', function() {
-        // Optionally, you could recalculate visibleCount here for responsiveness
-      });
+      }
+      leftBtn.addEventListener('click', function() { scrollFeatured('left'); });
+      rightBtn.addEventListener('click', function() { scrollFeatured('right'); });
+      window.addEventListener('resize', function() { renderFeaturedCarousel(); });
       renderFeaturedCarousel();
     })();
   </script>
