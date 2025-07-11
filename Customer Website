@@ -2415,6 +2415,9 @@
         </button>
       </div>
       <button class="modal-close" id="modal-close-btn">&times;</button>
+      <div class="modal-signup-text" style="text-align:center;margin-top:0.5em;font-size:0.98rem;color:#888;">
+        Don't have an account yet? <a href="#" id="open-signup-modal" style="color:var(--accent-pink-dark);font-weight:700;cursor:pointer;text-decoration:underline;">Sign up</a>
+      </div>
     </div>
   </div>
   <!-- Product Details Modal (hidden by default) -->
@@ -2502,11 +2505,74 @@
       </div>
     </div>
   </section>
+  <!-- Registration Modal -->
+  <div id="signup-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-title">Create Account</div>
+      <div class="modal-subtitle">Sign up to get started</div>
+      <form class="modal-form" id="signup-form" autocomplete="off" onsubmit="return false;">
+        <label class="modal-label" for="signup-fullname">Full Name</label>
+        <div class="modal-input-wrap">
+          <span class="modal-input-icon"><i class="fa fa-user"></i></span>
+          <input type="text" id="signup-fullname" class="modal-input" placeholder="Enter your full name..." required />
+        </div>
+        <label class="modal-label" for="signup-phone">Phone Number</label>
+        <div class="modal-input-wrap">
+          <span class="modal-input-icon"><i class="fa fa-phone"></i></span>
+          <input type="tel" id="signup-phone" class="modal-input" placeholder="Enter your phone number..." required />
+        </div>
+        <button class="modal-login-btn" type="submit">Sign Up</button>
+      </form>
+      <div class="modal-signup-text" style="text-align:center;margin-top:0.5em;font-size:0.98rem;color:#888;">
+        Already have an account? <a href="#" id="back-to-login" style="color:var(--accent-pink-dark);font-weight:700;cursor:pointer;text-decoration:underline;">Log in</a>
+      </div>
+      <button class="modal-close" id="signup-close-btn">&times;</button>
+    </div>
+  </div>
   <script>
     // Modal logic
     const loginBtn = document.querySelector('.login-btn');
     const modal = document.getElementById('login-modal');
     const closeModalBtn = document.getElementById('modal-close-btn');
+    // --- Signup modal logic ---
+    const signupModal = document.getElementById('signup-modal');
+    const openSignupBtn = document.getElementById('open-signup-modal');
+    const signupCloseBtn = document.getElementById('signup-close-btn');
+    const backToLoginBtn = document.getElementById('back-to-login');
+    // Open signup modal from login
+    if (openSignupBtn) {
+      openSignupBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        modal.classList.remove('active');
+        signupModal.classList.add('active');
+      });
+    }
+    // Close signup modal
+    if (signupCloseBtn) {
+      signupCloseBtn.addEventListener('click', function() {
+        signupModal.classList.remove('active');
+      });
+    }
+    // Back to login from signup
+    if (backToLoginBtn) {
+      backToLoginBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        signupModal.classList.remove('active');
+        modal.classList.add('active');
+      });
+    }
+    // Close signup modal on overlay click
+    signupModal.addEventListener('click', function(e) {
+      if (e.target === signupModal) {
+        signupModal.classList.remove('active');
+      }
+    });
+    // Close signup modal on Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        signupModal.classList.remove('active');
+      }
+    });
     loginBtn.addEventListener('click', function(e) {
       e.preventDefault();
       modal.classList.add('active');
