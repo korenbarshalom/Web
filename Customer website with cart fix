@@ -1,0 +1,4383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ShinyBelle – Timeless Elegance</title>
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    :root {
+      --accent-pink: #f7e6f2;
+      --accent-pink-dark: #b86fa7;
+      --accent-gold: #bfa05a;
+      --text-dark: #18141c;
+      --soft-gray: #f8f6fa;
+      --white: #fff;
+      --shadow: 0 4px 24px rgba(184, 111, 167, 0.10), 0 1.5px 6px rgba(0,0,0,0.06);
+      --radius: 20px;
+      --transition: all .32s cubic-bezier(.4,0,.2,1);
+      --max-width: 1200px;
+      --about-fade-duration: 1.1s;
+      --about-fade-delay: 0.2s;
+      --about-logo-float: 2.8s;
+      --feature-card-fade-duration: 0.9s;
+      --feature-icon-fade-duration: 1.1s;
+      --feature-icon-bounce: 0.7s;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { font-size: 16px; scroll-behavior: smooth; overflow-x: hidden !important; width: 100%; max-width: 100%; }
+    body {
+      font-family: 'Lato', sans-serif;
+      color: var(--text-dark);
+      background: var(--soft-gray);
+      line-height: 1.7;
+      letter-spacing: 0.01em;
+      min-height: 100vh;
+    }
+    img, video { max-width: 100%; display: block; border-radius: var(--radius); }
+    a {
+      text-decoration: none;
+      color: var(--accent-pink-dark);
+      font-weight: 600;
+      transition: color .2s;
+    }
+    a:hover, a:focus {
+      color: var(--accent-gold);
+    }
+    h1,h2,h3,h4 {
+      font-family: 'Playfair Display', serif;
+      color: var(--text-dark);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-shadow: 0 1.5px 6px rgba(184, 111, 167, 0.08);
+    }
+    h1 { font-size: 3.2rem; line-height: 1.1; margin-bottom: 1.2rem; }
+    h2 { font-size: 2rem; margin-bottom: 1rem; }
+    h3 { font-size: 1.2rem; }
+    p { margin-bottom: 1.1rem; font-size: 1.08rem; }
+    .container {
+      width: 92%;
+      max-width: var(--max-width);
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .btn {
+      display: inline-block;
+      padding: .85rem 2.2rem;
+      background: linear-gradient(90deg, var(--accent-pink-dark) 0%, var(--accent-gold) 100%);
+      color: #fff;
+      border-radius: 999px;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      font-size: 1.08rem;
+      box-shadow: 0 2px 12px rgba(184, 111, 167, 0.13);
+      border: none;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn:hover, .btn:focus {
+      background: linear-gradient(90deg, var(--accent-gold) 0%, var(--accent-pink-dark) 100%);
+      color: #fff;
+      box-shadow: 0 6px 24px rgba(184, 111, 167, 0.18);
+      transform: translateY(-2px) scale(1.04);
+    }
+    header {
+      position: sticky;
+      top: 0;
+      background: #fff;
+      box-shadow: 0 2px 12px rgba(184, 111, 167, 0.08);
+      z-index: 1000;
+    }
+    .navbar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem 0;
+      width: 100%;
+      position: relative;
+      gap: 2rem;
+    }
+    .logo {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      min-width: 0;
+      position: relative;
+    }
+    .logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.1rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+    }
+    .logo-accent {
+      color: var(--accent-gold);
+      margin-left: 0.12em;
+      font-family: inherit;
+      font-size: inherit;
+      font-weight: inherit;
+      letter-spacing: inherit;
+      text-shadow: 0 1.5px 6px rgba(231, 207, 164, 0.10);
+    }
+    .logo-underline {
+      display: block;
+      width: 70%;
+      height: 3px;
+      margin-left: 0.1em;
+      margin-top: 0.2em;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--accent-gold) 0%, var(--accent-pink-dark) 100%);
+      opacity: 0.5;
+      position: absolute;
+      left: 0;
+      bottom: -7px;
+      pointer-events: none;
+    }
+    nav {
+      display: flex;
+      flex: 1;
+      justify-content: center;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    nav a {
+      position: relative;
+      font-size: 1.08rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      padding-bottom: 2px;
+      transition: color .3s;
+    }
+    nav a::after {
+      content: '';
+      position: absolute;
+      left: 0; bottom: -4px;
+      width: 0; height: 2.5px;
+      background: linear-gradient(90deg, var(--accent-pink-dark), var(--accent-gold));
+      border-radius: 2px;
+      transition: width .35s cubic-bezier(.4,0,.2,1);
+    }
+    nav a:hover, nav a:focus {
+      color: var(--accent-pink-dark);
+    }
+    nav a:hover::after, nav a:focus::after {
+      width: 100%;
+    }
+    .navbar-action {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      z-index: 2;
+    }
+    .login-btn {
+      padding: 0.6rem 1.5rem;
+      border-radius: 999px;
+      border: 2px solid var(--accent-pink-dark);
+      background: #fff;
+      color: var(--accent-pink-dark);
+      font-family: 'Lato', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      transition: background 0.25s, color 0.25s, box-shadow 0.25s, border-color 0.25s;
+      box-shadow: 0 1.5px 6px rgba(184, 111, 167, 0.10);
+      outline: none;
+    }
+    .login-btn:hover, .login-btn:focus {
+      background: linear-gradient(90deg, var(--accent-pink-dark) 0%, var(--accent-gold) 100%);
+      color: #fff;
+      border-color: var(--accent-gold);
+      box-shadow: 0 4px 16px rgba(191, 160, 90, 0.13);
+      text-decoration: none;
+    }
+    .hero {
+      position: relative;
+      background: #ffffffd3 url('https://thumbs.dreamstime.com/b/beauty-woman-perfect-makeup-manicure-glamour-girl-jewelry-pink-lips-nails-precious-stones-silver-girls-face-isolated-192398621.jpg') center/cover no-repeat;
+      height: 70vh;
+      min-height: 420px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: var(--text-dark);
+      border-radius: 0 0 var(--radius) var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 2.5rem;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(247, 230, 242, 0.72);
+      border-radius: 0 0 var(--radius) var(--radius);
+    }
+    .hero-content {
+      position: relative;
+      max-width: 700px;
+      padding: 0 1.5rem;
+      z-index: 1;
+    }
+    .hero-content h1 {
+      font-size: 3.5rem;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      margin-bottom: 1.2rem;
+      color: var(--accent-pink-dark);
+      text-shadow: 0 2px 12px rgba(184, 111, 167, 0.13);
+    }
+    .hero-content .btn {
+      margin-top: 1.2rem;
+      font-size: 1.15rem;
+    }
+    .categories {
+      background: #fff;
+      padding: 3.5rem 0 2.5rem 0;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 2.5rem;
+    }
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 2.2rem;
+      padding: 0 1.5rem;
+      background: var(--accent-pink);
+      border-radius: var(--radius);
+    }
+    .category-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius);
+      background: #fff;
+      transition: var(--transition);
+      box-shadow: 0 2px 12px rgba(184, 111, 167, 0.10);
+      cursor: pointer;
+      border: 2px solid var(--accent-pink-dark);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 220px;
+    }
+    .category-card img {
+      transition: transform .4s cubic-bezier(.4,0,.2,1);
+      border-radius: var(--radius) var(--radius) 0 0;
+      min-height: 120px;
+      object-fit: cover;
+      width: 100%;
+      aspect-ratio: 1.2/1;
+    }
+    .category-card:hover img {
+      transform: scale(1.08) rotate(-1deg);
+      filter: brightness(1.08) saturate(1.1);
+    }
+    .category-card:hover {
+      box-shadow: 0 8px 24px rgba(191, 160, 90, 0.13), 0 2px 12px rgba(184, 111, 167, 0.13);
+      transform: translateY(-6px) scale(1.025);
+      border-color: var(--accent-gold);
+      background: linear-gradient(90deg, #fff 90%, var(--accent-pink) 100%);
+    }
+    .category-card .label {
+      text-align: center;
+      padding: 1.1rem 0 .9rem 0;
+      font-weight: 800;
+      font-size: 1.13rem;
+      background: #fff;
+      color: var(--accent-pink-dark);
+      letter-spacing: 1.2px;
+      border-radius: 0 0 var(--radius) var(--radius);
+      width: 100%;
+    }
+    .featured {
+      padding: 3.5rem 0 2.5rem 0;
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .featured h2 {
+      text-align: center;
+      margin-bottom: 2.2rem;
+      color: var(--accent-pink-dark);
+      letter-spacing: 2px;
+    }
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 2.2rem;
+      padding: 0 1.5rem;
+      overflow: visible;
+    }
+    .product-card {
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: 0 2px 12px rgba(184, 111, 167, 0.10);
+      text-align: center;
+      padding: 2.2rem 1.2rem 1.5rem 1.2rem;
+      transition: var(--transition);
+      border: 2px solid var(--accent-pink-dark);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 320px;
+      z-index: 1;
+    }
+    .product-card img {
+      width: 100%;
+      aspect-ratio: 1.2/1;
+      object-fit: cover;
+      border-radius: var(--radius) var(--radius) 0 0;
+      margin-bottom: 1.2rem;
+    }
+    .product-card:hover, .product-card:focus {
+      box-shadow: 0 8px 24px rgba(191, 160, 90, 0.13), 0 2px 12px rgba(184, 111, 167, 0.13);
+      transform: translateY(-6px) scale(1.025);
+      border-color: var(--accent-gold);
+      background: linear-gradient(90deg, #fff 90%, var(--accent-pink) 100%);
+      z-index: 2;
+    }
+    .product-card h4 {
+      margin: 1.2rem 0 .7rem 0;
+      font-size: 1.18rem;
+      color: var(--accent-pink-dark);
+      font-weight: 800;
+    }
+    .product-card span {
+      color: var(--accent-gold);
+      font-weight: 800;
+      font-size: 1.13rem;
+      letter-spacing: 1px;
+    }
+    footer {
+      border-top: 1.5px solid #f3e2ec;
+      padding: 2.5rem 0 1.5rem 0;
+      background: #fff;
+      border-radius: var(--radius) var(--radius) 0 0;
+      box-shadow: 0 -2px 12px rgba(184, 111, 167, 0.08);
+      margin-top: 3rem;
+    }
+    .footer-contact-minimal {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 120px;
+      padding: 2rem 0 1.5rem 0;
+      background: #fff;
+      border-radius: var(--radius) var(--radius) 0 0;
+      box-shadow: 0 -2px 12px rgba(184, 111, 167, 0.08);
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+    .footer-title {
+      color: var(--accent-pink-dark);
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 0.7rem;
+      letter-spacing: 1px;
+    }
+    .footer-contact-details {
+      font-family: 'Lato', sans-serif;
+      color: var(--text-dark);
+      font-size: 1.08rem;
+      font-weight: 500;
+      line-height: 1.7;
+      margin-bottom: 0.2rem;
+    }
+    .categories-section-title {
+      text-align: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; /* 32px */
+      color: #e7b6d6; /* soft pastel pink, matches branding */
+      font-weight: 700;
+      margin-bottom: 2.2rem;
+      letter-spacing: 1.5px;
+      margin-top: 0.2rem;
+    }
+    @media (max-width: 1024px) {
+      .hero-content h1 { font-size: 2.2rem; }
+      .container { width: 97%; }
+      .navbar { gap: 1.2rem; }
+      .logo { min-width: 150px; }
+    }
+    @media (max-width: 768px) {
+      .hero-content h1 { font-size: 1.7rem; }
+      .navbar { flex-direction: column; gap: 1rem; align-items: flex-start; }
+      .logo { margin-left: 0; align-items: flex-start; }
+      nav { margin-left: 0; }
+      .navbar-action { margin-left: 0; }
+      .login-btn { margin-left: 0; }
+      .categories, .featured { padding: 1.5rem 0 1rem 0; }
+      .footer-contact-minimal { padding: 1.2rem 0 1rem 0; }
+      .categories-section-title {
+        font-size: 1.4rem;
+        margin-bottom: 1.1rem;
+      }
+      .category-card {
+        min-height: 120px;
+        max-width: 120px;
+      }
+      .category-card img {
+        min-height: 60px;
+      }
+    }
+    @media (max-width: 480px) {
+      .hero { min-height: 220px; }
+      .hero-content h1 { font-size: 1.1rem; }
+      .btn { font-size: .98rem; padding: .7rem 1.2rem; }
+      .modal-content { padding: 1.2rem 0.5rem 0.7rem 0.5rem; width: 98vw; min-height: 420px; }
+      .navbar-action { padding-right: 0.5rem; }
+    }
+    /* Modal Styles */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      background: rgba(24, 20, 28, 0.18);
+      justify-content: center;
+      align-items: center;
+      transition: opacity .3s;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal-content {
+      background: #fff;
+      border-radius: 22px;
+      box-shadow: 0 12px 48px rgba(184, 111, 167, 0.18), 0 2px 12px rgba(24, 20, 28, 0.08);
+      width: 410px;
+      max-width: 98vw;
+      min-height: 480px;
+      padding: 3.2rem 2.5rem 2.2rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      font-family: 'Lato', sans-serif;
+      justify-content: flex-start;
+      box-shadow: 0 8px 40px rgba(184, 111, 167, 0.13), 0 2px 12px rgba(24, 20, 28, 0.08);
+      border: 1.5px solid #f7e6f2;
+    }
+    .modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.1rem;
+      font-weight: 700;
+      color: var(--accent-pink-dark);
+      text-align: center;
+      margin-bottom: 0.7rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.8;
+    }
+    .modal-subtitle {
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      text-align: center;
+      margin-bottom: 1.2rem;
+    }
+    .modal-form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      margin-bottom: 1.3rem;
+    }
+    .modal-label {
+      font-size: 1.05rem;
+      color: #888;
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+      text-align: left;
+      display: block;
+    }
+    .modal-input-wrap {
+      position: relative;
+      margin-bottom: 0.8rem;
+    }
+    .modal-input-icon {
+      position: absolute;
+      left: 0.7rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #bbb;
+      font-size: 1.1rem;
+      pointer-events: none;
+    }
+    .modal-input {
+      width: 100%;
+      padding: 0.7rem 2.2rem 0.7rem 2.1rem;
+      border: none;
+      border-bottom: 2px solid #bbb;
+      font-size: 1.08rem;
+      background: transparent;
+      color: var(--text-dark);
+      outline: none;
+      font-family: inherit;
+      border-radius: 0;
+      transition: border-color .2s;
+    }
+    .modal-input:focus {
+      border-bottom: 2px solid var(--accent-pink-dark);
+    }
+    .modal-login-btn {
+      width: 100%;
+      background: #18141c;
+      color: #fff;
+      font-size: 1.18rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 7px;
+      padding: 1.1rem 0;
+      margin-top: 0.7rem;
+      margin-bottom: 0.2rem;
+      cursor: pointer;
+      transition: background .2s;
+      letter-spacing: 1px;
+      box-shadow: 0 2px 8px rgba(24, 20, 28, 0.08);
+    }
+    .modal-login-btn:hover, .modal-login-btn:focus {
+      background: var(--accent-pink-dark);
+    }
+    .modal-divider-wrap {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      margin: 1.2rem 0 1.1rem 0;
+    }
+    .modal-divider {
+      flex: 1;
+      height: 1.5px;
+      background: #e5e5e5;
+      border-radius: 2px;
+    }
+    .modal-divider-text {
+      margin: 0 0.7rem;
+      color: #888;
+      font-size: 1.05rem;
+      font-weight: 600;
+      opacity: 0.8;
+    }
+    .modal-social-btns {
+      display: flex;
+      width: 100%;
+      margin-bottom: 1.5rem;
+      gap: 0;
+    }
+    .modal-social-btns.single-btn {
+      justify-content: center;
+    }
+    .modal-social-btn {
+      width: 100%;
+      background: #fff;
+      border: 1.5px solid #bbb;
+      border-radius: 8px;
+      padding: 1.1rem 0;
+      font-size: 1.13rem;
+      font-weight: 700;
+      color: #222;
+      cursor: pointer;
+      transition: border-color .2s, color .2s, box-shadow .2s;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(184, 111, 167, 0.07);
+      letter-spacing: 1px;
+      gap: 0.7em;
+    }
+    .modal-social-btn.google-google-logo {
+      border: 1px solid #000;
+      background: #fff;
+      color: #222;
+      font-size: 1.15rem;
+      font-weight: 500;
+      border-radius: 4px;
+      padding: 0.7rem 0;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: none;
+      letter-spacing: 0;
+      transition: background 0.18s, border-color 0.18s;
+      margin-bottom: 1.5rem;
+      outline: none;
+    }
+    .modal-social-btn.google-google-logo:hover, .modal-social-btn.google-google-logo:focus {
+      background: #f2f2f2;
+      border-color: #000;
+    }
+    .google-logo-text {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+      font-size: 1.15rem;
+      font-weight: 500;
+      letter-spacing: 0;
+      padding: 0;
+      margin: 0;
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      color: #18141c;
+      font-size: 2.2rem;
+      font-weight: 400;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity .2s, color .2s;
+      position: absolute;
+      top: 1.1rem;
+      right: 1.3rem;
+      left: auto;
+      bottom: auto;
+      margin: 0;
+      z-index: 10;
+    }
+    .modal-close:hover, .modal-close:focus {
+      opacity: 1;
+      color: var(--accent-pink-dark);
+    }
+    /* Product Details Modal Styles */
+    #product-details-modal {
+      display: none;
+      position: fixed;
+      z-index: 3000;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      background: rgba(24, 20, 28, 0.18);
+      justify-content: center;
+      align-items: center;
+      transition: opacity .3s;
+    }
+    #product-details-modal.active {
+      display: flex;
+    }
+    .product-details-modal-content {
+      background: #fff;
+      border-radius: 22px;
+      box-shadow: 0 12px 48px rgba(184, 111, 167, 0.18), 0 2px 12px rgba(24, 20, 28, 0.08);
+      width: 600px;
+      max-width: 98vw;
+      min-height: 420px;
+      padding: 2.5rem 2.2rem 2.2rem 2.2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      font-family: 'Lato', sans-serif;
+      justify-content: flex-start;
+      border: 1.5px solid #f7e6f2;
+      animation: fadeInUp .32s cubic-bezier(.4,0,.2,1);
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .product-details-modal-layout {
+      display: flex;
+      flex-direction: row;
+      gap: 2.2rem;
+      width: 100%;
+      align-items: flex-start;
+    }
+    .product-details-image-wrap {
+      flex: 1 1 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+    }
+    #product-details-img {
+      width: 100%;
+      max-width: 220px;
+      border-radius: var(--radius);
+      box-shadow: 0 4px 24px rgba(184, 111, 167, 0.13);
+      background: var(--accent-pink);
+      object-fit: cover;
+      aspect-ratio: 1.2/1;
+    }
+    .product-details-info {
+      flex: 1 1 50%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      gap: 1.1rem;
+      min-width: 0;
+    }
+    .product-details-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 0.2rem;
+      letter-spacing: 0.04em;
+      text-shadow: 0 1.5px 6px rgba(184, 111, 167, 0.08);
+    }
+    .product-details-price {
+      color: var(--accent-gold);
+      font-size: 1.18rem;
+      font-weight: 800;
+      margin-bottom: 0.7rem;
+      letter-spacing: 1.2px;
+    }
+    .product-details-desc {
+      font-size: 1.08rem;
+      color: var(--text-dark);
+      margin-bottom: 1.1rem;
+      line-height: 1.7;
+      opacity: 0.92;
+      font-weight: 500;
+      max-width: 28rem;
+    }
+    #product-details-add-to-cart {
+      display: inline-block;
+      padding: 0.8rem 2.2rem;
+      background: linear-gradient(90deg, var(--accent-pink-dark) 0%, var(--accent-gold) 100%);
+      color: #fff;
+      border-radius: 999px;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      font-size: 1.08rem;
+      box-shadow: 0 2px 12px rgba(184, 111, 167, 0.13);
+      border: none;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      margin-top: 0.7rem;
+    }
+    #product-details-add-to-cart:hover, #product-details-add-to-cart:focus {
+      background: linear-gradient(90deg, var(--accent-gold) 0%, var(--accent-pink-dark) 100%);
+      color: #fff;
+      box-shadow: 0 6px 24px rgba(184, 111, 167, 0.18);
+      transform: translateY(-2px) scale(1.04);
+    }
+    @media (max-width: 700px) {
+      .product-details-modal-layout {
+        flex-direction: column;
+        gap: 1.2rem;
+        align-items: center;
+      }
+      .product-details-image-wrap { justify-content: center; }
+      #product-details-img { max-width: 90vw; }
+    }
+    /* Product Detail Section Styles */
+    #product-detail-section {
+      background: var(--soft-gray);
+      padding: 2.5rem 0 2.5rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%;
+      overflow-x: hidden;
+    }
+    .product-detail-container {
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      max-width: 1100px;
+      width: 97vw;
+      margin: 0 auto;
+      padding: 2.5rem 2.2rem 2.2rem 2.2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      min-height: 80vh;
+      overflow: visible;
+    }
+    .back-btn {
+      margin-bottom: 1.5rem;
+      background: none;
+      border: none;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-pink-dark);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+      transition: color .2s;
+      z-index: 2;
+    }
+    .back-btn:hover, .back-btn:focus {
+      color: var(--accent-gold);
+    }
+    .product-detail-layout {
+      display: flex;
+      flex-direction: row;
+      gap: 2.5rem;
+      width: 100%;
+      align-items: flex-start;
+      justify-content: center;
+      flex-wrap: wrap;
+      overflow: visible;
+    }
+    .product-gallery {
+      flex: 1 1 420px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 240px;
+      max-width: 480px;
+      overflow: visible;
+    }
+    .product-main-img {
+      width: 100%;
+      max-width: 420px;
+      max-height: 420px;
+      border-radius: var(--radius);
+      box-shadow: 0 4px 24px rgba(184, 111, 167, 0.13);
+      background: var(--accent-pink);
+      object-fit: contain;
+      aspect-ratio: 1.2/1;
+      margin-bottom: 1.2em;
+      display: block;
+    }
+    .product-thumbnails {
+      display: flex;
+      flex-direction: row;
+      margin-top: 0.5em;
+      gap: 0.5em;
+      flex-wrap: wrap;
+      overflow: visible;
+    }
+    .product-thumb {
+      border: 2px solid transparent;
+      transition: border-color .2s, box-shadow .2s;
+      background: #fff;
+    }
+    .product-thumb.active, .product-thumb:hover {
+      border: 2px solid var(--accent-gold);
+      box-shadow: 0 2px 8px rgba(191, 160, 90, 0.13);
+    }
+    .product-info {
+      flex: 1 1 320px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      min-width: 220px;
+      max-width: 480px;
+      overflow: visible;
+    }
+    .product-detail-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.1rem;
+      font-weight: 700;
+      color: var(--accent-pink-dark);
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.04em;
+      text-shadow: 0 1.5px 6px rgba(184, 111, 167, 0.08);
+      word-break: break-word;
+    }
+    .product-detail-price {
+      color: var(--accent-gold);
+      font-size: 1.18rem;
+      font-weight: 800;
+      margin-bottom: 1.1rem;
+      letter-spacing: 1.2px;
+    }
+    .product-selectors {
+      margin-bottom: 1.2em;
+      width: 100%;
+    }
+    .color-options {
+      display: flex;
+      flex-direction: row;
+      gap: 0.7em;
+      margin-top: 0.5em;
+      flex-wrap: wrap;
+    }
+    .color-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--accent-pink-dark);
+      margin-right: 0.2em;
+      cursor: pointer;
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+      background: #eee;
+    }
+    .color-dot.active, .color-dot:focus {
+      border-color: var(--accent-gold);
+      box-shadow: 0 2px 8px rgba(191, 160, 90, 0.13);
+    }
+    .size-options {
+      display: flex;
+      flex-direction: row;
+      gap: 0.7em;
+      margin-top: 0.5em;
+      flex-wrap: wrap;
+    }
+    .size-btn {
+      padding: 0.5em 1.3em;
+      border-radius: 999px;
+      border: 2px solid var(--accent-pink-dark);
+      background: #fff;
+      color: var(--accent-pink-dark);
+      font-weight: 700;
+      font-size: 1.05rem;
+      cursor: pointer;
+      transition: border-color .2s, color .2s, background .2s;
+      outline: none;
+      margin-bottom: 0.3em;
+    }
+    .size-btn.active, .size-btn:focus {
+      border-color: var(--accent-gold);
+      color: var(--accent-gold);
+      background: var(--accent-pink);
+    }
+    .add-to-cart-btn {
+      margin: 1.5em 0 1em 0;
+      width: 100%;
+      max-width: 320px;
+    }
+    /* Product Info Sections (expanded, not accordion) */
+    .product-info-sections {
+      width: 100%;
+      margin-top: 1.5em;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2em;
+    }
+    .info-block {
+      background: var(--soft-gray);
+      border-radius: 12px;
+      padding: 1.1em 1.3em 1.1em 1.3em;
+      box-shadow: 0 1.5px 6px rgba(184, 111, 167, 0.06);
+    }
+    .info-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.13rem;
+      color: var(--accent-pink-dark);
+      font-weight: 700;
+      margin-bottom: 0.5em;
+      letter-spacing: 0.5px;
+    }
+    .info-content {
+      font-size: 1.05rem;
+      color: var(--text-dark);
+      line-height: 1.7;
+    }
+    @media (max-width: 900px) {
+      .product-detail-layout {
+        flex-direction: column;
+        gap: 1.5rem;
+        align-items: center;
+      }
+      .product-gallery, .product-info {
+        max-width: 98vw;
+        width: 100%;
+      }
+      .product-main-img {
+        max-width: 98vw;
+        max-height: 340px;
+      }
+    }
+    @media (max-width: 600px) {
+      .product-detail-container {
+        padding: 1.2rem 0.5rem 0.7rem 0.5rem;
+      }
+      .product-detail-title {
+        font-size: 1.3rem;
+      }
+      .product-detail-layout {
+        gap: 0.7rem;
+      }
+      .product-main-img {
+        max-width: 95vw;
+        max-height: 220px;
+      }
+      .product-info {
+        min-width: 0;
+        max-width: 100vw;
+      }
+      .product-info-sections {
+        gap: 0.7em;
+      }
+      .info-block {
+        padding: 0.7em 0.7em 0.7em 0.7em;
+      }
+      .info-title {
+        font-size: 1rem;
+      }
+    }
+    /* All Products Section Styles */
+    #all-products-section {
+      background: var(--soft-gray);
+      padding: 2.5rem 0 2.5rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%;
+      overflow-x: hidden;
+    }
+    .all-products-container {
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      max-width: 1100px;
+      width: 97vw;
+      margin: 0 auto;
+      padding: 2.5rem 2.2rem 2.2rem 2.2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      min-height: 80vh;
+      overflow: visible;
+    }
+    .all-products-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--accent-pink-dark);
+      font-weight: 700;
+      margin-bottom: 2rem;
+      letter-spacing: 1.5px;
+      margin-top: 0.2rem;
+      text-align: left;
+      width: 100%;
+    }
+    #all-products-grid {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 2.2rem;
+      margin-top: 0.5rem;
+    }
+    @media (max-width: 900px) {
+      .all-products-container {
+        padding: 1.2rem 0.5rem 0.7rem 0.5rem;
+      }
+      .all-products-title {
+        font-size: 1.3rem;
+      }
+      #all-products-grid {
+        gap: 1.1rem;
+      }
+    }
+    /* Mini Cart Styles */
+    #mini-cart-panel {
+      min-width: 320px;
+      max-width: 370px;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 8px 32px rgba(191,160,90,0.13), 0 2px 12px rgba(184,111,167,0.10);
+      padding: 1.2em 1.1em 1.1em 1.1em;
+      font-family: 'Lato', sans-serif;
+      display: none;
+      flex-direction: column;
+      gap: 1em;
+      border: 2px solid var(--accent-pink-dark);
+      z-index: 2000;
+    }
+    #mini-cart-panel.active { display: flex; }
+    .mini-cart-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.18rem;
+      color: var(--accent-pink-dark);
+      font-weight: 700;
+      margin-bottom: 0.7em;
+      letter-spacing: 0.5px;
+    }
+    .mini-cart-items {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7em;
+      max-height: none;
+      overflow: visible;
+      margin-bottom: 0.7em;
+    }
+    .mini-cart-item {
+      display: flex;
+      align-items: center;
+      gap: 0.7em;
+      background: var(--soft-gray);
+      border-radius: 10px;
+      padding: 0.5em 0.7em;
+      position: relative;
+    }
+    .mini-cart-item-img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      border-radius: 8px;
+      background: #fff;
+      border: 1.5px solid var(--accent-pink-dark);
+    }
+    .mini-cart-item-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.1em;
+    }
+    .mini-cart-item-title {
+      font-size: 1.05rem;
+      color: var(--accent-pink-dark);
+      font-weight: 700;
+      margin-bottom: 0.1em;
+      font-family: 'Playfair Display', serif;
+    }
+    .mini-cart-item-meta {
+      font-size: 0.97rem;
+      color: var(--text-dark);
+      opacity: 0.85;
+    }
+    .mini-cart-item-remove {
+      background: none;
+      border: none;
+      color: var(--accent-pink-dark);
+      font-size: 1.2rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-left: 0.5em;
+      transition: color 0.2s;
+    }
+    .mini-cart-item-remove:hover {
+      color: var(--accent-gold);
+    }
+    .mini-cart-footer {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5em;
+      margin-top: 0.7em;
+    }
+    .mini-cart-total {
+      font-size: 1.08rem;
+      color: var(--accent-pink-dark);
+      font-weight: 700;
+      text-align: right;
+    }
+    .mini-cart-checkout-btn {
+      width: 100%;
+      background: linear-gradient(90deg, var(--accent-pink-dark) 0%, var(--accent-gold) 100%);
+      color: #fff;
+      border-radius: 999px;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      font-size: 1.08rem;
+      border: none;
+      padding: 0.7em 0;
+      margin-top: 0.2em;
+      box-shadow: 0 2px 12px rgba(184,111,167,0.13);
+      transition: var(--transition);
+      cursor: pointer;
+    }
+    .mini-cart-checkout-btn:hover, .mini-cart-checkout-btn:focus {
+      background: linear-gradient(90deg, var(--accent-gold) 0%, var(--accent-pink-dark) 100%);
+      color: #fff;
+      box-shadow: 0 6px 24px rgba(184,111,167,0.18);
+      transform: translateY(-2px) scale(1.04);
+    }
+    @media (max-width: 600px) {
+      #mini-cart-panel {
+        min-width: 90vw;
+        max-width: 98vw;
+        right: -1.5em;
+      }
+    }
+    .checkout-container-2col {
+      display: flex;
+      flex-direction: row;
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      min-height: 70vh;
+      width: 97vw;
+      padding: 2.5rem 2.2rem 2.2rem 2.2rem;
+      gap: 2.5rem;
+      overflow: visible;
+    }
+    .checkout-left {
+      flex: 2 1 60%;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      max-width: 520px;
+    }
+    .checkout-right {
+      flex: 1 1 40%;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      max-width: 420px;
+      margin-left: 2.5rem;
+    }
+    .checkout-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--accent-pink-dark);
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+      letter-spacing: 1.5px;
+      text-align: left;
+    }
+    .checkout-form-2col {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1.5em;
+    }
+    .checkout-block {
+      background: var(--soft-gray);
+      border-radius: 14px;
+      padding: 1.2em 1em;
+      box-shadow: 0 1.5px 6px rgba(184, 111, 167, 0.06);
+      margin-bottom: 1.2em;
+    }
+    .checkout-block-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.13rem;
+      color: var(--accent-pink-dark);
+      font-weight: 700;
+      margin-bottom: 0.7em;
+      letter-spacing: 0.5px;
+      text-align: left;
+    }
+    .checkout-label {
+      font-size: 1.05rem;
+      color: #888;
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+      text-align: left;
+      display: block;
+    }
+    .checkout-input {
+      width: 100%;
+      padding: 0.7rem 1.2rem;
+      border: 2px solid #bbb;
+      font-size: 1.08rem;
+      background: #fff;
+      color: var(--text-dark);
+      outline: none;
+      font-family: inherit;
+      border-radius: 8px;
+      transition: border-color .2s;
+      margin-bottom: 0.7em;
+    }
+    .checkout-input:focus {
+      border-color: var(--accent-pink-dark);
+    }
+    .checkout-row {
+      display: flex;
+      flex-direction: row;
+      gap: 0.7em;
+      margin-bottom: 0.7em;
+    }
+    .checkout-checkbox-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.7em;
+    }
+    .checkout-summary-block {
+      background: var(--soft-gray);
+      border-radius: 14px;
+      padding: 1.2em 1em;
+      box-shadow: 0 1.5px 6px rgba(184, 111, 167, 0.06);
+      margin-bottom: 1.2em;
+    }
+    .checkout-summary-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.13rem;
+      color: var(--accent-pink-dark);
+      font-weight: 700;
+      margin-bottom: 0.7em;
+      letter-spacing: 0.5px;
+      text-align: left;
+    }
+    .checkout-order-items {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7em;
+      margin-bottom: 0.7em;
+    }
+    .checkout-summary-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.05rem;
+      color: var(--text-dark);
+      margin-bottom: 0.3em;
+    }
+    .checkout-total-row {
+      font-size: 1.18rem;
+      font-weight: 800;
+      color: var(--accent-pink-dark);
+      margin-top: 0.7em;
+    }
+    @media (max-width: 900px) {
+      .checkout-container-2col {
+        flex-direction: column;
+        gap: 1.5rem;
+        padding: 1.2rem 0.5rem 0.7rem 0.5rem;
+      }
+      .checkout-right {
+        margin-left: 0;
+        max-width: 100vw;
+      }
+      .checkout-left {
+        max-width: 100vw;
+      }
+    }
+    @media (max-width: 600px) {
+      .checkout-container-2col {
+        padding: 0.5rem 0.1rem 0.1rem 0.1rem;
+      }
+      .checkout-title {
+        font-size: 1.3rem;
+      }
+      .checkout-block-title {
+        font-size: 1rem;
+      }
+    }
+    /* --- Page Load Animation --- */
+    body.sb-fadein {
+      opacity: 0;
+      transition: opacity 1.1s cubic-bezier(.4,0,.2,1);
+    }
+    body.sb-fadein.sb-loaded {
+      opacity: 1;
+    }
+    /* --- Section Fade/Slide Animations --- */
+    .sb-animate {
+      opacity: 0;
+      transform: translateY(40px) scale(0.98);
+      transition: opacity 0.8s cubic-bezier(.4,0,.2,1), transform 0.8s cubic-bezier(.4,0,.2,1);
+      will-change: opacity, transform;
+    }
+    .sb-animate.sb-inview {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    /* --- Card Hover Animations --- */
+    .category-card, .product-card {
+      transition: box-shadow 0.38s cubic-bezier(.4,0,.2,1), transform 0.38s cubic-bezier(.4,0,.2,1), border-color 0.38s, background 0.38s;
+      will-change: box-shadow, transform, border-color, background;
+    }
+    .category-card:hover, .category-card:focus,
+    .product-card:hover, .product-card:focus {
+      box-shadow: 0 8px 24px rgba(191, 160, 90, 0.13), 0 2px 12px rgba(184, 111, 167, 0.13);
+      transform: translateY(-6px) scale(1.025);
+      border-color: var(--accent-gold);
+      background: linear-gradient(90deg, #fff 90%, var(--accent-pink) 100%);
+    }
+    /* --- Button Enhanced Hover --- */
+    .btn, .add-to-cart-btn, .mini-cart-checkout-btn {
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+    .btn::before, .add-to-cart-btn::before, .mini-cart-checkout-btn::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(191,160,90,0.13);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.5s cubic-bezier(.4,0,.2,1), height 0.5s cubic-bezier(.4,0,.2,1);
+      z-index: 0;
+    }
+    .btn:hover::before, .add-to-cart-btn:hover::before, .mini-cart-checkout-btn:hover::before {
+      width: 250%;
+      height: 250%;
+    }
+    .btn span, .add-to-cart-btn span, .mini-cart-checkout-btn span {
+      position: relative;
+      z-index: 2;
+    }
+    /* --- Modal Pop/Slide Animations --- */
+    .modal-overlay.active .modal-content, #product-details-modal.active .product-details-modal-content {
+      animation: sb-modal-pop 0.7s cubic-bezier(.4,0,.2,1);
+    }
+    @keyframes sb-modal-pop {
+      0% { opacity: 0; transform: scale(0.85) translateY(40px); }
+      60% { opacity: 1; transform: scale(1.04) translateY(-8px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    /* --- Mini Cart Slide In --- */
+    #mini-cart-panel {
+      transition: transform 0.55s cubic-bezier(.4,0,.2,1), opacity 0.55s cubic-bezier(.4,0,.2,1);
+      transform: translateY(-30px) scale(0.98);
+      opacity: 0;
+      pointer-events: none;
+    }
+    #mini-cart-panel.active {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    /* --- Checkout Section Slide --- */
+    #checkout-section {
+      transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1);
+      opacity: 0;
+      transform: translateY(40px);
+      width: 100%;
+      max-width: 100%;
+    }
+    #checkout-section.sb-inview {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* --- Product Detail Section Slide --- */
+    #product-detail-section {
+      transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1);
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    #product-detail-section.sb-inview {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* --- All Products Section Slide --- */
+    #all-products-section {
+      transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1);
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    #all-products-section.sb-inview {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* --- Navbar Fade/Slide --- */
+    .navbar {
+      opacity: 0;
+      transform: translateY(-30px);
+      transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1);
+    }
+    .navbar.sb-inview {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* --- Hero Section Fade/Zoom --- */
+    .hero {
+      opacity: 0;
+      transform: scale(0.97) translateY(30px);
+      transition: opacity 0.9s cubic-bezier(.4,0,.2,1), transform 0.9s cubic-bezier(.4,0,.2,1);
+    }
+    .hero.sb-inview {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+    /* --- Footer Fade --- */
+    footer, .footer-contact-minimal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s cubic-bezier(.4,0,.2,1), transform 0.8s cubic-bezier(.4,0,.2,1);
+    }
+    footer.sb-inview, .footer-contact-minimal.sb-inview {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* --- Category Card Image Zoom --- */
+    .category-card img {
+      transition: transform 0.5s cubic-bezier(.4,0,.2,1), filter 0.5s cubic-bezier(.4,0,.2,1);
+    }
+    .category-card:hover img {
+      transform: scale(1.13) rotate(-2deg);
+      filter: brightness(1.12) saturate(1.13);
+    }
+    /* --- Product Card Image Zoom --- */
+    .product-card img {
+      transition: transform 0.5s cubic-bezier(.4,0,.2,1), filter 0.5s cubic-bezier(.4,0,.2,1);
+    }
+    .product-card:hover img {
+      transform: scale(1.13) rotate(2deg);
+      filter: brightness(1.12) saturate(1.13);
+    }
+    /* --- Product Thumbnails Fade/Zoom --- */
+    .product-thumb {
+      opacity: 0.7;
+      transform: scale(0.95);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    .product-thumb.active, .product-thumb:hover {
+      opacity: 1;
+      transform: scale(1.08);
+      z-index: 2;
+    }
+    /* --- Color Dot Pop --- */
+    .color-dot {
+      transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+    }
+    .color-dot.active, .color-dot:focus {
+      transform: scale(1.13);
+      box-shadow: 0 2px 8px rgba(191, 160, 90, 0.18);
+    }
+    /* --- Size Button Pop --- */
+    .size-btn {
+      transition: border-color 0.3s, color 0.3s, background 0.3s, transform 0.3s;
+    }
+    .size-btn.active, .size-btn:focus {
+      transform: scale(1.09);
+      box-shadow: 0 2px 8px rgba(191, 160, 90, 0.13);
+    }
+    /* --- Modal Overlay Fade --- */
+    .modal-overlay {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.45s cubic-bezier(.4,0,.2,1);
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    /* --- Modal Content Slide --- */
+    .modal-content {
+      opacity: 0;
+      transform: translateY(40px) scale(0.98);
+      transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1);
+    }
+    .modal-overlay.active .modal-content {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    /* --- Google Button Ripple --- */
+    .modal-social-btn.google-google-logo {
+      overflow: hidden;
+      position: relative;
+    }
+    .modal-social-btn.google-google-logo:active::after {
+      content: '';
+      position: absolute;
+      left: 50%; top: 50%;
+      width: 0; height: 0;
+      background: rgba(66,133,244,0.13);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      animation: sb-btn-ripple 0.6s linear;
+      z-index: 1;
+    }
+    @keyframes sb-btn-ripple {
+      0% { width: 0; height: 0; opacity: 0.7; }
+      100% { width: 300px; height: 300px; opacity: 0; }
+    }
+    /* --- Scrollbar Styling for Elegance --- */
+    ::-webkit-scrollbar {
+      width: 10px;
+      background: var(--soft-gray);
+      border-radius: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(90deg, var(--accent-pink-dark) 0%, var(--accent-gold) 100%);
+      border-radius: 8px;
+      min-height: 40px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-gold);
+    }
+    /* --- Subtle Shadow on Focused Inputs --- */
+    .modal-input:focus, .checkout-input:focus {
+      box-shadow: 0 2px 8px rgba(184, 111, 167, 0.13);
+    }
+    /* --- Subtle Pulse for Cart Badge --- */
+    #cart-count-badge.sb-pulse {
+      animation: sb-badge-pulse 0.7s cubic-bezier(.4,0,.2,1);
+    }
+    @keyframes sb-badge-pulse {
+      0% { transform: scale(1); background: linear-gradient(90deg,var(--accent-pink-dark),var(--accent-gold)); }
+      50% { transform: scale(1.18); background: var(--accent-gold); }
+      100% { transform: scale(1); background: linear-gradient(90deg,var(--accent-pink-dark),var(--accent-gold)); }
+    }
+    /* --- Elegant Divider Animation --- */
+    .modal-divider {
+      position: relative;
+      overflow: hidden;
+    }
+    .modal-divider::after {
+      content: '';
+      position: absolute;
+      left: -100%;
+      top: 0; bottom: 0;
+      width: 100%;
+      background: linear-gradient(90deg, var(--accent-pink-dark), var(--accent-gold));
+      opacity: 0.18;
+      animation: sb-divider-slide 2.2s infinite linear;
+    }
+    @keyframes sb-divider-slide {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+    /* --- Subtle Fade for Info Blocks --- */
+    .info-block {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.7s, transform 0.7s;
+    }
+    .info-block.sb-inview {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* --- Subtle Fade for Checkout Blocks --- */
+    .checkout-block, .checkout-summary-block, .checkout-payment-block, .checkout-confirmation-block {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.7s, transform 0.7s;
+    }
+    .checkout-block.sb-inview, .checkout-summary-block.sb-inview, .checkout-payment-block.sb-inview, .checkout-confirmation-block.sb-inview {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* --- Subtle Fade for All Products Cards --- */
+    #all-products-grid .product-card {
+      opacity: 0;
+      transform: translateY(30px) scale(0.98);
+      transition: opacity 0.7s, transform 0.7s;
+    }
+    #all-products-grid .product-card.sb-inview {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    #homepage-content, #all-products-section, #product-detail-section, #checkout-section {
+      overflow-x: hidden;
+      width: 100%;
+      max-width: 100%;
+    }
+    /* --- Product Slider Arrow Improvements --- */
+    .carousel-arrow {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(247,230,242,0.55);
+      border: 1.5px solid #e7b6d6;
+      box-shadow: 0 2px 8px rgba(184,111,167,0.07);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem !important;
+      color: var(--accent-pink-dark) !important;
+      transition: background 0.22s, box-shadow 0.22s, color 0.22s, border-color 0.22s, transform 0.22s;
+      opacity: 0.82;
+      outline: none;
+      z-index: 2;
+      margin: 0;
+      padding: 0;
+    }
+    .carousel-arrow:focus, .carousel-arrow:hover {
+      background: #fff;
+      color: var(--accent-gold) !important;
+      border-color: var(--accent-gold);
+      box-shadow: 0 4px 16px rgba(191,160,90,0.10);
+      opacity: 1;
+      transform: scale(1.07);
+    }
+    .carousel-arrow i {
+      pointer-events: none;
+      font-size: 1.35rem;
+      margin: 0;
+    }
+    @media (max-width: 600px) {
+      .carousel-arrow {
+        width: 32px;
+        height: 32px;
+        font-size: 1.1rem !important;
+      }
+      .carousel-arrow i {
+        font-size: 1.1rem;
+      }
+    }
+    /* --- Product Slider Animation (Fade) --- */
+    .products-grid.slider-anim {
+      position: relative;
+      overflow: hidden;
+      min-height: 340px;
+    }
+    .products-grid .product-card {
+      transition: opacity 0.45s cubic-bezier(.4,0,.2,1), transform 0.45s cubic-bezier(.4,0,.2,1);
+      opacity: 1;
+      transform: none;
+    }
+    .products-grid.fade-out .product-card {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.98);
+    }
+    .products-grid.fade-in .product-card {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1);
+    }
+    .products-grid.slide-left .product-card {
+      transform: translateX(-60px);
+      opacity: 0;
+    }
+    .products-grid.slide-right .product-card {
+      transform: translateX(60px);
+      opacity: 0;
+    }
+    .products-grid.slide-reset .product-card {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    /* === LUXURY PRODUCT CARD HOVER ENHANCEMENTS START === */
+    .product-card {
+      /* 3D context for child elements */
+      perspective: 900px;
+      will-change: transform, box-shadow, filter;
+      /* Layer for lighting effect */
+      position: relative;
+      overflow: visible;
+      /* For smoothness */
+      backface-visibility: hidden;
+    }
+    .product-card::before {
+      /* Soft light overlay for depth illusion */
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      border-radius: var(--radius);
+      background: radial-gradient(ellipse 80% 60% at 60% 30%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.04) 80%, transparent 100%);
+      opacity: 0;
+      transition: opacity 0.5s cubic-bezier(.4,0,.2,1);
+      z-index: 2;
+    }
+    .product-card:hover::before, .product-card:focus::before {
+      opacity: 1;
+    }
+    .product-card::after {
+      /* Subtle bottom highlight for lift */
+      content: '';
+      position: absolute;
+      left: 10%;
+      right: 10%;
+      bottom: -18px;
+      height: 32px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse 60% 60% at 50% 0%, rgba(191,160,90,0.10) 0%, rgba(184,111,167,0.08) 60%, transparent 100%);
+      opacity: 0;
+      filter: blur(2px);
+      transition: opacity 0.5s cubic-bezier(.4,0,.2,1);
+      z-index: 1;
+    }
+    .product-card:hover::after, .product-card:focus::after {
+      opacity: 1;
+    }
+    .product-card .lux-glow {
+      /* Extra highlight for luxury feel */
+      pointer-events: none;
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      border-radius: var(--radius);
+      background: radial-gradient(ellipse 60% 40% at 70% 20%, rgba(255,255,255,0.13) 0%, transparent 80%);
+      opacity: 0;
+      transition: opacity 0.5s cubic-bezier(.4,0,.2,1);
+      z-index: 3;
+    }
+    .product-card:hover .lux-glow, .product-card:focus .lux-glow {
+      opacity: 1;
+    }
+    .product-card .lux-shadow {
+      /* Animated shadow for depth */
+      pointer-events: none;
+      position: absolute;
+      left: 0; right: 0; bottom: -10px;
+      height: 40px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse 60% 60% at 50% 0%, rgba(191,160,90,0.13) 0%, rgba(184,111,167,0.10) 60%, transparent 100%);
+      opacity: 0;
+      filter: blur(3px);
+      transition: opacity 0.5s cubic-bezier(.4,0,.2,1);
+      z-index: 0;
+    }
+    .product-card:hover .lux-shadow, .product-card:focus .lux-shadow {
+      opacity: 1;
+    }
+    .product-card .lux-border {
+      /* Animated border for focus */
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius);
+      border: 2.5px solid transparent;
+      background: linear-gradient(120deg, var(--accent-pink-dark), var(--accent-gold), var(--accent-pink-dark));
+      background-size: 200% 200%;
+      background-clip: border-box;
+      opacity: 0;
+      transition: opacity 0.5s cubic-bezier(.4,0,.2,1), border-color 0.5s cubic-bezier(.4,0,.2,1);
+      z-index: 4;
+    }
+    .product-card:hover .lux-border, .product-card:focus .lux-border {
+      opacity: 0.7;
+      border-color: var(--accent-gold);
+      animation: lux-border-move 2.2s linear infinite;
+    }
+    @keyframes lux-border-move {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+    .product-card .lux-light {
+      /* Subtle moving light reflection */
+      pointer-events: none;
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      border-radius: var(--radius);
+      background: linear-gradient(120deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.18) 40%, transparent 100%);
+      opacity: 0;
+      transition: opacity 0.5s cubic-bezier(.4,0,.2,1);
+      z-index: 5;
+      mix-blend-mode: lighten;
+      animation: lux-light-move 2.8s cubic-bezier(.4,0,.2,1) infinite alternate;
+      animation-play-state: paused;
+    }
+    .product-card:hover .lux-light, .product-card:focus .lux-light {
+      opacity: 1;
+      animation-play-state: running;
+    }
+    @keyframes lux-light-move {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 100% 100%; }
+    }
+    .product-card .lux-tilt {
+      /* For 3D tilt effect (no JS, just on hover) */
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius);
+      z-index: 6;
+      opacity: 0;
+      transition: opacity 0.5s cubic-bezier(.4,0,.2,1);
+    }
+    .product-card:hover .lux-tilt, .product-card:focus .lux-tilt {
+      opacity: 1;
+    }
+    /* --- Enhanced Hover Animation --- */
+    .product-card:hover, .product-card:focus {
+      /* 3D lift, scale, and slight rotate for luxury feel */
+      transform: scale(1.045) rotate3d(1,0.5,0.1,7deg) translateY(-10px);
+      box-shadow:
+        0 12px 36px 0 rgba(191,160,90,0.16),
+        0 4px 24px 0 rgba(184,111,167,0.13),
+        0 1.5px 6px 0 rgba(0,0,0,0.08);
+      border-color: var(--accent-gold);
+      background: linear-gradient(120deg, #fff 80%, var(--accent-pink) 100%);
+      filter: brightness(1.04) saturate(1.07) drop-shadow(0 2px 12px rgba(191,160,90,0.08));
+      transition:
+        transform 0.55s cubic-bezier(.4,0,.2,1),
+        box-shadow 0.55s cubic-bezier(.4,0,.2,1),
+        border-color 0.55s cubic-bezier(.4,0,.2,1),
+        background 0.55s cubic-bezier(.4,0,.2,1),
+        filter 0.55s cubic-bezier(.4,0,.2,1);
+    }
+    .product-card img {
+      /* Animate image for pop effect */
+      transition: transform 0.7s cubic-bezier(.4,0,.2,1), filter 0.7s cubic-bezier(.4,0,.2,1), box-shadow 0.7s cubic-bezier(.4,0,.2,1);
+      will-change: transform, filter, box-shadow;
+      z-index: 10;
+      position: relative;
+    }
+    .product-card:hover img, .product-card:focus img {
+      transform: scale(1.11) rotate3d(0.1,0.2,0.1,5deg) translateY(-4px);
+      filter: brightness(1.11) saturate(1.13) drop-shadow(0 4px 16px rgba(191,160,90,0.10));
+      box-shadow: 0 8px 32px rgba(191,160,90,0.13), 0 2px 12px rgba(184,111,167,0.13);
+    }
+    .product-card h4, .product-card span {
+      transition: color 0.5s cubic-bezier(.4,0,.2,1), text-shadow 0.5s cubic-bezier(.4,0,.2,1);
+    }
+    .product-card:hover h4, .product-card:focus h4 {
+      color: var(--accent-gold);
+      text-shadow: 0 2px 12px rgba(191,160,90,0.13);
+    }
+    .product-card:hover span, .product-card:focus span {
+      color: var(--accent-pink-dark);
+      text-shadow: 0 2px 12px rgba(184,111,167,0.13);
+    }
+    /* --- Add luxury overlays to all product cards --- */
+    .product-card .lux-glow,
+    .product-card .lux-shadow,
+    .product-card .lux-border,
+    .product-card .lux-light,
+    .product-card .lux-tilt {
+      /* These are injected overlays for effect layering */
+      pointer-events: none;
+      user-select: none;
+    }
+    /* --- Responsive: reduce effect on mobile for performance --- */
+    @media (max-width: 700px) {
+      .product-card:hover, .product-card:focus {
+        transform: scale(1.025) translateY(-4px);
+        box-shadow: 0 4px 16px rgba(191,160,90,0.10), 0 2px 8px rgba(184,111,167,0.10);
+      }
+      .product-card:hover img, .product-card:focus img {
+        transform: scale(1.05) translateY(-2px);
+      }
+      .product-card .lux-glow,
+      .product-card .lux-shadow,
+      .product-card .lux-border,
+      .product-card .lux-light,
+      .product-card .lux-tilt {
+        display: none !important;
+      }
+    }
+    /* --- Accessibility: focus-visible for keyboard users --- */
+    .product-card:focus-visible {
+      outline: 2.5px solid var(--accent-gold);
+      outline-offset: 2px;
+    }
+    /* === LUXURY PRODUCT CARD HOVER ENHANCEMENTS END === */
+
+    /* --- Inject overlays into product cards via CSS only (no JS) --- */
+    /* This is a CSS trick: overlays are added in HTML for each card. */
+    /* If not present, add overlays in HTML for each .product-card: */
+    /* <div class="lux-glow"></div><div class="lux-shadow"></div><div class="lux-border"></div><div class="lux-light"></div><div class="lux-tilt"></div> */
+    /* For demo, overlays can be added via a MutationObserver in JS if needed. */
+
+    /* --- Payment Button Styles --- */
+    .checkout-payment-btn {
+      display: block;
+      width: 100%;
+      max-width: 340px;
+      margin: 2.2em auto 0 auto;
+      padding: 1.1em 0;
+      background: linear-gradient(90deg, var(--accent-pink-dark) 0%, var(--accent-gold) 100%);
+      color: #fff;
+      border-radius: 999px;
+      font-family: 'Lato', sans-serif;
+      font-size: 1.18rem;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      border: none;
+      box-shadow: 0 4px 16px rgba(184, 111, 167, 0.13);
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      z-index: 2;
+    }
+    .checkout-payment-btn:hover, .checkout-payment-btn:focus {
+      background: linear-gradient(90deg, var(--accent-gold) 0%, var(--accent-pink-dark) 100%);
+      color: #fff;
+      box-shadow: 0 8px 32px rgba(191,160,90,0.13), 0 2px 12px rgba(184,111,167,0.13);
+      transform: translateY(-2px) scale(1.04);
+    }
+    .checkout-payment-btn::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(191,160,90,0.13);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.5s cubic-bezier(.4,0,.2,1), height 0.5s cubic-bezier(.4,0,.2,1);
+      z-index: 0;
+    }
+    .checkout-payment-btn:hover::before, .checkout-payment-btn:focus::before {
+      width: 250%;
+      height: 250%;
+    }
+    .checkout-payment-btn span {
+      position: relative;
+      z-index: 2;
+    }
+    /* --- Payment Section Enhancements --- */
+    .checkout-payment-block {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1);
+      pointer-events: none;
+      max-height: 0;
+      overflow: hidden;
+    }
+    .checkout-payment-block.active {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+      max-height: 900px;
+      overflow: visible;
+      transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1), max-height 0.7s cubic-bezier(.4,0,.2,1);
+    }
+    .payment-methods-row {
+      display: flex;
+      flex-direction: row;
+      gap: 1.2em;
+      margin-bottom: 1.2em;
+      justify-content: center;
+    }
+    .payment-method-btn {
+      flex: 1 1 40%;
+      background: #fff;
+      border: 2px solid var(--accent-pink-dark);
+      border-radius: 12px;
+      padding: 1.1em 0.5em;
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: var(--accent-pink-dark);
+      cursor: pointer;
+      transition: border-color 0.3s, color 0.3s, background 0.3s, box-shadow 0.3s;
+      box-shadow: 0 2px 8px rgba(184,111,167,0.07);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.7em;
+      outline: none;
+      position: relative;
+      z-index: 1;
+    }
+    .payment-method-btn.selected, .payment-method-btn:focus {
+      border-color: var(--accent-gold);
+      color: var(--accent-gold);
+      background: var(--accent-pink);
+      box-shadow: 0 4px 16px rgba(191,160,90,0.10);
+    }
+    .payment-method-btn i {
+      font-size: 1.3em;
+      margin-right: 0.5em;
+      color: inherit;
+    }
+    .payment-form-section {
+      display: none;
+      margin-top: 1.2em;
+      animation: fadeInUp 0.5s cubic-bezier(.4,0,.2,1);
+    }
+    .payment-form-section.active {
+      display: block;
+    }
+    .credit-card-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+      margin-bottom: 1.2em;
+    }
+    .credit-card-row {
+      display: flex;
+      flex-direction: row;
+      gap: 1em;
+    }
+    .credit-card-input {
+      flex: 1 1 50%;
+      padding: 0.7em 1.2em;
+      border: 2px solid #bbb;
+      border-radius: 8px;
+      font-size: 1.08rem;
+      background: #fff;
+      color: var(--text-dark);
+      outline: none;
+      font-family: inherit;
+      transition: border-color .2s;
+    }
+    .credit-card-input:focus {
+      border-color: var(--accent-pink-dark);
+      box-shadow: 0 2px 8px rgba(184, 111, 167, 0.13);
+    }
+    .payment-submit-btn {
+      width: 100%;
+      background: linear-gradient(90deg, var(--accent-pink-dark) 0%, var(--accent-gold) 100%);
+      color: #fff;
+      border-radius: 999px;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      font-size: 1.08rem;
+      border: none;
+      padding: 0.9em 0;
+      margin-top: 0.2em;
+      box-shadow: 0 2px 12px rgba(184,111,167,0.13);
+      transition: var(--transition);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      z-index: 2;
+    }
+    .payment-submit-btn:hover, .payment-submit-btn:focus {
+      background: linear-gradient(90deg, var(--accent-gold) 0%, var(--accent-pink-dark) 100%);
+      color: #fff;
+      box-shadow: 0 6px 24px rgba(184,111,167,0.18);
+      transform: translateY(-2px) scale(1.04);
+    }
+    .payment-submit-btn::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(191,160,90,0.13);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.5s cubic-bezier(.4,0,.2,1), height 0.5s cubic-bezier(.4,0,.2,1);
+      z-index: 0;
+    }
+    .payment-submit-btn:hover::before, .payment-submit-btn:focus::before {
+      width: 250%;
+      height: 250%;
+    }
+    .payment-submit-btn span {
+      position: relative;
+      z-index: 2;
+    }
+    .payment-success-message {
+      text-align: center;
+      color: var(--accent-gold);
+      font-size: 1.25rem;
+      font-family: 'Playfair Display', serif;
+      margin-top: 2em;
+      background: var(--soft-gray);
+      border-radius: 14px;
+      padding: 1.5em 1em;
+      box-shadow: 0 1.5px 6px rgba(184,111,167,0.06);
+      display: none;
+      animation: fadeInUp 0.7s cubic-bezier(.4,0,.2,1);
+    }
+    .payment-success-message.active {
+      display: block;
+    }
+    @media (max-width: 600px) {
+      .checkout-payment-btn {
+        max-width: 98vw;
+        font-size: 1.05rem;
+        padding: 0.8em 0;
+      }
+      .payment-methods-row {
+        flex-direction: column;
+        gap: 0.7em;
+      }
+      .payment-method-btn {
+        font-size: 1.01rem;
+        padding: 0.7em 0.5em;
+      }
+    }
+    /* === ABOUT SECTION ENHANCEMENTS === */
+    .about-section {
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+    .about-section.sb-inview {
+      /* triggers fade/slide in */
+    }
+    .about-container {
+      /* improved vertical centering and spacing */
+      align-items: center;
+      gap: 5.5rem !important;
+      padding: 0 2vw;
+    }
+    .about-title {
+      font-size: 2.3rem !important;
+      margin-bottom: 1.5rem !important;
+      letter-spacing: 2px !important;
+      line-height: 1.18;
+    }
+    .about-text p {
+      font-size: 1.18rem !important;
+      line-height: 1.85 !important;
+      margin-bottom: 0 !important;
+      color: var(--text-dark);
+      font-family: 'Lato', sans-serif;
+      font-weight: 500;
+      opacity: 0.97;
+      letter-spacing: 0.01em;
+      padding-right: 0.5em;
+    }
+    .about-section {
+      opacity: 0;
+      transform: translateY(60px) scale(0.98);
+      transition: opacity var(--about-fade-duration) cubic-bezier(.4,0,.2,1), transform var(--about-fade-duration) cubic-bezier(.4,0,.2,1);
+    }
+    .about-section.sb-inview {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      transition-delay: var(--about-fade-delay);
+    }
+    .about-image img {
+      box-shadow: 0 8px 32px rgba(184,111,167,0.13), 0 2px 12px rgba(191,160,90,0.10);
+      border-radius: 24px !important;
+      background: var(--accent-pink);
+      object-fit: cover;
+      display: block;
+      width: 100%;
+      max-width: 520px;
+      min-width: 220px;
+      aspect-ratio: 1.6/1;
+      /* logo animation */
+      opacity: 0;
+      transform: scale(0.97) translateY(30px);
+      transition: opacity 1.2s cubic-bezier(.4,0,.2,1), transform 1.2s cubic-bezier(.4,0,.2,1);
+      will-change: opacity, transform;
+    }
+    .about-section.sb-inview .about-image img {
+      opacity: 1;
+      transform: scale(1.04) translateY(0);
+      animation: about-logo-float var(--about-logo-float) ease-in-out infinite alternate;
+      transition-delay: 0.3s;
+    }
+    @keyframes about-logo-float {
+      0% { transform: scale(1.04) translateY(0); }
+      50% { transform: scale(1.07) translateY(-10px); }
+      100% { transform: scale(1.04) translateY(0); }
+    }
+    /* Responsive about section */
+    @media (max-width: 900px) {
+      .about-container { flex-direction: column; gap: 2.5rem !important; }
+      .about-image, .about-text { max-width: 100% !important; min-width: 0 !important; }
+      .about-image img { max-width: 98vw; }
+    }
+    @media (max-width: 600px) {
+      .about-title { font-size: 1.3rem !important; }
+      .about-text p { font-size: 1.01rem !important; }
+      .about-section { padding: 2.2rem 0 2.2rem 0 !important; }
+    }
+    /* === WHY SHOP WITH US ENHANCEMENTS === */
+    .why-shop-section {
+      position: relative;
+      z-index: 1;
+    }
+    .why-shop-features {
+      gap: 2.7rem !important;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+      justify-content: center;
+      align-items: stretch;
+    }
+    .why-feature {
+      background: var(--white);
+      border-radius: 22px;
+      box-shadow: 0 4px 24px rgba(184,111,167,0.10), 0 1.5px 6px rgba(0,0,0,0.06);
+      padding: 2.5rem 1.5rem 2.2rem 1.5rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1.5px solid #f7e6f2;
+      min-width: 220px;
+      max-width: 270px;
+      margin: 0 0.2em;
+      opacity: 0;
+      transform: translateY(40px) scale(0.97);
+      transition: opacity var(--feature-card-fade-duration) cubic-bezier(.4,0,.2,1), transform var(--feature-card-fade-duration) cubic-bezier(.4,0,.2,1), box-shadow 0.38s, filter 0.38s;
+      will-change: opacity, transform, box-shadow, filter;
+    }
+    .why-feature.sb-inview {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    .why-feature:hover, .why-feature:focus {
+      box-shadow: 0 12px 36px 0 rgba(191,160,90,0.16), 0 4px 24px 0 rgba(184,111,167,0.13);
+      transform: scale(1.045) translateY(-8px);
+      filter: brightness(1.04) saturate(1.07);
+      border-color: var(--accent-gold);
+      background: linear-gradient(120deg, #fff 80%, var(--accent-pink) 100%);
+      transition: box-shadow 0.38s, filter 0.38s, border-color 0.38s, background 0.38s, transform 0.38s;
+    }
+    .why-feature .fa {
+      font-size: 2.7rem !important;
+      margin-bottom: 0.8em;
+      color: var(--accent-pink-dark);
+      background: var(--white);
+      border-radius: 50%;
+      padding: 0.5em 0.7em;
+      box-shadow: 0 2px 8px rgba(184,111,167,0.07);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: scale(0.85) translateY(18px);
+      transition: opacity var(--feature-icon-fade-duration) cubic-bezier(.4,0,.2,1), transform var(--feature-icon-fade-duration) cubic-bezier(.4,0,.2,1);
+      will-change: opacity, transform;
+    }
+    .why-feature.sb-inview .fa {
+      opacity: 1;
+      transform: scale(1.08) translateY(0);
+      animation: feature-icon-bounce var(--feature-icon-bounce) cubic-bezier(.4,0,.2,1) 1;
+    }
+    @keyframes feature-icon-bounce {
+      0% { transform: scale(0.85) translateY(18px); }
+      60% { transform: scale(1.13) translateY(-8px); }
+      100% { transform: scale(1.08) translateY(0); }
+    }
+    .why-feature:hover .fa, .why-feature:focus .fa {
+      animation: feature-icon-pulse 0.7s cubic-bezier(.4,0,.2,1);
+      color: var(--accent-gold);
+      filter: drop-shadow(0 2px 12px rgba(191,160,90,0.13));
+    }
+    @keyframes feature-icon-pulse {
+      0% { transform: scale(1.08); }
+      50% { transform: scale(1.18); }
+      100% { transform: scale(1.08); }
+    }
+    .why-feature div[style*='font-family'] {
+      font-size: 1.18rem !important;
+      font-weight: 700 !important;
+      margin-bottom: 0.6em !important;
+      letter-spacing: 0.7px !important;
+      color: var(--accent-pink-dark) !important;
+      font-family: 'Playfair Display', serif !important;
+    }
+    .why-feature div[style*='font-size:1.07rem'] {
+      font-size: 1.09rem !important;
+      color: var(--text-dark) !important;
+      opacity: 0.92 !important;
+      font-family: 'Lato', sans-serif !important;
+      font-weight: 500 !important;
+      margin-top: 0.2em !important;
+      line-height: 1.7 !important;
+    }
+    @media (max-width: 900px) {
+      .why-shop-features { gap: 1.2rem !important; }
+      .why-feature { min-width: 160px; max-width: 98vw; padding: 1.5rem 0.7rem 1.2rem 0.7rem; }
+    }
+    @media (max-width: 600px) {
+      .why-shop-features { flex-direction: column; gap: 1.1rem !important; }
+      .why-feature { min-width: 0; max-width: 100vw; margin: 0 auto; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container navbar">
+      <div class="logo">
+        <span class="logo-text">Shiny<span class="logo-accent">Belle</span></span>
+        <span class="logo-underline"></span>
+      </div>
+      <nav>
+        <a href="#">Home</a>
+        <a href="#rings">Jewelry</a>
+        <a href="#earrings">Bags</a>
+        <a href="#necklaces">Shoes</a>
+        <a href="#bracelets">Bracelets</a>
+      </nav>
+      <div class="navbar-action">
+        <a href="#login" class="login-btn">Log In</a>
+        <div class="cart-navbar-wrap" style="position:relative;display:inline-block;margin-left:1.2em;">
+          <button id="cart-icon-btn" aria-label="View cart" style="background:none;border:none;cursor:pointer;position:relative;outline:none;">
+            <i class="fa fa-shopping-cart" style="font-size:1.7rem;color:var(--accent-pink-dark);"></i>
+            <span id="cart-count-badge" style="position:absolute;top:-7px;right:-10px;background:linear-gradient(90deg,var(--accent-pink-dark),var(--accent-gold));color:#fff;font-size:0.92rem;font-weight:700;padding:0.1em 0.6em;border-radius:999px;box-shadow:0 2px 8px rgba(184,111,167,0.13);min-width:1.5em;text-align:center;display:none;">0</span>
+          </button>
+          <div id="mini-cart-panel" style="display:none;position:absolute;right:0;top:2.5em;z-index:2000;"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div id="homepage-content">
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Timeless Elegance<br/>Effortless Style</h1>
+        <a href="#shop" class="btn" id="shop-now-btn">Shop Now</a>
+      </div>
+    </section>
+    <div class="container">
+      <section class="categories">
+        <h2 class="categories-section-title">Categories</h2>
+        <div class="categories-grid">
+          <div class="category-card" data-category="Jewelry">
+            <img src="https://img.freepik.com/premium-photo/gold-jewelry-white-background_237502-490.jpg" alt="Jewelry">
+            <div class="label">Jewelry</div>
+          </div>
+          <div class="category-card" data-category="Bags">
+            <img src="https://media.istockphoto.com/id/1363767151/photo/yellow-leather-bag-of-isolated-woman-on-white-background.jpg?s=612x612&w=0&k=20&c=X7PcXbPp99t0xAFbWLV7Yfm3YzsFSugtfEGZ0x2aCjo=" alt="Bags">
+            <div class="label">Bags</div>
+          </div>
+          <div class="category-card" data-category="Shoes">
+            <img src="https://img.freepik.com/premium-photo/elegant-women-s-summer-suede-red-stilettos-new-pair-shoes-white-background_400928-1689.jpg?w=360" alt="Shoes">
+            <div class="label">Shoes</div>
+          </div>
+        </div>
+      </section>
+      <section class="featured">
+        <h2>Our Most Loved Items:</h2>
+        <div class="featured-carousel-wrap" style="position:relative;overflow:visible;">
+          <button class="carousel-arrow left" id="featured-left" aria-label="Previous" style="position:absolute;left:-2.2rem;top:50%;transform:translateY(-50%);background:none;border:none;font-size:2.1rem;color:var(--accent-pink-dark);z-index:2;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .2s;outline:none;">
+            <i class="fa fa-chevron-left"></i>
+          </button>
+          <div class="products-grid">
+            <div class="product-card" data-category="Jewelry" data-title="Golden Leaf Earrings" data-price="$335" data-img="https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg" data-desc="Delicate gold-plated earrings shaped like leaves, capturing the beauty of nature in a timeless accessory." data-gallery='["https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg","https://www.jkjjewellers.in/_next/image?url=https%3A%2F%2Fres.cloudinary.com%2Fjkjjeweller%2Fproducts%2Fnthndtak3obvx8z2y2dg&w=1920&q=75","https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_3_lar.jpg"]' data-colors='["#bfa05a","#e5e5e5","#d6a4c2"]' data-sizes='["16 cm","17 cm","18 cm","19 cm","20 cm"]'>
+              <img src="https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg" alt="Golden Leaf Earrings">
+              <h4>Golden Leaf Earrings</h4>
+              <span>$245</span>
+              <div class="lux-glow"></div><div class="lux-shadow"></div><div class="lux-border"></div><div class="lux-light"></div><div class="lux-tilt"></div>
+            </div>
+            <div class="product-card" data-category="Bags" data-title="Blush Pink Mini Bag" data-price="$389" data-img="https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E01-1?$default_GHC$&crop=461,631,979,1169&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85" data-desc="A compact blush pink handbag with a modern silhouette, ideal for carrying your essentials from day to night." data-gallery='["https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E01-1?$default_GHC$&crop=461,631,979,1169&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E03-1?$default_GHC$&crop=561,642,849,1144&wid=1024&hei=1107&scale=0.4843&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E06-1?$default_GHC$&crop=727,555,483,897&wid=1024&hei=1107&scale=0.4843&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E07?$default_GHC$&crop=807,177,388,1599&wid=1024&hei=1107&scale=0.4843&bfc=on&qlt=85"]' data-colors='["#e7b6d6","#e5e5e5","#bfa05a"]' data-sizes='["Small","Medium","Large"]'>
+              <img src="https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E01-1?$default_GHC$&crop=461,631,979,1169&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85" alt="Blush Pink Mini Bag">
+              <h4>Blush Pink Mini Bag</h4>
+              <span>$189</span>
+              <div class="lux-glow"></div><div class="lux-shadow"></div><div class="lux-border"></div><div class="lux-light"></div><div class="lux-tilt"></div>
+            </div>
+            <div class="product-card" data-category="Jewelry" data-title="Luxe Pearl Necklace" data-price="$335" data-img="https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371" data-desc="A strand of luminous pearls with a modern twist, this necklace brings classic sophistication to any look." data-gallery='["https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371","https://lockwoodshop.com/cdn/shop/files/4be5752cfreshwater_20pearl_20necklace_202_864x864.jpg?v=1747436091","https://lockwoodshop.com/cdn/shop/files/69b33e51freshwater_20pearl_20necklace_203_864x864.jpg?v=1747436091"]' data-colors='["#fff","#e5e5e5","#bfa05a"]' data-sizes='["16 in","18 in","20 in"]'>
+              <img src="https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371" alt="Luxe Pearl Necklace">
+              <h4>Luxe Pearl Necklace</h4>
+              <span>$309</span>
+              <div class="lux-glow"></div><div class="lux-shadow"></div><div class="lux-border"></div><div class="lux-light"></div><div class="lux-tilt"></div>
+            </div>
+            <div class="product-card" data-category="Shoes" data-title="Velvet Burgundy Heels" data-price="$195" data-img="https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png" data-desc="Elegant high heels in plush burgundy velvet, designed for comfort and a bold, sophisticated statement." data-gallery='["https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png","https://m.media-amazon.com/images/I/61tTjOUqcWL._AC_SY575_.jpg","https://m.media-amazon.com/images/I/61LjFsmzVpL._AC_SY575_.jpg","https://m.media-amazon.com/images/I/61hBxedRM+L._AC_SY575_.jpg"]' data-colors='["#b86fa7","#e5e5e5","#bfa05a"]' data-sizes='["36","37","38","39","40"]'>
+              <img src="https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png" alt="Velvet Burgundy Heels">
+              <h4>Velvet Burgundy Heels</h4>
+              <span>$179</span>
+              <div class="lux-glow"></div><div class="lux-shadow"></div><div class="lux-border"></div><div class="lux-light"></div><div class="lux-tilt"></div>
+            </div>
+            <!-- Added products for the carousel -->
+            <div class="product-card" data-category="Shoes" data-title="Camel Luxe Pumps" data-price="$229" data-img="https://elliebelle.com/cdn/shop/files/4824942.jpg?height=871&v=1736956782" data-desc="Elegant ivory pumps in soft satin, perfect for weddings and special occasions." data-gallery='["https://elliebelle.com/cdn/shop/files/4824942.jpg?height=871&v=1736956782","https://elliebelle.com/cdn/shop/files/4824936.jpg?v=1736956782"]' data-colors='["#fff","#e5e5e5","#bfa05a"]' data-sizes='["36","37","38","39","40"]'>
+              <img src="https://elliebelle.com/cdn/shop/files/4824942.jpg?height=871&v=1736956782" alt="Camel Luxe Pumps">
+              <h4>Camel Luxe Pumps</h4>
+              <span>$229</span>
+              <div class="lux-glow"></div><div class="lux-shadow"></div><div class="lux-border"></div><div class="lux-light"></div><div class="lux-tilt"></div>
+            </div>
+            <div class="product-card" data-category="Shoes" data-title="Pearl Bow Ballet Flats" data-price="$199" data-img="https://image.made-in-china.com/202f0j00ceDlYbQsghop/Flat-Shoes-Hot-Selling-Women-Shoes-High-Quality-Casual-Shoes-Footwear-Leather-Shoes-Soft-2021.webp" data-desc="Chic rose gold sandals with delicate straps and a comfortable heel." data-gallery='["https://image.made-in-china.com/202f0j00ceDlYbQsghop/Flat-Shoes-Hot-Selling-Women-Shoes-High-Quality-Casual-Shoes-Footwear-Leather-Shoes-Soft-2021.webp"]' data-colors='["#e7b6d6","#bfa05a","#fff"]' data-sizes='["36","37","38","39","40"]'>
+              <img src="https://image.made-in-china.com/202f0j00ceDlYbQsghop/Flat-Shoes-Hot-Selling-Women-Shoes-High-Quality-Casual-Shoes-Footwear-Leather-Shoes-Soft-2021.webp" alt="Pearl Bow Ballet Flats">
+              <h4>Pearl Bow Ballet Flats</h4>
+              <span>$199</span>
+              <div class="lux-glow"></div><div class="lux-shadow"></div><div class="lux-border"></div><div class="lux-light"></div><div class="lux-tilt"></div>
+            </div>
+            <div class="product-card" data-category="Bags" data-title="Skyline Grace Bag" data-price="$259" data-img="https://media.istockphoto.com/id/1365118618/photo/blue-fashion-purse-handbag-on-white-background-isolated.jpg?s=612x612&w=0&k=20&c=VNszfC0cxenqZGhjlr3gqqvzHWREuhdY_H3CKF1B38g=" data-desc="Spacious and timeless black tote bag, crafted from premium leather." data-gallery='["https://media.istockphoto.com/id/1365118618/photo/blue-fashion-purse-handbag-on-white-background-isolated.jpg?s=612x612&w=0&k=20&c=VNszfC0cxenqZGhjlr3gqqvzHWREuhdY_H3CKF1B38g="]' data-colors='["#18141c","#e5e5e5","#bfa05a"]' data-sizes='["Medium","Large"]'>
+              <img src="https://media.istockphoto.com/id/1365118618/photo/blue-fashion-purse-handbag-on-white-background-isolated.jpg?s=612x612&w=0&k=20&c=VNszfC0cxenqZGhjlr3gqqvzHWREuhdY_H3CKF1B38g=" alt="Skyline Grace Bag">
+              <h4>Skyline Grace Bag</h4>
+              <span>$259</span>
+              <div class="lux-glow"></div><div class="lux-shadow"></div><div class="lux-border"></div><div class="lux-light"></div><div class="lux-tilt"></div>
+            </div>
+            <div class="product-card" data-category="Bags" data-title="Pastel Blue Satchel" data-price="$219" data-img="https://img.freepik.com/premium-photo/women-leather-bag-isolated-white-background-side-view-luxury-genuine-full-grain-leather-lady_709135-96.jpg" data-desc="Soft pastel blue satchel with gold hardware and adjustable strap." data-gallery='["https://img.freepik.com/premium-photo/women-leather-bag-isolated-white-background-side-view-luxury-genuine-full-grain-leather-lady_709135-96.jpg"]' data-colors='["#b6d6e7","#e5e5e5","#bfa05a"]' data-sizes='["Small","Medium"]'>
+              <img src="https://img.freepik.com/premium-photo/women-leather-bag-isolated-white-background-side-view-luxury-genuine-full-grain-leather-lady_709135-96.jpg" alt="Pastel Blue Satchel">
+              <h4>Pastel Blue Satchel</h4>
+              <span>$219</span>
+              <div class="lux-glow"></div><div class="lux-shadow"></div><div class="lux-border"></div><div class="lux-light"></div><div class="lux-tilt"></div>
+            </div>
+          </div>
+          <button class="carousel-arrow right" id="featured-right" aria-label="Next" style="position:absolute;right:-2.2rem;top:50%;transform:translateY(-50%);background:none;border:none;font-size:2.1rem;color:var(--accent-pink-dark);z-index:2;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .2s;outline:none;">
+            <i class="fa fa-chevron-right"></i>
+          </button>
+        </div>
+      </section>
+      <!-- === PERFECT SETS FOR HER SECTION START === -->
+      <section class="featured" id="perfect-sets-section" style="margin-top:2.5rem;">
+        <h2 class="categories-section-title" style="margin-bottom:2.2rem;">Perfect Sets for Her</h2>
+        <div class="perfect-sets-carousel-wrap" style="position:relative;overflow:visible;">
+          <button class="carousel-arrow left" id="perfect-sets-left" aria-label="Previous" style="position:absolute;left:-2.2rem;top:50%;transform:translateY(-50%);background:none;border:none;font-size:2.1rem;color:var(--accent-pink-dark);z-index:2;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .2s;outline:none;">
+            <i class="fa fa-chevron-left"></i>
+          </button>
+          <div class="products-grid" id="perfect-sets-carousel" style="overflow:visible;min-height:340px;"></div>
+          <button class="carousel-arrow right" id="perfect-sets-right" aria-label="Next" style="position:absolute;right:-2.2rem;top:50%;transform:translateY(-50%);background:none;border:none;font-size:2.1rem;color:var(--accent-pink-dark);z-index:2;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:color .2s;outline:none;">
+            <i class="fa fa-chevron-right"></i>
+          </button>
+        </div>
+      </section>
+      <!-- === PERFECT SETS FOR HER SECTION END === -->
+      
+      <!-- === ABOUT US SECTION START === -->
+      <section class="about-section" style="background:#fff;padding:4.5rem 0 4.5rem 0;margin:3.5rem 0 0 0;">
+        <div class="container about-container" style="display:flex;flex-direction:row;align-items:center;justify-content:center;gap:4.5rem;max-width:1200px;">
+          <div class="about-text" style="flex:1 1 48%;min-width:320px;max-width:540px;text-align:left;display:flex;flex-direction:column;justify-content:center;">
+            <h2 class="about-title" style="font-family:'Playfair Display',serif;font-size:2rem;color:var(--accent-pink-dark);font-weight:700;margin-bottom:1.2rem;letter-spacing:1.5px;">Who We Are</h2>
+            <p style="font-size:1.13rem;color:var(--text-dark);line-height:1.8;font-family:'Lato',sans-serif;font-weight:500;opacity:0.95;">
+              At ShinyBelle, we believe elegance is timeless and beauty is effortless. Our curated collections are designed to inspire confidence and celebrate individuality. Each piece is crafted with care, blending classic sophistication with a modern touch. We are passionate about quality, detail, and the joy that jewelry brings to every moment. Discover your signature style with us and let your story shine.
+            </p>
+          </div>
+          <div class="about-image" style="flex:1 1 52%;min-width:320px;max-width:600px;display:flex;justify-content:flex-end;align-items:center;">
+            <img src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjA2MjUxNy5wbmc=/250x600/baAFjG.png" alt="ShinyBelle Logo" style="width:100%;max-width:520px;min-width:320px;height:auto;aspect-ratio:1.6/1;border-radius:20px;box-shadow:0 4px 24px rgba(184,111,167,0.13);background:var(--accent-pink);object-fit:cover;display:block;"/>
+          </div>
+        </div>
+      </section>
+      <!-- === ABOUT US SECTION END === -->
+      
+      <!-- === WHY SHOP WITH US SECTION START === -->
+      <section class="why-shop-section" style="background:var(--soft-gray);padding:3.5rem 0 3.5rem 0;">
+        <div class="container" style="max-width:1200px;">
+          <h2 class="categories-section-title" style="text-align:center;margin-bottom:2.2rem;">Why Shop With Us?</h2>
+          <div class="why-shop-features" style="display:flex;flex-wrap:wrap;justify-content:center;gap:2.2rem;align-items:stretch;">
+            <div class="why-feature" style="flex:1 1 220px;min-width:220px;max-width:260px;background:var(--soft-gray);border-radius:22px;box-shadow:0 4px 24px rgba(184,111,167,0.10), 0 1.5px 6px rgba(0,0,0,0.06);padding:2.3rem 1.3rem 2.1rem 1.3rem;text-align:center;display:flex;flex-direction:column;align-items:center;transition:box-shadow .3s,transform .3s;border:1.5px solid #f7e6f2;">
+              <div style="font-size:2.5rem;margin-bottom:0.8em;color:var(--accent-pink-dark);background:var(--white);border-radius:50%;padding:0.5em 0.7em;box-shadow:0 2px 8px rgba(184,111,167,0.07);display:flex;align-items:center;justify-content:center;"><i class="fa fa-lock" aria-hidden="true"></i></div>
+              <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--accent-pink-dark);margin-bottom:0.5em;letter-spacing:0.5px;">Secure Checkout</div>
+              <div style="font-size:1.07rem;color:var(--text-dark);opacity:0.85;font-family:'Lato',sans-serif;font-weight:500;">Your payment details are protected</div>
+            </div>
+            <div class="why-feature" style="flex:1 1 220px;min-width:220px;max-width:260px;background:var(--soft-gray);border-radius:22px;box-shadow:0 4px 24px rgba(184,111,167,0.10), 0 1.5px 6px rgba(0,0,0,0.06);padding:2.3rem 1.3rem 2.1rem 1.3rem;text-align:center;display:flex;flex-direction:column;align-items:center;transition:box-shadow .3s,transform .3s;border:1.5px solid #f7e6f2;">
+              <div style="font-size:2.5rem;margin-bottom:0.8em;color:var(--accent-pink-dark);background:var(--white);border-radius:50%;padding:0.5em 0.7em;box-shadow:0 2px 8px rgba(184,111,167,0.07);display:flex;align-items:center;justify-content:center;"><i class="fa fa-retweet" aria-hidden="true"></i></div>
+              <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--accent-pink-dark);margin-bottom:0.5em;letter-spacing:0.5px;">Easy Returns</div>
+              <div style="font-size:1.07rem;color:var(--text-dark);opacity:0.85;font-family:'Lato',sans-serif;font-weight:500;">Returns and exchanges available at all locations</div>
+            </div>
+            <div class="why-feature" style="flex:1 1 220px;min-width:220px;max-width:260px;background:var(--soft-gray);border-radius:22px;box-shadow:0 4px 24px rgba(184,111,167,0.10), 0 1.5px 6px rgba(0,0,0,0.06);padding:2.3rem 1.3rem 2.1rem 1.3rem;text-align:center;display:flex;flex-direction:column;align-items:center;transition:box-shadow .3s,transform .3s;border:1.5px solid #f7e6f2;">
+              <div style="font-size:2.5rem;margin-bottom:0.8em;color:var(--accent-pink-dark);background:var(--white);border-radius:50%;padding:0.5em 0.7em;box-shadow:0 2px 8px rgba(184,111,167,0.07);display:flex;align-items:center;justify-content:center;"><i class="fa fa-truck" aria-hidden="true"></i></div>
+              <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--accent-pink-dark);margin-bottom:0.5em;letter-spacing:0.5px;">Free Shipping Over ₪199</div>
+              <div style="font-size:1.07rem;color:var(--text-dark);opacity:0.85;font-family:'Lato',sans-serif;font-weight:500;">Home delivery on orders above ₪199</div>
+            </div>
+            <div class="why-feature" style="flex:1 1 220px;min-width:220px;max-width:260px;background:var(--soft-gray);border-radius:22px;box-shadow:0 4px 24px rgba(184,111,167,0.10), 0 1.5px 6px rgba(0,0,0,0.06);padding:2.3rem 1.3rem 2.1rem 1.3rem;text-align:center;display:flex;flex-direction:column;align-items:center;transition:box-shadow .3s,transform .3s;border:1.5px solid #f7e6f2;">
+              <div style="font-size:2.5rem;margin-bottom:0.8em;color:var(--accent-pink-dark);background:var(--white);border-radius:50%;padding:0.5em 0.7em;box-shadow:0 2px 8px rgba(184,111,167,0.07);display:flex;align-items:center;justify-content:center;"><i class="fa fa-clock" aria-hidden="true"></i></div>
+              <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--accent-pink-dark);margin-bottom:0.5em;letter-spacing:0.5px;">Fast Delivery</div>
+              <div style="font-size:1.07rem;color:var(--text-dark);opacity:0.85;font-family:'Lato',sans-serif;font-weight:500;">Next-day delivery for orders placed by 14:00</div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- === WHY SHOP WITH US SECTION END === -->
+    </div>
+    <footer>
+      <div class="footer-contact-minimal">
+        <h3 class="footer-title">Contact Us</h3>
+        <div class="footer-contact-details">
+          <div>Email: ShinyBelle@gmail.com.com</div>
+          <div>Phone: 000-000-0000</div>
+        </div>
+      </div>
+    </footer>
+  </div>
+  <!-- ALL PRODUCTS SECTION (hidden by default) -->
+  <section id="all-products-section" style="display:none;">
+    <div class="all-products-container">
+      <button class="back-btn" id="all-products-back"><i class="fa fa-arrow-left"></i> Back to Home</button>
+      <h2 class="all-products-title">All Products</h2>
+      <div class="products-grid" id="all-products-grid"></div>
+    </div>
+  </section>
+  <!-- PRODUCT DETAIL SECTION (hidden by default) -->
+  <section id="product-detail-section" style="display:none;">
+    <div class="product-detail-container">
+      <button class="back-btn" id="back-to-home"><i class="fa fa-arrow-left"></i> Back</button>
+      <div class="product-detail-layout">
+        <div class="product-gallery">
+          <img id="product-main-img" class="product-main-img" src="" alt="Product Image" />
+          <div class="product-thumbnails" id="product-thumbnails"></div>
+        </div>
+        <div class="product-info">
+          <h2 id="product-detail-title" class="product-detail-title"></h2>
+          <div id="product-detail-price" class="product-detail-price"></div>
+          <div class="product-selectors">
+            <div class="color-selector">
+              <span style="font-weight:600;">Color:</span>
+              <div id="color-options" class="color-options"></div>
+            </div>
+            <div class="size-selector" style="margin-top:1.1em;">
+              <span style="font-weight:600;">Size:</span>
+              <div id="size-options" class="size-options"></div>
+            </div>
+          </div>
+          <button class="btn add-to-cart-btn" id="add-to-cart-btn"><i class="fa fa-shopping-cart"></i> Add to Cart</button>
+          <div class="product-info-sections">
+            <div class="info-block">
+              <h3 class="info-title">Product Description</h3>
+              <div class="info-content" id="product-detail-desc"></div>
+            </div>
+            <div class="info-block">
+              <h3 class="info-title">Sizing Guide</h3>
+              <div class="info-content">See our <a href="#">sizing guide</a> for more details.</div>
+            </div>
+            <div class="info-block">
+              <h3 class="info-title">Shipping & Returns</h3>
+              <div class="info-content">Free shipping on orders over $100. 30-day returns policy applies.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div id="login-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-title">Welcome Back</div>
+      <div class="modal-subtitle">Sign in to your account</div>
+      <form class="modal-form" autocomplete="off" onsubmit="return false;">
+        <label class="modal-label" for="modal-phone">Phone</label>
+        <div class="modal-input-wrap">
+          <span class="modal-input-icon"><i class="fa fa-info-circle"></i></span>
+          <input type="tel" id="modal-phone" class="modal-input" placeholder="Enter your phone number..." />
+        </div>
+        <button class="modal-login-btn" type="submit">Log In</button>
+      </form>
+      <div class="modal-divider-wrap">
+        <div class="modal-divider"></div>
+        <span class="modal-divider-text">or</span>
+        <div class="modal-divider"></div>
+      </div>
+      <div class="modal-social-btns single-btn">
+        <button class="modal-social-btn google-google-logo" type="button">
+          <span class="google-logo-text">
+            <span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC05">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span>
+          </span>
+        </button>
+      </div>
+      <button class="modal-close" id="modal-close-btn">&times;</button>
+      <div class="modal-signup-text" style="text-align:center;margin-top:0.5em;font-size:0.98rem;color:#888;">
+        Don't have an account yet? <a href="#" id="open-signup-modal" style="color:var(--accent-pink-dark);font-weight:700;cursor:pointer;text-decoration:underline;">Sign up</a>
+      </div>
+    </div>
+  </div>
+  <!-- Product Details Modal (hidden by default) -->
+  <div id="product-details-modal" class="modal-overlay">
+    <div class="modal-content product-details-modal-content">
+      <button class="modal-close" id="product-details-close">&times;</button>
+      <div class="product-details-modal-layout">
+        <div class="product-details-image-wrap">
+          <img id="product-details-img" src="" alt="Product Image" />
+        </div>
+        <div class="product-details-info">
+          <div class="product-details-title" id="product-details-title"></div>
+          <div class="product-details-price" id="product-details-price"></div>
+          <div class="product-details-desc" id="product-details-desc"></div>
+          <button class="add-to-cart-btn" id="product-details-add-to-cart"><i class="fa fa-shopping-cart"></i> Add to Cart</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- CHECKOUT FULL-PAGE SECTION (hidden by default) -->
+  <section id="checkout-section" style="display:none;width:100vw;min-height:100vh;background:var(--soft-gray);padding-top:2.5rem;">
+    <div class="checkout-container-2col">
+      <div class="checkout-left">
+        <div class="checkout-title">Checkout</div>
+        <form id="checkout-form" autocomplete="off" class="checkout-form-2col">
+          <div class="checkout-block">
+            <div class="checkout-block-title">Contact</div>
+            <label class="checkout-label" for="checkout-email">Email</label>
+            <input class="checkout-input" id="checkout-email" type="email" required placeholder="Enter your email..." />
+            <div class="checkout-checkbox-row">
+              <input type="checkbox" id="checkout-news" style="margin-right:0.5em;">
+              <label for="checkout-news" style="font-size:0.98rem;color:#888;">Email me with news and offers</label>
+            </div>
+          </div>
+          <div class="checkout-block">
+            <div class="checkout-block-title">Delivery</div>
+            <div class="checkout-row">
+              <input class="checkout-input" style="flex:1 1 50%;margin-right:0.5em;" id="checkout-firstname" type="text" placeholder="First name (optional)" />
+              <input class="checkout-input" style="flex:1 1 50%;" id="checkout-lastname" type="text" placeholder="Last name (optional)" />
+            </div>
+            <input class="checkout-input" id="checkout-address" type="text" required placeholder="Address" />
+            <input class="checkout-input" id="checkout-apt" type="text" placeholder="Apartment, suite, etc. (optional)" />
+            <div class="checkout-row">
+              <input class="checkout-input" style="flex:1 1 50%;margin-right:0.5em;" id="checkout-postal" type="text" placeholder="Postal code (optional)" />
+              <input class="checkout-input" style="flex:1 1 50%;" id="checkout-city" type="text" placeholder="City" />
+            </div>
+            <input class="checkout-input" id="checkout-phone" type="tel" required placeholder="Phone" />
+            <div class="checkout-checkbox-row">
+              <input type="checkbox" id="checkout-saveinfo" style="margin-right:0.5em;">
+              <label for="checkout-saveinfo" style="font-size:0.98rem;color:#888;">Save this information for next time</label>
+            </div>
+          </div>
+          <!-- <button class="checkout-continue-btn" id="checkout-continue-btn" type="button">Continue</button> -->
+        </form>
+      </div>
+      <div class="checkout-right">
+        <div class="checkout-summary-block">
+          <div class="checkout-summary-title">Order Summary</div>
+          <div class="checkout-order-items" id="checkout-order-summary-items"></div>
+          <div class="checkout-summary-row">
+            <span>Subtotal</span><span id="checkout-subtotal"></span>
+          </div>
+          <div class="checkout-summary-row">
+            <span>Shipping</span><span style="color:var(--accent-gold);font-weight:700;">FREE</span>
+          </div>
+          <div class="checkout-summary-row checkout-total-row">
+            <span>Total</span><span id="checkout-total" style="font-size:1.18rem;font-weight:800;color:var(--accent-pink-dark);"></span>
+          </div>
+        </div>
+        <div class="checkout-payment-block" id="checkout-payment-block" style="display:none;">
+          <div class="checkout-block-title">Payment</div>
+          <form id="checkout-payment-form" autocomplete="off">
+            <label class="checkout-label" for="checkout-payment-method">Payment Method</label>
+            <select class="checkout-input" id="checkout-payment-method" required>
+              <option value="">Select a payment method</option>
+              <option value="credit">Credit Card</option>
+              <option value="paypal">PayPal</option>
+              <option value="applepay">Apple Pay</option>
+            </select>
+            <button class="checkout-continue-btn" id="checkout-pay-btn" type="submit">Pay Now</button>
+          </form>
+        </div>
+        <div class="checkout-confirmation-block" id="checkout-confirmation-block" style="display:none;text-align:center;color:var(--accent-pink-dark);font-size:1.2rem;font-family:'Playfair Display',serif;margin-top:2em;background:var(--soft-gray);border-radius:14px;padding:1.5em 1em;box-shadow:0 1.5px 6px rgba(184,111,167,0.06);">
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Registration Modal -->
+  <div id="signup-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-title">Create Account</div>
+      <div class="modal-subtitle">Sign up to get started</div>
+      <form class="modal-form" id="signup-form" autocomplete="off" onsubmit="return false;">
+        <label class="modal-label" for="signup-fullname">Full Name</label>
+        <div class="modal-input-wrap">
+          <span class="modal-input-icon"><i class="fa fa-user"></i></span>
+          <input type="text" id="signup-fullname" class="modal-input" placeholder="Enter your full name..." required />
+        </div>
+        <label class="modal-label" for="signup-phone">Phone Number</label>
+        <div class="modal-input-wrap">
+          <span class="modal-input-icon"><i class="fa fa-phone"></i></span>
+          <input type="tel" id="signup-phone" class="modal-input" placeholder="Enter your phone number..." required />
+        </div>
+        <button class="modal-login-btn" type="submit">Sign Up</button>
+      </form>
+      <div class="modal-signup-text" style="text-align:center;margin-top:0.5em;font-size:0.98rem;color:#888;">
+        Already have an account? <a href="#" id="back-to-login" style="color:var(--accent-pink-dark);font-weight:700;cursor:pointer;text-decoration:underline;">Log in</a>
+      </div>
+      <button class="modal-close" id="signup-close-btn">&times;</button>
+    </div>
+  </div>
+  <script>
+    // Modal logic
+    const loginBtn = document.querySelector('.login-btn');
+    const modal = document.getElementById('login-modal');
+    const closeModalBtn = document.getElementById('modal-close-btn');
+    // --- Signup modal logic ---
+    const signupModal = document.getElementById('signup-modal');
+    const openSignupBtn = document.getElementById('open-signup-modal');
+    const signupCloseBtn = document.getElementById('signup-close-btn');
+    const backToLoginBtn = document.getElementById('back-to-login');
+    // Open signup modal from login
+    if (openSignupBtn) {
+      openSignupBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        modal.classList.remove('active');
+        signupModal.classList.add('active');
+      });
+    }
+    // Close signup modal
+    if (signupCloseBtn) {
+      signupCloseBtn.addEventListener('click', function() {
+        signupModal.classList.remove('active');
+      });
+    }
+    // Back to login from signup
+    if (backToLoginBtn) {
+      backToLoginBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        signupModal.classList.remove('active');
+        modal.classList.add('active');
+      });
+    }
+    // Close signup modal on overlay click
+    signupModal.addEventListener('click', function(e) {
+      if (e.target === signupModal) {
+        signupModal.classList.remove('active');
+      }
+    });
+    // Close signup modal on Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        signupModal.classList.remove('active');
+      }
+    });
+    loginBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      modal.classList.add('active');
+    });
+    closeModalBtn.addEventListener('click', function() {
+      modal.classList.remove('active');
+    });
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        modal.classList.remove('active');
+      }
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        modal.classList.remove('active');
+      }
+    });
+
+    // Product card click logic (REPLACED for full-page view)
+    const homepageContent = document.getElementById('homepage-content');
+    const productDetailSection = document.getElementById('product-detail-section');
+    const productMainImg = document.getElementById('product-main-img');
+    const productThumbnails = document.getElementById('product-thumbnails');
+    const productDetailTitle = document.getElementById('product-detail-title');
+    const productDetailPrice = document.getElementById('product-detail-price');
+    const productDetailDesc = document.getElementById('product-detail-desc');
+    const colorOptions = document.getElementById('color-options');
+    const sizeOptions = document.getElementById('size-options');
+    const addToCartBtn = document.getElementById('add-to-cart-btn');
+    const backToHomeBtn = document.getElementById('back-to-home');
+
+    function clearActiveOptions(container) {
+      Array.from(container.children).forEach(child => child.classList.remove('active'));
+    }
+
+    function renderProductDetail(card) {
+      // Set title, price, desc
+      productDetailTitle.textContent = card.getAttribute('data-title');
+      productDetailPrice.textContent = card.getAttribute('data-price');
+      productDetailDesc.textContent = card.getAttribute('data-desc');
+      // Gallery
+      const gallery = JSON.parse(card.getAttribute('data-gallery') || '["'+card.getAttribute('data-img')+'"]');
+      productMainImg.src = gallery[0];
+      productMainImg.alt = card.getAttribute('data-title');
+      productThumbnails.innerHTML = '';
+      gallery.forEach((img, idx) => {
+        const thumb = document.createElement('img');
+        thumb.src = img;
+        thumb.className = 'product-thumb' + (idx === 0 ? ' active' : '');
+        thumb.style.cursor = 'pointer';
+        thumb.style.width = '54px';
+        thumb.style.height = '54px';
+        thumb.style.objectFit = 'cover';
+        thumb.style.borderRadius = '12px';
+        thumb.style.marginRight = '0.7em';
+        thumb.addEventListener('click', () => {
+          productMainImg.src = img;
+          clearActiveOptions(productThumbnails);
+          thumb.classList.add('active');
+        });
+        productThumbnails.appendChild(thumb);
+      });
+      // Colors
+      colorOptions.innerHTML = '';
+      const colors = JSON.parse(card.getAttribute('data-colors') || '[]');
+      colors.forEach((color, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'color-dot' + (idx === 0 ? ' active' : '');
+        btn.style.background = color;
+        btn.setAttribute('aria-label', 'Color option');
+        btn.addEventListener('click', () => {
+          clearActiveOptions(colorOptions);
+          btn.classList.add('active');
+        });
+        colorOptions.appendChild(btn);
+      });
+      // Sizes
+      sizeOptions.innerHTML = '';
+      const sizes = JSON.parse(card.getAttribute('data-sizes') || '[]');
+      sizes.forEach((size, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'size-btn' + (idx === 0 ? ' active' : '');
+        btn.textContent = size;
+        btn.addEventListener('click', () => {
+          clearActiveOptions(sizeOptions);
+          btn.classList.add('active');
+        });
+        sizeOptions.appendChild(btn);
+      });
+    }
+
+    // Track navigation source for product detail back button
+    let cameFromAllProducts = false;
+
+    document.querySelectorAll('.product-card').forEach(card => {
+      card.style.cursor = 'pointer';
+      card.addEventListener('click', function() {
+        homepageContent.style.display = 'none';
+        productDetailSection.style.display = 'block';
+        renderProductDetail(card);
+        window.scrollTo({top:0,behavior:'smooth'});
+        cameFromAllProducts = false; // Default: not from All Products
+      });
+    });
+    backToHomeBtn.addEventListener('click', function() {
+      if (cameFromAllProducts) {
+        productDetailSection.style.display = 'none';
+        allProductsSection.style.display = 'flex';
+        window.scrollTo({top:0,behavior:'smooth'});
+      } else {
+        productDetailSection.style.display = 'none';
+        homepageContent.style.display = '';
+        window.scrollTo({top:0,behavior:'smooth'});
+      }
+      cameFromAllProducts = false; // Reset after navigating back
+    });
+    // Home link in navbar returns to homepage view
+    document.querySelectorAll('nav a').forEach(link => {
+      if (link.textContent.trim().toLowerCase() === 'home') {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          document.getElementById('product-detail-section').style.display = 'none';
+          document.getElementById('homepage-content').style.display = '';
+          window.scrollTo({top:0,behavior:'smooth'});
+        });
+      }
+    });
+    // ALL PRODUCTS SECTION LOGIC
+    const allProductsSection = document.getElementById('all-products-section');
+    const allProductsGrid = document.getElementById('all-products-grid');
+    const allProductsBack = document.getElementById('all-products-back');
+    const shopNowBtn = document.getElementById('shop-now-btn');
+    // Helper: get all product card data from homepage
+    function getAllProductData() {
+      // Define all products explicitly to ensure completeness and correct categories
+      const allProducts = [
+        // --- Most Loved Items (Featured) ---
+        {
+          title: "Golden Leaf Earrings",
+          price: "$245",
+          img: "https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg",
+          desc: "Delicate gold-plated earrings shaped like leaves, capturing the beauty of nature in a timeless accessory.",
+          gallery: '["https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_1_lar.jpg","https://www.jkjjewellers.in/_next/image?url=https%3A%2F%2Fres.cloudinary.com%2Fjkjjeweller%2Fproducts%2Fnthndtak3obvx8z2y2dg&w=1920&q=75","https://cdn.caratlane.com/media/catalog/product/U/E/UE00018-YG0000_3_lar.jpg"]',
+          colors: '["#bfa05a","#e5e5e5","#d6a4c2"]',
+          sizes: '["16 cm","17 cm","18 cm","19 cm","20 cm"]',
+          category: "Jewelry"
+        },
+        {
+          title: "Blush Pink Mini Bag",
+          price: "$189",
+          img: "https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E01-1?$default_GHC$&crop=461,631,979,1169&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85",
+          desc: "A compact blush pink handbag with a modern silhouette, ideal for carrying your essentials from day to night.",
+          gallery: '["https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E01-1?$default_GHC$&crop=461,631,979,1169&wid=1850&hei=2000&scale=0.875&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E03-1?$default_GHC$&crop=561,642,849,1144&wid=1024&hei=1107&scale=0.4843&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E06-1?$default_GHC$&crop=727,555,483,897&wid=1024&hei=1107&scale=0.4843&bfc=on&qlt=85","https://assets.christiandior.com/is/image/diorprod/M0505ONGEM09N_E07?$default_GHC$&crop=807,177,388,1599&wid=1024&hei=1107&scale=0.4843&bfc=on&qlt=85"]',
+          colors: '["#e7b6d6","#e5e5e5","#bfa05a"]',
+          sizes: '["Small","Medium","Large"]',
+          category: "Bags"
+        },
+        {
+          title: "Luxe Pearl Necklace",
+          price: "$309",
+          img: "https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371",
+          desc: "A strand of luminous pearls with a modern twist, this necklace brings classic sophistication to any look.",
+          gallery: '["https://www.roseandleeco.com/cdn/shop/files/996c4fa33493975053d86e5b2cabd7914c4e94ec26ea1f7f81224dfa09374408.webp?v=1688163371","https://lockwoodshop.com/cdn/shop/files/4be5752cfreshwater_20pearl_20necklace_202_864x864.jpg?v=1747436091","https://lockwoodshop.com/cdn/shop/files/69b33e51freshwater_20pearl_20necklace_203_864x864.jpg?v=1747436091"]',
+          colors: '["#fff","#e5e5e5","#bfa05a"]',
+          sizes: '["16 in","18 in","20 in"]',
+          category: "Jewelry"
+        },
+        {
+          title: "Velvet Burgundy Heels",
+          price: "$179",
+          img: "https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png",
+          desc: "Elegant high heels in plush burgundy velvet, designed for comfort and a bold, sophisticated statement.",
+          gallery: '["https://www.katescloset.com.au/uploads/2/1/2/9/21295692/rep-2_220.png","https://m.media-amazon.com/images/I/61tTjOUqcWL._AC_SY575_.jpg","https://m.media-amazon.com/images/I/61LjFsmzVpL._AC_SY575_.jpg","https://m.media-amazon.com/images/I/61hBxedRM+L._AC_SY575_.jpg"]',
+          colors: '["#b86fa7","#e5e5e5","#bfa05a"]',
+          sizes: '["36","37","38","39","40"]',
+          category: "Shoes"
+        },
+        // --- Newly Added Most Loved Items ---
+        {
+          title: "Camel Luxe Pumps",
+          price: "$229",
+          img: "https://elliebelle.com/cdn/shop/files/4824942.jpg?height=871&v=1736956782",
+          desc: "Elegant ivory pumps in soft satin, perfect for weddings and special occasions.",
+          gallery: '["https://elliebelle.com/cdn/shop/files/4824942.jpg?height=871&v=1736956782","https://elliebelle.com/cdn/shop/files/4824936.jpg?v=1736956782"]',
+          colors: '["#fff","#e5e5e5","#bfa05a"]',
+          sizes: '["36","37","38","39","40"]',
+          category: "Shoes"
+        },
+        {
+          title: "Pearl Bow Ballet Flats",
+          price: "$199",
+          img: "https://image.made-in-china.com/202f0j00ceDlYbQsghop/Flat-Shoes-Hot-Selling-Women-Shoes-High-Quality-Casual-Shoes-Footwear-Leather-Shoes-Soft-2021.webp",
+          desc: "Chic rose gold sandals with delicate straps and a comfortable heel.",
+          gallery: '["https://image.made-in-china.com/202f0j00ceDlYbQsghop/Flat-Shoes-Hot-Selling-Women-Shoes-High-Quality-Casual-Shoes-Footwear-Leather-Shoes-Soft-2021.webp"]',
+          colors: '["#e7b6d6","#bfa05a","#fff"]',
+          sizes: '["36","37","38","39","40"]',
+          category: "Shoes"
+        },
+        {
+          title: "Skyline Grace Bag",
+          price: "$259",
+          img: "https://media.istockphoto.com/id/1365118618/photo/blue-fashion-purse-handbag-on-white-background-isolated.jpg?s=612x612&w=0&k=20&c=VNszfC0cxenqZGhjlr3gqqvzHWREuhdY_H3CKF1B38g=",
+          desc: "Spacious and timeless black tote bag, crafted from premium leather.",
+          gallery: '["https://media.istockphoto.com/id/1365118618/photo/blue-fashion-purse-handbag-on-white-background-isolated.jpg?s=612x612&w=0&k=20&c=VNszfC0cxenqZGhjlr3gqqvzHWREuhdY_H3CKF1B38g="]',
+          colors: '["#18141c","#e5e5e5","#bfa05a"]',
+          sizes: '["Medium","Large"]',
+          category: "Bags"
+        },
+        {
+          title: "Pastel Blue Satchel",
+          price: "$219",
+          img: "https://img.freepik.com/premium-photo/women-leather-bag-isolated-white-background-side-view-luxury-genuine-full-grain-leather-lady_709135-96.jpg",
+          desc: "Soft pastel blue satchel with gold hardware and adjustable strap.",
+          gallery: '["https://img.freepik.com/premium-photo/women-leather-bag-isolated-white-background-side-view-luxury-genuine-full-grain-leather-lady_709135-96.jpg"]',
+          colors: '["#b6d6e7","#e5e5e5","#bfa05a"]',
+          sizes: '["Small","Medium"]',
+          category: "Bags"
+        },
+        // --- Perfect Sets for Her ---
+        {
+          title: "Golden Heart Jewelry Set",
+          price: "$429",
+          img: "https://m.media-amazon.com/images/I/71OOtiBa76L._UY1000_.jpg",
+          desc: "A radiant gold-tone jewelry set featuring a heart pendant necklace, matching earrings, and a delicate bracelet for a romantic touch.",
+          gallery: '["https://m.media-amazon.com/images/I/71OOtiBa76L._UY1000_.jpg","https://m.media-amazon.com/images/I/71OOtiBa76L._UX679_.jpg","https://m.media-amazon.com/images/I/71OOtiBa76L._UY500_.jpg"]',
+          colors: '["#bfa05a","#e5e5e5","#d6a4c2"]',
+          sizes: '["16 in","18 in","20 in"]',
+          category: "Jewelry"
+        },
+        {
+          title: "Midnight Sparkle Set",
+          price: "$389",
+          img: "https://i.etsystatic.com/9665455/r/il/a3949d/2777754922/il_570xN.2777754922_rs3d.jpg",
+          desc: "A dazzling jewelry set with deep blue stones and shimmering accents, including a necklace, earrings, and ring for evening glamour.",
+          gallery: '["https://i.etsystatic.com/9665455/r/il/a3949d/2777754922/il_570xN.2777754922_rs3d.jpg","https://i.etsystatic.com/9665455/r/il/2b2e2d/2777754924/il_570xN.2777754924_rs3d.jpg"]',
+          colors: '["#18141c","#e5e5e5","#bfa05a"]',
+          sizes: '["Small","Medium","Large"]',
+          category: "Jewelry"
+        },
+        {
+          title: "Royal Elegance Collection",
+          price: "$349",
+          img: "https://www.deraahstore.com/dw/image/v2/BJFS_PRD/on/demandware.static/-/Sites-deraah-master/default/dwa599e9cb/images/10711151022000-1696-1.jpg?sw=2000&sh=2000",
+          desc: "A regal gold-plated jewelry collection with intricate details, featuring a necklace, bracelet, and earrings for a majestic look.",
+          gallery: '["https://www.deraahstore.com/dw/image/v2/BJFS_PRD/on/demandware.static/-/Sites-deraah-master/default/dwa599e9cb/images/10711151022000-1696-1.jpg?sw=2000&sh=2000"]',
+          colors: '["#bfa05a","#e5e5e5"]',
+          sizes: '["Standard"]',
+          category: "Jewelry"
+        },
+        {
+          title: "Silver Petal Elegance",
+          price: "$299",
+          img: "https://m.media-amazon.com/images/I/711E7-QpLdL._UY1000_.jpg",
+          desc: "A graceful silver jewelry set with petal motifs, including a necklace, earrings, and a matching ring for understated elegance.",
+          gallery: '["https://m.media-amazon.com/images/I/711E7-QpLdL._UY1000_.jpg","https://m.media-amazon.com/images/I/711E7-QpLdL._UX679_.jpg"]',
+          colors: '["#e5e5e5","#bfa05a"]',
+          sizes: '["16 in","18 in"]',
+          category: "Jewelry"
+        }
+      ];
+      return allProducts;
+    }
+    // Helper to get all Perfect Sets data
+    function getPerfectSetsData() {
+      // Return the full perfectSetsData array with all fields (desc, gallery, colors, sizes, etc.)
+      return perfectSetsData;
+    }
+    // Helper to get all Most Loved Items data
+    function getMostLovedItemsData() {
+      // Only select product-cards from the 'Our Most Loved Items' section
+      const featuredSection = document.querySelector('.featured .products-grid');
+      if (!featuredSection) return [];
+      return Array.from(featuredSection.querySelectorAll('.product-card')).map(card => ({
+        title: card.getAttribute('data-title'),
+        price: card.getAttribute('data-price'),
+        img: card.getAttribute('data-img'),
+        desc: card.getAttribute('data-desc'),
+        gallery: card.getAttribute('data-gallery'),
+        colors: card.getAttribute('data-colors'),
+        sizes: card.getAttribute('data-sizes'),
+        category: card.getAttribute('data-category')
+      }));
+    }
+    // Update Shop Now button click to show both sections' products
+    shopNowBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      homepageContent.style.display = 'none';
+      allProductsSection.style.display = 'flex';
+      // Combine both arrays
+      const allProducts = getMostLovedItemsData().concat(getPerfectSetsData());
+      renderAllProductsGrid(null, allProducts);
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+    // Update renderAllProductsGrid to accept a data override
+    function renderAllProductsGrid(categoryFilter, dataOverride) {
+      // Define the 4 missing products to always include
+      const alwaysInclude = [
+        {
+          title: "Camel Luxe Pumps",
+          price: "$229",
+          img: "https://elliebelle.com/cdn/shop/files/4824942.jpg?height=871&v=1736956782",
+          desc: "Elegant ivory pumps in soft satin, perfect for weddings and special occasions.",
+          gallery: '["https://elliebelle.com/cdn/shop/files/4824942.jpg?height=871&v=1736956782","https://elliebelle.com/cdn/shop/files/4824936.jpg?v=1736956782"]',
+          colors: '["#fff","#e5e5e5","#bfa05a"]',
+          sizes: '["36","37","38","39","40"]',
+          category: "Shoes"
+        },
+        {
+          title: "Pearl Bow Ballet Flats",
+          price: "$199",
+          img: "https://image.made-in-china.com/202f0j00ceDlYbQsghop/Flat-Shoes-Hot-Selling-Women-Shoes-High-Quality-Casual-Shoes-Footwear-Leather-Shoes-Soft-2021.webp",
+          desc: "Chic rose gold sandals with delicate straps and a comfortable heel.",
+          gallery: '["https://image.made-in-china.com/202f0j00ceDlYbQsghop/Flat-Shoes-Hot-Selling-Women-Shoes-High-Quality-Casual-Shoes-Footwear-Leather-Shoes-Soft-2021.webp"]',
+          colors: '["#e7b6d6","#bfa05a","#fff"]',
+          sizes: '["36","37","38","39","40"]',
+          category: "Shoes"
+        },
+        {
+          title: "Skyline Grace Bag",
+          price: "$259",
+          img: "https://media.istockphoto.com/id/1365118618/photo/blue-fashion-purse-handbag-on-white-background-isolated.jpg?s=612x612&w=0&k=20&c=VNszfC0cxenqZGhjlr3gqqvzHWREuhdY_H3CKF1B38g=",
+          desc: "Spacious and timeless black tote bag, crafted from premium leather.",
+          gallery: '["https://media.istockphoto.com/id/1365118618/photo/blue-fashion-purse-handbag-on-white-background-isolated.jpg?s=612x612&w=0&k=20&c=VNszfC0cxenqZGhjlr3gqqvzHWREuhdY_H3CKF1B38g="]',
+          colors: '["#18141c","#e5e5e5","#bfa05a"]',
+          sizes: '["Medium","Large"]',
+          category: "Bags"
+        },
+        {
+          title: "Pastel Blue Satchel",
+          price: "$219",
+          img: "https://img.freepik.com/premium-photo/women-leather-bag-isolated-white-background-side-view-luxury-genuine-full-grain-leather-lady_709135-96.jpg",
+          desc: "Soft pastel blue satchel with gold hardware and adjustable strap.",
+          gallery: '["https://img.freepik.com/premium-photo/women-leather-bag-isolated-white-background-side-view-luxury-genuine-full-grain-leather-lady_709135-96.jpg"]',
+          colors: '["#b6d6e7","#e5e5e5","#bfa05a"]',
+          sizes: '["Small","Medium"]',
+          category: "Bags"
+        }
+      ];
+      // Combine products, ensuring no duplicates by title
+      const products = (dataOverride || getAllProductData());
+      const allTitles = new Set(products.map(p => p.title));
+      alwaysInclude.forEach(p => {
+        if (!allTitles.has(p.title)) products.push(p);
+      });
+      allProductsGrid.innerHTML = '';
+      let filtered = products;
+      if (categoryFilter) {
+        filtered = products.filter(p => (p.category || '').toLowerCase() === categoryFilter.toLowerCase());
+      }
+      filtered.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.setAttribute('data-title', product.title || '');
+        card.setAttribute('data-price', product.price || '');
+        card.setAttribute('data-img', product.img || '');
+        card.setAttribute('data-desc', product.desc || '');
+        card.setAttribute('data-gallery', product.gallery || `["${product.img || ''}"]`);
+        card.setAttribute('data-colors', product.colors || '[]');
+        card.setAttribute('data-sizes', product.sizes || '[]');
+        card.setAttribute('data-category', product.category || '');
+        card.innerHTML = `
+          <img src="${product.img}" alt="${product.title}">
+          <h4>${product.title}</h4>
+          <span>${product.price}</span>
+        `;
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', function() {
+          allProductsSection.style.display = 'none';
+          productDetailSection.style.display = 'block';
+          renderProductDetail(card);
+          window.scrollTo({top:0,behavior:'smooth'});
+          cameFromAllProducts = true;
+        });
+        allProductsGrid.appendChild(card);
+      });
+      if (filtered.length === 0) {
+        allProductsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;font-size:1.1rem;color:#b86fa7;padding:2em 0;">No products found in this category.</div>';
+      }
+    }
+    // Category card click logic
+    document.querySelectorAll('.category-card').forEach(card => {
+      card.style.cursor = 'pointer';
+      card.addEventListener('click', function() {
+        const category = card.getAttribute('data-category');
+        homepageContent.style.display = 'none';
+        allProductsSection.style.display = 'flex';
+        // Clear the grid before rendering new products to prevent duplication
+        allProductsGrid.innerHTML = '';
+        renderAllProductsGrid(category);
+        window.scrollTo({top:0,behavior:'smooth'});
+      });
+    });
+    allProductsBack.addEventListener('click', function() {
+      allProductsSection.style.display = 'none';
+      homepageContent.style.display = '';
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+    // Home link in navbar returns to homepage view from any section
+    document.querySelectorAll('nav a').forEach(link => {
+      if (link.textContent.trim().toLowerCase() === 'home') {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          document.getElementById('product-detail-section').style.display = 'none';
+          document.getElementById('all-products-section').style.display = 'none';
+          document.getElementById('homepage-content').style.display = '';
+          window.scrollTo({top:0,behavior:'smooth'});
+          // --- FIX: Hide checkout section when navigating Home from navbar ---
+          // This ensures checkout is hidden regardless of which step is visible
+          var checkoutSection = document.getElementById('checkout-section');
+          if (checkoutSection) checkoutSection.style.display = 'none';
+        });
+      }
+    });
+    // Add to Cart (demo only)
+    addToCartBtn.addEventListener('click', function() {
+      addToCartBtn.textContent = 'Added!';
+      setTimeout(()=>{addToCartBtn.innerHTML = '<i class="fa fa-shopping-cart"></i> Add to Cart';}, 1200);
+    });
+
+    // --- CART LOGIC ---
+    const cartIconBtn = document.getElementById('cart-icon-btn');
+    const cartCountBadge = document.getElementById('cart-count-badge');
+    const miniCartPanel = document.getElementById('mini-cart-panel');
+
+    function getCart() {
+      try {
+        return JSON.parse(localStorage.getItem('shinybelle_cart') || '[]');
+      } catch { return []; }
+    }
+    function setCart(cart) {
+      localStorage.setItem('shinybelle_cart', JSON.stringify(cart));
+    }
+    function updateCartBadge() {
+      const cart = getCart();
+      if (cart.length > 0) {
+        cartCountBadge.textContent = cart.length;
+        cartCountBadge.style.display = '';
+      } else {
+        cartCountBadge.style.display = 'none';
+      }
+    }
+    function renderMiniCart() {
+      const cart = getCart();
+      let html = `<div class="mini-cart-title">Your Cart</div><div class="mini-cart-items">`;
+      if (cart.length === 0) {
+        html += `<div style='text-align:center;color:#b86fa7;padding:1.2em 0;'>Your cart is empty.</div>`;
+      } else {
+        cart.forEach((item, idx) => {
+          html += `<div class='mini-cart-item'>
+            <img class='mini-cart-item-img' src='${item.img}' alt='${item.title}'>
+            <div class='mini-cart-item-info'>
+              <div class='mini-cart-item-title'>${item.title}</div>
+              <div class='mini-cart-item-meta'>${item.price}` +
+                (item.size ? ` &middot; <span>${item.size}</span>` : '') +
+                (item.color ? ` &middot; <span style='display:inline-block;width:1em;height:1em;border-radius:50%;background:${item.color};border:1.5px solid #bfa05a;margin-left:0.3em;vertical-align:middle;'></span>` : '') +
+              `</div>
+            </div>
+            <button class='mini-cart-item-remove' data-idx='${idx}' aria-label='Remove'>&times;</button>
+          </div>`;
+        });
+      }
+      html += `</div>`;
+      if (cart.length > 0) {
+        const total = cart.reduce((sum, item) => sum + (parseFloat(item.price.replace(/[^\d.]/g, '')) || 0), 0);
+        html += `<div class='mini-cart-footer'>
+          <div class='mini-cart-total'>Total: $${total.toFixed(2)}</div>
+          <button class='mini-cart-checkout-btn'>Checkout</button>
+        </div>`;
+      }
+      miniCartPanel.innerHTML = html;
+      miniCartPanel.classList.add('active');
+      // Remove item logic
+      miniCartPanel.querySelectorAll('.mini-cart-item-remove').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation(); // Prevent closing the cart popup
+          e.preventDefault();
+          const idx = parseInt(btn.getAttribute('data-idx'));
+          const cart = getCart();
+          cart.splice(idx, 1);
+          setCart(cart);
+          updateCartBadge();
+          renderMiniCart();
+          // Ensure mini cart stays open and visible
+          miniCartPanel.style.display = 'flex';
+          miniCartPanel.classList.add('active');
+        });
+      });
+      // Checkout button logic
+      const checkoutBtn = miniCartPanel.querySelector('.mini-cart-checkout-btn');
+      if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', function() {
+          // Show checkout full-page section, hide all other content except navbar
+          document.getElementById('checkout-section').style.display = 'block';
+          document.body.style.overflow = 'auto';
+          homepageContent.style.display = 'none';
+          productDetailSection.style.display = 'none';
+          allProductsSection.style.display = 'none';
+          miniCartPanel.style.display = 'none';
+          miniCartPanel.classList.remove('active');
+          renderCheckoutOrderSummary2col();
+          // Reset steps
+          document.getElementById('checkout-form').style.display = '';
+          var paymentBlock = document.getElementById('checkout-payment-block');
+          paymentBlock.style.display = 'none';
+          paymentBlock.classList.remove('active');
+          document.getElementById('checkout-confirmation-block').style.display = 'none';
+        });
+      }
+    }
+    cartIconBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (miniCartPanel.style.display === 'none' || !miniCartPanel.classList.contains('active')) {
+        renderMiniCart();
+        miniCartPanel.style.display = 'flex';
+        miniCartPanel.classList.add('active');
+      } else {
+        miniCartPanel.style.display = 'none';
+        miniCartPanel.classList.remove('active');
+      }
+    });
+    // Hide mini-cart when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!miniCartPanel.contains(e.target) && e.target !== cartIconBtn && !cartIconBtn.contains(e.target)) {
+        miniCartPanel.style.display = 'none';
+        miniCartPanel.classList.remove('active');
+      }
+    });
+    // Add to Cart integration
+    function getSelectedColor() {
+      const active = colorOptions.querySelector('.color-dot.active');
+      return active ? active.style.background : '';
+    }
+    function getSelectedSize() {
+      const active = sizeOptions.querySelector('.size-btn.active');
+      return active ? active.textContent : '';
+    }
+    addToCartBtn.addEventListener('click', function() {
+      const item = {
+        title: productDetailTitle.textContent,
+        price: productDetailPrice.textContent,
+        img: productMainImg.src,
+        size: getSelectedSize(),
+        color: getSelectedColor()
+      };
+      const cart = getCart();
+      cart.push(item);
+      setCart(cart);
+      updateCartBadge();
+      addToCartBtn.textContent = 'Added!';
+      setTimeout(()=>{addToCartBtn.innerHTML = '<i class="fa fa-shopping-cart"></i> Add to Cart';}, 1200);
+    });
+    // On page load, update badge
+    updateCartBadge();
+
+    // Checkout overlay close logic
+    const checkoutSection = document.getElementById('checkout-section');
+    const checkoutCloseBtn = document.getElementById('checkout-close-btn');
+    checkoutCloseBtn.addEventListener('click', function() {
+      checkoutSection.style.display = 'none';
+      document.body.style.overflow = '';
+      homepageContent.style.display = '';
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+    // Render order summary for checkout 2col
+    function renderCheckoutOrderSummary2col() {
+      const cart = getCart();
+      const itemsDiv = document.getElementById('checkout-order-summary-items');
+      const subtotalDiv = document.getElementById('checkout-subtotal');
+      const totalDiv = document.getElementById('checkout-total');
+      if (!cart || cart.length === 0) {
+        itemsDiv.innerHTML = `<div style='text-align:center;color:#b86fa7;padding:1.2em 0;'>Your cart is empty.</div>`;
+        subtotalDiv.textContent = '';
+        totalDiv.textContent = '';
+        return;
+      }
+      let html = '';
+      let total = 0;
+      cart.forEach(item => {
+        const price = parseFloat(item.price.replace(/[^\d.]/g, '')) || 0;
+        total += price;
+        html += `<div class='order-summary-item' style='display:flex;align-items:center;gap:0.7em;background:#fff;border-radius:10px;padding:0.5em 0.7em;position:relative;margin-bottom:0.5em;border:1.5px solid var(--accent-pink-dark);'>
+          <img class='order-summary-item-img' src='${item.img}' alt='${item.title}' style='width:44px;height:44px;object-fit:contain;border-radius:8px;background:#fff;border:1.5px solid var(--accent-pink-dark);'>
+          <div class='order-summary-item-info' style='flex:1;display:flex;flex-direction:column;gap:0.1em;'>
+            <div class='order-summary-item-title' style='font-size:1.05rem;color:var(--accent-pink-dark);font-weight:700;font-family:Playfair Display,serif;'>${item.title}</div>
+            <div class='order-summary-item-meta' style='font-size:0.97rem;color:var(--text-dark);opacity:0.85;'>${item.price}` +
+              (item.size ? ` &middot; <span>${item.size}</span>` : '') +
+              (item.color ? ` &middot; <span style='display:inline-block;width:1em;height:1em;border-radius:50%;background:${item.color};border:1.5px solid #bfa05a;margin-left:0.3em;vertical-align:middle;'></span>` : '') +
+            `</div>
+          </div>
+        </div>`;
+      });
+      itemsDiv.innerHTML = html;
+      subtotalDiv.textContent = `$${total.toFixed(2)}`;
+      totalDiv.textContent = `$${total.toFixed(2)}`;
+    }
+    // Checkout step logic 2col
+    const checkoutContinueBtn = document.getElementById('checkout-continue-btn');
+    const checkoutForm2col = document.getElementById('checkout-form');
+    const checkoutPaymentBlock = document.getElementById('checkout-payment-block');
+    const checkoutConfirmationBlock = document.getElementById('checkout-confirmation-block');
+    checkoutContinueBtn.addEventListener('click', function() {
+      // Validate required fields
+      if (!document.getElementById('checkout-email').value.trim() ||
+          !document.getElementById('checkout-address').value.trim() ||
+          !document.getElementById('checkout-phone').value.trim()) {
+        alert('Please fill in all required fields.');
+        return;
+      }
+      checkoutForm2col.style.display = 'none';
+      checkoutPaymentBlock.style.display = 'block';
+    });
+    // Payment step logic 2col
+    const checkoutPaymentForm2col = document.getElementById('checkout-payment-form');
+    checkoutPaymentForm2col.addEventListener('submit', function(e) {
+      e.preventDefault();
+      if (!document.getElementById('checkout-payment-method').value) {
+        alert('Please select a payment method.');
+        return;
+      }
+      setTimeout(() => {
+        setCart([]);
+        checkoutPaymentBlock.style.display = 'none';
+        checkoutConfirmationBlock.style.display = 'block';
+        checkoutConfirmationBlock.innerHTML = `<i class='fa fa-check-circle' style='font-size:2.2rem;color:var(--accent-gold);'></i><br>Thank you for your order!<br>Your payment was successful.`;
+        updateCartBadge();
+      }, 900);
+    });
+    // Hide checkout section and return to homepage when confirmation is clicked (optional)
+    checkoutConfirmationBlock.addEventListener('click', function() {
+      document.getElementById('checkout-section').style.display = 'none';
+      homepageContent.style.display = '';
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+  </script>
+  <!-- === ANIMATION & INTERACTION ENHANCEMENTS CONTINUED === -->
+  <script>
+  // === PAGE LOAD ANIMATION ===
+  document.body.classList.add('sb-fadein');
+  window.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+      document.body.classList.add('sb-loaded');
+    }, 80);
+  });
+  // === SECTION/CONTENT ANIMATIONS ===
+  function sbInViewObserver(selector, className = 'sb-inview', rootMargin = '0px 0px -10% 0px') {
+    const els = document.querySelectorAll(selector);
+    if (!('IntersectionObserver' in window)) {
+      els.forEach(el => el.classList.add(className));
+      return;
+    }
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add(className);
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { rootMargin });
+    els.forEach(el => obs.observe(el));
+  }
+  window.addEventListener('DOMContentLoaded', function() {
+    sbInViewObserver('.navbar');
+    sbInViewObserver('.hero');
+    sbInViewObserver('.categories');
+    sbInViewObserver('.featured');
+    sbInViewObserver('footer');
+    sbInViewObserver('.footer-contact-minimal');
+    sbInViewObserver('.category-card');
+    sbInViewObserver('.product-card');
+    sbInViewObserver('.info-block');
+    sbInViewObserver('.checkout-block');
+    sbInViewObserver('.checkout-summary-block');
+    sbInViewObserver('.checkout-payment-block');
+    sbInViewObserver('.checkout-confirmation-block');
+    sbInViewObserver('#all-products-grid .product-card');
+    sbInViewObserver('#checkout-section');
+    sbInViewObserver('#product-detail-section');
+    sbInViewObserver('#all-products-section');
+    // --- ENHANCED: About section and Why Shop With Us cards ---
+    sbInViewObserver('.about-section');
+    sbInViewObserver('.why-feature');
+  });
+  // === DYNAMICALLY ADD ANIMATION CLASSES ON SECTION SHOW ===
+  function sbShowSectionWithAnim(sectionId) {
+    var el = document.getElementById(sectionId);
+    if (el) {
+      el.classList.remove('sb-inview');
+      setTimeout(function() { el.classList.add('sb-inview'); }, 10);
+    }
+  }
+  // --- Patch navigation to use smooth transitions ---
+  (function() {
+    var homepageContent = document.getElementById('homepage-content');
+    var productDetailSection = document.getElementById('product-detail-section');
+    var allProductsSection = document.getElementById('all-products-section');
+    var checkoutSection = document.getElementById('checkout-section');
+    // Home link
+    document.querySelectorAll('nav a').forEach(link => {
+      if (link.textContent.trim().toLowerCase() === 'home') {
+        link.addEventListener('click', function(e) {
+          setTimeout(function() {
+            sbShowSectionWithAnim('homepage-content');
+          }, 30);
+        });
+      }
+    });
+    // Product card click
+    document.querySelectorAll('.product-card').forEach(card => {
+      card.addEventListener('click', function() {
+        setTimeout(function() {
+          sbShowSectionWithAnim('product-detail-section');
+        }, 30);
+      });
+    });
+    // Category card click
+    document.querySelectorAll('.category-card').forEach(card => {
+      card.addEventListener('click', function() {
+        setTimeout(function() {
+          sbShowSectionWithAnim('all-products-section');
+        }, 30);
+      });
+    });
+    // Shop now btn
+    var shopNowBtn = document.getElementById('shop-now-btn');
+    if (shopNowBtn) {
+      shopNowBtn.addEventListener('click', function() {
+        setTimeout(function() {
+          sbShowSectionWithAnim('all-products-section');
+        }, 30);
+      });
+    }
+    // All products back
+    var allProductsBack = document.getElementById('all-products-back');
+    if (allProductsBack) {
+      allProductsBack.addEventListener('click', function() {
+        setTimeout(function() {
+          sbShowSectionWithAnim('homepage-content');
+        }, 30);
+      });
+    }
+    // Product detail back
+    var backToHomeBtn = document.getElementById('back-to-home');
+    if (backToHomeBtn) {
+      backToHomeBtn.addEventListener('click', function() {
+        setTimeout(function() {
+          sbShowSectionWithAnim('homepage-content');
+        }, 30);
+      });
+    }
+    // Mini cart checkout
+    var miniCartPanel = document.getElementById('mini-cart-panel');
+    if (miniCartPanel) {
+      miniCartPanel.addEventListener('click', function(e) {
+        if (e.target.classList.contains('mini-cart-checkout-btn')) {
+          setTimeout(function() {
+            sbShowSectionWithAnim('checkout-section');
+          }, 30);
+        }
+      });
+    }
+    // Checkout confirmation click
+    var checkoutConfirmationBlock = document.getElementById('checkout-confirmation-block');
+    if (checkoutConfirmationBlock) {
+      checkoutConfirmationBlock.addEventListener('click', function() {
+        setTimeout(function() {
+          sbShowSectionWithAnim('homepage-content');
+        }, 30);
+      });
+    }
+  })();
+  // === Animate Cart Badge on Add ===
+  (function() {
+    var cartBadge = document.getElementById('cart-count-badge');
+    var addToCartBtn = document.getElementById('add-to-cart-btn');
+    if (addToCartBtn) {
+      addToCartBtn.addEventListener('click', function() {
+        if (cartBadge) {
+          cartBadge.classList.remove('sb-pulse');
+          void cartBadge.offsetWidth;
+          cartBadge.classList.add('sb-pulse');
+          setTimeout(function() { cartBadge.classList.remove('sb-pulse'); }, 700);
+        }
+      });
+    }
+  })();
+  // === Animate Modal Divider on Show ===
+  (function() {
+    var modal = document.getElementById('login-modal');
+    if (modal) {
+      modal.addEventListener('transitionend', function() {
+        var dividers = modal.querySelectorAll('.modal-divider');
+        dividers.forEach(function(div) {
+          div.classList.add('sb-inview');
+        });
+      });
+    }
+  })();
+  // === Animate Info Blocks on Product Detail Show ===
+  (function() {
+    var productDetailSection = document.getElementById('product-detail-section');
+    if (productDetailSection) {
+      productDetailSection.addEventListener('transitionend', function() {
+        var blocks = productDetailSection.querySelectorAll('.info-block');
+        blocks.forEach(function(b) { b.classList.add('sb-inview'); });
+      });
+    }
+  })();
+  // === Animate Checkout Blocks on Show ===
+  (function() {
+    var checkoutSection = document.getElementById('checkout-section');
+    if (checkoutSection) {
+      checkoutSection.addEventListener('transitionend', function() {
+        var blocks = checkoutSection.querySelectorAll('.checkout-block, .checkout-summary-block, .checkout-payment-block, .checkout-confirmation-block');
+        blocks.forEach(function(b) { b.classList.add('sb-inview'); });
+      });
+    }
+  })();
+  // === Animate All Products Cards on Show ===
+  (function() {
+    var allProductsSection = document.getElementById('all-products-section');
+    if (allProductsSection) {
+      allProductsSection.addEventListener('transitionend', function() {
+        var cards = allProductsSection.querySelectorAll('.product-card');
+        cards.forEach(function(c) { c.classList.add('sb-inview'); });
+      });
+    }
+  })();
+  // === Animate Modal Content on Show ===
+  (function() {
+    var modal = document.getElementById('login-modal');
+    if (modal) {
+      modal.addEventListener('transitionend', function() {
+        var content = modal.querySelector('.modal-content');
+        if (content) content.classList.add('sb-inview');
+      });
+    }
+  })();
+  // === Animate Product Details Modal on Show ===
+  (function() {
+    var pdModal = document.getElementById('product-details-modal');
+    if (pdModal) {
+      pdModal.addEventListener('transitionend', function() {
+        var content = pdModal.querySelector('.product-details-modal-content');
+        if (content) content.classList.add('sb-inview');
+      });
+    }
+  })();
+  // === Animate Footer on Show ===
+  (function() {
+    var footer = document.querySelector('footer');
+    if (footer) {
+      window.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() { footer.classList.add('sb-inview'); }, 600);
+      });
+    }
+  })();
+  // === Animate Hero on Show ===
+  (function() {
+    var hero = document.querySelector('.hero');
+    if (hero) {
+      window.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() { hero.classList.add('sb-inview'); }, 200);
+      });
+    }
+  })();
+  // === Animate Navbar on Show ===
+  (function() {
+    var navbar = document.querySelector('.navbar');
+    if (navbar) {
+      window.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() { navbar.classList.add('sb-inview'); }, 100);
+      });
+    }
+  })();
+  // === Animate Categories and Featured on Show ===
+  (function() {
+    var categories = document.querySelector('.categories');
+    var featured = document.querySelector('.featured');
+    if (categories) {
+      window.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() { categories.classList.add('sb-inview'); }, 300);
+      });
+    }
+    if (featured) {
+      window.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() { featured.classList.add('sb-inview'); }, 400);
+      });
+    }
+  })();
+  // === Animate Category Cards and Product Cards on Show ===
+  (function() {
+    var catCards = document.querySelectorAll('.category-card');
+    var prodCards = document.querySelectorAll('.product-card');
+    window.addEventListener('DOMContentLoaded', function() {
+      catCards.forEach(function(card, i) {
+        setTimeout(function() { card.classList.add('sb-inview'); }, 500 + i * 120);
+      });
+      prodCards.forEach(function(card, i) {
+        setTimeout(function() { card.classList.add('sb-inview'); }, 800 + i * 120);
+      });
+    });
+  })();
+  // === Animate Info Blocks on Show ===
+  (function() {
+    var infoBlocks = document.querySelectorAll('.info-block');
+    window.addEventListener('DOMContentLoaded', function() {
+      infoBlocks.forEach(function(block, i) {
+        setTimeout(function() { block.classList.add('sb-inview'); }, 1200 + i * 120);
+      });
+    });
+  })();
+  // === Animate Checkout Blocks on Show ===
+  (function() {
+    var checkoutBlocks = document.querySelectorAll('.checkout-block, .checkout-summary-block, .checkout-payment-block, .checkout-confirmation-block');
+    window.addEventListener('DOMContentLoaded', function() {
+      checkoutBlocks.forEach(function(block, i) {
+        setTimeout(function() { block.classList.add('sb-inview'); }, 1500 + i * 120);
+      });
+    });
+  })();
+  // === Animate All Products Cards on Show ===
+  (function() {
+    var allProductsCards = document.querySelectorAll('#all-products-grid .product-card');
+    window.addEventListener('DOMContentLoaded', function() {
+      allProductsCards.forEach(function(card, i) {
+        setTimeout(function() { card.classList.add('sb-inview'); }, 1800 + i * 120);
+      });
+    });
+  })();
+  </script>
+  <!-- === ANIMATION & INTERACTION ENHANCEMENTS END === -->
+  <script>
+    // === PERFECT SETS FOR HER CAROUSEL LOGIC ===
+    const perfectSetsData = [
+      {
+        title: "Golden Heart Jewelry Set",
+        price: "$429",
+        img: "https://m.media-amazon.com/images/I/71OOtiBa76L._UY1000_.jpg",
+        desc: "A radiant gold-tone jewelry set featuring a heart pendant necklace, matching earrings, and a delicate bracelet for a romantic touch.",
+        gallery: '["https://m.media-amazon.com/images/I/71OOtiBa76L._UY1000_.jpg","https://m.media-amazon.com/images/I/71OOtiBa76L._UX679_.jpg","https://m.media-amazon.com/images/I/71OOtiBa76L._UY500_.jpg"]',
+        colors: '["#bfa05a","#e5e5e5","#d6a4c2"]',
+        sizes: '["16 in","18 in","20 in"]',
+        category: "Jewelry"
+      },
+      {
+        title: "Midnight Sparkle Set",
+        price: "$389",
+        img: "https://i.etsystatic.com/9665455/r/il/a3949d/2777754922/il_570xN.2777754922_rs3d.jpg",
+        desc: "A dazzling jewelry set with deep blue stones and shimmering accents, including a necklace, earrings, and ring for evening glamour.",
+        gallery: '["https://i.etsystatic.com/9665455/r/il/a3949d/2777754922/il_570xN.2777754922_rs3d.jpg","https://i.etsystatic.com/9665455/r/il/2b2e2d/2777754924/il_570xN.2777754924_rs3d.jpg"]',
+        colors: '["#18141c","#e5e5e5","#bfa05a"]',
+        sizes: '["Small","Medium","Large"]',
+        category: "Jewelry"
+      },
+      {
+        title: "Royal Elegance Collection",
+        price: "$349",
+        img: "https://www.deraahstore.com/dw/image/v2/BJFS_PRD/on/demandware.static/-/Sites-deraah-master/default/dwa599e9cb/images/10711151022000-1696-1.jpg?sw=2000&sh=2000",
+        desc: "A regal gold-plated jewelry collection with intricate details, featuring a necklace, bracelet, and earrings for a majestic look.",
+        gallery: '["https://www.deraahstore.com/dw/image/v2/BJFS_PRD/on/demandware.static/-/Sites-deraah-master/default/dwa599e9cb/images/10711151022000-1696-1.jpg?sw=2000&sh=2000"]',
+        colors: '["#bfa05a","#e5e5e5"]',
+        sizes: '["Standard"]',
+        category: "Jewelry"
+      },
+      {
+        title: "Silver Petal Elegance",
+        price: "$299",
+        img: "https://m.media-amazon.com/images/I/711E7-QpLdL._UY1000_.jpg",
+        desc: "A graceful silver jewelry set with petal motifs, including a necklace, earrings, and a matching ring for understated elegance.",
+        gallery: '["https://m.media-amazon.com/images/I/711E7-QpLdL._UY1000_.jpg","https://m.media-amazon.com/images/I/711E7-QpLdL._UX679_.jpg"]',
+        colors: '["#e5e5e5","#bfa05a"]',
+        sizes: '["16 in","18 in"]',
+        category: "Jewelry"
+      },
+    ];
+    const perfectSetsCarousel = document.getElementById('perfect-sets-carousel');
+    const perfectSetsLeft = document.getElementById('perfect-sets-left');
+    const perfectSetsRight = document.getElementById('perfect-sets-right');
+    let perfectSetsIndex = 0;
+    function getPerfectSetsVisibleCount() {
+      if (window.innerWidth <= 700) return 2;
+      return 4;
+    }
+    function renderPerfectSetsCarousel(fadeDir) {
+      const visibleCount = getPerfectSetsVisibleCount();
+      perfectSetsCarousel.classList.add('slider-anim');
+      if (fadeDir) {
+        perfectSetsCarousel.classList.remove('fade-in');
+        perfectSetsCarousel.classList.add('fade-out');
+      }
+      setTimeout(() => {
+        perfectSetsCarousel.innerHTML = '';
+        for (let i = 0; i < visibleCount; i++) {
+          const idx = (perfectSetsIndex + i) % perfectSetsData.length;
+          const product = perfectSetsData[idx];
+          const card = document.createElement('div');
+          card.className = 'product-card';
+          card.setAttribute('data-title', product.title);
+          card.setAttribute('data-price', product.price);
+          card.setAttribute('data-img', product.img);
+          card.setAttribute('data-desc', product.desc || '');
+          card.setAttribute('data-gallery', product.gallery || '[]');
+          card.setAttribute('data-colors', product.colors || '[]');
+          card.setAttribute('data-sizes', product.sizes || '[]');
+          card.setAttribute('data-category', product.category || '');
+          card.innerHTML = `
+            <img src="${product.img}" alt="${product.title}">
+            <h4>${product.title}</h4>
+            <span>${product.price}</span>
+            <div class="lux-glow"></div><div class="lux-shadow"></div><div class="lux-border"></div><div class="lux-light"></div><div class="lux-tilt"></div>
+          `;
+          card.style.cursor = 'pointer';
+          card.addEventListener('click', function() {
+            // Optionally, show a modal or detail (not implemented for demo)
+          });
+          perfectSetsCarousel.appendChild(card);
+        }
+        setTimeout(() => {
+          perfectSetsCarousel.classList.remove('fade-out');
+          perfectSetsCarousel.classList.add('fade-in');
+          perfectSetsCarousel.querySelectorAll('.product-card').forEach((c, i) => {
+            c.classList.add('sb-inview');
+          });
+        }, 10);
+      }, fadeDir ? 450 : 0);
+    }
+    function scrollPerfectSets(dir) {
+      const visibleCount = getPerfectSetsVisibleCount();
+      if (dir === 'left') {
+        perfectSetsIndex = (perfectSetsIndex - visibleCount + perfectSetsData.length) % perfectSetsData.length;
+      } else {
+        perfectSetsIndex = (perfectSetsIndex + visibleCount) % perfectSetsData.length;
+      }
+      renderPerfectSetsCarousel('fade');
+    }
+    perfectSetsLeft.addEventListener('click', function() { scrollPerfectSets('left'); });
+    perfectSetsRight.addEventListener('click', function() { scrollPerfectSets('right'); });
+    window.addEventListener('resize', function() { renderPerfectSetsCarousel(); });
+    renderPerfectSetsCarousel();
+  </script>
+  <script>
+    // === OUR MOST LOVED ITEMS CAROUSEL FUNCTIONALITY ===
+    (function() {
+      const featuredWrap = document.querySelector('.featured-carousel-wrap');
+      const featuredGrid = featuredWrap ? featuredWrap.querySelector('.products-grid') : null;
+      const leftBtn = document.getElementById('featured-left');
+      const rightBtn = document.getElementById('featured-right');
+      if (!featuredGrid || !leftBtn || !rightBtn) return;
+      const originalCards = Array.from(featuredGrid.children);
+      let startIdx = 0;
+      function getFeaturedVisibleCount() {
+        if (window.innerWidth <= 700) return 2;
+        return 4;
+      }
+      function renderFeaturedCarousel(fadeDir) {
+        const visibleCount = getFeaturedVisibleCount();
+        featuredGrid.classList.add('slider-anim');
+        if (fadeDir) {
+          featuredGrid.classList.remove('fade-in');
+          featuredGrid.classList.add('fade-out');
+        }
+        setTimeout(() => {
+          featuredGrid.innerHTML = '';
+          for (let i = 0; i < visibleCount; i++) {
+            const idx = (startIdx + i) % originalCards.length;
+            featuredGrid.appendChild(originalCards[idx].cloneNode(true));
+          }
+          setTimeout(() => {
+            featuredGrid.classList.remove('fade-out');
+            featuredGrid.classList.add('fade-in');
+            featuredGrid.querySelectorAll('.product-card').forEach((c, i) => {
+              c.classList.add('sb-inview');
+            });
+          }, 10);
+        }, fadeDir ? 450 : 0);
+      }
+      function scrollFeatured(dir) {
+        const visibleCount = getFeaturedVisibleCount();
+        if (dir === 'left') {
+          startIdx = (startIdx - visibleCount + originalCards.length) % originalCards.length;
+        } else {
+          startIdx = (startIdx + visibleCount) % originalCards.length;
+        }
+        renderFeaturedCarousel('fade');
+      }
+      leftBtn.addEventListener('click', function() { scrollFeatured('left'); });
+      rightBtn.addEventListener('click', function() { scrollFeatured('right'); });
+      window.addEventListener('resize', function() { renderFeaturedCarousel(); });
+      renderFeaturedCarousel();
+    })();
+  </script>
+  <script>
+    // === ENABLE PRODUCT CARD CLICK ON HOMEPAGE CAROUSELS ===
+    (function() {
+      // Helper to delegate click to product detail logic
+      function handleProductCardClick(card) {
+        var homepageContent = document.getElementById('homepage-content');
+        var productDetailSection = document.getElementById('product-detail-section');
+        if (typeof renderProductDetail === 'function') {
+          homepageContent.style.display = 'none';
+          productDetailSection.style.display = 'block';
+          renderProductDetail(card);
+          window.scrollTo({top:0,behavior:'smooth'});
+        }
+      }
+      // For static (non-carousel) product cards
+      document.querySelectorAll('.featured .product-card, #perfect-sets-carousel .product-card').forEach(function(card) {
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', function() {
+          handleProductCardClick(card);
+        });
+      });
+      // For dynamically rendered carousel cards (after arrow navigation)
+      // MutationObserver for featured
+      var featuredGrid = document.querySelector('.featured .products-grid');
+      if (featuredGrid) {
+        new MutationObserver(function() {
+          featuredGrid.querySelectorAll('.product-card').forEach(function(card) {
+            card.style.cursor = 'pointer';
+            card.onclick = function() { handleProductCardClick(card); };
+          });
+        }).observe(featuredGrid, {childList:true});
+      }
+      // MutationObserver for perfect sets
+      var perfectSetsCarousel = document.getElementById('perfect-sets-carousel');
+      if (perfectSetsCarousel) {
+        new MutationObserver(function() {
+          perfectSetsCarousel.querySelectorAll('.product-card').forEach(function(card) {
+            card.style.cursor = 'pointer';
+            card.onclick = function() { handleProductCardClick(card); };
+          });
+        }).observe(perfectSetsCarousel, {childList:true});
+      }
+    })();
+  </script>
+  <script>
+    // === NAVBAR CATEGORY LINKS CLICK LOGIC ===
+    document.querySelectorAll('nav a').forEach(link => {
+      const text = link.textContent.trim().toLowerCase();
+      if (["jewelry","bags","shoes","bracelets"].includes(text)) {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          homepageContent.style.display = 'none';
+          allProductsSection.style.display = 'flex';
+          allProductsGrid.innerHTML = '';
+          // Capitalize first letter for category match
+          const category = text.charAt(0).toUpperCase() + text.slice(1);
+          renderAllProductsGrid(category);
+          window.scrollTo({top:0,behavior:'smooth'});
+          // Ensure product cards animate in immediately (fix for navbar category click)
+          setTimeout(function() {
+            allProductsSection.classList.add('sb-inview');
+            allProductsGrid.querySelectorAll('.product-card').forEach(function(card, i) {
+              card.classList.add('sb-inview');
+            });
+          }, 30);
+        });
+      }
+    });
+  </script>
+  <script>
+    // === ENSURE LUXURY OVERLAYS ON ALL PRODUCT CARDS (STATIC & DYNAMIC) ===
+    (function() {
+      function ensureLuxuryOverlays(card) {
+        if (!card.querySelector('.lux-glow')) {
+          card.insertAdjacentHTML('beforeend',
+            '<div class="lux-glow"></div><div class="lux-shadow"></div><div class="lux-border"></div><div class="lux-light"></div><div class="lux-tilt"></div>'
+          );
+        }
+      }
+      // For all static product cards on page load
+      document.querySelectorAll('.product-card').forEach(ensureLuxuryOverlays);
+      // For dynamically added product cards (e.g., all-products grid, carousels)
+      const observer = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+          mutation.addedNodes.forEach(node => {
+            if (node.nodeType === 1 && node.classList.contains('product-card')) {
+              ensureLuxuryOverlays(node);
+            } else if (node.nodeType === 1) {
+              node.querySelectorAll && node.querySelectorAll('.product-card').forEach(ensureLuxuryOverlays);
+            }
+          });
+        });
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+    })();
+  </script>
+  <!-- Payment Button at the bottom of checkout section -->
+  <script>
+    // Wait for DOMContentLoaded to ensure elements exist
+    window.addEventListener('DOMContentLoaded', function() {
+      // Add Payment button only if not already present
+      if (!document.getElementById('checkout-payment-btn')) {
+        var checkoutLeft = document.querySelector('.checkout-left');
+        var paymentBtn = document.createElement('button');
+        paymentBtn.className = 'checkout-payment-btn';
+        paymentBtn.id = 'checkout-payment-btn';
+        paymentBtn.innerHTML = '<span>Continue</span>';
+        paymentBtn.type = 'button';
+        paymentBtn.disabled = true;
+        paymentBtn.style.opacity = '0.6';
+        // Insert after the checkout form
+        checkoutLeft.appendChild(paymentBtn);
+
+        // Validation logic
+        function validateCheckoutForm() {
+          var email = document.getElementById('checkout-email').value.trim();
+          var address = document.getElementById('checkout-address').value.trim();
+          var phone = document.getElementById('checkout-phone').value.trim();
+          var city = document.getElementById('checkout-city').value.trim();
+          var saveInfo = document.getElementById('checkout-saveinfo').checked;
+          // Basic email regex
+          var emailValid = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
+          var phoneValid = phone.length >= 6;
+          var addressValid = address.length > 2;
+          var cityValid = city.length > 1;
+          var allValid = emailValid && addressValid && phoneValid && cityValid && saveInfo;
+          paymentBtn.disabled = !allValid;
+          paymentBtn.style.opacity = allValid ? '1' : '0.6';
+          paymentBtn.style.cursor = allValid ? 'pointer' : 'not-allowed';
+        }
+        // Attach listeners
+        ['checkout-email','checkout-address','checkout-phone','checkout-city','checkout-saveinfo'].forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) {
+            el.addEventListener('input', validateCheckoutForm);
+            el.addEventListener('change', validateCheckoutForm);
+          }
+        });
+        // Initial validation
+        validateCheckoutForm();
+
+        // Continue button click logic
+        paymentBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (paymentBtn.disabled) return;
+          // Show payment section with smooth transition
+          var paymentBlock = document.getElementById('checkout-payment-block');
+          if (paymentBlock) {
+            paymentBlock.classList.add('active');
+            paymentBlock.scrollIntoView({behavior:'smooth', block:'center'});
+          }
+          // Hide form if needed
+          var checkoutForm = document.getElementById('checkout-form');
+          if (checkoutForm) checkoutForm.style.display = 'none';
+          // Hide confirmation if visible
+          var confirmationBlock = document.getElementById('checkout-confirmation-block');
+          if (confirmationBlock) confirmationBlock.style.display = 'none';
+          // Remove the Continue button itself so it is not visible during payment
+          paymentBtn.remove();
+        });
+      }
+    });
+  </script>
+  <!-- Enhanced Payment Section (credit card & PayPal) -->
+  <script>
+  window.addEventListener('DOMContentLoaded', function() {
+    var paymentBlock = document.getElementById('checkout-payment-block');
+    if (!paymentBlock) return;
+    // Only add if not already present
+    if (!document.getElementById('enhanced-payment-methods')) {
+      // Clear existing content
+      paymentBlock.innerHTML = '';
+      // Payment method selection
+      var methodsRow = document.createElement('div');
+      methodsRow.className = 'payment-methods-row';
+      methodsRow.id = 'enhanced-payment-methods';
+      // Credit Card button
+      var creditBtn = document.createElement('button');
+      creditBtn.className = 'payment-method-btn selected';
+      creditBtn.type = 'button';
+      creditBtn.id = 'payment-method-credit';
+      creditBtn.innerHTML = '<i class="fa fa-credit-card"></i>Credit Card';
+      // PayPal button
+      var paypalBtn = document.createElement('button');
+      paypalBtn.className = 'payment-method-btn';
+      paypalBtn.type = 'button';
+      paypalBtn.id = 'payment-method-paypal';
+      paypalBtn.innerHTML = '<i class="fa fa-paypal"></i>PayPal';
+      methodsRow.appendChild(creditBtn);
+      methodsRow.appendChild(paypalBtn);
+      paymentBlock.appendChild(methodsRow);
+      // Credit Card Form
+      var creditForm = document.createElement('form');
+      creditForm.className = 'payment-form-section credit-card-fields active';
+      creditForm.id = 'credit-card-form';
+      creditForm.autocomplete = 'off';
+      creditForm.innerHTML = `
+        <div class="credit-card-fields">
+          <input class="credit-card-input" id="cc-name" type="text" placeholder="Name on Card" required autocomplete="cc-name" />
+          <input class="credit-card-input" id="cc-number" type="text" placeholder="Card Number" maxlength="19" required autocomplete="cc-number" inputmode="numeric" pattern="[0-9 ]*" />
+          <div class="credit-card-row">
+            <input class="credit-card-input" id="cc-exp" type="text" placeholder="MM/YY" maxlength="5" required autocomplete="cc-exp" inputmode="numeric" pattern="[0-9/]*" />
+            <input class="credit-card-input" id="cc-cvc" type="text" placeholder="CVC" maxlength="4" required autocomplete="cc-csc" inputmode="numeric" pattern="[0-9]*" />
+          </div>
+        </div>
+        <button class="payment-submit-btn" type="submit"><span>Pay Now</span></button>
+      `;
+      // PayPal Form (simulated)
+      var paypalForm = document.createElement('form');
+      paypalForm.className = 'payment-form-section';
+      paypalForm.id = 'paypal-form';
+      paypalForm.autocomplete = 'off';
+      paypalForm.innerHTML = `
+        <div style="text-align:center;margin-bottom:1.2em;">
+          <i class="fa fa-paypal" style="font-size:2.2em;color:#bfa05a;"></i><br>
+          <span style="font-size:1.1em;color:var(--accent-pink-dark);font-weight:700;">Pay securely with PayPal</span>
+        </div>
+        <input class="credit-card-input" id="paypal-email" type="email" placeholder="PayPal Email" required autocomplete="email" />
+        <button class="payment-submit-btn" type="submit"><span>Pay with PayPal</span></button>
+      `;
+      paymentBlock.appendChild(creditForm);
+      paymentBlock.appendChild(paypalForm);
+      // Payment Success Message
+      var successMsg = document.createElement('div');
+      successMsg.className = 'payment-success-message';
+      successMsg.id = 'payment-success-message';
+      successMsg.innerHTML = `<i class='fa fa-check-circle' style='font-size:2.2rem;color:var(--accent-gold);'></i><br>Thank you for your payment!<br>Your order is confirmed.`;
+      paymentBlock.appendChild(successMsg);
+      // Payment method switching logic
+      creditBtn.addEventListener('click', function() {
+        creditBtn.classList.add('selected');
+        paypalBtn.classList.remove('selected');
+        creditForm.classList.add('active');
+        paypalForm.classList.remove('active');
+      });
+      paypalBtn.addEventListener('click', function() {
+        paypalBtn.classList.add('selected');
+        creditBtn.classList.remove('selected');
+        paypalForm.classList.add('active');
+        creditForm.classList.remove('active');
+      });
+      // Credit card form submit
+      creditForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        // Simple validation
+        var name = document.getElementById('cc-name').value.trim();
+        var number = document.getElementById('cc-number').value.replace(/\D/g, '');
+        var exp = document.getElementById('cc-exp').value.trim();
+        var cvc = document.getElementById('cc-cvc').value.trim();
+        if (!name || number.length < 13 || exp.length < 4 || cvc.length < 3) {
+          alert('Please enter valid credit card details.');
+          return;
+        }
+        // Simulate payment
+        creditForm.querySelector('button').disabled = true;
+        creditForm.querySelector('button').innerHTML = '<span>Processing...</span>';
+        setTimeout(function() {
+          creditForm.querySelector('button').disabled = false;
+          creditForm.querySelector('button').innerHTML = '<span>Pay Now</span>';
+          creditForm.classList.remove('active');
+          successMsg.classList.add('active');
+          // Optionally clear cart
+          if (typeof setCart === 'function') setCart([]);
+          if (typeof updateCartBadge === 'function') updateCartBadge();
+        }, 1200);
+      });
+      // PayPal form submit
+      paypalForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var email = document.getElementById('paypal-email').value.trim();
+        if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+          alert('Please enter a valid PayPal email.');
+          return;
+        }
+        paypalForm.querySelector('button').disabled = true;
+        paypalForm.querySelector('button').innerHTML = '<span>Processing...</span>';
+        setTimeout(function() {
+          paypalForm.querySelector('button').disabled = false;
+          paypalForm.querySelector('button').innerHTML = '<span>Pay with PayPal</span>';
+          paypalForm.classList.remove('active');
+          successMsg.classList.add('active');
+          if (typeof setCart === 'function') setCart([]);
+          if (typeof updateCartBadge === 'function') updateCartBadge();
+        }, 1200);
+      });
+      // Hide payment block and show homepage on success click
+      successMsg.addEventListener('click', function() {
+        var checkoutSection = document.getElementById('checkout-section');
+        var homepageContent = document.getElementById('homepage-content');
+        if (checkoutSection) checkoutSection.style.display = 'none';
+        if (homepageContent) homepageContent.style.display = '';
+        window.scrollTo({top:0,behavior:'smooth'});
+        // Reset payment block for next time
+        setTimeout(function() {
+          creditForm.classList.add('active');
+          paypalForm.classList.remove('active');
+          successMsg.classList.remove('active');
+          document.getElementById('checkout-form').style.display = '';
+          paymentBlock.classList.remove('active');
+        }, 800);
+      });
+    }
+  });
+  </script>
+  <!-- === CUSTOM CREDIT CARD PAYMENT FORM & PAYPAL BUTTON (ADDED) === -->
+  <script>
+  window.addEventListener('DOMContentLoaded', function() {
+    // Only add if not already present
+    if (!document.getElementById('custom-cc-payment-wrap')) {
+      // Find the Payment button
+      var paymentBtn = document.getElementById('checkout-payment-btn');
+      if (!paymentBtn) return;
+      // Create the payment form wrapper (hidden by default)
+      var ccWrap = document.createElement('div');
+      ccWrap.id = 'custom-cc-payment-wrap';
+      ccWrap.style.display = 'none';
+      ccWrap.innerHTML = `
+        <form id="custom-cc-form" autocomplete="off">
+          <div class="custom-cc-fields">
+            <label class="custom-cc-label" for="custom-cc-name">Cardholder Name</label>
+            <input class="custom-cc-input" id="custom-cc-name" type="text" placeholder="Name on Card" required autocomplete="cc-name" />
+            <label class="custom-cc-label" for="custom-cc-number">Card Number</label>
+            <input class="custom-cc-input" id="custom-cc-number" type="text" placeholder="Card Number" maxlength="19" required autocomplete="cc-number" inputmode="numeric" pattern="[0-9 ]*" />
+            <div class="custom-cc-row">
+              <div style="flex:1 1 50%;display:flex;flex-direction:column;">
+                <label class="custom-cc-label" for="custom-cc-exp">Expiration (MM/YY)</label>
+                <input class="custom-cc-input" id="custom-cc-exp" type="text" placeholder="MM/YY" maxlength="5" required autocomplete="cc-exp" inputmode="numeric" pattern="[0-9/]*" />
+              </div>
+              <div style="flex:1 1 50%;display:flex;flex-direction:column;margin-left:1.2em;">
+                <label class="custom-cc-label" for="custom-cc-cvv">CVV</label>
+                <input class="custom-cc-input" id="custom-cc-cvv" type="text" placeholder="CVV" maxlength="4" required autocomplete="cc-csc" inputmode="numeric" pattern="[0-9]*" />
+              </div>
+            </div>
+          </div>
+          <button type="button" id="custom-paypal-btn" class="custom-paypal-btn">Pay</button>
+          <button type="submit" id="custom-cc-pay-btn" class="custom-cc-pay-btn" style="display:none;">Pay</button>
+        </form>
+        <div id="custom-cc-success" class="custom-cc-success" style="display:none;">
+          <i class='fa fa-check-circle' style='font-size:2.2rem;color:var(--accent-gold);'></i><br>Thank you for your payment!<br>Your order is confirmed.
+        </div>
+      `;
+      // Insert after the Payment button
+      paymentBtn.parentNode.insertBefore(ccWrap, paymentBtn.nextSibling);
+      // Add styles for the new form
+      var style = document.createElement('style');
+      style.innerHTML = `
+        #custom-cc-payment-wrap {
+          margin-top: 2.2em;
+          width: 100%;
+          max-width: 420px;
+          background: #fff;
+          border-radius: 18px;
+          box-shadow: 0 4px 24px rgba(184,111,167,0.10), 0 1.5px 6px rgba(0,0,0,0.06);
+          padding: 2.2em 2em 2em 2em;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          border: 2px solid var(--accent-pink-dark);
+          animation: fadeInUp .32s cubic-bezier(.4,0,.2,1);
+        }
+        .custom-cc-fields {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          gap: 1.1em;
+          margin-bottom: 1.5em;
+        }
+        .custom-cc-label {
+          font-size: 1.05rem;
+          color: #888;
+          font-weight: 600;
+          margin-bottom: 0.2em;
+          text-align: left;
+          display: block;
+        }
+        .custom-cc-input {
+          width: 100%;
+          padding: 0.7rem 1.2rem;
+          border: 2px solid #bbb;
+          font-size: 1.08rem;
+          background: #fff;
+          color: var(--text-dark);
+          outline: none;
+          font-family: inherit;
+          border-radius: 8px;
+          transition: border-color .2s, box-shadow .2s;
+          margin-bottom: 0.7em;
+        }
+        .custom-cc-input:focus {
+          border-color: var(--accent-pink-dark);
+          box-shadow: 0 2px 8px rgba(184, 111, 167, 0.13);
+        }
+        .custom-cc-row {
+          display: flex;
+          flex-direction: row;
+          gap: 1.2em;
+          width: 100%;
+          margin-bottom: 0.7em;
+        }
+        .custom-paypal-btn {
+          width: 100%;
+          background: #fff;
+          border: 2px solid #bfa05a;
+          border-radius: 999px;
+          padding: 1.1em 0;
+          font-size: 1.13rem;
+          font-weight: 700;
+          color: #bfa05a;
+          cursor: pointer;
+          transition: border-color 0.3s, color 0.3s, background 0.3s, box-shadow 0.3s;
+          font-family: inherit;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.7em;
+          margin-bottom: 1.5em;
+          outline: none;
+          box-shadow: 0 2px 8px rgba(191,160,90,0.07);
+          letter-spacing: 1px;
+        }
+        .custom-paypal-btn:focus, .custom-paypal-btn:hover {
+          border-color: var(--accent-pink-dark);
+          color: var(--accent-pink-dark);
+          background: var(--accent-pink);
+          box-shadow: 0 4px 16px rgba(184,111,167,0.10);
+        }
+        .custom-paypal-btn i {
+          font-size: 1.3em;
+          margin-right: 0.5em;
+          color: inherit;
+        }
+        .custom-cc-pay-btn {
+          width: 100%;
+          background: linear-gradient(90deg, var(--accent-pink-dark) 0%, var(--accent-gold) 100%);
+          color: #fff;
+          border-radius: 999px;
+          text-transform: uppercase;
+          font-weight: 700;
+          letter-spacing: 1.2px;
+          font-size: 1.08rem;
+          border: none;
+          padding: 0.9em 0;
+          margin-top: 0.2em;
+          box-shadow: 0 2px 12px rgba(184,111,167,0.13);
+          transition: var(--transition);
+          cursor: pointer;
+          position: relative;
+          overflow: hidden;
+          z-index: 2;
+          display: block;
+          text-align: center;
+        }
+        .custom-cc-pay-btn:focus, .custom-cc-pay-btn:hover {
+          background: linear-gradient(90deg, var(--accent-gold) 0%, var(--accent-pink-dark) 100%);
+          color: #fff;
+          box-shadow: 0 6px 24px rgba(184,111,167,0.18);
+          transform: translateY(-2px) scale(1.04);
+        }
+        .custom-cc-success {
+          text-align: center;
+          color: var(--accent-gold);
+          font-size: 1.25rem;
+          font-family: 'Playfair Display', serif;
+          margin-top: 2em;
+          background: var(--soft-gray);
+          border-radius: 14px;
+          padding: 1.5em 1em;
+          box-shadow: 0 1.5px 6px rgba(184,111,167,0.06);
+          animation: fadeInUp 0.7s cubic-bezier(.4,0,.2,1);
+        }
+        @media (max-width: 600px) {
+          #custom-cc-payment-wrap {
+            max-width: 98vw;
+            padding: 1.2em 0.5em 0.7em 0.5em;
+          }
+          .custom-cc-row { flex-direction: column; gap: 0.7em; }
+        }
+      `;
+      document.head.appendChild(style);
+      // Payment button click logic
+      paymentBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        ccWrap.style.display = 'block';
+        paymentBtn.style.display = 'none';
+      });
+      // Show Pay button only when all fields are filled
+      function checkCCFields() {
+        var name = document.getElementById('custom-cc-name').value.trim();
+        var number = document.getElementById('custom-cc-number').value.replace(/\D/g, '');
+        var exp = document.getElementById('custom-cc-exp').value.trim();
+        var cvv = document.getElementById('custom-cc-cvv').value.trim();
+        var payBtn = document.getElementById('custom-cc-pay-btn');
+        if (name && number.length >= 13 && exp.length >= 4 && cvv.length >= 3) {
+          payBtn.style.display = 'block';
+        } else {
+          payBtn.style.display = 'none';
+        }
+      }
+    }
+  });
+  </script>
+  <!-- === END CUSTOM CREDIT CARD PAYMENT FORM & PAYPAL BUTTON (ADDED) === -->
+  <script>
+(function(){
+  if(!window.chatbase || window.chatbase("getState")!=="initialized"){
+    window.chatbase=(...args)=>{
+      if(!window.chatbase.q){window.chatbase.q=[]}
+      window.chatbase.q.push(args)
+    };
+    window.chatbase=new Proxy(window.chatbase,{
+      get(t,prop){ if(prop==="q"){return t.q}
+        return(...a)=>t(prop,...a)
+      }
+    });
+  }
+  const onLoad=function(){
+    const s=document.createElement("script");
+    s.src="https://www.chatbase.co/embed.min.js";
+    s.id="-bdusH7XjzkE2e4iM2oDj";
+    s.domain="www.chatbase.co";
+    document.body.appendChild(s);
+  };
+  if(document.readyState==="complete"){ onLoad(); }
+  else { window.addEventListener("load",onLoad); }
+})();
+</script>
+</body>
+</html> 
