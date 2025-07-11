@@ -2528,6 +2528,94 @@
         gap: 1.1rem;
       }
     }
+    #product-like-btn {
+      color: var(--accent-pink-dark);
+      filter: drop-shadow(0 2px 8px rgba(184,111,167,0.10));
+      transition: color 0.22s, transform 0.22s, filter 0.22s;
+      background: none;
+      border: none;
+      outline: none;
+      font-size: 2.2rem;
+      position: absolute;
+      top: 2.2rem;
+      right: 2.2rem;
+      z-index: 10;
+      opacity: 0.92;
+      padding: 0.1em 0.2em;
+      border-radius: 50%;
+      box-shadow: none;
+      user-select: none;
+    }
+    #product-like-btn.liked {
+      color: var(--accent-gold);
+      filter: drop-shadow(0 2px 12px rgba(191,160,90,0.13));
+      animation: heart-pop 0.38s cubic-bezier(.4,0,.2,1);
+    }
+    @keyframes heart-pop {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.4); }
+      70% { transform: scale(0.92); }
+      100% { transform: scale(1); }
+    }
+    #product-like-btn:focus {
+      outline: 2px solid var(--accent-pink-dark);
+    }
+    @media (max-width: 600px) {
+      #product-like-btn {
+        top: 1.1rem;
+        right: 1.1rem;
+        font-size: 1.5rem;
+      }
+    }
+    .product-like-btn {
+      background: #fff;
+      border: 2.5px solid var(--accent-pink-dark);
+      color: var(--accent-pink-dark);
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      box-shadow: 0 2px 12px rgba(184,111,167,0.10);
+      cursor: pointer;
+      outline: none;
+      margin: 1.1rem 0.2rem 0 0;
+      transition: color 0.22s, border-color 0.22s, box-shadow 0.22s, background 0.22s, transform 0.22s;
+      position: relative;
+      z-index: 11;
+      opacity: 0.97;
+      padding: 0;
+    }
+    .product-like-btn.liked {
+      color: var(--accent-gold);
+      border-color: var(--accent-gold);
+      background: var(--accent-pink);
+      box-shadow: 0 4px 16px rgba(191,160,90,0.13);
+      animation: heart-pop 0.38s cubic-bezier(.4,0,.2,1);
+    }
+    .product-like-btn:focus {
+      outline: 2px solid var(--accent-pink-dark);
+      outline-offset: 2px;
+    }
+    .product-like-btn:active {
+      transform: scale(0.96);
+    }
+    @keyframes heart-pop {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.3); }
+      70% { transform: scale(0.92); }
+      100% { transform: scale(1); }
+    }
+    @media (max-width: 600px) {
+      .product-like-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 1.3rem;
+        margin: 0.7rem 0.1rem 0 0;
+      }
+    }
   </style>
 </head>
 <body>
@@ -2724,7 +2812,10 @@
   </section>
   <!-- PRODUCT DETAIL SECTION (hidden by default) -->
   <section id="product-detail-section" style="display:none;">
-    <div class="product-detail-container">
+    <div class="product-detail-container" style="position:relative;">
+      <div style="display:flex;justify-content:flex-end;align-items:flex-start;width:100%;position:relative;z-index:11;min-height:0;">
+        <button id="product-like-btn" aria-label="Like this product" class="product-like-btn" tabindex="0"></button>
+      </div>
       <button class="back-btn" id="back-to-home"><i class="fa fa-arrow-left"></i> Back</button>
       <div class="product-detail-layout">
         <div class="product-gallery">
@@ -3035,6 +3126,10 @@
         });
         sizeOptions.appendChild(btn);
       });
+      // Show and update heart icon
+      const title = card.getAttribute('data-title');
+      updateProductLikeBtn(title);
+      productLikeBtn.style.display = 'flex';
     }
 
     // Track navigation source for product detail back button
@@ -4719,5 +4814,46 @@
       <div class="products-grid" id="liked-products-grid"></div>
     </div>
   </section>
+  <script>
+    // --- PRODUCT LIKE/HEART LOGIC ---
+    const productLikeBtn = document.getElementById('product-like-btn');
+    function getLikedProducts() {
+      try { return JSON.parse(localStorage.getItem('shinybelle_liked_products')||'[]'); } catch { return []; }
+    }
+    function setLikedProducts(arr) {
+      localStorage.setItem('shinybelle_liked_products', JSON.stringify(arr));
+    }
+    function isProductLiked(title) {
+      const liked = getLikedProducts();
+      return liked.includes(title);
+    }
+    function updateProductLikeBtn(title) {
+      if (!productLikeBtn) return;
+      const liked = isProductLiked(title);
+      productLikeBtn.innerHTML = liked ? '<span style="font-size:2rem;transition:color 0.22s;">&#10084;&#65039;</span>' : '<span style="font-size:2rem;transition:color 0.22s;">&#9825;</span>';
+      productLikeBtn.classList.toggle('liked', liked);
+      productLikeBtn.setAttribute('aria-pressed', liked ? 'true' : 'false');
+    }
+    productLikeBtn.addEventListener('click', function() {
+      const title = productDetailTitle.textContent;
+      let liked = getLikedProducts();
+      if (liked.includes(title)) {
+        liked = liked.filter(t => t !== title);
+      } else {
+        liked.push(title);
+      }
+      setLikedProducts(liked);
+      updateProductLikeBtn(title);
+    });
+    // Patch renderProductDetail to update heart icon
+    const origRenderProductDetail = renderProductDetail;
+    renderProductDetail = function(card) {
+      origRenderProductDetail(card);
+      // Show and update heart icon
+      const title = card.getAttribute('data-title');
+      updateProductLikeBtn(title);
+      productLikeBtn.style.display = 'flex';
+    };
+  </script>
 </body>
 </html> 
