@@ -4854,6 +4854,112 @@
       updateProductLikeBtn(title);
       productLikeBtn.style.display = 'flex';
     };
+
+    // === LIKED PRODUCTS SECTION FUNCTIONALITY ===
+    const likedProductsSection = document.getElementById('liked-products-section');
+    const likedProductsGrid = document.getElementById('liked-products-grid');
+    const likedProductsBack = document.getElementById('liked-products-back');
+    // Helper: get all product data (from homepage and perfect sets)
+    function getAllProductsForLike() {
+      // Use the same logic as getAllProductData, but ensure all products are included
+      if (typeof getAllProductData === 'function') return getAllProductData();
+      return [];
+    }
+    // Render liked products as cards
+    function renderLikedProductsGrid() {
+      const likedTitles = getLikedProducts();
+      const allProducts = getAllProductsForLike();
+      likedProductsGrid.innerHTML = '';
+      const liked = allProducts.filter(p => likedTitles.includes(p.title));
+      if (liked.length === 0) {
+        likedProductsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;font-size:1.1rem;color:#b86fa7;padding:2em 0;">You have not liked any products yet.</div>';
+        return;
+      }
+      liked.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.setAttribute('data-title', product.title || '');
+        card.setAttribute('data-price', product.price || '');
+        card.setAttribute('data-img', product.img || '');
+        card.setAttribute('data-desc', product.desc || '');
+        card.setAttribute('data-gallery', product.gallery || `["${product.img || ''}"]`);
+        card.setAttribute('data-colors', product.colors || '[]');
+        card.setAttribute('data-sizes', product.sizes || '[]');
+        card.setAttribute('data-category', product.category || '');
+        card.innerHTML = `
+          <img src="${product.img}" alt="${product.title}">
+          <h4>${product.title}</h4>
+          <span>${product.price}</span>
+        `;
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', function() {
+          likedProductsSection.style.display = 'none';
+          productDetailSection.style.display = 'block';
+          renderProductDetail(card);
+          window.scrollTo({top:0,behavior:'smooth'});
+        });
+        likedProductsGrid.appendChild(card);
+      });
+      // Animate cards in
+      setTimeout(function() {
+        likedProductsGrid.querySelectorAll('.product-card').forEach(function(card, i) {
+          card.classList.add('sb-inview');
+        });
+      }, 30);
+    }
+    // Show liked products section
+    function showLikedProductsSection() {
+      homepageContent.style.display = 'none';
+      allProductsSection.style.display = 'none';
+      productDetailSection.style.display = 'none';
+      checkoutSection && (checkoutSection.style.display = 'none');
+      likedProductsSection.style.display = 'flex';
+      renderLikedProductsGrid();
+      setTimeout(function() {
+        likedProductsSection.classList.add('sb-inview');
+      }, 10);
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+    // Dropdown event (re-attach after nav render)
+    function attachLikedProductsDropdownHandler() {
+      const likedBtn = document.getElementById('liked-products-btn');
+      if (likedBtn) {
+        likedBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          showLikedProductsSection();
+          // Close dropdown
+          const dropdown = document.getElementById('user-dropdown');
+          if (dropdown) dropdown.classList.remove('open');
+        });
+      }
+    }
+    // Attach handler on load and after nav render
+    window.addEventListener('DOMContentLoaded', attachLikedProductsDropdownHandler);
+    // Patch renderUserNav to re-attach handler
+    if (typeof renderUserNav === 'function') {
+      const origRenderUserNav = renderUserNav;
+      renderUserNav = function() {
+        origRenderUserNav();
+        attachLikedProductsDropdownHandler();
+      };
+    }
+    // Back button logic
+    likedProductsBack.addEventListener('click', function() {
+      likedProductsSection.style.display = 'none';
+      homepageContent.style.display = '';
+      setTimeout(function() {
+        homepageContent.classList.add('sb-inview');
+      }, 10);
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+    // Hide liked products section on Home link click
+    document.querySelectorAll('nav a').forEach(link => {
+      if (link.textContent.trim().toLowerCase() === 'home') {
+        link.addEventListener('click', function(e) {
+          likedProductsSection.style.display = 'none';
+        });
+      }
+    });
   </script>
 </body>
 </html> 
