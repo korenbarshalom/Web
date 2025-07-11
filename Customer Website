@@ -3009,7 +3009,9 @@
           renderCheckoutOrderSummary2col();
           // Reset steps
           document.getElementById('checkout-form').style.display = '';
-          document.getElementById('checkout-payment-block').style.display = 'none';
+          var paymentBlock = document.getElementById('checkout-payment-block');
+          paymentBlock.style.display = 'none';
+          paymentBlock.classList.remove('active');
           document.getElementById('checkout-confirmation-block').style.display = 'none';
         });
       }
@@ -4082,5 +4084,29 @@
   });
   </script>
   <!-- === END CUSTOM CREDIT CARD PAYMENT FORM & PAYPAL BUTTON (ADDED) === -->
+  <script>
+(function(){
+  if(!window.chatbase || window.chatbase("getState")!=="initialized"){
+    window.chatbase=(...args)=>{
+      if(!window.chatbase.q){window.chatbase.q=[]}
+      window.chatbase.q.push(args)
+    };
+    window.chatbase=new Proxy(window.chatbase,{
+      get(t,prop){ if(prop==="q"){return t.q}
+        return(...a)=>t(prop,...a)
+      }
+    });
+  }
+  const onLoad=function(){
+    const s=document.createElement("script");
+    s.src="https://www.chatbase.co/embed.min.js";
+    s.id="-bdusH7XjzkE2e4iM2oDj";
+    s.domain="www.chatbase.co";
+    document.body.appendChild(s);
+  };
+  if(document.readyState==="complete"){ onLoad(); }
+  else { window.addEventListener("load",onLoad); }
+})();
+</script>
 </body>
 </html> 
