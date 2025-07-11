@@ -2630,7 +2630,7 @@
         <a href="#rings">Jewelry</a>
         <a href="#earrings">Bags</a>
         <a href="#necklaces">Shoes</a>
-        <a href="#bracelets">Bracelets</a>
+        <a href="#about-us" id="about-us-link">About Us</a>
       </nav>
       <div class="navbar-action" id="navbar-action-user">
         <a href="#login" class="login-btn" id="login-signup-btn">Log In</a>
@@ -2642,6 +2642,7 @@
           <div id="mini-cart-panel" style="display:none;position:absolute;right:0;top:2.5em;z-index:2000;"></div>
         </div>
       </div>
+      <a href="#contact-us" id="contact-us-link" class="navbar-contact-link" style="margin-left:1.5rem;font-size:1.08rem;font-weight:600;color:var(--text-dark);padding-bottom:2px;transition:color .3s;position:relative;">Contact Us</a>
     </div>
   </header>
   <div id="homepage-content">
@@ -2656,15 +2657,15 @@
         <h2 class="categories-section-title">Categories</h2>
         <div class="categories-grid">
           <div class="category-card" data-category="Jewelry">
-            <img src="https://static.vecteezy.com/system/resources/previews/042/112/913/large_2x/indian-design-gold-bangle-isolated-on-white-background-free-photo.jpg" alt="Jewelry">
+            <img src="https://img.freepik.com/premium-photo/gold-jewelry-white-background_237502-490.jpg" alt="Jewelry">
             <div class="label">Jewelry</div>
           </div>
           <div class="category-card" data-category="Bags">
-            <img src="https://media.istockphoto.com/id/1365118618/photo/blue-fashion-purse-handbag-on-white-background-isolated.jpg?s=612x612&w=0&k=20&c=VNszfC0cxenqZGhjlr3gqqvzHWREuhdY_H3CKF1B38g=" alt="Bags">
+            <img src="https://media.istockphoto.com/id/1363767151/photo/yellow-leather-bag-of-isolated-woman-on-white-background.jpg?s=612x612&w=0&k=20&c=X7PcXbPp99t0xAFbWLV7Yfm3YzsFSugtfEGZ0x2aCjo=" alt="Bags">
             <div class="label">Bags</div>
           </div>
           <div class="category-card" data-category="Shoes">
-            <img src="https://img.freepik.com/premium-photo/stylish-women-s-shoes-white-background_126801-403.jpg" alt="Shoes">
+            <img src="https://img.freepik.com/premium-photo/elegant-women-s-summer-suede-red-stilettos-new-pair-shoes-white-background_400928-1689.jpg?w=360" alt="Shoes">
             <div class="label">Shoes</div>
           </div>
         </div>
@@ -4180,7 +4181,7 @@
     // === NAVBAR CATEGORY LINKS CLICK LOGIC ===
     document.querySelectorAll('nav a').forEach(link => {
       const text = link.textContent.trim().toLowerCase();
-      if (["jewelry","bags","shoes","bracelets"].includes(text)) {
+      if (["jewelry","bags","shoes"].includes(text)) {
         link.addEventListener('click', function(e) {
           e.preventDefault();
           homepageContent.style.display = 'none';
@@ -4199,6 +4200,41 @@
           }, 30);
         });
       }
+    });
+    // === ABOUT US & CONTACT US SMOOTH SCROLL ===
+    document.getElementById('about-us-link').addEventListener('click', function(e) {
+      e.preventDefault();
+      // Show homepage if not visible
+      homepageContent.style.display = '';
+      allProductsSection.style.display = 'none';
+      productDetailSection.style.display = 'none';
+      checkoutSection && (checkoutSection.style.display = 'none');
+      likedProductsSection && (likedProductsSection.style.display = 'none');
+      // Scroll to About section
+      setTimeout(function() {
+        const aboutSection = document.querySelector('.about-section');
+        if (aboutSection) {
+          aboutSection.scrollIntoView({behavior:'smooth', block:'start'});
+          aboutSection.classList.add('sb-inview');
+        }
+      }, 30);
+    });
+    document.getElementById('contact-us-link').addEventListener('click', function(e) {
+      e.preventDefault();
+      // Show homepage if not visible
+      homepageContent.style.display = '';
+      allProductsSection.style.display = 'none';
+      productDetailSection.style.display = 'none';
+      checkoutSection && (checkoutSection.style.display = 'none');
+      likedProductsSection && (likedProductsSection.style.display = 'none');
+      // Scroll to footer contact
+      setTimeout(function() {
+        const contactSection = document.querySelector('.footer-contact-minimal');
+        if (contactSection) {
+          contactSection.scrollIntoView({behavior:'smooth', block:'center'});
+          contactSection.classList.add('sb-inview');
+        }
+      }, 30);
     });
   </script>
   <script>
