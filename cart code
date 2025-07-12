@@ -1,0 +1,153 @@
+// cart.js
+// ShinyBelle Cart Feature (modularized)
+// All cart logic is moved here from index.html
+
+(function() {
+  // === ELEMENTS ===
+  const cartIconBtn = document.getElementById('cart-icon-btn');
+  const cartCountBadge = document.getElementById('cart-count-badge');
+  const miniCartPanel = document.getElementById('mini-cart-panel');
+  const homepageContent = document.getElementById('homepage-content');
+  const productDetailSection = document.getElementById('product-detail-section');
+  const allProductsSection = document.getElementById('all-products-section');
+  const checkoutSection = document.getElementById('checkout-section');
+
+  // === CART STORAGE ===
+  function getCart() {
+    try {
+      return JSON.parse(localStorage.getItem('shinybelle_cart') || '[]');
+    } catch { return []; }
+  }
+  function setCart(cart) {
+    localStorage.setItem('shinybelle_cart', JSON.stringify(cart));
+  }
+
+  // === BADGE ===
+  function updateCartBadge() {
+    const cart = getCart();
+    if (cart.length > 0) {
+      cartCountBadge.textContent = cart.length;
+      cartCountBadge.style.display = '';
+    } else {
+      cartCountBadge.style.display = 'none';
+    }
+  }
+
+  // === RENDER MINI CART ===
+  function renderMiniCart() {
+    const cart = getCart();
+    let html = `<div class="mini-cart-title">Your Cart</div><div class="mini-cart-items">`;
+    if (cart.length === 0) {
+      html += `<div style='text-align:center;color:#b86fa7;padding:1.2em 0;'>Your cart is empty.</div>`;
+    } else {
+      cart.forEach((item, idx) => {
+        html += `<div class='mini-cart-item'>
+          <img class='mini-cart-item-img' src='${item.img}' alt='${item.title}'>
+          <div class='mini-cart-item-info'>
+            <div class='mini-cart-item-title'>${item.title}</div>
+            <div class='mini-cart-item-meta'>${item.price}` +
+              (item.size ? ` &middot; <span>${item.size}</span>` : '') +
+              (item.color ? ` &middot; <span style='display:inline-block;width:1em;height:1em;border-radius:50%;background:${item.color};border:1.5px solid #bfa05a;margin-left:0.3em;vertical-align:middle;'></span>` : '') +
+            `</div>
+          </div>
+          <button class='mini-cart-item-remove' data-idx='${idx}' aria-label='Remove'>&times;</button>
+        </div>`;
+      });
+    }
+    html += `</div>`;
+    if (cart.length > 0) {
+      const total = cart.reduce((sum, item) => sum + (parseFloat(item.price.replace(/[^\d.]/g, '')) || 0), 0);
+      html += `<div class='mini-cart-footer'>
+        <div class='mini-cart-total'>Total: $${total.toFixed(2)}</div>
+        <button class='mini-cart-checkout-btn'>Checkout</button>
+      </div>`;
+    }
+    miniCartPanel.innerHTML = html;
+    miniCartPanel.classList.add('active');
+    // Remove item logic
+    miniCartPanel.querySelectorAll('.mini-cart-item-remove').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        const idx = parseInt(btn.getAttribute('data-idx'));
+        const cart = getCart();
+        cart.splice(idx, 1);
+        setCart(cart);
+        updateCartBadge();
+        renderMiniCart();
+        miniCartPanel.style.display = 'flex';
+        miniCartPanel.classList.add('active');
+      });
+    });
+    // Checkout button logic
+    const checkoutBtn = miniCartPanel.querySelector('.mini-cart-checkout-btn');
+    if (checkoutBtn) {
+      checkoutBtn.addEventListener('click', function() {
+        if (checkoutSection) checkoutSection.style.display = 'block';
+        if (homepageContent) homepageContent.style.display = 'none';
+        if (productDetailSection) productDetailSection.style.display = 'none';
+        if (allProductsSection) allProductsSection.style.display = 'none';
+        miniCartPanel.style.display = 'none';
+        miniCartPanel.classList.remove('active');
+        // Optionally, trigger order summary render if function exists
+        if (typeof renderCheckoutOrderSummary2col === 'function') {
+          renderCheckoutOrderSummary2col();
+        }
+        // Reset steps if needed
+        var form = document.getElementById('checkout-form');
+        var paymentBlock = document.getElementById('checkout-payment-block');
+        var confirmationBlock = document.getElementById('checkout-confirmation-block');
+        if (form) form.style.display = '';
+        if (paymentBlock) {
+          paymentBlock.style.display = 'none';
+          paymentBlock.classList.remove('active');
+        }
+        if (confirmationBlock) confirmationBlock.style.display = 'none';
+      });
+    }
+  }
+
+  // === CART ICON CLICK ===
+  if (cartIconBtn) {
+    cartIconBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (miniCartPanel.style.display === 'none' || !miniCartPanel.classList.contains('active')) {
+        renderMiniCart();
+        miniCartPanel.style.display = 'flex';
+        miniCartPanel.classList.add('active');
+      } else {
+        miniCartPanel.style.display = 'none';
+        miniCartPanel.classList.remove('active');
+      }
+    });
+  }
+
+  // === HIDE MINI CART WHEN CLICKING OUTSIDE ===
+  document.addEventListener('click', function(e) {
+    if (!miniCartPanel.contains(e.target) && e.target !== cartIconBtn && !cartIconBtn.contains(e.target)) {
+      miniCartPanel.style.display = 'none';
+      miniCartPanel.classList.remove('active');
+    }
+  });
+
+  // === ADD TO CART (EXPOSED FOR PRODUCT DETAIL) ===
+  window.ShinyBelleCart = {
+    add: function(item) {
+      const cart = getCart();
+      cart.push(item);
+      setCart(cart);
+      updateCartBadge();
+    },
+    get: getCart,
+    set: setCart,
+    updateBadge: updateCartBadge
+  };
+
+  // === INITIALIZE BADGE ON LOAD ===
+  updateCartBadge();
+
+  // === PATCH ADD TO CART BUTTONS IF NEEDED ===
+  // (Optional: If you want to auto-patch all .add-to-cart-btn buttons)
+  // Example usage in product detail: ShinyBelleCart.add({title, price, img, size, color});
+
+})(); 
