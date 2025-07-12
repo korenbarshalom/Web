@@ -3454,146 +3454,9 @@
         });
       }
     });
-    // Add to Cart (demo only)
-    addToCartBtn.addEventListener('click', function() {
-      addToCartBtn.textContent = 'Added!';
-      setTimeout(()=>{addToCartBtn.innerHTML = '<i class="fa fa-shopping-cart"></i> Add to Cart';}, 1200);
-    });
-
-    // --- CART LOGIC ---
-    const cartIconBtn = document.getElementById('cart-icon-btn');
-    const cartCountBadge = document.getElementById('cart-count-badge');
-    const miniCartPanel = document.getElementById('mini-cart-panel');
-
-    function getCart() {
-      try {
-        return JSON.parse(localStorage.getItem('shinybelle_cart') || '[]');
-      } catch { return []; }
-    }
-    function setCart(cart) {
-      localStorage.setItem('shinybelle_cart', JSON.stringify(cart));
-    }
-    function updateCartBadge() {
-      const cart = getCart();
-      if (cart.length > 0) {
-        cartCountBadge.textContent = cart.length;
-        cartCountBadge.style.display = '';
-      } else {
-        cartCountBadge.style.display = 'none';
-      }
-    }
-    function renderMiniCart() {
-      const cart = getCart();
-      let html = `<div class="mini-cart-title">Your Cart</div><div class="mini-cart-items">`;
-      if (cart.length === 0) {
-        html += `<div style='text-align:center;color:#b86fa7;padding:1.2em 0;'>Your cart is empty.</div>`;
-      } else {
-        cart.forEach((item, idx) => {
-          html += `<div class='mini-cart-item'>
-            <img class='mini-cart-item-img' src='${item.img}' alt='${item.title}'>
-            <div class='mini-cart-item-info'>
-              <div class='mini-cart-item-title'>${item.title}</div>
-              <div class='mini-cart-item-meta'>${item.price}` +
-                (item.size ? ` &middot; <span>${item.size}</span>` : '') +
-                (item.color ? ` &middot; <span style='display:inline-block;width:1em;height:1em;border-radius:50%;background:${item.color};border:1.5px solid #bfa05a;margin-left:0.3em;vertical-align:middle;'></span>` : '') +
-              `</div>
-            </div>
-            <button class='mini-cart-item-remove' data-idx='${idx}' aria-label='Remove'>&times;</button>
-          </div>`;
-        });
-      }
-      html += `</div>`;
-      if (cart.length > 0) {
-        const total = cart.reduce((sum, item) => sum + (parseFloat(item.price.replace(/[^\d.]/g, '')) || 0), 0);
-        html += `<div class='mini-cart-footer'>
-          <div class='mini-cart-total'>Total: $${total.toFixed(2)}</div>
-          <button class='mini-cart-checkout-btn'>Checkout</button>
-        </div>`;
-      }
-      miniCartPanel.innerHTML = html;
-      miniCartPanel.classList.add('active');
-      // Remove item logic
-      miniCartPanel.querySelectorAll('.mini-cart-item-remove').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-          e.stopPropagation(); // Prevent closing the cart popup
-          e.preventDefault();
-          const idx = parseInt(btn.getAttribute('data-idx'));
-          const cart = getCart();
-          cart.splice(idx, 1);
-          setCart(cart);
-          updateCartBadge();
-          renderMiniCart();
-          // Ensure mini cart stays open and visible
-          miniCartPanel.style.display = 'flex';
-          miniCartPanel.classList.add('active');
-        });
-      });
-      // Checkout button logic
-      const checkoutBtn = miniCartPanel.querySelector('.mini-cart-checkout-btn');
-      if (checkoutBtn) {
-        checkoutBtn.addEventListener('click', function() {
-          // Show checkout full-page section, hide all other content except navbar
-          document.getElementById('checkout-section').style.display = 'block';
-          document.body.style.overflow = 'auto';
-          homepageContent.style.display = 'none';
-          productDetailSection.style.display = 'none';
-          allProductsSection.style.display = 'none';
-          miniCartPanel.style.display = 'none';
-          miniCartPanel.classList.remove('active');
-          renderCheckoutOrderSummary2col();
-          // Reset steps
-          document.getElementById('checkout-form').style.display = '';
-          var paymentBlock = document.getElementById('checkout-payment-block');
-          paymentBlock.style.display = 'none';
-          paymentBlock.classList.remove('active');
-          document.getElementById('checkout-confirmation-block').style.display = 'none';
-        });
-      }
-    }
-    cartIconBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      if (miniCartPanel.style.display === 'none' || !miniCartPanel.classList.contains('active')) {
-        renderMiniCart();
-        miniCartPanel.style.display = 'flex';
-        miniCartPanel.classList.add('active');
-      } else {
-        miniCartPanel.style.display = 'none';
-        miniCartPanel.classList.remove('active');
-      }
-    });
-    // Hide mini-cart when clicking outside
-    document.addEventListener('click', function(e) {
-      if (!miniCartPanel.contains(e.target) && e.target !== cartIconBtn && !cartIconBtn.contains(e.target)) {
-        miniCartPanel.style.display = 'none';
-        miniCartPanel.classList.remove('active');
-      }
-    });
-    // Add to Cart integration
-    function getSelectedColor() {
-      const active = colorOptions.querySelector('.color-dot.active');
-      return active ? active.style.background : '';
-    }
-    function getSelectedSize() {
-      const active = sizeOptions.querySelector('.size-btn.active');
-      return active ? active.textContent : '';
-    }
-    addToCartBtn.addEventListener('click', function() {
-      const item = {
-        title: productDetailTitle.textContent,
-        price: productDetailPrice.textContent,
-        img: productMainImg.src,
-        size: getSelectedSize(),
-        color: getSelectedColor()
-      };
-      const cart = getCart();
-      cart.push(item);
-      setCart(cart);
-      updateCartBadge();
-      addToCartBtn.textContent = 'Added!';
-      setTimeout(()=>{addToCartBtn.innerHTML = '<i class="fa fa-shopping-cart"></i> Add to Cart';}, 1200);
-    });
-    // On page load, update badge
-    updateCartBadge();
+    // --- CART LOGIC REMOVED - NOW HANDLED BY cart.js ---
+    // All cart functionality is now managed by the modular cart.js file
+    // This ensures consistent behavior for both logged-in and guest users
 
     // Checkout overlay close logic
     const checkoutSection = document.getElementById('checkout-section');
@@ -4832,6 +4695,13 @@
             setCurrentUser(user);
             loginModal.classList.remove('active');
             renderUserNav();
+            // --- Ensure cart.js and liked-products are re-initialized after login ---
+            if (window.ShinyBelleCart && typeof window.ShinyBelleCart.reinitialize === 'function') {
+              window.ShinyBelleCart.reinitialize();
+            }
+            if (typeof attachLikedProductsDropdownHandler === 'function') {
+              attachLikedProductsDropdownHandler();
+            }
           } else {
             alert('No account found for this phone number. Please sign up.');
           }
@@ -4839,6 +4709,13 @@
       }
       // On load
       renderUserNav();
+      // --- Ensure cart.js and liked-products are initialized on page load ---
+      if (window.ShinyBelleCart && typeof window.ShinyBelleCart.reinitialize === 'function') {
+        window.ShinyBelleCart.reinitialize();
+      }
+      if (typeof attachLikedProductsDropdownHandler === 'function') {
+        attachLikedProductsDropdownHandler();
+      }
     })();
   </script>
   <!-- LIKED PRODUCTS SECTION (hidden by default) -->
