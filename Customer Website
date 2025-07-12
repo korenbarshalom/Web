@@ -4636,6 +4636,10 @@
           signoutBtn.addEventListener('click', function() {
             setCurrentUser(null);
             renderUserNav();
+            // --- Ensure cart is re-initialized after logout ---
+            if (window.ShinyBelleCart && typeof window.ShinyBelleCart.reinitialize === 'function') {
+              window.ShinyBelleCart.reinitialize();
+            }
           });
         } else {
           // Show login/signup
