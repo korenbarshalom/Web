@@ -2167,9 +2167,8 @@
       overflow: hidden;
       z-index: 1;
     }
-    .about-section.sb-inview {
-      /* triggers fade/slide in */
-    }
+   
+    
     .about-container {
       /* improved vertical centering and spacing */
       align-items: center;
