@@ -192,21 +192,59 @@ img{max-width:100%;display:block;border-radius:var(--radius-sm);}
   .nav-actions { gap: 0.7rem; }
 }
 
-/* ===== Navbar Search Bar ===== */
+/* ===== Navbar Search Bar (Polished) ===== */
+.nav-search {
+  position: relative;
+  flex: 1 1 220px;
+  max-width: 320px;
+  margin-left: 0;
+  margin-right: 2.2rem;
+  display: flex;
+  align-items: center;
+  height: 44px;
+}
 #template-search {
   width: 100%;
-  padding: 0.7rem 1.1rem;
+  padding: 0.7rem 2.7rem 0.7rem 1.1rem; /* right padding for icon */
   border-radius: var(--radius-sm);
-  border: 1.5px solid #e2e4ee;
-  background: #f8f9fb;
+  border: 1.5px solid #23272f;
+  background: #181a1b;
+  color: #f5f6fa;
   font-size: 1.05rem;
-  transition: border var(--transition), box-shadow var(--transition);
+  transition: border var(--transition), box-shadow var(--transition), background var(--transition);
   box-shadow: var(--shadow-soft);
+  outline: none;
+  height: 44px;
+  line-height: 1.2;
+  font-family: inherit;
 }
 #template-search:focus {
   border: 1.5px solid var(--clr-primary);
-  box-shadow: var(--shadow-hover);
-  outline: none;
+  box-shadow: 0 0 0 2px rgba(0,191,166,0.13), var(--shadow-hover);
+  background: #23272f;
+}
+.search-icon {
+  position: absolute;
+  right: 1.1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--clr-muted);
+  font-size: 1.13rem;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+#template-search::placeholder {
+  color: #b0b3b8;
+  opacity: 1;
+  font-weight: 400;
+}
+@media (max-width: 900px) {
+  .nav-search { max-width: 100%; }
+}
+@media (max-width: 768px) {
+  .nav-search { margin-left: 0.7rem; max-width: 100%; }
 }
 
 /* ===== Hero Polish ===== */
@@ -1211,41 +1249,3 @@ img{max-width:100%;display:block;border-radius:var(--radius-sm);}
 #signup-form .login-label {
   margin-bottom: 4px;
   font-size: 1.01rem;
-  font-weight: 600;
-  color: #e0e0e0;
-  letter-spacing: 0.01em;
-}
-#signup-form .login-input {
-  padding: 0.95rem 1.1rem;
-  border: 1.5px solid #35363c;
-  border-radius: 10px;
-  background: #18191f;
-  color: #fff;
-  font-size: 1.05rem;
-  font-family: inherit;
-  margin-bottom: 0.2rem;
-  transition: border 0.22s, box-shadow 0.22s;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-}
-#signup-form .login-input:focus {
-  border: 1.5px solid var(--clr-primary);
-  outline: none;
-  box-shadow: 0 4px 18px rgba(0,191,166,0.13);
-}
-#signup-modal .google-signin-btn {
-  width: 80%;
-  max-width: 280px;
-  margin: 0.7rem auto 0.2rem auto;
-}
-#signup-modal .login-signup-text, #signup-modal .login-or-google {
-  text-align: center;
-  color: #b0b3b8;
-  font-size: 1.01rem;
-  margin: 1.1rem 0 0.7rem 0;
-}
-@media (max-width: 600px) {
-  #signup-modal .modal-content.login-panel {
-    padding: 1.2rem 0.7rem;
-    max-width: 98vw;
-  }
-}
