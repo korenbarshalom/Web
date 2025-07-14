@@ -218,20 +218,26 @@
       
       // Browse button click handler
       browseBtn.addEventListener('click', function() {
-        // Add browse mode class to body
-        body.classList.add('browse-mode');
-        // Show back to home button
-        backHomeBtn.classList.remove('section-hidden');
-        // Smooth scroll to top
-        window.scrollTo({
-          top: 0,
-          behavior: 'smooth'
-        });
+        // Animate hero out
+        hero.classList.add('fade-out');
+        // Animate modern-storefront in after delay
+        setTimeout(function() {
+          body.classList.add('browse-mode');
+          modernStorefront.classList.add('fade-in');
+          backHomeBtn.classList.remove('section-hidden');
+          // Ensure hero is hidden after animation
+        }, 550);
       });
       // Back to Home button click handler
       backHomeBtn.addEventListener('click', function() {
-        body.classList.remove('browse-mode');
-        backHomeBtn.classList.add('section-hidden');
+        // Animate modern-storefront out
+        modernStorefront.classList.remove('fade-in');
+        // Animate hero in after delay
+        setTimeout(function() {
+          body.classList.remove('browse-mode');
+          hero.classList.remove('fade-out');
+          backHomeBtn.classList.add('section-hidden');
+        }, 550);
       });
       // Set current year in footer
       document.getElementById('year').textContent = new Date().getFullYear();
