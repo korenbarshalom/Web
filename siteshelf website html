@@ -29,6 +29,10 @@
       padding-top: 120px;
       min-height: 100vh;
     }
+
+    .browse-mode .about-us-section {
+      display: none !important;
+    }
   </style>
 </head>
 <body>
@@ -117,6 +121,112 @@
           width: 100%;
           min-width: 0;
           max-width: 500px;
+        }
+      }
+    </style>
+  </section>
+
+  <!-- ===== About Us Section ===== -->
+  <section id="about-us" class="about-us-section">
+    <div class="about-us-container">
+      <div class="about-us-text">
+        <h2 class="about-us-title">About Us</h2>
+        <p class="about-us-desc">
+          We offer ready-made websites and templates to help people save time. Our templates cover a wide range of categories — from portfolios to online stores and service-based websites.
+        </p>
+      </div>
+      <div class="about-us-logo">
+        <img src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjE0NTQzNy5wbmc=/250x600/iuDvPb.png" alt="SiteShelf Logo" class="about-logo-img" />
+      </div>
+    </div>
+    <style>
+      .about-us-section {
+        background: var(--clr-bg-soft, #181a1b);
+        border-radius: var(--radius);
+        margin: 4.5rem auto 0 auto;
+        padding: 3.2rem 1.2rem 3.2rem 1.2rem;
+        max-width: 1100px;
+        box-shadow: var(--shadow-soft);
+        display: block;
+      }
+      .about-us-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 3.5rem;
+      }
+      .about-us-text {
+        flex: 1 1 340px;
+        min-width: 220px;
+      }
+      .about-us-title {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 1.1rem;
+        color: var(--clr-text);
+        letter-spacing: 0.01em;
+      }
+      .about-us-desc {
+        font-size: 1.18rem;
+        color: #e0e3ea;
+        font-weight: 400;
+        line-height: 1.7;
+        margin-bottom: 0;
+        /* Elegant, slightly muted but readable on dark */
+        text-shadow: 0 1px 2px rgba(0,0,0,0.10);
+      }
+      .about-us-logo {
+        flex: 0 0 370px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .about-logo-img {
+        width: 320px;
+        height: 320px;
+        object-fit: contain;
+        border-radius: 22px;
+        background: linear-gradient(135deg, var(--clr-bg) 60%, var(--clr-primary) 100%);
+        box-shadow: 0 6px 32px rgba(0,0,0,0.13);
+        padding: 1.7rem;
+        border: 2.5px solid var(--clr-primary);
+        transition: transform 0.32s cubic-bezier(.4,0,.2,1), box-shadow 0.32s cubic-bezier(.4,0,.2,1);
+        display: block;
+      }
+      .about-logo-img:hover, .about-logo-img:focus {
+        transform: scale(1.06);
+        box-shadow: 0 12px 48px 0 rgba(0,191,166,0.18), 0 6px 32px rgba(0,0,0,0.18);
+        z-index: 2;
+      }
+      @media (max-width: 1100px) {
+        .about-us-logo {
+          flex: 0 0 260px;
+        }
+        .about-logo-img {
+          width: 220px;
+          height: 220px;
+        }
+      }
+      @media (max-width: 900px) {
+        .about-us-container {
+          flex-direction: column-reverse;
+          gap: 2.2rem;
+          align-items: center;
+        }
+        .about-us-logo {
+          margin-bottom: 0.5rem;
+        }
+        .about-logo-img {
+          width: 150px;
+          height: 150px;
+          padding: 1rem;
+        }
+        .about-us-title {
+          font-size: 1.4rem;
+        }
+        .about-us-desc {
+          font-size: 1rem;
         }
       }
     </style>
