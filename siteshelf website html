@@ -37,6 +37,7 @@
     <div class="logo">siteshelf</div>
     <div class="nav-search">
       <input id="template-search" type="text" placeholder="Search templates..." aria-label="Search templates" />
+      <span class="search-icon"><i class="fa fa-search" aria-hidden="true"></i></span>
     </div>
     <nav id="nav-links">
       <a href="#home">Home</a>
