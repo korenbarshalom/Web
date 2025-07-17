@@ -227,3 +227,160 @@ $('#contact-form').addEventListener('submit',e=>{
 
 /* -------- Footer Year -------- */
 $('#year').textContent = new Date().getFullYear();
+
+/* ===== Template Detail View Logic ===== */
+// Template data (sync with index.html order)
+const templateData = [
+  {
+    title: 'Elegant Portfolio',
+    img: 'https://www.sliderrevolution.com/wp-content/uploads/2021/11/Vie-1.jpg',
+    preview: 'https://www.sliderrevolution.com/templates/vie-portfolio/',
+    desc: 'A refined, modern portfolio for creatives and professionals. Features a clean layout, bold typography, and smooth transitions.',
+    specs: ['Responsive', 'Portfolio', 'Minimalist', 'Fast loading']
+  },
+  {
+    title: 'Modern Storefront',
+    img: 'https://wrapmarketusercontent.com/assets/items/thumb/9b89fe00bedf3cf544cbb5af0478f52099744ee920981e66980a88cdc630537b.webp?v=1710580878',
+    preview: 'https://wrapbootstrap.com/theme/modern-storefront-WB0B30D1J',
+    desc: 'A stylish e-commerce template for modern brands. Includes product grids, smooth navigation, and a polished checkout experience.',
+    specs: ['E-commerce', 'Responsive', 'Product grid', 'Checkout ready']
+  },
+  {
+    title: 'Creative Agency',
+    img: 'https://miro.medium.com/v2/resize:fit:1400/1*lH0_H4Tz5hAj-AtzzoqHbA.jpeg',
+    preview: 'https://themeforest.net/item/creative-agency-html-template/12345678',
+    desc: 'A bold, creative template for agencies and studios. Showcases projects, team, and services with flair.',
+    specs: ['Agency', 'Creative', 'Team showcase', 'Service sections']
+  },
+  {
+    title: 'Creative Portfolio',
+    img: 'https://elements-resized.envatousercontent.com/elements-cover-images/edbbc4ab-95c0-4fca-b096-036d38cc9711?w=433&cf_fit=scale-down&q=85&format=auto&s=3055db25f7249cccc3be0006043c1d05b75d5250c9dc3ed0d834b382906e22db',
+    preview: 'https://elements.envato.com/creative-portfolio-template-EDBBC4AB',
+    desc: 'A visually striking portfolio for artists and designers. Large visuals, elegant grid, and smooth scrolling.',
+    specs: ['Portfolio', 'Grid layout', 'Large visuals', 'Smooth scroll']
+  },
+  {
+    title: 'Minimal Portfolio',
+    img: 'https://wrapmarketusercontent.com/assets/items/thumb/6af5272d95517f0350ab9393f6350c90039cf7a0ffc2e8d295b6cdcd85c8855a.webp?v=1732200882',
+    preview: 'https://wrapbootstrap.com/theme/minimal-portfolio-WB0B30D1J',
+    desc: 'A minimal, elegant portfolio for showcasing work. Subtle colors, clean lines, and focus on content.',
+    specs: ['Minimal', 'Portfolio', 'Clean lines', 'Subtle colors']
+  },
+  {
+    title: 'Startup Landing',
+    img: 'https://bootstrapmade.com/content/templatefiles/Arsha/Arsha-bootstrap-website-template-md.webp',
+    preview: 'https://bootstrapmade.com/arsha-free-bootstrap-html-template-corporate/',
+    desc: 'A landing page for startups and SaaS. Conversion-focused, modern, and easy to customize.',
+    specs: ['Startup', 'Landing page', 'Conversion', 'Modern']
+  },
+  {
+    title: 'Consulting Firm',
+    img: 'https://149842033.v2.pressablecdn.com/wp-content/uploads/2020/07/services-website-templates-1000x750.jpg',
+    preview: 'https://colorlib.com/wp/template/consulting/',
+    desc: 'A professional template for consulting businesses. Trust-building design, service highlights, and contact forms.',
+    specs: ['Consulting', 'Professional', 'Contact forms', 'Service highlights']
+  },
+  {
+    title: 'Fashion Store',
+    img: 'https://s.tmimgcdn.com/scr/1200x750/52500/free-responsive-corporate-template-website-template_52524-0-original.jpg',
+    preview: 'https://www.templatemonster.com/website-templates/fashion-store/',
+    desc: 'A chic, modern template for fashion brands. Features product showcases, lookbooks, and a stylish shop.',
+    specs: ['Fashion', 'E-commerce', 'Lookbook', 'Shop']
+  }
+];
+
+const detailSection = document.getElementById('template-detail');
+const detailImg = document.getElementById('template-detail-img');
+const detailTitle = document.getElementById('template-detail-title');
+const detailDesc = document.getElementById('template-detail-desc');
+const detailSpecs = document.getElementById('template-detail-specs');
+const previewBtn = document.getElementById('template-preview-btn');
+const backToTemplates = document.getElementById('back-to-templates');
+let lastFocusedCard = null;
+
+// Gather all template cards
+const templateCards = [
+  ...document.querySelectorAll('.home-demo-cards .demo-card'),
+  ...document.querySelectorAll('#modern-storefront .modern-card-vertical')
+];
+
+// Make cards focusable and accessible (redundant if already in HTML, but safe)
+templateCards.forEach((card, i) => {
+  card.setAttribute('tabindex', '0');
+  card.setAttribute('role', 'button');
+  card.setAttribute('aria-label', templateData[i]?.title + ' details');
+  card.setAttribute('data-template', i);
+  // Click/Enter/Space handler
+  function openDetail(e) {
+    if (e.type === 'click' || e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      showTemplateDetail(i, card);
+    }
+  }
+  card.addEventListener('click', openDetail);
+  card.addEventListener('keydown', openDetail);
+});
+
+function showTemplateDetail(idx, card) {
+  const data = templateData[idx];
+  detailImg.src = data.img;
+  detailImg.alt = data.title + ' Screenshot';
+  detailTitle.textContent = data.title;
+  detailDesc.textContent = data.desc;
+  detailSpecs.innerHTML = '';
+  data.specs.forEach(spec => {
+    const li = document.createElement('li');
+    li.textContent = spec;
+    detailSpecs.appendChild(li);
+  });
+  previewBtn.href = data.preview;
+  previewBtn.setAttribute('aria-label', 'Preview ' + data.title + ' website');
+  detailSection.classList.remove('section-hidden');
+  setTimeout(() => detailSection.classList.add('show'), 10);
+  detailSection.focus();
+  lastFocusedCard = card;
+  document.body.style.overflow = 'hidden';
+}
+function hideTemplateDetail() {
+  detailSection.classList.remove('show');
+  setTimeout(() => {
+    detailSection.classList.add('section-hidden');
+    if (lastFocusedCard) lastFocusedCard.focus();
+    document.body.style.overflow = '';
+  }, 320);
+}
+backToTemplates.addEventListener('click', hideTemplateDetail);
+// ESC key closes detail
+if (detailSection) {
+  detailSection.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      hideTemplateDetail();
+    }
+  });
+  // Click outside closes detail
+  detailSection.addEventListener('mousedown', function(e) {
+    if (e.target === detailSection) hideTemplateDetail();
+  });
+}
+// Trap focus inside detail modal for accessibility
+if (detailSection) {
+  detailSection.addEventListener('keydown', function(e) {
+    if (!detailSection.classList.contains('show')) return;
+    if (e.key === 'Tab') {
+      const focusable = detailSection.querySelectorAll('a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])');
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+  });
+}
