@@ -33,6 +33,128 @@
     .browse-mode .about-us-section {
       display: none !important;
     }
+    .template-detail-section {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 1000;
+      background: rgba(24,26,27,0.98);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.45s cubic-bezier(.4,0,.2,1);
+    }
+    .template-detail-section.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .template-detail-container {
+      background: var(--clr-bg-soft, #181a1b);
+      border-radius: var(--radius, 18px);
+      box-shadow: var(--shadow-soft, 0 8px 32px rgba(0,0,0,0.18));
+      display: flex;
+      flex-direction: row;
+      gap: 3.2rem;
+      padding: 2.5rem 2.2rem 2.5rem 2.2rem;
+      max-width: 900px;
+      width: 98vw;
+      min-width: 0;
+      margin: 0 auto;
+      position: relative;
+    }
+    .template-detail-left {
+      flex: 1 1 340px;
+      min-width: 220px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.2rem;
+    }
+    .template-detail-img {
+      width: 320px;
+      max-width: 100%;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.13);
+      background: #232526;
+      margin-bottom: 1.1rem;
+      object-fit: cover;
+      aspect-ratio: 16/10;
+    }
+    .template-preview-btn {
+      font-weight: 700;
+      font-size: 1.13rem;
+      width: 100%;
+      margin-top: 0.2rem;
+      letter-spacing: 0.01em;
+      box-shadow: var(--shadow-soft, 0 2px 8px rgba(0,0,0,0.10));
+    }
+    .template-detail-right {
+      flex: 1 1 320px;
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 1.2rem;
+    }
+    .template-detail-title {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 0.7rem;
+      color: var(--clr-text, #fff);
+      letter-spacing: 0.01em;
+    }
+    .template-detail-desc {
+      font-size: 1.13rem;
+      color: #e0e3ea;
+      font-weight: 400;
+      line-height: 1.7;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.10);
+    }
+    .template-detail-specs {
+      list-style: disc inside;
+      color: #b6c2d1;
+      font-size: 1rem;
+      margin: 0 0 0.5rem 0;
+      padding: 0 0 0 1.1rem;
+    }
+    .back-to-templates {
+      margin: 2.2rem auto 0 auto;
+      display: block;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      min-width: 180px;
+      box-shadow: var(--shadow-soft, 0 2px 8px rgba(0,0,0,0.10));
+    }
+    @media (max-width: 900px) {
+      .template-detail-container {
+        flex-direction: column;
+        gap: 1.7rem;
+        padding: 1.2rem 0.7rem 1.2rem 0.7rem;
+        max-width: 98vw;
+      }
+      .template-detail-img {
+        width: 100%;
+        min-width: 0;
+        max-width: 98vw;
+        aspect-ratio: 16/10;
+      }
+      .template-detail-title {
+        font-size: 1.3rem;
+      }
+      .template-detail-desc {
+        font-size: 1rem;
+      }
+    }
+    /* Fade in/out transitions */
+    .template-detail-section.section-hidden {
+      display: none !important;
+    }
+    .template-detail-section.show {
+      display: flex !important;
+    }
   </style>
 </head>
 <body>
@@ -69,15 +191,15 @@
   <section id="home-demo-cards" class="section home-demo-cards">
     <h2 class="section-title center" style="font-size:2.3rem;font-weight:800;margin-bottom:2.3rem;">A Showcase of Premium Web Designs</h2>
     <div class="demo-cards-grid showcase-row">
-      <div class="demo-card showcase-card">
+      <div class="demo-card showcase-card" tabindex="0" role="button" aria-label="Elegant Portfolio details" data-template="0">
         <img src="https://www.sliderrevolution.com/wp-content/uploads/2021/11/Vie-1.jpg" alt="Elegant Portfolio Demo">
         <div class="demo-card-title">Elegant Portfolio</div>
       </div>
-      <div class="demo-card showcase-card">
+      <div class="demo-card showcase-card" tabindex="0" role="button" aria-label="Modern Storefront details" data-template="1">
         <img src="https://wrapmarketusercontent.com/assets/items/thumb/9b89fe00bedf3cf544cbb5af0478f52099744ee920981e66980a88cdc630537b.webp?v=1710580878" alt="Modern Storefront Demo">
         <div class="demo-card-title">Modern Storefront</div>
       </div>
-      <div class="demo-card showcase-card">
+      <div class="demo-card showcase-card" tabindex="0" role="button" aria-label="Creative Agency details" data-template="2">
         <img src="https://miro.medium.com/v2/resize:fit:1400/1*lH0_H4Tz5hAj-AtzzoqHbA.jpeg" alt="Creative Agency Demo">
         <div class="demo-card-title">Creative Agency</div>
       </div>
@@ -237,31 +359,31 @@
     <a href="#home" id="back-home-btn" class="btn outline section-hidden"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back to Home</a>
     <h2 class="section-title center">E-commerce, Portfolio, Business & More</h2>
     <div class="modern-grid-vertical">
-      <div class="modern-card-vertical">
+      <div class="modern-card-vertical" tabindex="0" role="button" aria-label="Creative Portfolio details" data-template="3">
         <div class="modern-card-img-wrap">
           <img src="https://elements-resized.envatousercontent.com/elements-cover-images/edbbc4ab-95c0-4fca-b096-036d38cc9711?w=433&cf_fit=scale-down&q=85&format=auto&s=3055db25f7249cccc3be0006043c1d05b75d5250c9dc3ed0d834b382906e22db" alt="Creative Portfolio">
         </div>
         <div class="modern-card-title">Creative Portfolio</div>
       </div>
-      <div class="modern-card-vertical">
+      <div class="modern-card-vertical" tabindex="0" role="button" aria-label="Minimal Portfolio details" data-template="4">
         <div class="modern-card-img-wrap">
           <img src="https://wrapmarketusercontent.com/assets/items/thumb/6af5272d95517f0350ab9393f6350c90039cf7a0ffc2e8d295b6cdcd85c8855a.webp?v=1732200882" alt="Minimal Portfolio">
         </div>
         <div class="modern-card-title">Minimal Portfolio</div>
       </div>
-      <div class="modern-card-vertical">
+      <div class="modern-card-vertical" tabindex="0" role="button" aria-label="Startup Landing details" data-template="5">
         <div class="modern-card-img-wrap">
           <img src="https://bootstrapmade.com/content/templatefiles/Arsha/Arsha-bootstrap-website-template-md.webp" alt="Startup Landing">
         </div>
         <div class="modern-card-title">Startup Landing</div>
       </div>
-      <div class="modern-card-vertical">
+      <div class="modern-card-vertical" tabindex="0" role="button" aria-label="Consulting Firm details" data-template="6">
         <div class="modern-card-img-wrap">
           <img src="https://149842033.v2.pressablecdn.com/wp-content/uploads/2020/07/services-website-templates-1000x750.jpg" alt="Consulting Firm">
         </div>
         <div class="modern-card-title">Consulting Firm</div>
       </div>
-      <div class="modern-card-vertical">
+      <div class="modern-card-vertical" tabindex="0" role="button" aria-label="Fashion Store details" data-template="7">
         <div class="modern-card-img-wrap">
           <img src="https://s.tmimgcdn.com/scr/1200x750/52500/free-responsive-corporate-template-website-template_52524-0-original.jpg" alt="Fashion Store">
         </div>
@@ -269,6 +391,23 @@
       </div>
     </div>
   </section>
+
+  <!-- ===== Template Detail View (Hidden by Default) ===== -->
+  <section id="template-detail" class="template-detail-section section-hidden" tabindex="-1" aria-modal="true" role="dialog" aria-labelledby="template-detail-title">
+    <div class="template-detail-container">
+      <div class="template-detail-left">
+        <img id="template-detail-img" src="" alt="Template Screenshot" class="template-detail-img" />
+        <a id="template-preview-btn" class="btn primary template-preview-btn" href="#" target="_blank" rel="noopener">Website Preview</a>
+      </div>
+      <div class="template-detail-right">
+        <h2 id="template-detail-title" class="template-detail-title"></h2>
+        <p id="template-detail-desc" class="template-detail-desc"></p>
+        <ul id="template-detail-specs" class="template-detail-specs"></ul>
+      </div>
+    </div>
+    <button id="back-to-templates" class="btn outline back-to-templates" aria-label="Back to Templates"><i class="fa fa-arrow-left"></i> Back to Templates</button>
+  </section>
+  <!-- Remove inline <style> and <script> for template-detail-section, as logic will be in script.js and style.css -->
 
   <!-- ===== Footer ===== -->
   <footer class="footer">
@@ -476,6 +615,145 @@
         document.body.style.overflow = 'hidden';
       });
     }
+
+    // ===== Template Detail View Functionality =====
+    const templateCards = [
+      // Home demo cards
+      ...Array.from(document.querySelectorAll('.home-demo-cards .demo-card')),
+      // Modern Storefront cards
+      ...Array.from(document.querySelectorAll('#modern-storefront .modern-card-vertical'))
+    ];
+    // Template data (add more as needed)
+    const templateData = [
+      {
+        title: 'Elegant Portfolio',
+        img: 'https://www.sliderrevolution.com/wp-content/uploads/2021/11/Vie-1.jpg',
+        preview: 'https://www.sliderrevolution.com/templates/vie-portfolio/',
+        desc: 'A refined, modern portfolio for creatives and professionals. Features a clean layout, bold typography, and smooth transitions.',
+        specs: ['Responsive', 'Portfolio', 'Minimalist', 'Fast loading']
+      },
+      {
+        title: 'Modern Storefront',
+        img: 'https://wrapmarketusercontent.com/assets/items/thumb/9b89fe00bedf3cf544cbb5af0478f52099744ee920981e66980a88cdc630537b.webp?v=1710580878',
+        preview: 'https://wrapbootstrap.com/theme/modern-storefront-WB0B30D1J',
+        desc: 'A stylish e-commerce template for modern brands. Includes product grids, smooth navigation, and a polished checkout experience.',
+        specs: ['E-commerce', 'Responsive', 'Product grid', 'Checkout ready']
+      },
+      {
+        title: 'Creative Agency',
+        img: 'https://miro.medium.com/v2/resize:fit:1400/1*lH0_H4Tz5hAj-AtzzoqHbA.jpeg',
+        preview: 'https://themeforest.net/item/creative-agency-html-template/12345678',
+        desc: 'A bold, creative template for agencies and studios. Showcases projects, team, and services with flair.',
+        specs: ['Agency', 'Creative', 'Team showcase', 'Service sections']
+      },
+      {
+        title: 'Creative Portfolio',
+        img: 'https://elements-resized.envatousercontent.com/elements-cover-images/edbbc4ab-95c0-4fca-b096-036d38cc9711?w=433&cf_fit=scale-down&q=85&format=auto&s=3055db25f7249cccc3be0006043c1d05b75d5250c9dc3ed0d834b382906e22db',
+        preview: 'https://elements.envato.com/creative-portfolio-template-EDBBC4AB',
+        desc: 'A visually striking portfolio for artists and designers. Large visuals, elegant grid, and smooth scrolling.',
+        specs: ['Portfolio', 'Grid layout', 'Large visuals', 'Smooth scroll']
+      },
+      {
+        title: 'Minimal Portfolio',
+        img: 'https://wrapmarketusercontent.com/assets/items/thumb/6af5272d95517f0350ab9393f6350c90039cf7a0ffc2e8d295b6cdcd85c8855a.webp?v=1732200882',
+        preview: 'https://wrapbootstrap.com/theme/minimal-portfolio-WB0B30D1J',
+        desc: 'A minimal, elegant portfolio for showcasing work. Subtle colors, clean lines, and focus on content.',
+        specs: ['Minimal', 'Portfolio', 'Clean lines', 'Subtle colors']
+      },
+      {
+        title: 'Startup Landing',
+        img: 'https://bootstrapmade.com/content/templatefiles/Arsha/Arsha-bootstrap-website-template-md.webp',
+        preview: 'https://bootstrapmade.com/arsha-free-bootstrap-html-template-corporate/',
+        desc: 'A landing page for startups and SaaS. Conversion-focused, modern, and easy to customize.',
+        specs: ['Startup', 'Landing page', 'Conversion', 'Modern']
+      },
+      {
+        title: 'Consulting Firm',
+        img: 'https://149842033.v2.pressablecdn.com/wp-content/uploads/2020/07/services-website-templates-1000x750.jpg',
+        preview: 'https://colorlib.com/wp/template/consulting/',
+        desc: 'A professional template for consulting businesses. Trust-building design, service highlights, and contact forms.',
+        specs: ['Consulting', 'Professional', 'Contact forms', 'Service highlights']
+      },
+      {
+        title: 'Fashion Store',
+        img: 'https://s.tmimgcdn.com/scr/1200x750/52500/free-responsive-corporate-template-website-template_52524-0-original.jpg',
+        preview: 'https://www.templatemonster.com/website-templates/fashion-store/',
+        desc: 'A chic, modern template for fashion brands. Features product showcases, lookbooks, and a stylish shop.',
+        specs: ['Fashion', 'E-commerce', 'Lookbook', 'Shop']
+      }
+    ];
+    // Map card index to templateData index
+    function getTemplateIndex(card) {
+      // Home demo cards: 0,1,2; Modern Storefront: 3,4,5,6,7
+      if (card.classList.contains('demo-card')) {
+        return Array.from(document.querySelectorAll('.home-demo-cards .demo-card')).indexOf(card);
+      } else {
+        return 3 + Array.from(document.querySelectorAll('#modern-storefront .modern-card-vertical')).indexOf(card);
+      }
+    }
+    const detailSection = document.getElementById('template-detail');
+    const detailImg = document.getElementById('template-detail-img');
+    const detailTitle = document.getElementById('template-detail-title');
+    const detailDesc = document.getElementById('template-detail-desc');
+    const detailSpecs = document.getElementById('template-detail-specs');
+    const previewBtn = document.getElementById('template-preview-btn');
+    const backToTemplates = document.getElementById('back-to-templates');
+    let lastFocusedCard = null;
+    // Make cards focusable and accessible
+    templateCards.forEach((card, i) => {
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('role', 'button');
+      card.setAttribute('aria-label', templateData[getTemplateIndex(card)].title + ' details');
+      // Click/Enter/Space handler
+      function openDetail(e) {
+        if (e.type === 'click' || e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          const idx = getTemplateIndex(card);
+          showTemplateDetail(idx, card);
+        }
+      }
+      card.addEventListener('click', openDetail);
+      card.addEventListener('keydown', openDetail);
+    });
+    function showTemplateDetail(idx, card) {
+      const data = templateData[idx];
+      detailImg.src = data.img;
+      detailImg.alt = data.title + ' Screenshot';
+      detailTitle.textContent = data.title;
+      detailDesc.textContent = data.desc;
+      detailSpecs.innerHTML = '';
+      data.specs.forEach(spec => {
+        const li = document.createElement('li');
+        li.textContent = spec;
+        detailSpecs.appendChild(li);
+      });
+      previewBtn.href = data.preview;
+      previewBtn.setAttribute('aria-label', 'Preview ' + data.title + ' website');
+      detailSection.classList.remove('section-hidden');
+      setTimeout(() => detailSection.classList.add('show'), 10);
+      detailSection.focus();
+      lastFocusedCard = card;
+      document.body.style.overflow = 'hidden';
+    }
+    function hideTemplateDetail() {
+      detailSection.classList.remove('show');
+      setTimeout(() => {
+        detailSection.classList.add('section-hidden');
+        if (lastFocusedCard) lastFocusedCard.focus();
+        document.body.style.overflow = '';
+      }, 400);
+    }
+    backToTemplates.addEventListener('click', hideTemplateDetail);
+    // ESC key closes detail
+    detailSection.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        hideTemplateDetail();
+      }
+    });
+    // Click outside closes detail
+    detailSection.addEventListener('mousedown', function(e) {
+      if (e.target === detailSection) hideTemplateDetail();
+    });
   </script>
 
 </body>
