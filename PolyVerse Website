@@ -85,11 +85,20 @@
     nav {
       position:sticky; top:0; z-index:10;
       display:flex; align-items:center; justify-content:space-between;
-      padding:.75rem 1rem; background:var(--card-bg);
+      padding:1.5rem 2rem; /* Slightly more vertical and horizontal padding */
+      min-height:76px; /* Slightly taller nav */
+      background:var(--card-bg);
       box-shadow:0 1px 3px rgba(0,0,0,.5);
     }
-    .logo { display:flex; align-items:center; gap:.5rem }
-    nav ul { display:flex; gap:1rem; list-style:none }
+    .logo {
+      display:flex; align-items:center; gap:0.75rem;
+    }
+    .logo img {
+      height:40px !important;
+      width:40px !important;
+      border-radius:8px !important;
+    }
+    nav ul { display:flex; gap:1.25rem; list-style:none; align-items:center; }
     @media(max-width:600px){ nav ul{ display:none } }
 
     /* ---------- Hero Section (blue gradient) ---------- */
@@ -1147,6 +1156,15 @@
         max-width: 100%;
         margin-left: 0;
       }
+    }
+
+    #signupBtn, #loginBtn.btn {
+      font-size: 1.13rem;
+      padding: 0.5rem 2rem;
+      border-radius: 14px;
+      min-width: 120px;
+      min-height: 48px;
+      letter-spacing: 0.01em;
     }
   </style>
 </head>
