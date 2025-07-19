@@ -469,7 +469,7 @@
       padding:2rem 2rem 2.5rem;
       border-radius:var(--radius);
       background:var(--card-bg);
-      box-shadow:0 8px 24px rgba(0,0,0,0.4);
+      box-shadow:0 8px 24px rgba(255,152,0,0.5), 0 8px 24px rgba(0,0,0,0.4); /* Added orange glow as in card hover */
     }
     #loginModal .modal-header {
       position:relative;
