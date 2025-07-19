@@ -1166,6 +1166,82 @@
       min-height: 48px;
       letter-spacing: 0.01em;
     }
+
+    /* --- Login Modal Animation Additions --- */
+    .modal.login-animate {
+      /* Ensure modal is visible for animation */
+      display: flex !important;
+      pointer-events: auto;
+    }
+    .modal.login-animate .modal-content {
+      /* Start hidden for animation */
+      opacity: 0;
+      transform: translateY(40px) scale(0.98);
+      transition: opacity 0.45s cubic-bezier(.4,.01,.22,1), transform 0.45s cubic-bezier(.4,.01,.22,1);
+    }
+    .modal.login-animate.active .modal-content {
+      /* Animate in: fade and slide up */
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      transition: opacity 0.45s cubic-bezier(.4,.01,.22,1), transform 0.45s cubic-bezier(.4,.01,.22,1);
+    }
+    .modal.login-animate.closing .modal-content {
+      /* Animate out: fade and slide down */
+      opacity: 0;
+      transform: translateY(40px) scale(0.98);
+      transition: opacity 0.38s cubic-bezier(.4,.01,.22,1), transform 0.38s cubic-bezier(.4,.01,.22,1);
+    }
+    /* Prevent pointer events during closing animation */
+    .modal.login-animate.closing {
+      pointer-events: none;
+    }
+    /* Responsive: ensure modal-content stays centered and scales well */
+    @media (max-width: 600px) {
+      .modal.login-animate .modal-content {
+        width: 98vw !important;
+        max-width: 98vw !important;
+        min-width: 0 !important;
+        padding: 1.2rem 0.5rem 2rem 0.5rem !important;
+      }
+    }
+    /* --- Enlarged Log In and Sign Up Buttons for Usability --- */
+    .btn.enlarged, .btn.btn-outline.enlarged, #loginBtn.btn.enlarged, #signupBtn.enlarged {
+      font-size: 1.23rem !important;
+      padding: 0.7rem 2.5rem !important;
+      min-width: 140px !important;
+      min-height: 54px !important;
+      border-radius: 16px !important;
+      letter-spacing: 0.01em;
+    }
+    @media (max-width: 600px) {
+      .btn.enlarged, .btn.btn-outline.enlarged, #loginBtn.btn.enlarged, #signupBtn.enlarged {
+        font-size: 1.08rem !important;
+        padding: 0.6rem 1.2rem !important;
+        min-width: 110px !important;
+        min-height: 44px !important;
+      }
+    }
+    /* --- Subtle shadow for modal for more polish --- */
+    .modal.login-animate .modal-content {
+      box-shadow: 0 12px 48px rgba(0,0,0,0.38), 0 2px 8px rgba(0,0,0,0.10);
+    }
+    /* --- Overlay fade-in/out for modal background --- */
+    .modal.login-animate {
+      background: rgba(0,0,0,0.0);
+      transition: background 0.45s cubic-bezier(.4,.01,.22,1);
+    }
+    .modal.login-animate.active {
+      background: rgba(0,0,0,0.6);
+      transition: background 0.45s cubic-bezier(.4,.01,.22,1);
+    }
+    .modal.login-animate.closing {
+      background: rgba(0,0,0,0.0);
+      transition: background 0.38s cubic-bezier(.4,.01,.22,1);
+    }
+    /* --- Prevent scroll when modal is open --- */
+    body.login-modal-open {
+      overflow: hidden !important;
+    }
   </style>
 </head>
 <body>
@@ -3064,6 +3140,59 @@
         // Optionally, prompt automatically
         // window.google.accounts.id.prompt();
       }
+    });
+
+    // --- LOGIN MODAL ANIMATION LOGIC ---
+    // Utility: add/remove class helpers
+    function addClass(el, cls) { if (el && !el.classList.contains(cls)) el.classList.add(cls); }
+    function removeClass(el, cls) { if (el && el.classList.contains(cls)) el.classList.remove(cls); }
+
+    // Patch openModal and closeModal for login modal animation
+    const _originalOpenModal = openModal;
+    openModal = function(m) {
+      if (m === loginModal) {
+        // Add animation class
+        addClass(m, 'login-animate');
+        // Remove closing state if present
+        removeClass(m, 'closing');
+        // Add active to trigger animation
+        setTimeout(() => addClass(m, 'active'), 10);
+        // Prevent scroll on body
+        addClass(document.body, 'login-modal-open');
+        // Focus first input after animation
+        setTimeout(() => {
+          const firstInput = m.querySelector('input');
+          if (firstInput) firstInput.focus();
+        }, 500);
+        showLogin();
+        clearAllErrors();
+      } else {
+        _originalOpenModal(m);
+      }
+    };
+    const _originalCloseModal = closeModal;
+    closeModal = function(m) {
+      if (m === loginModal && m.classList.contains('login-animate')) {
+        // Animate out
+        addClass(m, 'closing');
+        removeClass(m, 'active');
+        // Remove scroll lock after animation
+        setTimeout(() => {
+          removeClass(m, 'closing');
+          removeClass(m, 'login-animate');
+          removeClass(document.body, 'login-modal-open');
+          // Actually hide modal (display:none)
+          m.classList.remove('active');
+        }, 420);
+      } else {
+        _originalCloseModal(m);
+      }
+    };
+    // --- ENLARGE LOG IN AND SIGN UP BUTTONS ---
+    // Add enlarged class on DOMContentLoaded
+    window.addEventListener('DOMContentLoaded', () => {
+      addClass(document.getElementById('loginBtn'), 'enlarged');
+      addClass(document.getElementById('signupBtn'), 'enlarged');
     });
   </script>
 </body>
