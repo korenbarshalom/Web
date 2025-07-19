@@ -272,17 +272,18 @@
     /* --- Suggested/Related Models Sidebar --- */
     #modelPage .suggested {
       flex: 1 1 0%;
-      min-width: 320px;
+      min-width: 300px;
       max-width: 420px;
-      margin-left: 0;
+      margin-left: 32px; /* Move slightly to the right for better alignment */
       background: var(--card-bg);
       border-radius: 18px;
-      padding: 1.2rem 0.7rem 1.2rem 0.7rem;
+      padding: 0.5rem 0.7rem 1.2rem 0.7rem;
       box-shadow: 0 4px 24px rgba(0,0,0,0.32);
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
       align-items: center;
+      margin-top: -48px; /* Move container even higher up */
     }
     #modelPage .suggested h4 {
       font-size: 1.13rem;
@@ -329,7 +330,7 @@
       display: block;
     }
     #modelPage .suggested-card-content {
-      padding: 0.85rem 0.8rem 1rem 0.8rem; /* Slightly reduced padding */
+      padding: 0.6rem 0.7rem 0.7rem 0.7rem; /* Further reduced padding for a shorter card */
       display: flex;
       flex-direction: column;
       align-items: flex-start;
