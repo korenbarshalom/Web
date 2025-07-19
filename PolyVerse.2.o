@@ -286,14 +286,30 @@
       margin-top: -48px; /* Move container even higher up */
     }
     #modelPage .suggested h4 {
-      font-size: 1.13rem;
-      font-weight: 700;
+      font-size: 1.22rem;
+      font-weight: 800;
       margin-bottom: 1.1rem;
-      color: #fff;
+      color: #ff9800;
       letter-spacing: -0.01em;
       text-align: left;
       width: 100%;
-      padding-left: 0.2rem;
+      padding: 0.7rem 0 0.5rem 0.2rem;
+      position: relative;
+      display: flex;
+      align-items: center;
+      min-height: 2.6rem;
+    }
+    #modelPage .suggested h4::after {
+      content: '';
+      display: block;
+      position: absolute;
+      left: 0.2rem;
+      bottom: 0.18rem;
+      width: 38px;
+      height: 3px;
+      background: #ff9800;
+      border-radius: 2px;
+      opacity: 0.7;
     }
     #modelPage .suggested-card {
       display: flex;
@@ -330,7 +346,7 @@
       display: block;
     }
     #modelPage .suggested-card-content {
-      padding: 0.6rem 0.7rem 0.7rem 0.7rem; /* Further reduced padding for a shorter card */
+      padding: 0.38rem 0.6rem 0.5rem 0.6rem; /* Even further reduced padding for a shorter card */
       display: flex;
       flex-direction: column;
       align-items: flex-start;
