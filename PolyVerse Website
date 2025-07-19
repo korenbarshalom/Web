@@ -41,9 +41,11 @@
     /* ---------- Buttons ---------- */
     .btn {
       display:inline-flex; align-items:center; gap:.5rem;
-      padding:.75rem 1.5rem; border:none; border-radius:var(--radius);
+      padding:.7rem 1.35rem; /* Reduced padding slightly */
+      border:none; border-radius:var(--radius);
       font-weight:600; cursor:pointer; background:var(--accent);
       color:#fff; transition:transform .2s, box-shadow .2s;
+      font-size:0.97rem; /* Slightly reduced font size */
     }
     .btn:hover { transform:scale(1.05); box-shadow:0 6px 14px rgba(0,0,0,.4) }
     .btn:active { transform:scale(.97) }
@@ -101,8 +103,8 @@
     nav {
       position:sticky; top:0; z-index:10;
       display:flex; align-items:center; justify-content:space-between;
-      padding:1.2rem 1.5rem; /* Slightly more vertical and horizontal padding */
-      min-height:76px; /* Slightly taller nav */
+      padding:1rem 1.2rem; /* Reduced vertical and horizontal padding slightly */
+      min-height:68px; /* Slightly reduced nav height */
       background:var(--card-bg);
       box-shadow:0 1px 3px rgba(0,0,0,.5);
     }
@@ -1175,12 +1177,20 @@
     }
 
     #signupBtn, #loginBtn.btn {
-      font-size: 1.13rem;
-      padding: 0.5rem 2rem;
+      font-size: 1.05rem;
+      padding: 0.45rem 1.8rem;
       border-radius: 14px;
-      min-width: 120px;
-      min-height: 48px;
+      min-width: 112px;
+      min-height: 44px;
       letter-spacing: 0.01em;
+    }
+    @media (max-width: 600px) {
+      #signupBtn, #loginBtn.btn {
+        font-size: 0.97rem;
+        padding: 0.4rem 1rem;
+        min-width: 90px;
+        min-height: 36px;
+      }
     }
 
     /* --- Login Modal Animation Additions --- */
@@ -1222,19 +1232,19 @@
     }
     /* --- Enlarged Log In and Sign Up Buttons for Usability --- */
     .btn.enlarged, .btn.btn-outline.enlarged, #loginBtn.btn.enlarged, #signupBtn.enlarged {
-      font-size: 1.23rem !important;
-      padding: 0.7rem 2.5rem !important;
-      min-width: 140px !important;
-      min-height: 54px !important;
+      font-size: 1.13rem !important; /* Reduced from 1.23rem */
+      padding: 0.6rem 2.2rem !important; /* Reduced padding slightly */
+      min-width: 132px !important; /* Slightly reduced min-width */
+      min-height: 50px !important; /* Slightly reduced min-height */
       border-radius: 16px !important;
       letter-spacing: 0.01em;
     }
     @media (max-width: 600px) {
       .btn.enlarged, .btn.btn-outline.enlarged, #loginBtn.btn.enlarged, #signupBtn.enlarged {
-        font-size: 1.08rem !important;
-        padding: 0.6rem 1.2rem !important;
-        min-width: 110px !important;
-        min-height: 44px !important;
+        font-size: 1.03rem !important; /* Reduced from 1.08rem */
+        padding: 0.5rem 1rem !important; /* Reduced padding slightly */
+        min-width: 100px !important; /* Slightly reduced min-width */
+        min-height: 40px !important; /* Slightly reduced min-height */
       }
     }
     /* --- Subtle shadow for modal for more polish --- */
