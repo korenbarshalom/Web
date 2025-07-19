@@ -47,7 +47,23 @@
     }
     .btn:hover { transform:scale(1.05); box-shadow:0 6px 14px rgba(0,0,0,.4) }
     .btn:active { transform:scale(.97) }
-    .back-btn { margin-bottom:1rem; }
+    .back-btn {
+      margin-bottom: 3rem;
+      padding: 0.3rem 1.5rem;
+      font-size: 1.13rem;
+      min-width: 140px;
+      min-height: 48px;
+      border-radius: 14px;
+      letter-spacing: 0.01em;
+    }
+    @media (max-width: 600px) {
+      .back-btn {
+        font-size: 1rem;
+        padding: 0.7rem 1.2rem;
+        min-width: 110px;
+        min-height: 40px;
+      }
+    }
 
     /* ---------- Buy-Now Button ---------- */
     .buy-btn {
@@ -2057,6 +2073,11 @@
       // Show the login-signup text
       const loginSignupText = document.getElementById('loginSignupText');
       if (loginSignupText) loginSignupText.style.display = 'block';
+      // Focus first input after animation
+      setTimeout(() => {
+        const firstInput = loginView.querySelector('input');
+        if (firstInput) firstInput.focus();
+      }, 500);
     }
     function showRegister(){
       loginView.style.display='none';
@@ -2069,16 +2090,46 @@
         if (backToLogin) {
           backToLogin.onclick = function(e) {
             e.preventDefault();
-            showLogin();
+            // Animate transition back to login
+            animateModalSwitch('register', 'login');
           };
         }
       }, 0);
+      // Focus first input after animation
+      setTimeout(() => {
+        const firstInput = registerView.querySelector('input');
+        if (firstInput) firstInput.focus();
+      }, 500);
     }
+
+    // --- Modal Switch Animation Logic ---
+    function animateModalSwitch(from, to) {
+      // from: 'login' or 'register', to: 'login' or 'register'
+      // Only animate if modal is open and has login-animate class
+      if (!loginModal.classList.contains('login-animate')) {
+        if (to === 'login') showLogin();
+        else showRegister();
+        return;
+      }
+      // Animate out
+      addClass(loginModal, 'closing');
+      removeClass(loginModal, 'active');
+      setTimeout(() => {
+        removeClass(loginModal, 'closing');
+        // Switch view
+        if (to === 'login') showLogin();
+        else showRegister();
+        // Animate in
+        addClass(loginModal, 'active');
+      }, 420);
+    }
+
     // Remove createAccBtn event (now handled by link below Continue)
     if (loginToSignup) {
       loginToSignup.onclick = function(e) {
         e.preventDefault();
-        showRegister();
+        // Animate transition from login to register
+        animateModalSwitch('login', 'register');
       };
     }
     // === INITIALIZATION ===
