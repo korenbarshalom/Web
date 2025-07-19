@@ -3073,74 +3073,71 @@
       if (lastOpenedModel) renderComments(lastOpenedModel.id);
     };
 
-    // --- Google Identity Services Login ---
-    function handleGoogleCredentialResponse(response) {
-      try {
-        const decoded = jwt_decode(response.credential);
-        // Try to find existing Google user in users DB
-        let users = getUsers();
-        let user = users.find(u => u.provider === 'google' && (u.sub === decoded.sub || u.email === decoded.email));
-        if (!user) {
-          // New Google user: create user object
-          user = {
-            name: decoded.name,
-            email: decoded.email,
-            image: decoded.picture,
-            sub: decoded.sub,
-            provider: 'google',
-            likes: [],
-            myList: [],
-            purchased: []
-          };
-          users.push(user);
-          saveUsers(users);
-        }
-        // Store in localStorage
-        localStorage.setItem('user', JSON.stringify(user));
-        // Also set as currentUser for app logic
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        // Redirect to homepage
-        window.location.href = 'index.html';
-      } catch (err) {
-        alert('Google login failed: ' + (err && err.message ? err.message : err));
-      }
+   // --- Google Identity Services Login ---
+function handleGoogleCredentialResponse(response) {
+  try {
+    const decoded = jwt_decode(response.credential);
+    let users = getUsers();
+    let user = users.find(u => u.provider === 'google' && (u.sub === decoded.sub || u.email === decoded.email));
+    if (!user) {
+      user = {
+        name: decoded.name,
+        email: decoded.email,
+        image: decoded.picture,
+        sub: decoded.sub,
+        provider: 'google',
+        likes: [],
+        myList: [],
+        purchased: []
+      };
+      users.push(user);
+      saveUsers(users);
+    }
+    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    window.location.href = 'index.html';
+  } catch (err) {
+    alert('Google login failed: ' + (err?.message || err));
+  }
+}
+
+// --- Initialize Google Sign-In buttons ---
+window.addEventListener('DOMContentLoaded', () => {
+  if (window.google?.accounts?.id) {
+    window.google.accounts.id.initialize({
+      client_id: '665196132587-cbo8bflq7cstp7mjjcudoa1k5fu1ftss.apps.googleusercontent.com', // ← זה ה־Client ID שלך
+      callback: handleGoogleCredentialResponse,
+      ux_mode: 'popup' // Using popup, so no redirect_uri needed
+    });
+
+    // Render login button
+    const loginBtn = document.getElementById('g_id_signin');
+    if (loginBtn) {
+      window.google.accounts.id.renderButton(loginBtn, {
+        theme: 'outline',
+        size: 'large',
+        width: 280,
+        text: 'signin_with',
+        shape: 'rectangular',
+        logo_alignment: 'left'
+      });
     }
 
-    // Render Google Sign-In button after DOM is ready
-    window.addEventListener('DOMContentLoaded', () => {
-      if (window.google && window.google.accounts && window.google.accounts.id) {
-        window.google.accounts.id.initialize({
-          client_id: '665196132587-cbo8bflq7cstp7mjjcudoa1k5fu1ftss.apps.googleusercontent.com',
-          callback: handleGoogleCredentialResponse,
-          ux_mode: 'popup',
-        });
-        window.google.accounts.id.renderButton(
-          document.getElementById('g_id_signin'),
-          {
-            theme: 'outline',
-            size: 'large',
-            width: 280,
-            text: 'signin_with',
-            shape: 'rectangular',
-            logo_alignment: 'left',
-          }
-        );
-        // Sign Up modal button (same config, different container)
-        window.google.accounts.id.renderButton(
-          document.getElementById('g_id_signup'),
-          {
-            theme: 'outline',
-            size: 'large',
-            width: 280,
-            text: 'signup_with',
-            shape: 'rectangular',
-            logo_alignment: 'left',
-          }
-        );
-        // Optionally, prompt automatically
-        // window.google.accounts.id.prompt();
-      }
-    });
+    // Render sign-up button
+    const signupBtn = document.getElementById('g_id_signup');
+    if (signupBtn) {
+      window.google.accounts.id.renderButton(signupBtn, {
+        theme: 'outline',
+        size: 'large',
+        width: 280,
+        text: 'signup_with',
+        shape: 'rectangular',
+        logo_alignment: 'left'
+      });
+    }
+  }
+});
+
 
     // --- LOGIN MODAL ANIMATION LOGIC ---
     // Utility: add/remove class helpers
