@@ -41,21 +41,39 @@
     /* ---------- Buttons ---------- */
     .btn {
       display:inline-flex; align-items:center; gap:.5rem;
-      padding:.75rem 1.5rem; border:none; border-radius:var(--radius);
+      padding:.7rem 1.35rem; /* Reduced padding slightly */
+      border:none; border-radius:var(--radius);
       font-weight:600; cursor:pointer; background:var(--accent);
       color:#fff; transition:transform .2s, box-shadow .2s;
+      font-size:0.97rem; /* Slightly reduced font size */
     }
     .btn:hover { transform:scale(1.05); box-shadow:0 6px 14px rgba(0,0,0,.4) }
     .btn:active { transform:scale(.97) }
-    .back-btn { margin-bottom:1rem; }
+    .back-btn {
+      margin-bottom: 3rem;
+      padding: 0.3rem 1.5rem;
+      font-size: 1.13rem;
+      min-width: 140px;
+      min-height: 48px;
+      border-radius: 14px;
+      letter-spacing: 0.01em;
+    }
+    @media (max-width: 600px) {
+      .back-btn {
+        font-size: 1rem;
+        padding: 0.7rem 1.2rem;
+        min-width: 110px;
+        min-height: 40px;
+      }
+    }
 
     /* ---------- Buy-Now Button ---------- */
     .buy-btn {
-      background: var(--accent);
+      background: #e53935; /* Changed from var(--accent)/orange to red */
       color: #fff;
-      font-size: 1rem;
+      font-size: 1.08rem; /* Slightly increased from 1rem */
       font-weight: 600;
-      padding: 0.5rem 1.25rem;
+      padding: 0.62rem 1.45rem; /* Slightly increased padding */
       border: none;
       border-radius: 8px;
       margin-left: auto;
@@ -64,12 +82,12 @@
       display: block;
       box-shadow: 0 2px 8px rgba(0,0,0,0.10);
       transition: background 0.18s, box-shadow 0.18s, transform 0.15s;
-      min-width: 110px;
-      max-width: 160px;
+      min-width: 115px; /* Slightly increased min-width */
+      max-width: 170px; /* Slightly increased max-width */
       text-align: center;
     }
     .buy-btn:hover {
-      background: #ffb74d;
+      background: #ff5252; /* Lighter red on hover */
       box-shadow: 0 4px 16px rgba(0,0,0,0.13);
       transform: translateY(-2px) scale(1.03);
     }
@@ -85,11 +103,20 @@
     nav {
       position:sticky; top:0; z-index:10;
       display:flex; align-items:center; justify-content:space-between;
-      padding:.75rem 1rem; background:var(--card-bg);
+      padding:1rem 1.2rem; /* Reduced vertical and horizontal padding slightly */
+      min-height:68px; /* Slightly reduced nav height */
+      background:var(--card-bg);
       box-shadow:0 1px 3px rgba(0,0,0,.5);
     }
-    .logo { display:flex; align-items:center; gap:.5rem }
-    nav ul { display:flex; gap:1rem; list-style:none }
+    .logo {
+      display:flex; align-items:center; gap:0.75rem;
+    }
+    .logo img {
+      height:40px !important;
+      width:40px !important;
+      border-radius:8px !important;
+    }
+    nav ul { display:flex; gap:1.25rem; list-style:none; align-items:center; }
     @media(max-width:600px){ nav ul{ display:none } }
 
     /* ---------- Hero Section (blue gradient) ---------- */
@@ -142,6 +169,11 @@
       z-index:1000;
     }
     .modal.active { display:flex }
+
+    /* Remove overlay for loginRequiredModal only */
+    #loginRequiredModal {
+      background: none !important;
+    }
 
     .modal-content {
       background:var(--card-bg);
@@ -240,152 +272,129 @@
     /* --- Suggested/Related Models Sidebar --- */
     #modelPage .suggested {
       flex: 1 1 0%;
-      min-width: 420px;
-      max-width: 600px;
+      min-width: 320px;
+      max-width: 420px;
       margin-left: 0;
       background: var(--card-bg);
-      border-radius: 28px;
-      padding: 2.5rem 2rem 2.5rem 2rem;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+      border-radius: 18px;
+      padding: 1.2rem 0.7rem 1.2rem 0.7rem;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.32);
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
       align-items: center;
-      /* Remove overflow and max-height to prevent scrollbars */
-    }
-    #modelPage .suggested::-webkit-scrollbar {
-      width: 8px;
-      background: #18181a;
-    }
-    #modelPage .suggested::-webkit-scrollbar-thumb {
-      background: #232326;
-      border-radius: 10px;
     }
     #modelPage .suggested h4 {
-      font-size: 1.5rem;
+      font-size: 1.13rem;
       font-weight: 700;
-      margin-bottom: 1.5rem;
-      color: var(--text);
-      letter-spacing: -0.02em;
-      position: relative;
-      padding-bottom: 0.8rem;
+      margin-bottom: 1.1rem;
+      color: #fff;
+      letter-spacing: -0.01em;
       text-align: left;
       width: 100%;
+      padding-left: 0.2rem;
     }
-    #modelPage .suggested h4::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 48px;
-      height: 3px;
-      background: var(--accent);
-      border-radius: 2px;
-    }
-    #modelPage .suggested .suggested-card {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      background: #232326;
-      border-radius: 20px;
-      padding: 1.5rem 1.5rem 1.5rem 1.5rem;
-      cursor: pointer;
-      transition: box-shadow 0.25s, transform 0.22s, background 0.22s;
-      min-height: 140px;
-      height: 150px;
-      width: 100%;
-      max-width: 480px;
-      margin-bottom: 0;
-      box-shadow: 0 6px 32px rgba(0,0,0,0.22);
-      border: 2px solid transparent;
-      position: relative;
-    }
-    #modelPage .suggested .suggested-card:hover {
-      background: #29292d;
-      box-shadow: 0 16px 48px rgba(255,152,0,0.10), 0 8px 32px rgba(0,0,0,0.32);
-      transform: translateY(-4px) scale(1.025);
-      border: 2px solid #ff9800;
-    }
-    #modelPage .suggested .suggested-card.active {
-      background: linear-gradient(135deg, #ff9800 60%, #ffb74d 100%);
-      border: 2px solid #ff9800;
-      box-shadow: 0 12px 40px rgba(255,152,0,0.18), 0 8px 32px rgba(0,0,0,0.32);
-      cursor: default;
-      transform: translateY(-4px) scale(1.03);
-    }
-    #modelPage .suggested .suggested-card.active::before {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      background: linear-gradient(135deg, #ff9800, #ffb74d);
-      border-radius: 22px;
-      z-index: -1;
-      opacity: 0.18;
-      filter: blur(10px);
-    }
-    #modelPage .suggested .suggested-thumb {
-      width: 100px;
-      height: 100px;
-      border-radius: 16px;
-      object-fit: cover;
-      background: #18181a;
-      flex-shrink: 0;
-      box-shadow: 0 6px 24px rgba(0,0,0,0.22);
-      border: 2px solid #232326;
-      transition: border 0.2s;
-    }
-    #modelPage .suggested .suggested-card:hover .suggested-thumb {
-      border: 2px solid #ff9800;
-    }
-    #modelPage .suggested .suggested-info {
+    #modelPage .suggested-card {
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      height: 100%;
-      min-width: 0;
-      flex: 1 1 0%;
-      gap: 0.5rem;
+      align-items: stretch;
+      background: #232326;
+      border-radius: 12px; /* Slightly reduced from 14px */
+      padding: 0;
+      cursor: pointer;
+      transition: box-shadow 0.18s, transform 0.16s, background 0.16s, border 0.16s;
+      min-height: 220px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.18);
+      border: 1.5px solid #232326;
+      width: 100%;
+      max-width: 310px; /* Slightly reduced card width */
+      margin: 0 auto 0.08rem auto; /* Slightly reduced bottom margin */
+      overflow: hidden;
     }
-    #modelPage .suggested .suggested-title {
-      font-size: 1.3rem;
+    #modelPage .suggested-card:hover {
+      background: #29292d;
+      box-shadow: 0 6px 24px rgba(255,152,0,0.10), 0 4px 16px rgba(0,0,0,0.22);
+      border: 1.5px solid #ff9800;
+      transform: translateY(-2px) scale(1.015);
+    }
+    #modelPage .suggested-thumb {
+      width: 100%;
+      height: 270px; /* Slightly increased height for full model visibility */
+      object-fit: cover;
+      background: #18181a;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      margin: 0;
+      display: block;
+    }
+    #modelPage .suggested-card-content {
+      padding: 0.85rem 0.8rem 1rem 0.8rem; /* Slightly reduced padding */
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      background: none;
+    }
+    #modelPage .suggested-title {
+      font-size: 1.08rem;
       color: #fff;
       font-weight: 700;
-      line-height: 1.3;
-      margin-bottom: 0.2rem;
+      line-height: 1.2;
+      margin-bottom: 0.18rem;
       word-wrap: break-word;
       overflow-wrap: break-word;
       hyphens: auto;
       letter-spacing: -0.01em;
+      text-align: left;
+      width: 100%;
     }
-    #modelPage .suggested .suggested-meta {
-      font-size: 0.95rem;
-      color: #ffb74d;
+    #modelPage .suggested-desc {
+      color: #ccc;
+      font-size: 0.98rem;
+      margin-top: 0.3rem;
+      width: 100%;
+      text-align: left;
+    }
+    #modelPage .suggested-creator-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      width: 100%;
+      margin-bottom: 0.1rem;
+    }
+    #modelPage .suggested-creator-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #18181a;
+      border: 1.5px solid #232326;
+    }
+    #modelPage .suggested-creator {
+      font-size: 0.97rem;
+      color: #aaa;
       font-weight: 500;
-      line-height: 1.3;
       opacity: 0.82;
       letter-spacing: 0.01em;
+      text-align: left;
     }
     @media (max-width: 900px) {
       #modelPage .suggested {
         min-width: 100vw;
         max-width: 100vw;
         border-radius: 0;
-        padding: 1.5rem 0.5rem;
+        padding: 1.2rem 0.2rem;
       }
-      #modelPage .suggested .suggested-card {
+      #modelPage .suggested-card {
         max-width: 98vw;
-        min-height: 120px;
-        height: 130px;
-        padding: 1rem 1rem;
-        border-radius: 16px;
-      }
-      #modelPage .suggested .suggested-thumb {
-        width: 70px;
-        height: 70px;
+        min-height: 180px;
+        padding: 0.6rem 0.7rem 1rem 0.7rem;
         border-radius: 10px;
+      }
+      #modelPage .suggested-thumb {
+        max-width: 98vw;
+        height: 120px;
+        border-radius: 7px;
       }
     }
     @media (max-width: 600px) {
@@ -455,7 +464,7 @@
       padding:2rem 2rem 2.5rem;
       border-radius:var(--radius);
       background:var(--card-bg);
-      box-shadow:0 8px 24px rgba(0,0,0,0.4);
+      box-shadow:0 8px 24px rgba(255,152,0,0.5), 0 8px 24px rgba(0,0,0,0.4); /* Added orange glow as in card hover */
     }
     #loginModal .modal-header {
       position:relative;
@@ -1053,6 +1062,189 @@
         max-width: 98vw;
       }
     }
+
+    .login-required-btn-group {
+      margin-top: 0.2rem !important;
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    /* Responsive style for price label */
+    @media (max-width: 700px) {
+      #priceLabel {
+        display: block !important;
+        margin-left: 0;
+        margin-top: 0.5rem;
+        font-size: 1rem;
+      }
+    }
+
+    /* --- Purchased Page Custom Styles --- */
+    #purchasedListPage {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      display: none;
+      padding: 2.5rem 0 2.5rem 0;
+    }
+    .purchased-list-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      position: relative;
+    }
+    #backPurchasedList {
+      position: absolute;
+      top: 1.5rem;
+      left: 1.5rem;
+      margin: 0;
+      z-index: 2;
+      padding: 0.7rem 1.4rem;
+      font-size: 1.08rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    }
+    #purchasedListTitle {
+      font-size: 2.1rem;
+      font-weight: 700;
+      text-align: center;
+      margin-top: 0.7rem;
+      margin-bottom: 2.2rem;
+      letter-spacing: -0.01em;
+    }
+    @media (max-width: 700px) {
+      .purchased-list-container {
+        padding: 0 0.5rem;
+      }
+      #backPurchasedList {
+        top: 1rem;
+        left: 1rem;
+        font-size: 1rem;
+        padding: 0.6rem 1.1rem;
+      }
+      #purchasedListTitle {
+        font-size: 1.35rem;
+        margin-top: 0.5rem;
+        margin-bottom: 1.3rem;
+      }
+    }
+    @media (max-width: 500px) {
+      #purchasedListTitle {
+        font-size: 1.1rem;
+        margin-top: 0.3rem;
+        margin-bottom: 1rem;
+      }
+      #backPurchasedList {
+        top: 0.5rem;
+        left: 0.5rem;
+        padding: 0.5rem 0.8rem;
+      }
+    }
+    /* Add responsive style for download-btn on purchased page */
+    @media (max-width: 700px) {
+      .download-btn {
+        width: 100%;
+        max-width: 100%;
+        margin-left: 0;
+      }
+    }
+
+    #signupBtn, #loginBtn.btn {
+      font-size: 1.05rem;
+      padding: 0.45rem 1.8rem;
+      border-radius: 14px;
+      min-width: 112px;
+      min-height: 44px;
+      letter-spacing: 0.01em;
+    }
+    @media (max-width: 600px) {
+      #signupBtn, #loginBtn.btn {
+        font-size: 0.97rem;
+        padding: 0.4rem 1rem;
+        min-width: 90px;
+        min-height: 36px;
+      }
+    }
+
+    /* --- Login Modal Animation Additions --- */
+    .modal.login-animate {
+      /* Ensure modal is visible for animation */
+      display: flex !important;
+      pointer-events: auto;
+    }
+    .modal.login-animate .modal-content {
+      /* Start hidden for animation */
+      opacity: 0;
+      transform: translateY(40px) scale(0.98);
+      transition: opacity 0.45s cubic-bezier(.4,.01,.22,1), transform 0.45s cubic-bezier(.4,.01,.22,1);
+    }
+    .modal.login-animate.active .modal-content {
+      /* Animate in: fade and slide up */
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      transition: opacity 0.45s cubic-bezier(.4,.01,.22,1), transform 0.45s cubic-bezier(.4,.01,.22,1);
+    }
+    .modal.login-animate.closing .modal-content {
+      /* Animate out: fade and slide down */
+      opacity: 0;
+      transform: translateY(40px) scale(0.98);
+      transition: opacity 0.38s cubic-bezier(.4,.01,.22,1), transform 0.38s cubic-bezier(.4,.01,.22,1);
+    }
+    /* Prevent pointer events during closing animation */
+    .modal.login-animate.closing {
+      pointer-events: none;
+    }
+    /* Responsive: ensure modal-content stays centered and scales well */
+    @media (max-width: 600px) {
+      .modal.login-animate .modal-content {
+        width: 98vw !important;
+        max-width: 98vw !important;
+        min-width: 0 !important;
+        padding: 1.2rem 0.5rem 2rem 0.5rem !important;
+      }
+    }
+    /* --- Enlarged Log In and Sign Up Buttons for Usability --- */
+    .btn.enlarged, .btn.btn-outline.enlarged, #loginBtn.btn.enlarged, #signupBtn.enlarged {
+      font-size: 1.13rem !important; /* Reduced from 1.23rem */
+      padding: 0.6rem 2.2rem !important; /* Reduced padding slightly */
+      min-width: 132px !important; /* Slightly reduced min-width */
+      min-height: 50px !important; /* Slightly reduced min-height */
+      border-radius: 16px !important;
+      letter-spacing: 0.01em;
+    }
+    @media (max-width: 600px) {
+      .btn.enlarged, .btn.btn-outline.enlarged, #loginBtn.btn.enlarged, #signupBtn.enlarged {
+        font-size: 1.03rem !important; /* Reduced from 1.08rem */
+        padding: 0.5rem 1rem !important; /* Reduced padding slightly */
+        min-width: 100px !important; /* Slightly reduced min-width */
+        min-height: 40px !important; /* Slightly reduced min-height */
+      }
+    }
+    /* --- Subtle shadow for modal for more polish --- */
+    .modal.login-animate .modal-content {
+      box-shadow: 0 12px 48px rgba(0,0,0,0.38), 0 2px 8px rgba(0,0,0,0.10);
+    }
+    /* --- Overlay fade-in/out for modal background --- */
+    .modal.login-animate {
+      background: rgba(0,0,0,0.0);
+      transition: background 0.45s cubic-bezier(.4,.01,.22,1);
+    }
+    .modal.login-animate.active {
+      background: rgba(0,0,0,0.6);
+      transition: background 0.45s cubic-bezier(.4,.01,.22,1);
+    }
+    .modal.login-animate.closing {
+      background: rgba(0,0,0,0.0);
+      transition: background 0.38s cubic-bezier(.4,.01,.22,1);
+    }
+    /* --- Prevent scroll when modal is open --- */
+    body.login-modal-open {
+      overflow: hidden !important;
+    }
   </style>
 </head>
 <body>
@@ -1144,9 +1336,12 @@
                   <span id="listIcon">＋</span> <span>Add to List</span>
                 </button>
               </div>
+              <!-- Comment Box UI -->
+              <div id="commentsSection" style="margin-top:1.5rem;"></div>
             </div>
-            <div class="download-container">
+            <div class="download-container" style="display: flex; align-items: center; gap: 1.1rem; min-height: 48px;">
               <button class="btn buy-btn" id="buyNowBtn">Buy Now</button>
+              <span id="priceLabel" style="display:none;font-weight:700;color:#fff;white-space:nowrap;font-size:1.08rem;vertical-align:middle;line-height:1;"> </span>
               <button class="download-btn" id="downloadBtn" style="display:none;">Download</button>
               <div class="download-dropdown" id="downloadDropdown">
                 <a href="#" class="download-option" data-format="fbx">
@@ -1170,21 +1365,8 @@
   <section id="checkoutPage">
     <button class="btn back-btn" id="backCheckout">← Back</button>
     <h2 style="text-align:center;margin-bottom:1rem;">Checkout</h2>
-    <form id="checkoutForm">
-      <label>
-        Full Name
-        <input type="text" required placeholder="Your Name">
-      </label>
-      <label>
-        Email Address
-        <input type="email" required placeholder="you@example.com">
-      </label>
-      <label>
-        Billing Address
-        <input type="text" required placeholder="Street, City, Country">
-      </label>
-      <button type="submit" class="btn" style="justify-content:center;">Pay with PayPal</button>
-    </form>
+    <div id="paypal-button-container" style="max-width:400px;margin:2rem auto 0 auto;"></div>
+    <button class="btn" id="paidDownloadBtn" style="display:none;background:#ff9800;color:#fff;font-weight:600;font-size:1.1rem;margin:2rem auto 0 auto;max-width:400px;width:100%;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.10);padding:0.85rem 0;">Download FBX Model</button>
   </section>
 
   <!-- CONTACT INFO FOOTER -->
@@ -1204,23 +1386,26 @@
 
       <!-- ===== LOGIN VIEW ===== -->
       <div id="loginView">
-        <label>Email</label>
-        <input type="email" class="login-input" id="loginEmail" placeholder="you@example.com" required>
-        <div class="error-message" id="loginEmailError"></div>
+        <label>Username</label>
+        <input type="text" class="login-input" id="loginUsername" placeholder="Your username" required>
+        <div class="error-message" id="loginUsernameError"></div>
 
         <label>Password</label>
         <input type="password" class="login-input" id="loginPassword" placeholder="Your password" required>
         <div class="error-message" id="loginPasswordError"></div>
 
-        <div class="action-row">
+        <div class="action-row" id="loginActionRow">
           <button class="login-btn" id="loginSubmitBtn">Continue</button>
-          <button class="btn" id="createAccountBtn">Create&nbsp;Account</button>
+        </div>
+        <div id="loginSignupText" style="text-align:center; margin-bottom:1rem; font-size:0.93rem; color:#aaa;">
+          Not have an account yet? <a href="#" id="loginToSignup" style="color:var(--accent); font-weight:600;">Sign up</a>
         </div>
 
         <div class="success-message" id="loginSuccess"></div>
 
-        <button class="google-btn">Log in with Google</button>
-        <p>Auth backend coming soon.</p>
+        <!-- Google Sign-In button container -->
+        <div id="g_id_signin" style="display:flex;justify-content:center;margin-top:1.2rem;margin-bottom:0.5rem;"></div>
+        <p id="googleLoginMsg" style="text-align:center;font-size:0.92rem;color:#888;margin-top:0.5rem;">Or sign in with Google</p>
       </div>
 
       <!-- ===== REGISTER VIEW ===== -->
@@ -1229,9 +1414,9 @@
         <input type="text" class="login-input" id="registerName" placeholder="Your Name" required>
         <div class="error-message" id="nameError"></div>
 
-        <label>Email</label>
-        <input type="email" class="login-input" id="registerEmail" placeholder="you@example.com" required>
-        <div class="error-message" id="emailError"></div>
+        <label>Username</label>
+        <input type="text" class="login-input" id="registerUsername" placeholder="Choose a username" required>
+        <div class="error-message" id="usernameError"></div>
 
         <label>Password</label>
         <input type="password" class="login-input" id="registerPassword" placeholder="Choose a strong password" required>
@@ -1246,184 +1431,56 @@
         <button class="register-submit" id="registerSubmitBtn">Create Account</button>
         <div class="success-message" id="registerSuccess"></div>
 
-        <button class="google-btn">Sign up with Google</button>
+        <!-- Google Sign-Up button container -->
+        <div id="g_id_signup" style="display:flex;justify-content:center;margin-top:1.2rem;margin-bottom:0.5rem;"></div>
+        <p id="googleSignupMsg" style="text-align:center;font-size:0.92rem;color:#888;margin-top:0.5rem;">Or sign up with Google</p>
         <p style="margin-top:.75rem;">Already have an account? <a href="#" id="backToLogin" style="color:var(--accent);">Log In</a></p>
       </div>
     </div>
   </div>
 
+  <!-- Add a login-required modal if not present -->
+  <div class="modal" id="loginRequiredModal">
+    <div class="modal-content" style="max-width:340px;text-align:center;">
+      <div style="font-size:2.2rem;margin-bottom:0.5rem;">🔒</div>
+      <h2 style="margin-bottom:0.1rem;">Login Required</h2>
+      <p style="margin-bottom:0.5rem;">You need to log in to like models or add them to your list.</p>
+      <div class="login-required-btn-group" style="margin-top:0.2rem; display:flex; justify-content:center; gap:0.75rem; flex-wrap:wrap;">
+        <button class="btn" id="loginRequiredBtn">Log In</button>
+        <button class="btn btn-outline" id="loginRequiredClose">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.paypal.com/sdk/js?client-id=AWOtXB5c_Nnjr1Um-H3SWsgG3M5yaRAjK3uWrNU5WpkBFW7XoN9G_3USs5dpDEWyRJRne1sqPh9giL_J&currency=USD"></script>
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <!-- jwt-decode for Google login -->
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
   <script type="module">
     // === DATA & HOOKS ===
+    const DEFAULT_PROFILE_IMAGE = 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk1ODQ0MS5wbmc=/250x600/j0omjw.png';
     const models = [
-      { 
-        id:1, 
-        title:'Human Character Base', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQwMy5wbmc=/250x600/vaWBiI.png', 
-        desc:'A versatile low-poly human base mesh, ready for your animations and rigs.',
-        src: 'A20.glb',  // Your existing .gltf file
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3DHumanfbx1.fbx',
-        glb: 'A20.glb',
-        gltf: 'A20.gltf'
-      },
-      { 
-        id:2, 
-        title:'Human Character Base', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTM1NS5wbmc=/250x600/iV5gql.png', 
-        desc:'Alternate low-poly human model optimized for mobile and VR.',
-        src: '3DHuman11.gltf',
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3DHumanfbx.fbx',
-        glb: '3DHuman11.glb',
-        gltf: '3DHuman11.gltf'
-      },
-      { 
-        id:3, 
-        title:'Player Model', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQ4NC5wbmc=/250x600/FAM6Ft.png', 
-        desc:'A stylized player avatar with simple topology for game characters.',
-        src: 'A19.glb',
-        availableFormats: ['glb', 'fbx', 'gltf'],
-        fbx: '3DHumanfbx5.fbx',
-        glb: 'A19.glb',
-        gltf: 'A19.gltf'
-      },
-      { 
-        id:4, 
-        title:'Farmer', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzNy5wbmc=/250x600/xUXRMO.png', 
-        desc:'A medieval knight in low-poly style.',
-        src: 'AFramer.gltf',
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3DHumanfbx6.fbx',
-        glb: 'AFramer.glb',
-        gltf: 'AFramer.gltf'
-      },
-      { 
-        id:5, 
-        title:'Space Marine', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzOC5wbmc=/250x600/ATA380.png', 
-        desc:'A ready-to-animate archer character.',
-        src: 'Aspacemarine.gltf',
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3DHumanfbx7.fbx',
-        glb: 'Aspacemarine.glb',
-        gltf: 'Aspacemarine.gltf'
-      },
-      { 
-        id:6, 
-        title:'Police Officer', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzOS5wbmc=/250x600/tht5cv.png', 
-        desc:'Low-poly steampunk robot NPC.',
-        src: 'Police.gltf',
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3DHumanfbx8.fbx',
-        glb: 'Police.glb',
-        gltf: 'Police.gltf'
-      },
-      { 
-        id:7, 
-        title:'Scientist', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTg0MC5wbmc=/250x600/iZBPRT.png', 
-        desc:'Blocky mage perfect for voxel games.',
-        src: '3Dcharcter4.gltf',
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3D1characterfbx4.fbx',
-        glb: 'AS.glb',
-        gltf: 'AS.gltf'
-      },
-      { 
-        id:8, 
-        title:'Astronaut', 
-        price:1, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTg0MS5wbmc=/250x600/lZnMKc.png', 
-        desc:'Futuristic soldier rigged for animation.',
-        src: 'AS1.gltf',
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3DHumanfbx10.fbx',
-        glb: 'AS1.glb',
-        gltf: 'AS1.gltf'
-      },
-       { 
-        id:8, 
-        title:'Chef', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE4MC5wbmc=/250x600/89K1oc.png', 
-        desc:'Futuristic soldier rigged for animation.',
-        src: '3Dcharcter9.gltf',
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3DLowPolyCharacter9.fbx',
-        glb: 'AS1.glb',
-        gltf: 'AS1.gltf'
-      },
-       { 
-        id:8, 
-        title:'Samurai', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3OC5wbmc=/250x600/0DKTnv.png', 
-        desc:'Futuristic soldier rigged for animation.',
-        src: '3Dcharcter6.gltf',
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3DLowPolyCharacter6.fbx',
-        glb: 'AS1.glb',
-        gltf: 'AS1.gltf'
-      },
-       { 
-        id:8, 
-        title:'Builder', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE4MS5wbmc=/250x600/%2BXIu8o.png', 
-        desc:'Futuristic soldier rigged for animation.',
-        src: '3Dcharcter111.gltf',
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3DLowPolyCharacter3.fbx',
-        glb: 'AS1.glb',
-        gltf: 'AS1.gltf'
-      },
-       { 
-        id:8, 
-        title:'Medic', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3OS5wbmc=/250x600/yLs1Oq.png', 
-        desc:'Futuristic soldier rigged for animation.',
-        src: '3Dcharcter1.gltf',
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3DLowPolyCharacter1.fbx',
-        glb: 'AS1.glb',
-        gltf: 'AS1.gltf'
-      },
-       { 
-        id:8, 
-        title:'Human Model', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3Ni5wbmc=/250x600/YWf1vV.png', 
-        desc:'Futuristic soldier rigged for animation.',
-        src: '3Dcharcter10.gltf',
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3DLowPolyCharacter10.fbx',
-        glb: 'AS1.glb',
-        gltf: 'AS1.gltf'
-      },
-       { 
-        id:8, 
-        title:'Fire Fighter', 
-        price:0, 
-        thumb:'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3Ny5wbmc=/250x600/S%2FDg5u.png', 
-        desc:'Futuristic soldier rigged for animation.',
-        src: '3Dcharcter5.gltf',
-        availableFormats: ['gltf', 'fbx', 'glb'],
-        fbx: '3DLowPolyCharacter5.fbx',
-        glb: 'AS1.glb',
-        gltf: 'AS1.gltf'
-      },
-       
+      { id: 1, title: 'Human Character Base', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQwMy5wbmc=/250x600/vaWBiI.png', desc: 'A versatile low-poly human base mesh, ready for your animations and rigs.', src: 'A20.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx1.fbx', glb: 'A20.glb', gltf: 'A20.gltf' },
+      { id: 2, title: 'Human Character Base', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTM1NS5wbmc=/250x600/iV5gql.png', desc: 'Alternate low-poly human model optimized for mobile and VR.', src: '3DHuman11.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx.fbx', glb: '3DHuman11.glb', gltf: '3DHuman11.gltf' },
+      { id: 3, title: 'Player Model', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQ4NC5wbmc=/250x600/FAM6Ft.png', desc: 'A stylized player avatar with simple topology for game characters.', src: 'A19.glb', availableFormats: ['glb', 'fbx', 'gltf'], fbx: '3DCustomBean.fbx', glb: 'A19.glb', gltf: 'A19.gltf' },
+      { id: 4, title: 'Farmer', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzNy5wbmc=/250x600/xUXRMO.png', desc: 'A medieval knight in low-poly style.', src: 'AFramer.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx6.fbx', glb: 'AFramer.glb', gltf: 'AFramer.gltf' },
+      { id: 5, title: 'Space Marine', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzOC5wbmc=/250x600/ATA380.png', desc: 'A ready-to-animate archer character.', src: 'Aspacemarine.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx7.fbx', glb: 'Aspacemarine.glb', gltf: 'Aspacemarine.gltf' },
+      { id: 6, title: 'Police Officer', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzOS5wbmc=/250x600/tht5cv.png', desc: 'Low-poly steampunk robot NPC.', src: 'Police.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx8.fbx', glb: 'Police.glb', gltf: 'Police.gltf' },
+      { id: 7, title: 'Scientist', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTg0MC5wbmc=/250x600/iZBPRT.png', desc: 'Blocky mage perfect for voxel games.', src: '3Dcharcter4.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3D1characterfbx4.fbx', glb: 'AS.glb', gltf: 'AS.gltf' },
+      { id: 8, title: 'Astronaut', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTg0MS5wbmc=/250x600/lZnMKc.png', desc: 'Futuristic soldier rigged for animation.', src: 'AS1.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx10.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 9, title: 'Chef', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE4MC5wbmc=/250x600/89K1oc.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter9.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter9.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 10, title: 'Samurai', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3OC5wbmc=/250x600/0DKTnv.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter6.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter6.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 11, title: 'Builder', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE4MS5wbmc=/250x600/%2BXIu8o.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter111.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter3.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 12, title: 'Medic', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3OS5wbmc=/250x600/yLs1Oq.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter1.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter1.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 13, title: 'Human Model', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3Ni5wbmc=/250x600/YWf1vV.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter10.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter10.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 14, title: 'Fire Fighter', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3Ny5wbmc=/250x600/S%2FDg5u.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter5.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter5.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 13, title: 'SteelGuard', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjIwMTU2MS5wbmc=/250x600/NCG7Kb.png', desc: 'Armored robot with drill arm, rigged and ready for animation.', src: 'Villan11.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Villan1.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 13, title: 'InfernoBot', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjIwMTgwNy5wbmc=/250x600/IJYtyS.png', desc: 'Flaming armored bot rigged and ready for animation.', src: 'Villan12.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Villan2.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 13, title: 'Emerald Mage', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjIwMTk2NS5wbmc=/250x600/ky9C0L.png', desc: ' Mystic green sorcerer rigged for animation.', src: 'Villan13.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Villan3.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 13, title: 'Frost King', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjIwMjA2OS5wbmc=/250x600/%2F0h3XD.png', desc: ' Ice-armored mage rigged for animation.', src: 'Villan14.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Villan4.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 13, title: 'Nightblade', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjIwMjEzNy5wbmc=/250x600/OD1IR5.png', desc: ' Shadow assassin rigged for animation.', src: 'Villan15.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Villan5.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+       { id: 13, title: 'Cinderblade', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjIwMjIxMy5wbmc=/250x600/tJjTaP.png', desc: 'Flame rogue rigged for animation.', src: 'Villan16.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Villan6.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
     ];
 
     // DOM refs
@@ -1457,6 +1514,7 @@
     const modalTitle  = document.getElementById('modalTitle');
     const createAccBtn= document.getElementById('createAccountBtn');
     const backToLogin = document.getElementById('backToLogin');
+    const loginToSignup = document.getElementById('loginToSignup');
 
     const navbarSearch   = document.getElementById('navbarSearch');
     const suggestedModels = document.getElementById('suggestedModels');
@@ -1623,43 +1681,41 @@
       
       // Handle free vs paid models
       if (m.price === 0) {
-        // Free model - show download button
         buyNowBtn.style.display = 'none';
         downloadBtn.style.display = 'block';
+        priceLabel.style.display = 'none';
       } else {
-        // Paid model - show buy button
         buyNowBtn.style.display = 'block';
         downloadBtn.style.display = 'none';
+        priceLabel.style.display = 'inline-block';
+        priceLabel.textContent = `$${Number(m.price).toFixed(2)} USD`;
       }
-      // Show Like/List buttons only if logged in
-      if (currentUser) {
-        modelActions.style.display = 'flex';
-        updateLikeListUI(m);
-      } else {
-        modelActions.style.display = 'none';
-      }
+      // Always show Like/List buttons
+      modelActions.style.display = 'flex';
+      // Store the current model's ID on the buttons
+      likeBtn.setAttribute('data-model-id', m.id);
+      listBtn.setAttribute('data-model-id', m.id);
+      updateLikeListUI(m);
     }
 
     // --- Suggested Models Logic ---
     function renderSuggestedModels(currentId) {
       if (!suggestedModels) return;
       suggestedModels.innerHTML = '<h4>Suggested Models</h4>';
-      
       // Filter out the current model and create a shuffled array
       const availableModels = models.filter(mod => mod.id !== currentId);
       const shuffledModels = shuffleArray([...availableModels]);
-      
-      // Show up to 3 random models
-      const modelsToShow = shuffledModels.slice(0, 3);
-      
+      // Show only 2–3 cards at once
+      const limit = 3;
+      const modelsToShow = shuffledModels.slice(0, limit);
       modelsToShow.forEach(mod => {
         const card = document.createElement('div');
         card.className = 'suggested-card';
         card.innerHTML = `
           <img class="suggested-thumb" src="${mod.thumb}" alt="${mod.title}">
-          <div class="suggested-info">
-            <span class="suggested-title">${mod.title}</span>
-            <span class="suggested-meta">Free Model</span>
+          <div class="suggested-card-content">
+            <div class="suggested-title">${mod.title}</div>
+            <div class="suggested-desc">${mod.desc || ''}</div>
           </div>
         `;
         card.onclick = () => openModelPage(mod, false);
@@ -1701,6 +1757,10 @@
       topSearchbar.style.display = 'none';
       // Show hero banner
       if(homepageBanner) homepageBanner.style.display = '';
+      // Hide likes/list page and clear gallery
+      const likesListPage = document.getElementById('likesListPage');
+      likesListPage.style.display = 'none';
+      document.getElementById('likesListGallery').innerHTML = '';
       // Reset the flag when returning to homepage
       comingFromHomepage = true;
       window.scrollTo(0,0);
@@ -1710,6 +1770,10 @@
       renderGallery(models, true);
     };
     buyNowBtn.onclick=()=>{
+      // Store paid model ID in sessionStorage for post-payment download
+      if (lastOpenedModel) {
+        sessionStorage.setItem('paidModelId', lastOpenedModel.id);
+      }
       modelPage.style.display='none';
       mainContent.style.display='none';
       checkoutPage.style.display='block';
@@ -1718,6 +1782,10 @@
       heroSearch.parentElement.classList.add('hide');
       if(homepageBanner) homepageBanner.style.display = 'none';
       window.scrollTo(0,0);
+      // Render PayPal button for the selected model
+      if (lastOpenedModel) {
+        renderPayPalButton(lastOpenedModel);
+      }
     };
     backCheckout.onclick=()=>{
       // Return to previous model page if available
@@ -1743,18 +1811,18 @@
     
     // DOM refs for auth
     const registerName = document.getElementById('registerName');
-    const registerEmail = document.getElementById('registerEmail');
+    const registerUsername = document.getElementById('registerUsername');
     const registerPassword = document.getElementById('registerPassword');
     const registerSubmitBtn = document.getElementById('registerSubmitBtn');
-    const loginEmail = document.getElementById('loginEmail');
+    const loginUsername = document.getElementById('loginUsername');
     const loginPassword = document.getElementById('loginPassword');
     const loginSubmitBtn = document.getElementById('loginSubmitBtn');
     
     // Error message elements
     const nameError = document.getElementById('nameError');
-    const emailError = document.getElementById('emailError');
+    const usernameError = document.getElementById('usernameError');
     const passwordError = document.getElementById('passwordError');
-    const loginEmailError = document.getElementById('loginEmailError');
+    const loginUsernameError = document.getElementById('loginUsernameError');
     const loginPasswordError = document.getElementById('loginPasswordError');
     const registerSuccess = document.getElementById('registerSuccess');
     const loginSuccess = document.getElementById('loginSuccess');
@@ -1772,10 +1840,11 @@
       if (!/^[a-zA-Z\s]+$/.test(name.trim())) return 'Name can only contain letters and spaces';
       return null;
     }
-    function validateEmail(email) {
-      if (!email.trim()) return 'Email is required';
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email.trim())) return 'Please enter a valid email address';
+    function validateUsername(username) {
+      if (!username.trim()) return 'Username is required';
+      if (username.trim().length < 3) return 'Username must be at least 3 characters';
+      if (username.trim().length > 20) return 'Username must be less than 20 characters';
+      if (!/^[a-zA-Z0-9_]+$/.test(username.trim())) return 'Username can only contain letters, numbers, and underscores';
       return null;
     }
     function validatePassword(password) {
@@ -1837,10 +1906,10 @@
       setTimeout(() => element.classList.remove('show'), 3000);
     }
     function clearAllErrors() {
-      [nameError, emailError, passwordError, loginEmailError, loginPasswordError].forEach(el => {
+      [nameError, usernameError, passwordError, loginUsernameError, loginPasswordError].forEach(el => {
         hideError(el);
       });
-      [registerName, registerEmail, registerPassword, loginEmail, loginPassword].forEach(el => {
+      [registerName, registerUsername, registerPassword, loginUsername, loginPassword].forEach(el => {
         el.classList.remove('input-error', 'input-success');
       });
     }
@@ -1850,6 +1919,26 @@
     }
     function saveUsers(users) {
       localStorage.setItem('users', JSON.stringify(users));
+    }
+    // Helper: find user by username (regular) or google sub/email (Google)
+    function findUser({ provider, username, sub, email }) {
+      const users = getUsers();
+      if (provider === 'google') {
+        // Prefer sub (Google ID), fallback to email
+        return users.find(u => u.provider === 'google' && (u.sub === sub || u.email === email));
+      } else {
+        return users.find(u => u.username === username && !u.provider);
+      }
+    }
+    // Helper: update user in users array
+    function updateUserInUsers(user) {
+      let users = getUsers();
+      if (user.provider === 'google') {
+        users = users.map(u => (u.provider === 'google' && (u.sub === user.sub || u.email === user.email)) ? user : u);
+      } else {
+        users = users.map(u => (u.username === user.username && !u.provider) ? user : u);
+      }
+      saveUsers(users);
     }
     // === EVENT LISTENERS ===
     // Password strength indicator
@@ -1862,30 +1951,30 @@
       e.preventDefault();
       clearAllErrors();
       const name = registerName.value.trim();
-      const email = registerEmail.value.trim().toLowerCase();
+      const username = registerUsername.value.trim();
       const password = registerPassword.value;
       // Validate inputs
       const nameErrorMsg = validateName(name);
-      const emailErrorMsg = validateEmail(email);
+      const usernameErrorMsg = validateUsername(username);
       const passwordErrorMsg = validatePassword(password);
       if (nameErrorMsg) showError(nameError, nameErrorMsg);
-      if (emailErrorMsg) showError(emailError, emailErrorMsg);
+      if (usernameErrorMsg) showError(usernameError, usernameErrorMsg);
       if (passwordErrorMsg) showError(passwordError, passwordErrorMsg);
-      if (nameErrorMsg || emailErrorMsg || passwordErrorMsg) {
+      if (nameErrorMsg || usernameErrorMsg || passwordErrorMsg) {
         return;
       }
-      // Simulate backend: check for duplicate email
+      // Simulate backend: check for duplicate username
       const users = getUsers();
-      if (users.some(u => u.email === email)) {
-        showError(emailError, 'An account with this email already exists.');
+      if (users.some(u => u.username === username)) {
+        showError(usernameError, 'An account with this username already exists.');
         return;
       }
       // Simulate user creation
-      users.push({ name, email, password });
+      users.push({ name, username, password });
       saveUsers(users);
       showSuccess(registerSuccess, 'Account created successfully! Redirecting to login...');
       registerName.value = '';
-      registerEmail.value = '';
+      registerUsername.value = '';
       registerPassword.value = '';
       passwordStrength.style.display = 'none';
       setTimeout(() => {
@@ -1897,21 +1986,21 @@
     loginSubmitBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       clearAllErrors();
-      const email = loginEmail.value.trim().toLowerCase();
+      const username = loginUsername.value.trim();
       const password = loginPassword.value;
-      const emailErrorMsg = validateEmail(email);
+      const usernameErrorMsg = validateUsername(username);
       if (!password) {
         showError(loginPasswordError, 'Password is required');
         return;
       }
-      if (emailErrorMsg) {
-        showError(loginEmailError, emailErrorMsg);
+      if (usernameErrorMsg) {
+        showError(loginUsernameError, usernameErrorMsg);
         return;
       }
       const users = getUsers();
-      const user = users.find(u => u.email === email && u.password === password);
+      const user = users.find(u => u.username === username && u.password === password);
       if (!user) {
-        showError(loginPasswordError, 'Invalid email or password.');
+        showError(loginPasswordError, 'Invalid username or password.');
         return;
       }
       currentUser = user;
@@ -1924,9 +2013,14 @@
       }, 1500);
     });
     // Clear errors on input
-    [registerName, registerEmail, registerPassword, loginEmail, loginPassword].forEach(input => {
+    [registerName, registerUsername, registerPassword, loginUsername, loginPassword].forEach(input => {
       input.addEventListener('input', () => {
-        const errorElement = document.getElementById(input.id.replace('register', '').replace('login', '') + 'Error');
+        let errorElement = null;
+        if (input.id === 'registerName') errorElement = nameError;
+        else if (input.id === 'registerUsername') errorElement = usernameError;
+        else if (input.id === 'registerPassword') errorElement = passwordError;
+        else if (input.id === 'loginUsername') errorElement = loginUsernameError;
+        else if (input.id === 'loginPassword') errorElement = loginPasswordError;
         if (errorElement) hideError(errorElement);
         input.classList.remove('input-error');
       });
@@ -1954,18 +2048,71 @@
       registerView.style.display='none';
       modalTitle.textContent='Log In';
       clearAllErrors();
+      // Hide create account button if present
+      const createAccBtn = document.getElementById('createAccountBtn');
+      if (createAccBtn) createAccBtn.style.display = 'none';
+      // Show the login-signup text
+      const loginSignupText = document.getElementById('loginSignupText');
+      if (loginSignupText) loginSignupText.style.display = 'block';
+      // Focus first input after animation
+      setTimeout(() => {
+        const firstInput = loginView.querySelector('input');
+        if (firstInput) firstInput.focus();
+      }, 500);
     }
     function showRegister(){
       loginView.style.display='none';
       registerView.style.display='block';
       modalTitle.textContent='Create Account';
       clearAllErrors();
+      // Attach event listener for 'Log In' link in register view
+      setTimeout(() => {
+        const backToLogin = document.getElementById('backToLogin');
+        if (backToLogin) {
+          backToLogin.onclick = function(e) {
+            e.preventDefault();
+            // Animate transition back to login
+            animateModalSwitch('register', 'login');
+          };
+        }
+      }, 0);
+      // Focus first input after animation
+      setTimeout(() => {
+        const firstInput = registerView.querySelector('input');
+        if (firstInput) firstInput.focus();
+      }, 500);
     }
-    createAccBtn.onclick=showRegister;
-    backToLogin.onclick=e=>{
-      e.preventDefault();
-      showLogin();
-    };
+
+    // --- Modal Switch Animation Logic ---
+    function animateModalSwitch(from, to) {
+      // from: 'login' or 'register', to: 'login' or 'register'
+      // Only animate if modal is open and has login-animate class
+      if (!loginModal.classList.contains('login-animate')) {
+        if (to === 'login') showLogin();
+        else showRegister();
+        return;
+      }
+      // Animate out
+      addClass(loginModal, 'closing');
+      removeClass(loginModal, 'active');
+      setTimeout(() => {
+        removeClass(loginModal, 'closing');
+        // Switch view
+        if (to === 'login') showLogin();
+        else showRegister();
+        // Animate in
+        addClass(loginModal, 'active');
+      }, 420);
+    }
+
+    // Remove createAccBtn event (now handled by link below Continue)
+    if (loginToSignup) {
+      loginToSignup.onclick = function(e) {
+        e.preventDefault();
+        // Animate transition from login to register
+        animateModalSwitch('login', 'register');
+      };
+    }
     // === INITIALIZATION ===
     window.addEventListener('DOMContentLoaded', () => {
       // Simulate session
@@ -1982,7 +2129,7 @@
         // Remove all children
         loginBtn.innerHTML = '';
         // Get image (fallback if not set)
-        const imgSrc = currentUser.image || 'https://static.itch.io/images/cover.svg';
+        const imgSrc = currentUser.image || DEFAULT_PROFILE_IMAGE;
         // Create avatar+name row
         const avatar = document.createElement('img');
         avatar.src = imgSrc;
@@ -2017,7 +2164,7 @@
         min-width: 180px;
       `;
       // Avatar + name row
-      const imgSrc = currentUser.image || 'https://static.itch.io/images/cover.svg';
+      const imgSrc = currentUser.image || DEFAULT_PROFILE_IMAGE;
       menu.innerHTML = `
         <div class="user-menu-header">
           <img class="profile-avatar" src="${imgSrc}" alt="Profile">
@@ -2027,6 +2174,7 @@
         <button id="profileBtn" class="user-menu-option">Profile</button>
         <button id="myLikesBtn" class="user-menu-option">My Likes</button>
         <button id="myListBtn" class="user-menu-option">My List</button>
+        <button id="myPurchasedBtn" class="user-menu-option">My Purchased</button>
         <button id="logoutBtn" class="user-menu-option">Logout</button>
       `;
       const loginBtn = document.getElementById('loginBtn');
@@ -2064,13 +2212,18 @@
         menu.remove();
         openLikesOrListPage('list');
       };
+      // My Purchased
+      document.getElementById('myPurchasedBtn').onclick = () => {
+        menu.remove();
+        openPurchasedPage();
+      };
     }
 
     // --- Fake checkout ---
-    document.getElementById('checkoutForm').addEventListener('submit',e=>{
-      e.preventDefault();
-      window.open('https://www.paypal.com/paypalme/korenbar1', '_blank', 'noopener');
-    });
+    // document.getElementById('checkoutForm').addEventListener('submit',e=>{
+    //   e.preventDefault();
+    //   window.open('https://www.paypal.com/paypalme/korenbar1', '_blank', 'noopener');
+    // });
 
     // --- Download functionality ---
     downloadBtn.addEventListener('click', (e) => {
@@ -2168,7 +2321,7 @@
     };
 
     // --- Profile Page ---
-    // Add profile page HTML after checkoutPage
+    // Add profile page HTML before footer if not present
     if (!document.getElementById('profilePage')) {
       const profileSection = document.createElement('section');
       profileSection.id = 'profilePage';
@@ -2191,7 +2344,9 @@
           </div>
         </div>
       `;
-      document.body.appendChild(profileSection);
+      // Insert before footer
+      const footer = document.querySelector('footer');
+      document.body.insertBefore(profileSection, footer);
     }
     // Add profile page styles
     if (!document.getElementById('profilePageStyles')) {
@@ -2303,6 +2458,13 @@
       checkoutPage.style.display = 'none';
       homepageBanner.style.display = 'none';
       topSearchbar.style.display = 'none';
+      // Hide likes/list page and clear gallery
+      const likesListPage = document.getElementById('likesListPage');
+      if (likesListPage) {
+        likesListPage.style.display = 'none';
+        const likesListGallery = document.getElementById('likesListGallery');
+        if (likesListGallery) likesListGallery.innerHTML = '';
+      }
       // Show profile page
       const profilePage = document.getElementById('profilePage');
       profilePage.style.display = 'block';
@@ -2322,7 +2484,7 @@
       if (tempProfile.image) {
         profileImage.src = tempProfile.image;
       } else {
-        profileImage.src = 'https://static.itch.io/images/cover.svg'; // fallback avatar
+        profileImage.src = DEFAULT_PROFILE_IMAGE;
       }
       // Change image logic
       const imageInput = document.getElementById('profileImageInput');
@@ -2352,9 +2514,7 @@
         user.image = tempProfile.image;
         localStorage.setItem('currentUser', JSON.stringify(user));
         // Also update in users DB
-        let users = JSON.parse(localStorage.getItem('users') || '[]');
-        users = users.map(u => u.email === user.email ? { ...u, name: user.name, image: user.image } : u);
-        localStorage.setItem('users', JSON.stringify(users));
+        updateUserInUsers(user);
         // Show success
         saveSuccess.textContent = 'Profile updated!';
         saveSuccess.classList.add('show');
@@ -2387,18 +2547,14 @@
       currentUser.likes = likes;
       localStorage.setItem('currentUser', JSON.stringify(currentUser));
       // Also update in users DB
-      let users = JSON.parse(localStorage.getItem('users') || '[]');
-      users = users.map(u => u.email === currentUser.email ? { ...u, likes } : u);
-      localStorage.setItem('users', JSON.stringify(users));
+      updateUserInUsers(currentUser);
     }
     function saveUserList(myList) {
       if (!currentUser) return;
       currentUser.myList = myList;
       localStorage.setItem('currentUser', JSON.stringify(currentUser));
       // Also update in users DB
-      let users = JSON.parse(localStorage.getItem('users') || '[]');
-      users = users.map(u => u.email === currentUser.email ? { ...u, myList } : u);
-      localStorage.setItem('users', JSON.stringify(users));
+      updateUserInUsers(currentUser);
     }
     function updateLikeListUI(model) {
       // Like state
@@ -2414,27 +2570,41 @@
       listBtn.classList.toggle('listed', listed);
       listBtn.querySelector('span:last-child').textContent = listed ? 'Added' : 'Add to List';
     }
-    likeBtn.addEventListener('click', () => {
-      if (!lastOpenedModel || !currentUser) return;
+    likeBtn.addEventListener('click', (e) => {
+      const modelId = parseInt(likeBtn.getAttribute('data-model-id'), 10);
+      if (!modelId) return;
+      if (!currentUser) {
+        showLoginRequiredModal(() => likeBtn.click());
+        return;
+      }
       let likes = getUserLikes();
-      if (!likes.includes(lastOpenedModel.id)) {
-        likes.push(lastOpenedModel.id);
+      if (!likes.includes(modelId)) {
+        likes.push(modelId);
       } else {
-        likes = likes.filter(id => id !== lastOpenedModel.id);
+        likes = likes.filter(id => id !== modelId);
       }
       saveUserLikes(likes);
-      updateLikeListUI(lastOpenedModel);
+      // Find the model by ID and update UI
+      const model = models.find(m => m.id === modelId);
+      if (model) updateLikeListUI(model);
     });
-    listBtn.addEventListener('click', () => {
-      if (!lastOpenedModel || !currentUser) return;
+    listBtn.addEventListener('click', (e) => {
+      const modelId = parseInt(listBtn.getAttribute('data-model-id'), 10);
+      if (!modelId) return;
+      if (!currentUser) {
+        showLoginRequiredModal(() => listBtn.click());
+        return;
+      }
       let myList = getUserList();
-      if (!myList.includes(lastOpenedModel.id)) {
-        myList.push(lastOpenedModel.id);
+      if (!myList.includes(modelId)) {
+        myList.push(modelId);
       } else {
-        myList = myList.filter(id => id !== lastOpenedModel.id);
+        myList = myList.filter(id => id !== modelId);
       }
       saveUserList(myList);
-      updateLikeListUI(lastOpenedModel);
+      // Find the model by ID and update UI
+      const model = models.find(m => m.id === modelId);
+      if (model) updateLikeListUI(model);
     });
 
     // --- Add Likes/List pages HTML if not present ---
@@ -2449,7 +2619,9 @@
           <div id="likesListGallery" class="gallery"></div>
         </div>
       `;
-      document.body.appendChild(likesListSection);
+      // Insert before footer
+      const footer = document.querySelector('footer');
+      document.body.insertBefore(likesListSection, footer);
     }
     // --- Likes/List page logic ---
     function openLikesOrListPage(type) {
@@ -2459,6 +2631,9 @@
       checkoutPage.style.display = 'none';
       homepageBanner.style.display = 'none';
       topSearchbar.style.display = 'none';
+      // Hide profile page if present
+      const profilePage = document.getElementById('profilePage');
+      if (profilePage) profilePage.style.display = 'none';
       // Show likes/list page
       const likesListPage = document.getElementById('likesListPage');
       likesListPage.style.display = 'block';
@@ -2475,15 +2650,15 @@
       // Render
       const galleryDiv = document.getElementById('likesListGallery');
       if (filtered.length === 0) {
-        galleryDiv.innerHTML = `<div id="no-results-message"><div>¯\\_(ツ)_/¯</div><div>No models yet</div></div>`;
+        galleryDiv.innerHTML = `<div id=\"no-results-message\"><div>¯\\_(ツ)_/¯</div><div>No models yet</div></div>`;
       } else {
         galleryDiv.innerHTML = '';
         filtered.forEach(m => {
           const card = document.createElement('div');
           card.className = 'card';
           card.innerHTML = `
-            <img src="${m.thumb}" alt="${m.title}">
-            <div class="info">
+            <img src=\"${m.thumb}\" alt=\"${m.title}\">
+            <div class=\"info\">
               <h3>${m.title}</h3>
               <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>
             </div>`;
@@ -2494,12 +2669,560 @@
       // Back button
       document.getElementById('backLikesList').onclick = () => {
         likesListPage.style.display = 'none';
+        // Clear the gallery content to prevent bleed-through
+        document.getElementById('likesListGallery').innerHTML = '';
         mainContent.style.display = 'block';
         homepageBanner.style.display = '';
         topSearchbar.style.display = 'none';
+        // Ensure the hero search bar is visible again
+        heroSearch.parentElement.classList.remove('hide');
         window.scrollTo(0,0);
       };
     }
+
+    // --- Purchased logic ---
+    function getUserPurchased() {
+      if (!currentUser) return [];
+      return (currentUser.purchased || []);
+    }
+    function saveUserPurchased(purchased) {
+      if (!currentUser) return;
+      currentUser.purchased = purchased;
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      // Also update in users DB
+      updateUserInUsers(currentUser);
+    }
+    function openPurchasedPage() {
+      if (!currentUser) {
+        showLoginRequiredModal(() => openPurchasedPage());
+        return;
+      }
+      // Hide all other pages
+      modelPage.style.display = 'none';
+      mainContent.style.display = 'none';
+      checkoutPage.style.display = 'none';
+      homepageBanner.style.display = 'none';
+      topSearchbar.style.display = 'none';
+      // Hide profile page if present
+      const profilePage = document.getElementById('profilePage');
+      if (profilePage) profilePage.style.display = 'none';
+      // Hide likes/list page if present
+      const likesListPage = document.getElementById('likesListPage');
+      if (likesListPage) likesListPage.style.display = 'none';
+      // Show purchased page
+      const purchasedListPage = document.getElementById('purchasedListPage');
+      purchasedListPage.style.display = 'block';
+      window.scrollTo(0,0);
+      // Get purchased model IDs
+      let ids = getUserPurchased();
+      // Get models
+      const filtered = models.filter(m => ids.includes(m.id));
+      // Render
+      const galleryDiv = document.getElementById('purchasedListGallery');
+      if (filtered.length === 0) {
+        galleryDiv.innerHTML = `<div id=\"no-results-message\"><div>¯\\_(ツ)_/¯</div><div>No purchased models yet</div></div>`;
+      } else {
+        galleryDiv.innerHTML = '';
+        filtered.forEach(m => {
+          const cardWrapper = document.createElement('div');
+          cardWrapper.style.display = 'flex';
+          cardWrapper.style.flexDirection = 'column';
+          cardWrapper.style.alignItems = 'center';
+          cardWrapper.style.marginBottom = '2.5rem';
+
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <img src=\"${m.thumb}\" alt=\"${m.title}\">
+            <div class=\"info\">
+              <h3>${m.title}</h3>
+              <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>
+            </div>`;
+          card.onclick = () => openModelPage(m, false);
+          cardWrapper.appendChild(card);
+
+          // Download button below card
+          const downloadBtn = document.createElement('button');
+          downloadBtn.className = 'download-btn';
+          downloadBtn.style.marginTop = '20px';
+          downloadBtn.style.display = 'block';
+          downloadBtn.style.alignSelf = 'center';
+          downloadBtn.textContent = 'Download';
+          downloadBtn.onclick = (e) => {
+            e.stopPropagation();
+            const format = 'fbx';
+            const modelName = m.title.replace(/\s+/g, '_');
+            const availableFormats = getAvailableFormats(m);
+            if (!availableFormats.includes(format)) {
+              alert(`Sorry, ${format.toUpperCase()} format is not available for this model yet.\n\nAvailable formats: ${availableFormats.map(f => f.toUpperCase()).join(', ')}`);
+              return;
+            }
+            const fileUrl = getFileUrlForFormat(m, format);
+            if (!fileUrl) {
+              alert(`Download not available for ${format.toUpperCase()} format.`);
+              return;
+            }
+            const link = document.createElement('a');
+            link.href = fileUrl;
+            link.download = `${modelName}.${format}`;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            alert(`Downloading ${modelName}.${format}...`);
+          };
+          cardWrapper.appendChild(downloadBtn);
+
+          galleryDiv.appendChild(cardWrapper);
+        });
+      }
+      // Back button
+      document.getElementById('backPurchasedList').onclick = () => {
+        purchasedListPage.style.display = 'none';
+        document.getElementById('purchasedListGallery').innerHTML = '';
+        mainContent.style.display = 'block';
+        homepageBanner.style.display = '';
+        topSearchbar.style.display = 'none';
+        heroSearch.parentElement.classList.remove('hide');
+        window.scrollTo(0,0);
+      };
+    }
+
+    // --- Add Purchased page HTML if not present ---
+    if (!document.getElementById('purchasedListPage')) {
+      const purchasedListSection = document.createElement('section');
+      purchasedListSection.id = 'purchasedListPage';
+      purchasedListSection.style.display = 'none';
+      purchasedListSection.innerHTML = `
+        <div class="likes-list-container purchased-list-container">
+          <button class="btn back-btn" id="backPurchasedList">← Back</button>
+          <h2 id="purchasedListTitle">My Purchased</h2>
+          <div id="purchasedListGallery" class="gallery"></div>
+        </div>
+      `;
+      // Insert before footer
+      const footer = document.querySelector('footer');
+      document.body.insertBefore(purchasedListSection, footer);
+    }
+
+    // Modal logic for login required
+    function showLoginRequiredModal(afterLoginAction) {
+      const modal = document.getElementById('loginRequiredModal');
+      modal.classList.add('active');
+      // Focus Log In button
+      setTimeout(() => document.getElementById('loginRequiredBtn').focus(), 100);
+      // Log In button opens login modal, then runs afterLoginAction after successful login
+      document.getElementById('loginRequiredBtn').onclick = () => {
+        modal.classList.remove('active');
+        openModal(loginModal);
+        // After login, run the action
+        const loginHandler = () => {
+          if (currentUser) {
+            setTimeout(() => afterLoginAction && afterLoginAction(), 200);
+            window.removeEventListener('storage', loginHandler);
+          }
+        };
+        // Listen for login (localStorage change)
+        window.addEventListener('storage', loginHandler);
+        // Also check after login modal closes
+        const closeCheck = setInterval(() => {
+          if (currentUser) {
+            afterLoginAction && afterLoginAction();
+            clearInterval(closeCheck);
+          }
+        }, 300);
+        // Remove listeners after 10s
+        setTimeout(() => {
+          window.removeEventListener('storage', loginHandler);
+          clearInterval(closeCheck);
+        }, 10000);
+      };
+      document.getElementById('loginRequiredClose').onclick = () => {
+        modal.classList.remove('active');
+      };
+      // Also close on outside click
+      modal.onclick = (e) => {
+        if (e.target === modal) modal.classList.remove('active');
+      };
+    }
+
+    // --- PayPal Smart Payment Button Integration ---
+    function renderPayPalButton(model) {
+      const container = document.getElementById('paypal-button-container');
+      const paidDownloadBtn = document.getElementById('paidDownloadBtn');
+      if (!container) return;
+      container.innerHTML = '';
+      paidDownloadBtn.style.display = 'none'; // Hide by default
+
+      // --- SESSION PURCHASE STATE ---
+      // Use a session variable to track purchased model IDs (not persistent)
+      window._sessionPurchasedModels = window._sessionPurchasedModels || {};
+      // Helper to check if purchased in this session
+      function isModelPurchasedSession(id) {
+        return !!window._sessionPurchasedModels[id];
+      }
+      // Helper to set purchased in this session
+      function setModelPurchasedSession(id) {
+        window._sessionPurchasedModels[id] = true;
+        // Also save to user purchase history if logged in
+        if (currentUser) {
+          let purchased = getUserPurchased();
+          if (!purchased.includes(id)) {
+            purchased.push(id);
+            saveUserPurchased(purchased);
+          }
+        }
+      }
+
+      // If already purchased in this session, show download button immediately
+      if (isModelPurchasedSession(model.id)) {
+        paidDownloadBtn.style.display = 'block';
+        // Hide PayPal button
+        container.innerHTML = '<div style="color:#4CAF50;font-weight:600;font-size:1.1rem;text-align:center;margin:1.5rem 0;">Purchased ✔</div>';
+        return;
+      }
+
+      paidDownloadBtn.onclick = function() {
+        // Always use the current model (from payment context)
+        const format = 'fbx';
+        const modelName = model ? model.title.replace(/\s+/g, '_') : 'model';
+        // Check what formats are actually available for this model
+        const availableFormats = getAvailableFormats(model);
+        if (!availableFormats.includes(format)) {
+          alert(`Sorry, ${format.toUpperCase()} format is not available for this model yet.\n\nAvailable formats: ${availableFormats.map(f => f.toUpperCase()).join(', ')}`);
+          return;
+        }
+        // Get the correct file URL for this format
+        const fileUrl = getFileUrlForFormat(model, format);
+        if (!fileUrl) {
+          alert(`Download not available for ${format.toUpperCase()} format.`);
+          return;
+        }
+        // Create download link
+        const link = document.createElement('a');
+        link.href = fileUrl;
+        link.download = `${modelName}.${format}`;
+        link.style.display = 'none';
+        // Trigger download
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        // Show success message (same as free download)
+        alert(`Downloading ${modelName}.${format}...`);
+      };
+      // Remove any previous PayPal button if present
+      if (window.paypal && container) {
+        window.paypal.Buttons({
+          style: {
+            color: 'gold',
+            shape: 'rect',
+            label: 'paypal',
+            layout: 'vertical',
+            height: 45,
+          },
+          createOrder: function(data, actions) {
+            return actions.order.create({
+              purchase_units: [{
+                amount: {
+                  value: Number(model.price).toFixed(2),
+                  currency_code: 'USD',
+                },
+                description: model.title,
+                shipping_preference: 'NO_SHIPPING',
+              }],
+              application_context: {
+                shipping_preference: 'NO_SHIPPING',
+              }
+            });
+          },
+          onApprove: function(data, actions) {
+            return actions.order.capture().then(function(details) {
+              // After successful payment, show the download button and mark as purchased in session
+              if (model && model.fbx) {
+                setModelPurchasedSession(model.id);
+                paidDownloadBtn.style.display = 'block';
+                // Hide PayPal button and show Purchased label
+                container.innerHTML = '<div style="color:#4CAF50;font-weight:600;font-size:1.1rem;text-align:center;margin:1.5rem 0;">Purchased ✔</div>';
+              } else {
+                paidDownloadBtn.style.display = 'none';
+                alert('No FBX file available for this model.');
+              }
+            });
+          },
+          onError: function(err) {
+            alert('Payment could not be completed. Please try again.');
+          }
+        }).render('#paypal-button-container');
+      }
+    }
+
+    // --- Update Buy Now button on model page for session-purchased state ---
+    function updateModelPagePurchaseUI(model) {
+      // Only for paid models
+      if (!model || !model.price || model.price === 0) return;
+      window._sessionPurchasedModels = window._sessionPurchasedModels || {};
+      const purchased = !!window._sessionPurchasedModels[model.id];
+      if (purchased) {
+        buyNowBtn.style.display = 'none';
+        // Insert or show a Purchased label in the same place
+        let purchasedLabel = document.getElementById('purchasedLabel');
+        if (!purchasedLabel) {
+          purchasedLabel = document.createElement('span');
+          purchasedLabel.id = 'purchasedLabel';
+          purchasedLabel.textContent = 'Purchased';
+          purchasedLabel.style.cssText = buyNowBtn.style.cssText + ';background:#4CAF50;opacity:0.95;cursor:default;pointer-events:none;display:block;text-align:center;font-weight:600;font-size:1rem;border-radius:8px;margin-left:auto;margin-top:0.5rem;min-width:110px;max-width:160px;padding:0.5rem 1.25rem;box-shadow:0 2px 8px rgba(0,0,0,0.10);';
+          buyNowBtn.parentNode.insertBefore(purchasedLabel, buyNowBtn);
+        } else {
+          purchasedLabel.style.display = 'block';
+        }
+        // Show Download FBX button
+        downloadBtn.style.display = 'block';
+        priceLabel.style.display = 'none';
+      } else {
+        // Not purchased: restore normal state
+        buyNowBtn.style.display = 'block';
+        let purchasedLabel = document.getElementById('purchasedLabel');
+        if (purchasedLabel) purchasedLabel.style.display = 'none';
+        downloadBtn.style.display = 'none';
+        priceLabel.style.display = 'inline-block';
+        priceLabel.textContent = `$${Number(model.price).toFixed(2)} USD`;
+      }
+    }
+
+    // Patch openModelPage to call updateModelPagePurchaseUI
+    const _originalOpenModelPage = openModelPage;
+    openModelPage = function(m, fromHomepage = true) {
+      _originalOpenModelPage(m, fromHomepage);
+      updateModelPagePurchaseUI(m);
+    };
+
+    // Patch buyNowBtn.onclick to also update model page UI after purchase
+    const _originalRenderPayPalButton = renderPayPalButton;
+    renderPayPalButton = function(model) {
+      _originalRenderPayPalButton(model);
+      // After rendering PayPal, also update model page UI if returning
+      updateModelPagePurchaseUI(model);
+    };
+
+    // When returning to checkout page, update UI for session-purchased state
+    const _originalBackCheckout = backCheckout.onclick;
+    backCheckout.onclick = function() {
+      if (lastOpenedModel) {
+        checkoutPage.style.display = 'none';
+        openModelPage(lastOpenedModel);
+        // If purchased, and user goes back to checkout, show download button and purchased label
+        if (window._sessionPurchasedModels && window._sessionPurchasedModels[lastOpenedModel.id]) {
+          renderPayPalButton(lastOpenedModel);
+        }
+      } else {
+        // Fallback: go to home/shop
+        checkoutPage.style.display = 'none';
+        modelPage.style.display = 'none';
+        mainContent.style.display = 'block';
+        navbarSearch.value = '';
+        heroSearch.parentElement.classList.remove('hide');
+        topSearchbar.style.display = 'none';
+        if(homepageBanner) homepageBanner.style.display = '';
+        window.scrollTo(0,0);
+      }
+    };
+
+    // --- Comments Logic ---
+    function renderComments(modelId) {
+      const section = document.getElementById('commentsSection');
+      if (!section) return;
+      section.innerHTML = '';
+      // Get comments from localStorage (per model)
+      const comments = JSON.parse(localStorage.getItem('comments_' + modelId) || '[]');
+      // Comments header
+      const header = document.createElement('div');
+      header.style = 'font-weight:600;font-size:1.08rem;margin-bottom:0.7rem;color:#fff;';
+      header.textContent = `${comments.length} Comment${comments.length === 1 ? '' : 's'}`;
+      section.appendChild(header);
+      // Comments list
+      const list = document.createElement('div');
+      list.id = 'commentsList';
+      comments.forEach(c => {
+        const item = document.createElement('div');
+        item.style = 'display:flex;align-items:flex-start;gap:0.7rem;margin-bottom:1.1rem;';
+        item.innerHTML = `
+          <div style="width:38px;height:38px;border-radius:50%;background:#232326;display:flex;align-items:center;justify-content:center;">
+            <img src="${c.avatar || DEFAULT_PROFILE_IMAGE}" alt="avatar" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
+          </div>
+          <div style="flex:1;">
+            <div style="font-weight:600;font-size:1rem;color:#ffb74d;">${c.name || 'User'}</div>
+            <div style="color:#fff;font-size:0.98rem;margin-top:0.1rem;">${c.text}</div>
+            <div style="color:#aaa;font-size:0.78rem;margin-top:0.2rem;">${new Date(c.time).toLocaleString()}</div>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+      section.appendChild(list);
+      // Only show comment box if logged in
+      if (currentUser) {
+        const box = document.createElement('div');
+        box.style = 'display:flex;align-items:flex-start;gap:0.7rem;margin-top:0.5rem;';
+        box.innerHTML = `
+          <div style="width:38px;height:38px;border-radius:50%;background:#232326;display:flex;align-items:center;justify-content:center;">
+            <img src="${currentUser.image || DEFAULT_PROFILE_IMAGE}" alt="avatar" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
+          </div>
+          <form id="commentForm" style="flex:1;display:flex;align-items:center;gap:0.7rem;">
+            <input id="commentInput" type="text" maxlength="300" placeholder="Like this model? Let the creator know!" style="flex:1;padding:0.7rem 1rem;border-radius:8px;border:1.5px solid #444;background:#232326;color:#fff;font-size:1.05rem;outline:none;transition:border 0.18s;" required />
+            <button class="btn" style="padding:0.6rem 1.2rem;font-size:1rem;" type="submit">Send</button>
+          </form>
+        `;
+        section.appendChild(box);
+        // Add submit handler
+        box.querySelector('#commentForm').onsubmit = function(e) {
+          e.preventDefault();
+          const input = box.querySelector('#commentInput');
+          const text = input.value.trim();
+          if (!text) return;
+          // Save comment
+          const newComment = {
+            name: currentUser.name || 'User',
+            avatar: currentUser.image || DEFAULT_PROFILE_IMAGE,
+            text,
+            time: Date.now()
+          };
+          comments.push(newComment);
+          localStorage.setItem('comments_' + modelId, JSON.stringify(comments));
+          input.value = '';
+          renderComments(modelId);
+        };
+      }
+    }
+    // Call renderComments when opening a model page
+    const originalOpenModelPage = openModelPage;
+    openModelPage = function(m, fromHomepage = true) {
+      originalOpenModelPage(m, fromHomepage);
+      renderComments(m.id);
+    };
+    // Also update comments when login/logout
+    const originalUpdateAuthUI = updateAuthUI;
+    updateAuthUI = function() {
+      originalUpdateAuthUI();
+      if (lastOpenedModel) renderComments(lastOpenedModel.id);
+    };
+
+   // --- Google Identity Services Login ---
+function handleGoogleCredentialResponse(response) {
+  try {
+    const decoded = jwt_decode(response.credential);
+    let users = getUsers();
+    let user = users.find(u => u.provider === 'google' && (u.sub === decoded.sub || u.email === decoded.email));
+    if (!user) {
+      user = {
+        name: decoded.name,
+        email: decoded.email,
+        image: decoded.picture,
+        sub: decoded.sub,
+        provider: 'google',
+        likes: [],
+        myList: [],
+        purchased: []
+      };
+      users.push(user);
+      saveUsers(users);
+    }
+    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    window.location.href = 'index.html';
+  } catch (err) {
+    alert('Google login failed: ' + (err?.message || err));
+  }
+}
+
+// --- Initialize Google Sign-In buttons ---
+window.addEventListener('DOMContentLoaded', () => {
+  if (window.google?.accounts?.id) {
+    window.google.accounts.id.initialize({
+      client_id: '665196132587-cbo8bflq7cstp7mjjcudoa1k5fu1ftss.apps.googleusercontent.com', // ← זה ה־Client ID שלך
+      callback: handleGoogleCredentialResponse,
+      ux_mode: 'popup' // Using popup, so no redirect_uri needed
+    });
+
+    // Render login button
+    const loginBtn = document.getElementById('g_id_signin');
+    if (loginBtn) {
+      window.google.accounts.id.renderButton(loginBtn, {
+        theme: 'outline',
+        size: 'large',
+        width: 280,
+        text: 'signin_with',
+        shape: 'rectangular',
+        logo_alignment: 'left'
+      });
+    }
+
+    // Render sign-up button
+    const signupBtn = document.getElementById('g_id_signup');
+    if (signupBtn) {
+      window.google.accounts.id.renderButton(signupBtn, {
+        theme: 'outline',
+        size: 'large',
+        width: 280,
+        text: 'signup_with',
+        shape: 'rectangular',
+        logo_alignment: 'left'
+      });
+    }
+  }
+});
+
+
+    // --- LOGIN MODAL ANIMATION LOGIC ---
+    // Utility: add/remove class helpers
+    function addClass(el, cls) { if (el && !el.classList.contains(cls)) el.classList.add(cls); }
+    function removeClass(el, cls) { if (el && el.classList.contains(cls)) el.classList.remove(cls); }
+
+    // Patch openModal and closeModal for login modal animation
+    const _originalOpenModal = openModal;
+    openModal = function(m) {
+      if (m === loginModal) {
+        // Add animation class
+        addClass(m, 'login-animate');
+        // Remove closing state if present
+        removeClass(m, 'closing');
+        // Add active to trigger animation
+        setTimeout(() => addClass(m, 'active'), 10);
+        // Prevent scroll on body
+        addClass(document.body, 'login-modal-open');
+        // Focus first input after animation
+        setTimeout(() => {
+          const firstInput = m.querySelector('input');
+          if (firstInput) firstInput.focus();
+        }, 500);
+        showLogin();
+        clearAllErrors();
+      } else {
+        _originalOpenModal(m);
+      }
+    };
+    const _originalCloseModal = closeModal;
+    closeModal = function(m) {
+      if (m === loginModal && m.classList.contains('login-animate')) {
+        // Animate out
+        addClass(m, 'closing');
+        removeClass(m, 'active');
+        // Remove scroll lock after animation
+        setTimeout(() => {
+          removeClass(m, 'closing');
+          removeClass(m, 'login-animate');
+          removeClass(document.body, 'login-modal-open');
+          // Actually hide modal (display:none)
+          m.classList.remove('active');
+        }, 420);
+      } else {
+        _originalCloseModal(m);
+      }
+    };
+    // --- ENLARGE LOG IN AND SIGN UP BUTTONS ---
+    // Add enlarged class on DOMContentLoaded
+    window.addEventListener('DOMContentLoaded', () => {
+      addClass(document.getElementById('loginBtn'), 'enlarged');
+      addClass(document.getElementById('signupBtn'), 'enlarged');
+    });
   </script>
 </body>
 </html>
