@@ -1518,6 +1518,7 @@
 
   <!-- GALLERY -->
   <main id="mainContent">
+    <button class="btn back-btn" id="backToShopSearch" style="display:none;position:absolute;top:120px;left:2vw;z-index:20;font-size:1.09rem;padding:0.62rem 1.7rem;min-width:124px;min-height:44px;">← Back to Shop</button>
     <section class="gallery" id="gallery"></section>
   </main>
 
@@ -1828,6 +1829,7 @@
         window.scrollTo(0,0);
         doSearch(value, true);
         lastSearchQuery = value;
+        showBackToShopButton();
       }
     });
     // Only trigger search on Enter for top searchbar
@@ -1841,24 +1843,13 @@
         window.scrollTo(0,0);
         doSearch(value, true);
         lastSearchQuery = value;
+        showBackToShopButton();
       }
     });
     // Clear search logic for top searchbar
     navbarSearch.addEventListener('input', e => {
       if (e.target.value.trim() === '') {
-        // Hide top searchbar, show homepage banner
-        topSearchbar.style.display = 'none';
-        homepageBanner.style.display = '';
-        // Show main search bar in banner
-        heroSearch.parentElement.classList.remove('hide');
-        heroSearch.value = '';
-        // Hide model/checkout, show gallery
-        modelPage.style.display = 'none';
-        checkoutPage.style.display = 'none';
-        mainContent.style.display = 'block';
-        // Clear results
-        renderGallery(models, true);
-        lastSearchQuery = '';
+        hideBackToShopButton();
       }
     });
 
@@ -3515,6 +3506,56 @@ window.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('DOMContentLoaded', () => {
       addClass(document.getElementById('loginBtn'), 'enlarged');
       addClass(document.getElementById('signupBtn'), 'enlarged');
+    });
+
+    const backToShopSearch = document.getElementById('backToShopSearch');
+
+    // Show the button after a search is performed
+    function showBackToShopButton() {
+      backToShopSearch.style.display = 'block';
+    }
+    function hideBackToShopButton() {
+      backToShopSearch.style.display = 'none';
+    }
+
+    // Update search logic to show/hide the button
+    heroSearch.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        // ... existing code ...
+        showBackToShopButton();
+      }
+    });
+    navbarSearch.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        // ... existing code ...
+        showBackToShopButton();
+      }
+    });
+    // Hide the button when returning to homepage
+    navbarSearch.addEventListener('input', e => {
+      if (e.target.value.trim() === '') {
+        hideBackToShopButton();
+      }
+    });
+    // Also hide when navigating away from search results
+    function hideSearchResultsAndBackButton() {
+      hideBackToShopButton();
+    }
+    // Attach to all navigation that returns to homepage
+    backToShopSearch.onclick = () => {
+      // Hide search results and button, show homepage
+      mainContent.style.display = 'block';
+      homepageBanner.style.display = '';
+      topSearchbar.style.display = 'none';
+      heroSearch.parentElement.classList.remove('hide');
+      navbarSearch.value = '';
+      renderGallery(models, true);
+      hideBackToShopButton();
+      window.scrollTo(0,0);
+    };
+    // Also hide on initial load
+    window.addEventListener('DOMContentLoaded', () => {
+      hideBackToShopButton();
     });
   </script>
 </body>
