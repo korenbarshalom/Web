@@ -175,6 +175,35 @@
       background: none !important;
     }
 
+    #loginRequiredModal .modal-content {
+      background: var(--card-bg);
+      padding: 2.2rem 2.2rem 1.7rem 2.2rem !important;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.32);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 320px;
+      max-width: 98vw;
+    }
+
+    #loginRequiredModal .modal-content h2 {
+      margin-bottom: 0.5rem;
+    }
+    #loginRequiredModal .modal-content p {
+      margin-bottom: 1.3rem;
+      text-align: center;
+    }
+    .login-required-btn-group {
+      margin-top: 0.7rem !important;
+      margin-bottom: 0.1rem !important;
+      display: flex;
+      justify-content: center;
+      gap: 1.1rem;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
     .modal-content {
       background:var(--card-bg);
       transform:scale(0.8); opacity:0;
