@@ -222,6 +222,157 @@
       justify-content: center;
       flex: 1 1 0%;
     }
+    /* --- Model Card Layout Improvements --- */
+    #modelPage .model-card-section {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+    }
+    #modelPage .model-media {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      display: block;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      object-fit: contain;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+    }
+    #modelPage .model-info-row {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+      width: 100%;
+      margin-top: 1.5rem;
+      gap: 2rem;
+    }
+    #modelPage .model-info-left {
+      flex: 2 1 0%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    #modelPage .model-title {
+      font-size: 1.65rem; /* Slightly reduced for balance */
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.2rem;
+      line-height: 1.1;
+    }
+    #modelPage .model-desc {
+      font-size: 1.13rem;
+      color: #ccc;
+      margin-bottom: 0.2rem;
+      line-height: 1.5;
+    }
+    #modelPage .model-info-right {
+      flex: 1 1 0%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.7rem;
+      min-width: 180px;
+    }
+    #modelPage .buy-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 1.1rem;
+      margin-bottom: 0.2rem;
+    }
+    #modelPage .price-label {
+      display: inline-block;
+      font-size: 1.18rem;
+      font-weight: 700;
+      color: #fff; /* Changed to white */
+      margin-left: 0.7rem;
+      letter-spacing: 0.01em;
+      vertical-align: middle;
+      line-height: 1.1;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.13);
+    }
+    #modelPage .model-actions-row {
+      display: flex;
+      flex-direction: row;
+      gap: 1.2rem;
+      margin-top: 1.2rem;
+      margin-bottom: 0.5rem;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    #modelPage .model-actions-row .btn {
+      min-width: 140px;
+      font-size: 1.08rem;
+      border-radius: 10px;
+      border: 2px solid #FFA500;
+      background: transparent;
+      color: #FFA500;
+      font-weight: 600;
+      transition: background 0.18s, color 0.18s, box-shadow 0.18s, transform 0.15s;
+      box-shadow: none;
+      white-space: nowrap;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #modelPage .model-actions-row .btn#listBtn {
+      min-width: 160px; /* Ensure Add to List never wraps */
+      padding-left: 1.7rem;
+      padding-right: 1.7rem;
+    }
+    #modelPage .model-actions-row .btn:hover, #modelPage .model-actions-row .btn:focus {
+      background: rgba(255,165,0,0.10);
+      color: #ffb74d;
+      border-color: #ffb74d;
+      box-shadow: 0 4px 16px rgba(255,165,0,0.13);
+      transform: scale(1.04);
+    }
+    /* --- Comments Section Improvements --- */
+    #modelPage .comments-section {
+      margin-top: 2.5rem;
+      width: 100%;
+      max-width: 600px;
+      align-self: flex-start;
+    }
+    #modelPage .comments-header {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 1.1rem;
+      letter-spacing: -0.01em;
+    }
+    @media (max-width: 900px) {
+      #modelPage .model-info-row {
+        flex-direction: column;
+        gap: 1.5rem;
+        align-items: stretch;
+      }
+      #modelPage .model-info-right {
+        align-items: flex-start;
+        min-width: 0;
+      }
+      #modelPage .comments-section {
+        max-width: 98vw;
+      }
+    }
+    #modelPage .model-viewer-container {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1 1 0%;
+    }
     #modelPage model-viewer, #modelPage img {
       width: 100%;
       max-width: 900px;
@@ -1340,38 +1491,31 @@
     <button class="btn back-btn" id="backModel">← Back to Shop</button>
     <div class="model-detail">
       <div class="model-viewer-container">
-        <button class="view-toggle" id="viewToggle">3D View</button>
-        <img id="modelImg" src="" alt="Model preview">
-        <model-viewer 
-          id="modelViewer"
-          camera-controls 
-          auto-rotate 
-          shadow-intensity="1"
-          environment-image="neutral"
-          exposure="0.5"
-          shadow-softness="0.5"
-          style="display:none;">
-        </model-viewer>
-        <div class="desc">
-          <div style="display: flex; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
-            <div style="flex:1 1 200px; min-width:0;">
-              <h2 id="modelTitle"></h2>
-              <p id="modelDesc"></p>
-              <div id="modelActions" style="display:none; margin-top: 1rem; gap: 0.5rem; flex-wrap: wrap;">
-                <button class="btn like-btn" id="likeBtn" title="Like this model" style="display:inline-flex;align-items:center;gap:0.5rem;">
-                  <span id="likeIcon">♡</span> <span>Like</span>
-                </button>
-                <button class="btn list-btn" id="listBtn" title="Add to My List" style="display:inline-flex;align-items:center;gap:0.5rem;">
-                  <span id="listIcon">＋</span> <span>Add to List</span>
-                </button>
-              </div>
-              <!-- Comment Box UI -->
-              <div id="commentsSection" style="margin-top:1.5rem;"></div>
+        <div class="model-card-section">
+          <button class="view-toggle" id="viewToggle">3D View</button>
+          <img id="modelImg" class="model-media" src="" alt="Model preview">
+          <model-viewer 
+            id="modelViewer"
+            class="model-media"
+            camera-controls 
+            auto-rotate 
+            shadow-intensity="1"
+            environment-image="neutral"
+            exposure="0.5"
+            shadow-softness="0.5"
+            style="display:none;">
+          </model-viewer>
+          <div class="model-info-row">
+            <div class="model-info-left">
+              <div class="model-title" id="modelTitle"></div>
+              <div class="model-desc" id="modelDesc"></div>
             </div>
-            <div class="download-container" style="display: flex; align-items: center; gap: 1.1rem; min-height: 48px;">
-              <button class="btn buy-btn" id="buyNowBtn">Buy Now</button>
-              <span id="priceLabel" style="display:none;font-weight:700;color:#fff;white-space:nowrap;font-size:1.08rem;vertical-align:middle;line-height:1;"> </span>
-              <button class="download-btn" id="downloadBtn" style="display:none;">Download</button>
+            <div class="model-info-right">
+              <div class="buy-row">
+                <button class="btn buy-btn" id="buyNowBtn">Buy Now</button>
+                <span class="price-label" id="priceLabel" style="display:none;"></span>
+                <button class="download-btn" id="downloadBtn" style="display:none;">Download</button>
+              </div>
               <div class="download-dropdown" id="downloadDropdown">
                 <a href="#" class="download-option" data-format="fbx">
                   <span class="format-icon">📦</span>
@@ -1380,6 +1524,18 @@
                 </a>
               </div>
             </div>
+          </div>
+          <div class="model-actions-row" id="modelActions" style="display:none;">
+            <button class="btn like-btn" id="likeBtn" title="Like this model">
+              <span id="likeIcon">♡</span> <span>Like</span>
+            </button>
+            <button class="btn list-btn" id="listBtn" title="Add to My List">
+              <span id="listIcon">＋</span> <span>Add to List</span>
+            </button>
+          </div>
+          <div class="comments-section">
+            <div class="comments-header" id="commentsHeader"></div>
+            <div id="commentsSection"></div>
           </div>
         </div>
       </div>
@@ -3127,15 +3283,13 @@
     // --- Comments Logic ---
     function renderComments(modelId) {
       const section = document.getElementById('commentsSection');
-      if (!section) return;
+      const header = document.getElementById('commentsHeader');
+      if (!section || !header) return;
       section.innerHTML = '';
       // Get comments from localStorage (per model)
       const comments = JSON.parse(localStorage.getItem('comments_' + modelId) || '[]');
       // Comments header
-      const header = document.createElement('div');
-      header.style = 'font-weight:600;font-size:1.08rem;margin-bottom:0.7rem;color:#fff;';
       header.textContent = `${comments.length} Comment${comments.length === 1 ? '' : 's'}`;
-      section.appendChild(header);
       // Comments list
       const list = document.createElement('div');
       list.id = 'commentsList';
