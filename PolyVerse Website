@@ -1460,6 +1460,19 @@
     body.login-modal-open {
       overflow: hidden !important;
     }
+
+    /* Add underline hover effect for orange links in login/signup modals */
+    #loginModal a,
+    #loginModal a:visited {
+      color: var(--accent);
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.18s;
+      position: relative;
+    }
+    #loginModal a:hover, #loginModal a:focus {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
