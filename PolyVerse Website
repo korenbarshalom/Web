@@ -27,7 +27,7 @@
       --text:#ffffff;
       --card-bg:#2a2a2d;
       --accent:#ff9800;
-      --radius:12px;
+      --radius:8px;
     }
     @keyframes fadeInUp {
       from { opacity:0; transform:translateY(20px) }
