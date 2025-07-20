@@ -300,6 +300,29 @@
       background: none;
       display: block;
     }
+    /* --- Load More Button for Suggested Models --- */
+    #suggestedLoadMoreBtn {
+      margin: 0.7rem auto 0 auto;
+      display: block;
+      background: #FFA500;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.08rem;
+      border: none;
+      border-radius: 14px;
+      padding: 0.7rem 2.2rem;
+      box-shadow: 0 2px 8px rgba(255,165,0,0.13), 0 2px 8px rgba(0,0,0,0.10);
+      transition: background 0.18s, box-shadow 0.18s, transform 0.15s, filter 0.18s;
+      cursor: pointer;
+      outline: none;
+      letter-spacing: 0.01em;
+    }
+    #suggestedLoadMoreBtn:hover, #suggestedLoadMoreBtn:focus {
+      background: #ffb74d;
+      box-shadow: 0 6px 24px rgba(255,165,0,0.22), 0 4px 16px rgba(0,0,0,0.18);
+      transform: scale(1.045);
+      filter: brightness(1.08);
+    }
     #modelPage .suggested-card {
       display: flex;
       flex-direction: column;
@@ -1716,10 +1739,21 @@
       suggestedModels.innerHTML = '<h4>Suggested Models</h4>';
       // Filter out the current model and create a shuffled array
       const availableModels = models.filter(mod => mod.id !== currentId);
-      const shuffledModels = shuffleArray([...availableModels]);
-      // Show only 2–3 cards at once
-      const limit = 3;
-      const modelsToShow = shuffledModels.slice(0, limit);
+      // Track which models are currently shown in suggested
+      let suggestedIndices = [];
+      // Helper to get 3 random models, not repeating the last set
+      function getRandomModels(excludeIndices = []) {
+        const pool = availableModels.filter((_, idx) => !excludeIndices.includes(idx));
+        const shuffled = shuffleArray([...pool]);
+        return shuffled.slice(0, 3);
+      }
+      // Store the last shown indices in a closure
+      if (!renderSuggestedModels._lastIndices) renderSuggestedModels._lastIndices = [];
+      // Get 3 models to show
+      const modelsToShow = getRandomModels(renderSuggestedModels._lastIndices.map(i => i));
+      // Save their indices for next time
+      renderSuggestedModels._lastIndices = modelsToShow.map(m => availableModels.indexOf(m));
+      // Render cards
       modelsToShow.forEach(mod => {
         const card = document.createElement('div');
         card.className = 'suggested-card';
@@ -1733,6 +1767,46 @@
         card.onclick = () => openModelPage(mod, false);
         suggestedModels.appendChild(card);
       });
+      // Add Load More button
+      const loadMoreBtn = document.createElement('button');
+      loadMoreBtn.id = 'suggestedLoadMoreBtn';
+      loadMoreBtn.textContent = 'Load More';
+      loadMoreBtn.onclick = function() {
+        // Animate out old cards
+        const cards = Array.from(suggestedModels.querySelectorAll('.suggested-card'));
+        cards.forEach(card => {
+          card.style.transition = 'opacity 0.32s cubic-bezier(.4,.01,.22,1), transform 0.32s cubic-bezier(.4,.01,.22,1)';
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(30px) scale(0.98)';
+        });
+        loadMoreBtn.disabled = true;
+        setTimeout(() => {
+          // Remove old cards
+          cards.forEach(card => card.remove());
+          // Get new models (avoid showing the same as last time)
+          const newModels = getRandomModels(renderSuggestedModels._lastIndices.map(i => i));
+          renderSuggestedModels._lastIndices = newModels.map(m => availableModels.indexOf(m));
+          // Render new cards with appear animation
+          newModels.forEach(mod => {
+            const card = document.createElement('div');
+            card.className = 'suggested-card card-appear';
+            card.innerHTML = `
+              <img class="suggested-thumb" src="${mod.thumb}" alt="${mod.title}">
+              <div class="suggested-card-content">
+                <div class="suggested-title">${mod.title}</div>
+                <div class="suggested-desc">${mod.desc || ''}</div>
+              </div>
+            `;
+            card.onclick = () => openModelPage(mod, false);
+            suggestedModels.insertBefore(card, loadMoreBtn);
+            card.addEventListener('animationend', () => {
+              card.classList.remove('card-appear');
+            }, { once: true });
+          });
+          loadMoreBtn.disabled = false;
+        }, 320);
+      };
+      suggestedModels.appendChild(loadMoreBtn);
     }
 
     // Helper function to shuffle array (Fisher-Yates algorithm)
