@@ -286,14 +286,19 @@
       margin-top: -48px; /* Move container even higher up */
     }
     #modelPage .suggested h4 {
-      font-size: 1.13rem;
+      font-size: 1.23rem; /* Increased font size */
       font-weight: 700;
-      margin-bottom: 1.1rem;
-      color: #fff;
+      color: #FFA500; /* Strong orange */
       letter-spacing: -0.01em;
-      text-align: left;
+      text-align: center; /* Center horizontally */
       width: 100%;
-      padding-left: 0.2rem;
+      padding-left: 0;
+      margin-bottom: 1.1rem;
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      text-shadow: 0 2px 12px rgba(255, 165, 0, 0.18), 0 1px 4px rgba(0,0,0,0.22); /* Subtle orange glow and shadow */
+      border: none;
+      background: none;
+      display: block;
     }
     #modelPage .suggested-card {
       display: flex;
