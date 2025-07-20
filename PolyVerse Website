@@ -1192,12 +1192,14 @@
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
+      transform-origin: center center; /* Ensure scaling is centered */
+      margin-left: 4px; /* Nudge buttons slightly right to prevent overflow */
     }
     .like-btn:hover, .list-btn:hover {
       background: #ff9800;
       color: #fff;
       border: 2px solid #ffb74d;
-      transform: translateY(-2px) scale(1.03);
+      transform: scale(1.03); /* Remove translateY to prevent shifting */
     }
     .like-btn.liked, .list-btn.listed {
       background: #ff9800;
