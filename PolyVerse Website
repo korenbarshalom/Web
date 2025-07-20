@@ -1922,6 +1922,13 @@
       likeBtn.setAttribute('data-model-id', m.id);
       listBtn.setAttribute('data-model-id', m.id);
       updateLikeListUI(m);
+      // Hide likes/list page and clear gallery if present
+      const likesListPage = document.getElementById('likesListPage');
+      if (likesListPage) {
+        likesListPage.style.display = 'none';
+        const likesListGallery = document.getElementById('likesListGallery');
+        if (likesListGallery) likesListGallery.innerHTML = '';
+      }
     }
 
     // --- Suggested Models Logic ---
