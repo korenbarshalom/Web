@@ -119,9 +119,9 @@
     nav ul { display:flex; gap:1.25rem; list-style:none; align-items:center; }
     @media(max-width:600px){ nav ul{ display:none } }
 
-    /* ---------- Hero Section (blue gradient) ---------- */
+    /* ---------- Hero Section (warm orange-red gradient) ---------- */
     .hero {
-      background: linear-gradient(to right, #007cf0, #00dfd8);
+      background: linear-gradient(to right, #ff5f6d, #ffc371);
       padding: 4rem 1rem;
       text-align: center;
     }
