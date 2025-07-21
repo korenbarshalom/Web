@@ -1599,6 +1599,15 @@
   <section id="checkoutPage">
     <button class="btn back-btn" id="backCheckout">← Back</button>
     <h2 style="text-align:center;margin-bottom:1rem;">Checkout</h2>
+    <!-- Model preview section (horizontal layout) -->
+    <div id="checkoutModelPreview" style="display:flex;align-items:center;justify-content:center;margin-bottom:2.2rem;gap:2.5rem;">
+      <div id="checkoutModelText" style="display:flex;flex-direction:column;align-items:flex-end;justify-content:center;min-width:180px;">
+        <div id="checkoutModelName" style="font-size:1.35rem;font-weight:700;color:#fff;text-align:right;margin-bottom:0.7rem;">Model Name</div>
+        <div id="checkoutModelPrice" style="font-size:1.18rem;font-weight:700;color:#fff;text-align:right;">$1.00 USD</div>
+      </div>
+      <img id="checkoutModelImg" src="" alt="Model preview" style="width:120px;height:120px;object-fit:cover;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.3);background:#232326;">
+    </div>
+    <!-- End model preview section -->
     <div id="paypal-button-container" style="max-width:400px;margin:2rem auto 0 auto;"></div>
     <button class="btn" id="paidDownloadBtn" style="display:none;background:#ff9800;color:#fff;font-weight:600;font-size:1.1rem;margin:2rem auto 0 auto;max-width:400px;width:100%;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.10);padding:0.85rem 0;">Download FBX Model</button>
   </section>
@@ -2077,6 +2086,10 @@
       if (lastOpenedModel) {
         renderPayPalButton(lastOpenedModel);
       }
+      // Update checkout preview with selected model info
+      document.getElementById('checkoutModelImg').src = lastOpenedModel.thumb;
+      document.getElementById('checkoutModelName').textContent = lastOpenedModel.title;
+      document.getElementById('checkoutModelPrice').textContent = `$${Number(lastOpenedModel.price).toFixed(2)} USD`;
     };
     backCheckout.onclick=()=>{
       // Return to previous model page if available
