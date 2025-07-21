@@ -1473,6 +1473,107 @@
     #loginModal a:hover, #loginModal a:focus {
       text-decoration: underline;
     }
+
+    .checkout-order-card {
+      background: #232326;
+      border-radius: 18px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+      max-width: 420px;
+      margin: 0 auto 0 auto;
+      padding: 2.1rem 2.1rem 2.1rem 2.1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .checkout-order-content {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 2.2rem;
+      width: 100%;
+    }
+    .checkout-order-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: center;
+      min-width: 160px;
+      flex: 1 1 0%;
+    }
+    .checkout-model-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+      text-align: right;
+      margin-bottom: 0.7rem;
+    }
+    .checkout-model-price {
+      font-size: 1.18rem;
+      font-weight: 700;
+      color: #fff;
+      text-align: right;
+      margin-bottom: 0.5rem;
+    }
+    .checkout-model-meta {
+      font-size: 0.98rem;
+      color: #bbb;
+      text-align: right;
+      margin-top: 0.2rem;
+      font-weight: 500;
+    }
+    .checkout-order-img-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .checkout-model-img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.3);
+      background: #18181a;
+      transition: transform 0.18s cubic-bezier(.4,.01,.22,1), box-shadow 0.18s;
+      cursor: pointer;
+    }
+    .checkout-model-img:hover {
+      transform: scale(1.07);
+      box-shadow: 0 8px 24px rgba(255,152,0,0.18), 0 4px 16px rgba(0,0,0,0.22);
+    }
+    .checkout-secure-line {
+      text-align: center;
+      color: #aaa;
+      font-size: 0.98rem;
+      margin-top: 2.2rem;
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.01em;
+      opacity: 0.85;
+    }
+    @media (max-width: 600px) {
+      .checkout-order-card {
+        max-width: 98vw;
+        padding: 1.2rem 0.5rem 1.2rem 0.5rem;
+      }
+      .checkout-order-content {
+        flex-direction: column-reverse;
+        gap: 1.2rem;
+        align-items: center;
+      }
+      .checkout-order-text {
+        align-items: center;
+        text-align: center;
+        min-width: 0;
+      }
+      .checkout-model-name, .checkout-model-price, .checkout-model-meta {
+        text-align: center !important;
+        align-items: center !important;
+      }
+      .checkout-model-img {
+        width: 110px;
+        height: 110px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1599,17 +1700,24 @@
   <section id="checkoutPage">
     <button class="btn back-btn" id="backCheckout">← Back</button>
     <h2 style="text-align:center;margin-bottom:1rem;">Checkout</h2>
-    <!-- Model preview section (horizontal layout) -->
-    <div id="checkoutModelPreview" style="display:flex;align-items:center;justify-content:center;margin-bottom:2.2rem;gap:2.5rem;">
-      <div id="checkoutModelText" style="display:flex;flex-direction:column;align-items:flex-end;justify-content:center;min-width:180px;">
-        <div id="checkoutModelName" style="font-size:1.35rem;font-weight:700;color:#fff;text-align:right;margin-bottom:0.7rem;">Model Name</div>
-        <div id="checkoutModelPrice" style="font-size:1.18rem;font-weight:700;color:#fff;text-align:right;">$1.00 USD</div>
+    <!-- Order summary card -->
+    <div id="checkoutOrderCard" class="checkout-order-card">
+      <div class="checkout-order-content">
+        <div class="checkout-order-text">
+          <div id="checkoutModelName" class="checkout-model-name">Model Name</div>
+          <div id="checkoutModelPrice" class="checkout-model-price">$1.00 USD</div>
+          <div id="checkoutModelMeta" class="checkout-model-meta">Formats: FBX, GLTF | Rigged</div>
+        </div>
+        <div class="checkout-order-img-wrapper">
+          <img id="checkoutModelImg" src="" alt="Model preview" class="checkout-model-img">
+        </div>
       </div>
-      <img id="checkoutModelImg" src="" alt="Model preview" style="width:120px;height:120px;object-fit:cover;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.3);background:#232326;">
     </div>
-    <!-- End model preview section -->
+    <!-- End order summary card -->
+    <div style="height:2.2rem;"></div>
     <div id="paypal-button-container" style="max-width:400px;margin:2rem auto 0 auto;"></div>
     <button class="btn" id="paidDownloadBtn" style="display:none;background:#ff9800;color:#fff;font-weight:600;font-size:1.1rem;margin:2rem auto 0 auto;max-width:400px;width:100%;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.10);padding:0.85rem 0;">Download FBX Model</button>
+    <div class="checkout-secure-line">🔒 Secure checkout powered by PayPal</div>
   </section>
 
   <!-- CONTACT INFO FOOTER -->
@@ -2090,6 +2198,11 @@
       document.getElementById('checkoutModelImg').src = lastOpenedModel.thumb;
       document.getElementById('checkoutModelName').textContent = lastOpenedModel.title;
       document.getElementById('checkoutModelPrice').textContent = `$${Number(lastOpenedModel.price).toFixed(2)} USD`;
+      // Compose metadata line
+      let meta = [];
+      if (lastOpenedModel.availableFormats) meta.push('Formats: ' + lastOpenedModel.availableFormats.map(f=>f.toUpperCase()).join(', '));
+      if (lastOpenedModel.desc && /rigged/i.test(lastOpenedModel.desc)) meta.push('Rigged');
+      document.getElementById('checkoutModelMeta').textContent = meta.join(' | ');
     };
     backCheckout.onclick=()=>{
       // Return to previous model page if available
