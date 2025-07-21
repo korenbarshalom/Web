@@ -156,14 +156,98 @@
     }
 
     /* ---------- Search Bar Styling ---------- */
-    .hero-search { margin-top:1rem }
-    .hero-search input {
-      width:100%; max-width:600px;
-      padding:1rem 1.5rem;
-      border:none; border-radius:var(--radius);
-      outline:none; font-size:1rem;
+    .hero-search {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
-    .hero-search input::placeholder { color:#ccc }
+    .hero-search .modern-search-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      background: linear-gradient(90deg, #ff7e5f 0%, #feb47b 100%);
+      border-radius: 10px;
+      box-shadow: 0 4px 32px rgba(255, 94, 87, 0.10), 0 1.5px 8px rgba(0,0,0,0.08);
+      transition: box-shadow 0.32s cubic-bezier(.4,.01,.22,1), border 0.32s cubic-bezier(.4,.01,.22,1);
+      padding: 0.12rem 0.12rem;
+      display: flex;
+      align-items: center;
+    }
+    .hero-search input#heroSearch {
+      width: 100%;
+      padding: 1.05rem 3.2rem 1.05rem 1.5rem;
+      border: none;
+      border-radius: 10px;
+      outline: none;
+      font-size: 1.08rem;
+      background: rgba(255,255,255,0.98);
+      color: #1e1e20;
+      box-shadow: none;
+      transition: box-shadow 0.32s, border 0.32s, background 0.32s;
+      font-family: inherit;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      position: relative;
+      z-index: 2;
+    }
+    .hero-search .modern-search-wrapper:focus-within {
+      box-shadow: 0 0 0 4px rgba(255,152,0,0.18), 0 8px 32px rgba(255, 94, 87, 0.13), 0 1.5px 8px rgba(0,0,0,0.10);
+      background: linear-gradient(90deg, #ffb347 0%, #ff5f6d 100%);
+    }
+    .hero-search input#heroSearch::placeholder {
+      color: #bdbdbd;
+      opacity: 1;
+      transition: opacity 0.28s cubic-bezier(.4,.01,.22,1);
+    }
+    .hero-search input#heroSearch:focus::placeholder {
+      opacity: 0.25;
+    }
+    .hero-search .search-icon-right {
+      position: absolute;
+      right: 1.1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 1.7rem;
+      width: 1.7rem;
+    }
+    .hero-search .search-icon-right svg {
+      width: 1.7rem;
+      height: 1.7rem;
+      fill: none;
+      stroke: #ff7e5f;
+      stroke-width: 2.2;
+      filter: drop-shadow(0 1px 2px rgba(255,94,87,0.10));
+      transition: stroke 0.22s;
+    }
+    .hero-search .modern-search-wrapper:focus-within .search-icon-right svg {
+      stroke: #ff9800;
+    }
+    @media (max-width: 700px) {
+      .hero-search .modern-search-wrapper {
+        max-width: 98vw;
+        border-radius: 8px;
+      }
+      .hero-search input#heroSearch {
+        font-size: 0.98rem;
+        border-radius: 8px;
+        padding: 0.85rem 2.7rem 0.85rem 1.1rem;
+      }
+      .hero-search .search-icon-right {
+        right: 0.7rem;
+        width: 1.3rem;
+        height: 1.3rem;
+      }
+      .hero-search .search-icon-right svg {
+        width: 1.3rem;
+        height: 1.3rem;
+      }
+    }
 
     /* ---------- Gallery ---------- */
     main { max-width:1280px; margin:2rem auto; padding:0 1rem }
@@ -1646,15 +1730,23 @@
     <div class="hero-headline">Grab a rigged low-poly character in seconds.</div>
     <div class="hero-subline">Over 20 unique models. Download and create instantly.</div>
     <div class="hero-search">
-      <input
-        id="heroSearch"
-        type="search"
-        placeholder="Search for anything"
-        autocomplete="off"
-        autocorrect="off"
-        autocapitalize="off"
-        spellcheck="false"
-      />
+      <div class="modern-search-wrapper">
+        <input
+          id="heroSearch"
+          type="search"
+          placeholder="Search for anything"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+        />
+        <span class="search-icon-right">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" stroke="#ff7e5f" stroke-width="2.2" fill="none"/>
+            <line x1="16.2" y1="16.2" x2="21" y2="21" stroke="#ff7e5f" stroke-width="2.2" stroke-linecap="round"/>
+          </svg>
+        </span>
+      </div>
     </div>
   </section>
 
