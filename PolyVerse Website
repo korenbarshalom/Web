@@ -2689,7 +2689,7 @@
     function showRegister(){
       loginView.style.display='none';
       registerView.style.display='block';
-      modalTitle.textContent='Create Account';
+      modalTitle.textContent='Sign Up';
       clearAllErrors();
       // Attach event listener for 'Log In' link in register view
       setTimeout(() => {
