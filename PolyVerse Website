@@ -1686,6 +1686,58 @@
         height: 110px;
       }
     }
+
+    /* --- Custom Login/Signup Button Adjustments --- */
+    .login-btn-custom {
+      color: #e0e0e0 !important;
+      border: 2px solid #e0e0e0 !important;
+      background: transparent !important;
+      font-weight: 600;
+      min-width: 100px !important;
+      min-height: 44px;
+      font-size: 1.05rem;
+      padding: 0.45rem 1.3rem !important;
+      letter-spacing: 0.01em;
+      transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    }
+    .login-btn-custom:hover, .login-btn-custom:focus {
+      background: #232326 !important;
+      color: #fafafa !important;
+      border-color: #bdbdbd !important;
+      box-shadow: none;
+      transform: none;
+    }
+    .signup-btn-custom {
+      min-width: 100px !important;
+      min-height: 44px;
+      font-size: 1.05rem;
+      padding: 0.45rem 1.3rem !important;
+      letter-spacing: 0.01em;
+      transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    }
+    .signup-btn-custom:hover, .signup-btn-custom:focus {
+      background: rgba(255,153,0,0.10);
+      color: #ffa833;
+      border-color: #ffa833;
+      box-shadow: none;
+      transform: none;
+    }
+    /* Remove enlarge-on-hover for signup */
+    .signup-btn-custom.enlarged, .signup-btn-custom:active, .signup-btn-custom:hover {
+      font-size: 1.05rem !important;
+      padding: 0.45rem 1.3rem !important;
+      min-width: 100px !important;
+      min-height: 44px !important;
+      border-radius: 14px !important;
+    }
+    @media (max-width: 600px) {
+      .login-btn-custom, .signup-btn-custom {
+        font-size: 0.97rem !important;
+        padding: 0.4rem 0.8rem !important;
+        min-width: 80px !important;
+        min-height: 36px !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1720,8 +1772,8 @@
       </div>
     </div>
     <ul>
-      <li><button class="btn btn-outline" id="signupBtn">Sign Up</button></li>
-      <li><button class="btn btn-outline profile-btn-combo" id="loginBtn"><!-- Avatar+Name injected by JS --></button></li>
+      <li><button class="btn btn-outline login-btn-custom" id="loginBtn">Login</button></li>
+      <li><button class="btn btn-outline signup-btn-custom" id="signupBtn">Sign Up</button></li>
     </ul>
   </nav>
 
