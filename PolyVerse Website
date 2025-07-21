@@ -1755,6 +1755,42 @@
         min-height: 36px !important;
       }
     }
+
+    /* Custom checkbox for Sign Up form */
+    #termsCheckbox {
+      width: 16px;
+      height: 16px;
+      margin-right: 0.7em;
+      margin-top: 4px;
+      accent-color: #ff9800;
+      flex-shrink: 0;
+      vertical-align: top;
+      appearance: none;
+      -webkit-appearance: none;
+      background: transparent;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      outline: none;
+      cursor: pointer;
+      position: relative;
+      transition: border 0.18s, box-shadow 0.18s;
+      display: inline-block;
+    }
+    #termsCheckbox:checked {
+      background: #ff9800;
+      border-color: #ff9800;
+    }
+    #termsCheckbox:checked::after {
+      content: '\2714';
+      color: #222;
+      font-size: 14px;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-weight: bold;
+      line-height: 1;
+    }
   </style>
 </head>
 <body>
@@ -1968,6 +2004,17 @@
           <div class="strength-text" id="strengthText"></div>
         </div>
         <div class="error-message" id="passwordError"></div>
+
+        <!-- Terms Checkbox -->
+        <div style="display:flex;align-items:flex-start;margin-bottom:1.1rem;margin-top:0.2rem;">
+          <input type="checkbox" id="termsCheckbox">
+          <label for="termsCheckbox" style="font-size:1.05rem;color:#fff;cursor:pointer;user-select:none;line-height:1.4;display:inline-block;">
+            I accept the
+            <a href="#" style="color:#ff9800;font-weight:600;text-decoration:none;" target="_blank">Terms of Service</a>
+            and
+            <a href="#" style="color:#ff9800;font-weight:600;text-decoration:none;" target="_blank">Privacy Policy</a>
+          </label>
+        </div>
 
         <button class="register-submit" id="registerSubmitBtn">Create Account</button>
         <div class="success-message" id="registerSuccess"></div>
