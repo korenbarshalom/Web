@@ -2677,7 +2677,13 @@
         return;
       }
       currentUser = user;
-      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      // Only store minimal info in currentUser
+      const minimalUser = {
+        id: user.username,
+        username: user.username,
+        token: undefined // No token for local login, but keep field for consistency
+      };
+      localStorage.setItem('currentUser', JSON.stringify(minimalUser));
       showSuccess(loginSuccess, 'Login successful! Welcome back!');
       setTimeout(() => {
         closeModal(loginModal);
@@ -3804,8 +3810,14 @@ function handleGoogleCredentialResponse(response) {
       users.push(user);
       saveUsers(users);
     }
-    localStorage.setItem('user', JSON.stringify(user));
-    localStorage.setItem('currentUser', JSON.stringify(user));
+    // Only store minimal info in currentUser
+    const minimalUser = {
+      id: user.sub || user.email,
+      username: user.email,
+      token: response.credential
+    };
+    localStorage.setItem('user', JSON.stringify(user)); // keep full user for legacy, but not for currentUser
+    localStorage.setItem('currentUser', JSON.stringify(minimalUser));
     window.location.href = 'index.html';
   } catch (err) {
     alert('Google login failed: ' + (err?.message || err));
