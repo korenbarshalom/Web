@@ -1366,6 +1366,14 @@
       display: none;
       padding: 2.5rem 0 2.5rem 0;
       width: 100%;
+      opacity: 0;
+      transition: opacity 0.45s cubic-bezier(.4,.01,.22,1);
+      pointer-events: none;
+    }
+    #likesListPage.active {
+      display: block;
+      opacity: 1;
+      pointer-events: auto;
     }
     .likes-list-container {
       max-width: 1280px;
@@ -1432,6 +1440,14 @@
       color: var(--text);
       display: none;
       padding: 2.5rem 0 2.5rem 0;
+      opacity: 0;
+      transition: opacity 0.45s cubic-bezier(.4,.01,.22,1);
+      pointer-events: none;
+    }
+    #purchasedListPage.active {
+      display: block;
+      opacity: 1;
+      pointer-events: auto;
     }
     .purchased-list-container {
       max-width: 1280px;
@@ -1790,6 +1806,22 @@
       transform: translate(-50%, -50%);
       font-weight: bold;
       line-height: 1;
+    }
+
+    #profilePage {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      display: none;
+      padding: 2.5rem 0 2.5rem 0;
+      opacity: 0;
+      transition: opacity 0.45s cubic-bezier(.4,.01,.22,1);
+      pointer-events: none;
+    }
+    #profilePage.active {
+      display: block;
+      opacity: 1;
+      pointer-events: auto;
     }
   </style>
 </head>
@@ -3140,16 +3172,24 @@
       // Hide likes/list page and clear gallery
       const likesListPage = document.getElementById('likesListPage');
       if (likesListPage) {
-        likesListPage.style.display = 'none';
+        likesListPage.classList.remove('active');
+        setTimeout(() => { likesListPage.style.display = 'none'; }, 450);
         const likesListGallery = document.getElementById('likesListGallery');
         if (likesListGallery) likesListGallery.innerHTML = '';
       }
       // Hide purchased page if present
       const purchasedListPage = document.getElementById('purchasedListPage');
-      if (purchasedListPage) purchasedListPage.style.display = 'none';
-      // Show profile page
+      if (purchasedListPage) {
+        purchasedListPage.classList.remove('active');
+        setTimeout(() => { purchasedListPage.style.display = 'none'; }, 450);
+      }
+      // Show profile page with smooth transition
       const profilePage = document.getElementById('profilePage');
+      profilePage.classList.remove('active');
       profilePage.style.display = 'block';
+      setTimeout(() => {
+        profilePage.classList.add('active');
+      }, 10);
       window.scrollTo(0,0);
       // Load current user data (from localStorage, not yet saved changes)
       let user = JSON.parse(localStorage.getItem('currentUser'));
@@ -3207,14 +3247,20 @@
       };
       // Back button
       document.getElementById('backProfile').onclick = () => {
-        profilePage.style.display = 'none';
-        mainContent.style.display = 'block';
-        homepageBanner.style.display = '';
-        topSearchbar.style.display = 'none';
-        window.scrollTo(0,0);
+        profilePage.classList.remove('active');
+        setTimeout(() => {
+          profilePage.style.display = 'none';
+          mainContent.style.display = 'block';
+          homepageBanner.style.display = '';
+          topSearchbar.style.display = 'none';
+          window.scrollTo(0,0);
+        }, 450);
       };
       // In openProfilePage, after hiding other pages:
-      if (purchasedListPage) purchasedListPage.style.display = 'none';
+      if (purchasedListPage) {
+        purchasedListPage.classList.remove('active');
+        setTimeout(() => { purchasedListPage.style.display = 'none'; }, 450);
+      }
     }
 
     // --- Like/List logic ---
@@ -3317,13 +3363,23 @@
       topSearchbar.style.display = 'none';
       // Hide profile page if present
       const profilePage = document.getElementById('profilePage');
-      if (profilePage) profilePage.style.display = 'none';
+      if (profilePage) {
+        profilePage.classList.remove('active');
+        setTimeout(() => { profilePage.style.display = 'none'; }, 450);
+      }
       // Hide purchased page if present
       const purchasedListPage = document.getElementById('purchasedListPage');
-      if (purchasedListPage) purchasedListPage.style.display = 'none';
-      // Show likes/list page
+      if (purchasedListPage) {
+        purchasedListPage.classList.remove('active');
+        setTimeout(() => { purchasedListPage.style.display = 'none'; }, 450);
+      }
+      // Show likes/list page with smooth transition
       const likesListPage = document.getElementById('likesListPage');
+      likesListPage.classList.remove('active');
       likesListPage.style.display = 'block';
+      setTimeout(() => {
+        likesListPage.classList.add('active');
+      }, 10);
       window.scrollTo(0,0);
       // Set title
       const title = type === 'likes' ? 'My Likes' : 'My List';
@@ -3355,15 +3411,17 @@
       }
       // Back button
       document.getElementById('backLikesList').onclick = () => {
-        likesListPage.style.display = 'none';
-        // Clear the gallery content to prevent bleed-through
-        document.getElementById('likesListGallery').innerHTML = '';
-        mainContent.style.display = 'block';
-        homepageBanner.style.display = '';
-        topSearchbar.style.display = 'none';
-        // Ensure the hero search bar is visible again
-        heroSearch.parentElement.classList.remove('hide');
-        window.scrollTo(0,0);
+        likesListPage.classList.remove('active');
+        setTimeout(() => {
+          likesListPage.style.display = 'none';
+          document.getElementById('likesListGallery').innerHTML = '';
+          mainContent.style.display = 'block';
+          homepageBanner.style.display = '';
+          topSearchbar.style.display = 'none';
+          // Ensure the hero search bar is visible again
+          heroSearch.parentElement.classList.remove('hide');
+          window.scrollTo(0,0);
+        }, 450);
       };
     }
 
@@ -3392,13 +3450,23 @@
       topSearchbar.style.display = 'none';
       // Hide profile page if present
       const profilePage = document.getElementById('profilePage');
-      if (profilePage) profilePage.style.display = 'none';
+      if (profilePage) {
+        profilePage.classList.remove('active');
+        setTimeout(() => { profilePage.style.display = 'none'; }, 450);
+      }
       // Hide likes/list page if present
       const likesListPage = document.getElementById('likesListPage');
-      if (likesListPage) likesListPage.style.display = 'none';
-      // Show purchased page
+      if (likesListPage) {
+        likesListPage.classList.remove('active');
+        setTimeout(() => { likesListPage.style.display = 'none'; }, 450);
+      }
+      // Show purchased page with smooth transition
       const purchasedListPage = document.getElementById('purchasedListPage');
+      purchasedListPage.classList.remove('active');
       purchasedListPage.style.display = 'block';
+      setTimeout(() => {
+        purchasedListPage.classList.add('active');
+      }, 10);
       window.scrollTo(0,0);
       // Get purchased model IDs
       let ids = getUserPurchased();
@@ -3465,13 +3533,16 @@
       }
       // Back button
       document.getElementById('backPurchasedList').onclick = () => {
-        purchasedListPage.style.display = 'none';
-        document.getElementById('purchasedListGallery').innerHTML = '';
-        mainContent.style.display = 'block';
-        homepageBanner.style.display = '';
-        topSearchbar.style.display = 'none';
-        heroSearch.parentElement.classList.remove('hide');
-        window.scrollTo(0,0);
+        purchasedListPage.classList.remove('active');
+        setTimeout(() => {
+          purchasedListPage.style.display = 'none';
+          document.getElementById('purchasedListGallery').innerHTML = '';
+          mainContent.style.display = 'block';
+          homepageBanner.style.display = '';
+          topSearchbar.style.display = 'none';
+          heroSearch.parentElement.classList.remove('hide');
+          window.scrollTo(0,0);
+        }, 450);
       };
     }
 
