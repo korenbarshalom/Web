@@ -335,6 +335,14 @@
       min-height: 100vh;
       display: none;
       color: #fff;
+      opacity: 0;
+      transition: opacity 0.45s cubic-bezier(.4,.01,.22,1);
+      pointer-events: none;
+    }
+    #modelPage.active {
+      display: block;
+      opacity: 1;
+      pointer-events: auto;
     }
     #modelPage .model-detail {
       display: flex;
@@ -762,6 +770,15 @@
     #checkoutPage {
       display:none; padding:2rem; min-height:100vh;
       background:var(--bg); color:var(--text);
+      /* Add transition for smooth fade-in */
+      opacity: 0;
+      transition: opacity 0.45s cubic-bezier(.4,.01,.22,1);
+      pointer-events: none;
+    }
+    #checkoutPage.active {
+      display: block;
+      opacity: 1;
+      pointer-events: auto;
     }
     #checkoutPage form {
       max-width:500px; margin:auto; display:flex; flex-direction:column; gap:1rem;
@@ -2165,7 +2182,11 @@
       // Hide main content, show model page
       mainContent.style.display = 'none';
       checkoutPage.style.display = 'none';
+      modelPage.classList.remove('active');
       modelPage.style.display = 'block';
+      setTimeout(() => {
+        modelPage.classList.add('active');
+      }, 10);
       // Hide purchased page if present
       const purchasedListPage = document.getElementById('purchasedListPage');
       if (purchasedListPage) purchasedListPage.style.display = 'none';
@@ -2357,7 +2378,13 @@
       }
       modelPage.style.display='none';
       mainContent.style.display='none';
-      checkoutPage.style.display='block';
+      // --- Begin smooth transition for checkout page ---
+      checkoutPage.classList.remove('active');
+      checkoutPage.style.display = 'block';
+      setTimeout(() => {
+        checkoutPage.classList.add('active');
+      }, 10);
+      // --- End smooth transition ---
       // Show navbar search, hide hero search and hero banner
       navbarSearch.value = '';
       heroSearch.parentElement.classList.add('hide');
@@ -2378,20 +2405,29 @@
       document.getElementById('checkoutModelMeta').textContent = meta.join(' | ');
     };
     backCheckout.onclick=()=>{
-      // Return to previous model page if available
       if (lastOpenedModel) {
-        checkoutPage.style.display = 'none';
-        openModelPage(lastOpenedModel);
+        checkoutPage.classList.remove('active');
+        setTimeout(() => {
+          checkoutPage.style.display = 'none';
+          modelPage.classList.remove('active');
+          modelPage.style.display = 'block';
+          setTimeout(() => {
+            modelPage.classList.add('active');
+          }, 10);
+          openModelPage(lastOpenedModel);
+        }, 450);
       } else {
-        // Fallback: go to home/shop
-        checkoutPage.style.display = 'none';
-        modelPage.style.display = 'none';
-        mainContent.style.display = 'block';
-        navbarSearch.value = '';
-        heroSearch.parentElement.classList.remove('hide');
-        topSearchbar.style.display = 'none';
-        if(homepageBanner) homepageBanner.style.display = '';
-        window.scrollTo(0,0);
+        checkoutPage.classList.remove('active');
+        setTimeout(() => {
+          checkoutPage.style.display = 'none';
+          modelPage.style.display = 'none';
+          mainContent.style.display = 'block';
+          navbarSearch.value = '';
+          heroSearch.parentElement.classList.remove('hide');
+          topSearchbar.style.display = 'none';
+          if(homepageBanner) homepageBanner.style.display = '';
+          window.scrollTo(0,0);
+        }, 450);
       }
     };
 
