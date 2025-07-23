@@ -1878,6 +1878,27 @@
       font-weight: 500;
     }
     /* End overrides */
+
+    /* ---- Primary Action Button Overrides (Create Account & Continue) ---- */
+    #loginModal .login-btn,
+    #loginModal .register-submit {
+      font-size: 17px !important; /* Typography */
+      font-weight: 700 !important;
+      border-radius: 4px !important; /* Shape */
+      transition: background 150ms linear !important; /* Hover transition */
+      transform: none !important; /* Remove grow/scale */
+    }
+    #loginModal .login-btn:hover,
+    #loginModal .register-submit:hover {
+      background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), var(--accent) !important; /* Subtle black overlay */
+      transform: none !important; /* Ensure no movement */
+      cursor: pointer;
+    }
+    #loginModal .login-btn:active,
+    #loginModal .register-submit:active {
+      transform: none !important; /* Prevent press translate */
+    }
+    /* ---- End Button Overrides ---- */
   </style>
 </head>
 <body>
