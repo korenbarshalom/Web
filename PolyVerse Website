@@ -1932,6 +1932,57 @@
     .password-field .toggle-visibility .material-icons { font-size: 18px; color: rgba(242,242,242,0.85); line-height: 1; }
     .password-field input:focus ~ .toggle-visibility .material-icons { color: #f7931e; }
     /* ---- End Toggle Styles ---- */
+
+    /* ==== Floating-Label Inputs (Register Modal) ==== */
+    .input-wrapper {
+      position: relative;
+      margin-bottom: 1.1rem;
+    }
+
+    /* Ensure previously hidden labels are visible within wrapper */
+    #registerView .input-wrapper label {
+      display: inline-block; /* avoid full-width block causing rectangle */
+      width: auto; /* reset width from generic rule to fit content */
+    }
+
+    .input-wrapper label {
+      position: absolute;
+      left: 14px;
+      top: 36%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: rgba(242,242,242,0.85);
+      font-size: 15px;
+      line-height: 1;
+      transition: all 0.18s cubic-bezier(.4,.01,.22,1);
+      background: var(--card-bg); /* match modal background to mask border without extra bar */
+      z-index: 1; /* sit above border */
+    }
+
+    .input-wrapper input::placeholder {
+      color: transparent !important; /* Hide placeholder so label acts as placeholder */
+    }
+
+    /* Float label when field is focused or contains text */
+    .input-wrapper input:focus ~ label,
+    .input-wrapper input:not(:placeholder-shown) ~ label {
+      top: 0; /* place label directly in center of border */
+      left: 10px;
+      font-size: 13px;
+      background: var(--card-bg);
+      padding: 0 6px;
+      color: var(--accent);
+    }
+
+    /* Maintain correct layering for password icon & label overlap */
+    .password-field .toggle-visibility {
+      z-index: 2;
+    }
+
+    /* Highlight outline on focus */
+    #registerView input.login-input:focus {
+      border-color: var(--accent);
+    }
   </style>
 </head>
 <body>
@@ -2131,17 +2182,21 @@
 
       <!-- ===== REGISTER VIEW ===== -->
       <div id="registerView">
-        <label>Full Name</label>
-        <input type="text" class="login-input" id="registerName" placeholder="Full Name" required>
+        <div class="input-wrapper">
+          <input type="text" class="login-input" id="registerName" placeholder=" " required>
+          <label for="registerName">Full Name</label>
+        </div>
         <div class="error-message" id="nameError"></div>
 
-        <label>Username</label>
-        <input type="text" class="login-input" id="registerUsername" placeholder="Username" required>
+        <div class="input-wrapper">
+          <input type="text" class="login-input" id="registerUsername" placeholder=" " required>
+          <label for="registerUsername">Username</label>
+        </div>
         <div class="error-message" id="usernameError"></div>
 
-        <label>Password</label>
-        <div class="password-field">
-          <input type="password" class="login-input" id="registerPassword" placeholder="Password" required>
+        <div class="password-field input-wrapper">
+          <input type="password" class="login-input" id="registerPassword" placeholder=" " required>
+          <label for="registerPassword">Password</label>
           <button type="button" class="toggle-visibility" aria-label="Show password"><span class="material-icons">visibility_off</span></button>
         </div>
         <p class="password-helper">Password must be at least 8 characters</p>
