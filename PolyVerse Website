@@ -2238,7 +2238,7 @@
 
   <!-- GALLERY -->
   <main id="mainContent">
-    <button class="btn back-btn" id="backToShopSearch" style="display:none;position:absolute;top:120px;left:2vw;z-index:20;font-size:1.09rem;padding:0.62rem 1.7rem;min-width:124px;min-height:44px;">← Back to Shop</button>
+    <button class="btn back-btn" id="backToShopSearch" style="display:none;position:absolute;top:120px;left:2vw;z-index:20;">← Back to Shop</button>
     <section class="gallery" id="gallery"></section>
   </main>
 
