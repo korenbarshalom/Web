@@ -1857,7 +1857,12 @@
 
     /* ---- Log-In Input Styling Overrides ---- */
     #loginView label {
-      display: none; /* Hide external labels */
+      display: none; /* Hide external labels outside wrappers */
+    }
+    /* Show floating labels inside input-wrapper */
+    #loginView .input-wrapper label {
+      display: inline-block;
+      width: auto;
     }
     #loginView input.login-input {
       width: 100%;
@@ -1870,7 +1875,7 @@
       font-weight: 500;
     }
     #loginView input.login-input:focus {
-      border-color: #6f6f76;
+      border-color: var(--accent);
     }
     #loginView input.login-input::placeholder {
       color: #f2f2f2;
@@ -2155,13 +2160,15 @@
 
       <!-- ===== LOGIN VIEW ===== -->
       <div id="loginView">
-        <label>Username</label>
-        <input type="text" class="login-input" id="loginUsername" placeholder="Your username" required>
+        <div class="input-wrapper">
+          <input type="text" class="login-input" id="loginUsername" placeholder=" " required>
+          <label for="loginUsername">Username</label>
+        </div>
         <div class="error-message" id="loginUsernameError"></div>
 
-        <label>Password</label>
-        <div class="password-field">
-          <input type="password" class="login-input" id="loginPassword" placeholder="Password" required>
+        <div class="password-field input-wrapper">
+          <input type="password" class="login-input" id="loginPassword" placeholder=" " required>
+          <label for="loginPassword">Password</label>
           <button type="button" class="toggle-visibility" aria-label="Show password"><span class="material-icons">visibility_off</span></button>
         </div>
         <div class="error-message" id="loginPasswordError"></div>
