@@ -2646,6 +2646,8 @@
       // In openLikesOrListPage, after hiding other pages:
       const purchasedListPage = document.getElementById('purchasedListPage');
       if (purchasedListPage) purchasedListPage.style.display = 'none';
+      // Hide the Back to Shop button if visible
+      hideBackToShopButton();
     };
     buyNowBtn.onclick=()=>{
       // Store paid model ID in sessionStorage for post-payment download
@@ -3687,7 +3689,12 @@
 
               const card = document.createElement('div');
               card.className = 'card';
-              card.innerHTML = `\n            <img src=\"${m.thumb}\" alt=\"${m.title}\">\n            <div class=\"info\">\n              <h3>${m.title}</h3>\n              <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>\n            </div>`;
+              card.innerHTML = `
+                <img src=\"${m.thumb}\" alt=\"${m.title}\">
+                <div class=\"info\">
+                  <h3>${m.title}</h3>
+                  <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>
+                </div>`;
               card.onclick = () => openModelPage(m, false);
               cardWrapper.appendChild(card);
 
@@ -3754,7 +3761,12 @@
 
             const card = document.createElement('div');
             card.className = 'card';
-            card.innerHTML = `\n            <img src=\"${m.thumb}\" alt=\"${m.title}\">\n            <div class=\"info\">\n              <h3>${m.title}</h3>\n              <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>\n            </div>`;
+            card.innerHTML = `
+              <img src=\"${m.thumb}\" alt=\"${m.title}\">
+              <div class=\"info\">
+                <h3>${m.title}</h3>
+                <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>
+              </div>`;
             card.onclick = () => openModelPage(m, false);
             cardWrapper.appendChild(card);
 
