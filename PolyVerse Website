@@ -4453,15 +4453,19 @@ if (signupBtn) {
 
     const backToShopSearch = document.getElementById('backToShopSearch');
 
-    // Show the button after a search is performed
+    // Show the button only when the search page (mainContent) is visible
     function showBackToShopButton() {
-      backToShopSearch.style.display = 'block';
+      if (mainContent.style.display !== 'none') {
+        backToShopSearch.style.display = 'block';
+      } else {
+        backToShopSearch.style.display = 'none';
+      }
     }
     function hideBackToShopButton() {
       backToShopSearch.style.display = 'none';
     }
 
-    // Update search logic to show/hide the button
+    // Update search logic to always show the button on the search page
     heroSearch.addEventListener('keydown', e => {
       if (e.key === 'Enter') {
         // ... existing code ...
@@ -4474,13 +4478,15 @@ if (signupBtn) {
         showBackToShopButton();
       }
     });
-    // Hide the button when returning to homepage
+    // Always show the button when on the search page, even if input is empty
     navbarSearch.addEventListener('input', e => {
-      if (e.target.value.trim() === '') {
-        hideBackToShopButton();
-      }
+      showBackToShopButton();
     });
-    // Also hide when navigating away from search results
+    // Also show when search page is opened
+    window.addEventListener('DOMContentLoaded', () => {
+      showBackToShopButton();
+    });
+    // Hide when navigating away from search page
     function hideSearchResultsAndBackButton() {
       hideBackToShopButton();
     }
