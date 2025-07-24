@@ -2487,9 +2487,10 @@
       viewToggle.style.display = 'none';
       window.scrollTo(0,0);
       
+      // Always render suggested models
+      renderSuggestedModels(m.id);
       // Only randomize suggestions when coming from homepage
       if (fromHomepage) {
-        renderSuggestedModels(m.id);
         comingFromHomepage = false;
       }
       
