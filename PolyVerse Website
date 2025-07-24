@@ -3564,47 +3564,61 @@
         profilePage.classList.remove('active');
         setTimeout(() => { profilePage.style.display = 'none'; }, 450);
       }
-      // Hide purchased page if present
+      // Hide purchased page if present (use fade helper)
       const purchasedListPage = document.getElementById('purchasedListPage');
-      if (purchasedListPage) {
-        purchasedListPage.classList.remove('active');
-        setTimeout(() => { purchasedListPage.style.display = 'none'; }, 450);
-      }
-      // Show likes/list page with smooth transition
       const likesListPage = document.getElementById('likesListPage');
-      likesListPage.classList.remove('active');
-      likesListPage.style.display = 'block';
-      setTimeout(() => {
-        likesListPage.classList.add('active');
-      }, 10);
-      window.scrollTo(0,0);
-      // Set title
-      const title = type === 'likes' ? 'My Likes' : 'My List';
-      document.getElementById('likesListTitle').textContent = title;
-      // Get model IDs
-      let ids = [];
-      if (type === 'likes') ids = getUserLikes();
-      else ids = getUserList();
-      // Get models
-      const filtered = models.filter(m => ids.includes(m.id));
-      // Render
-      const galleryDiv = document.getElementById('likesListGallery');
-      if (filtered.length === 0) {
-        galleryDiv.innerHTML = `<div id=\"no-results-message\"><div>¯\\_(ツ)_/¯</div><div>No models yet</div></div>`;
-      } else {
-        galleryDiv.innerHTML = '';
-        filtered.forEach(m => {
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.innerHTML = `
-            <img src=\"${m.thumb}\" alt=\"${m.title}\">
-            <div class=\"info\">
-              <h3>${m.title}</h3>
-              <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>
-            </div>`;
-          card.onclick = () => openModelPage(m, false);
-          galleryDiv.appendChild(card);
+      if (purchasedListPage && purchasedListPage.style.display !== 'none') {
+        switchSectionFadeOutIn(purchasedListPage, likesListPage, () => {
+          // Set title and render after fade in
+          const title = type === 'likes' ? 'My Likes' : 'My List';
+          document.getElementById('likesListTitle').textContent = title;
+          let ids = type === 'likes' ? getUserLikes() : getUserList();
+          const filtered = models.filter(m => ids.includes(m.id));
+          const galleryDiv = document.getElementById('likesListGallery');
+          if (filtered.length === 0) {
+            galleryDiv.innerHTML = `<div id=\"no-results-message\"><div>¯\\_(ツ)_/¯</div><div>No models yet</div></div>`;
+          } else {
+            galleryDiv.innerHTML = '';
+            filtered.forEach(m => {
+              const card = document.createElement('div');
+              card.className = 'card';
+              card.innerHTML = `\n            <img src=\"${m.thumb}\" alt=\"${m.title}\">\n            <div class=\"info\">\n              <h3>${m.title}</h3>\n              <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>\n            </div>`;
+              card.onclick = () => openModelPage(m, false);
+              galleryDiv.appendChild(card);
+            });
+          }
         });
+      } else {
+        // Show likes/list page with smooth transition
+        likesListPage.classList.remove('active');
+        likesListPage.style.display = 'block';
+        setTimeout(() => {
+          likesListPage.classList.add('active');
+        }, 10);
+        window.scrollTo(0,0);
+        // Set title
+        const title = type === 'likes' ? 'My Likes' : 'My List';
+        document.getElementById('likesListTitle').textContent = title;
+        // Get model IDs
+        let ids = [];
+        if (type === 'likes') ids = getUserLikes();
+        else ids = getUserList();
+        // Get models
+        const filtered = models.filter(m => ids.includes(m.id));
+        // Render
+        const galleryDiv = document.getElementById('likesListGallery');
+        if (filtered.length === 0) {
+          galleryDiv.innerHTML = `<div id=\"no-results-message\"><div>¯\\_(ツ)_/¯</div><div>No models yet</div></div>`;
+        } else {
+          galleryDiv.innerHTML = '';
+          filtered.forEach(m => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `\n            <img src=\"${m.thumb}\" alt=\"${m.title}\">\n            <div class=\"info\">\n              <h3>${m.title}</h3>\n              <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>\n            </div>`;
+            card.onclick = () => openModelPage(m, false);
+            galleryDiv.appendChild(card);
+          });
+        }
       }
       // Back button
       document.getElementById('backLikesList').onclick = () => {
@@ -3651,82 +3665,134 @@
         profilePage.classList.remove('active');
         setTimeout(() => { profilePage.style.display = 'none'; }, 450);
       }
-      // Hide likes/list page if present
+      // Hide likes/list page if present (use fade helper)
       const likesListPage = document.getElementById('likesListPage');
-      if (likesListPage) {
-        likesListPage.classList.remove('active');
-        setTimeout(() => { likesListPage.style.display = 'none'; }, 450);
-      }
-      // Show purchased page with smooth transition
       const purchasedListPage = document.getElementById('purchasedListPage');
-      purchasedListPage.classList.remove('active');
-      purchasedListPage.style.display = 'block';
-      setTimeout(() => {
-        purchasedListPage.classList.add('active');
-      }, 10);
-      window.scrollTo(0,0);
-      // Get purchased model IDs
-      let ids = getUserPurchased();
-      // Get models
-      const filtered = models.filter(m => ids.includes(m.id));
-      // Render
-      const galleryDiv = document.getElementById('purchasedListGallery');
-      if (filtered.length === 0) {
-        galleryDiv.innerHTML = `<div id=\"no-results-message\"><div>¯\\_(ツ)_/¯</div><div>No purchased models yet</div></div>`;
-      } else {
-        galleryDiv.innerHTML = '';
-        filtered.forEach(m => {
-          const cardWrapper = document.createElement('div');
-          cardWrapper.style.display = 'flex';
-          cardWrapper.style.flexDirection = 'column';
-          cardWrapper.style.alignItems = 'center';
-          cardWrapper.style.marginBottom = '2.5rem';
+      if (likesListPage && likesListPage.style.display !== 'none') {
+        switchSectionFadeOutIn(likesListPage, purchasedListPage, () => {
+          // Render after fade in
+          let ids = getUserPurchased();
+          const filtered = models.filter(m => ids.includes(m.id));
+          const galleryDiv = document.getElementById('purchasedListGallery');
+          if (filtered.length === 0) {
+            galleryDiv.innerHTML = `<div id=\"no-results-message\"><div>¯\\_(ツ)_/¯</div><div>No purchased models yet</div></div>`;
+          } else {
+            galleryDiv.innerHTML = '';
+            filtered.forEach(m => {
+              const cardWrapper = document.createElement('div');
+              cardWrapper.style.display = 'flex';
+              cardWrapper.style.flexDirection = 'column';
+              cardWrapper.style.alignItems = 'center';
+              cardWrapper.style.marginBottom = '2.5rem';
 
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.innerHTML = `
-            <img src=\"${m.thumb}\" alt=\"${m.title}\">
-            <div class=\"info\">
-              <h3>${m.title}</h3>
-              <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>
-            </div>`;
-          card.onclick = () => openModelPage(m, false);
-          cardWrapper.appendChild(card);
+              const card = document.createElement('div');
+              card.className = 'card';
+              card.innerHTML = `\n            <img src=\"${m.thumb}\" alt=\"${m.title}\">\n            <div class=\"info\">\n              <h3>${m.title}</h3>\n              <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>\n            </div>`;
+              card.onclick = () => openModelPage(m, false);
+              cardWrapper.appendChild(card);
 
-          // Download button below card
-          const downloadBtn = document.createElement('button');
-          downloadBtn.className = 'download-btn';
-          downloadBtn.style.marginTop = '20px';
-          downloadBtn.style.display = 'block';
-          downloadBtn.style.alignSelf = 'center';
-          downloadBtn.textContent = 'Download';
-          downloadBtn.onclick = (e) => {
-            e.stopPropagation();
-            const format = 'fbx';
-            const modelName = m.title.replace(/\s+/g, '_');
-            const availableFormats = getAvailableFormats(m);
-            if (!availableFormats.includes(format)) {
-              alert(`Sorry, ${format.toUpperCase()} format is not available for this model yet.\n\nAvailable formats: ${availableFormats.map(f => f.toUpperCase()).join(', ')}`);
-              return;
-            }
-            const fileUrl = getFileUrlForFormat(m, format);
-            if (!fileUrl) {
-              alert(`Download not available for ${format.toUpperCase()} format.`);
-              return;
-            }
-            const link = document.createElement('a');
-            link.href = fileUrl;
-            link.download = `${modelName}.${format}`;
-            link.style.display = 'none';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            alert(`Downloading ${modelName}.${format}...`);
-          };
-          cardWrapper.appendChild(downloadBtn);
+              // Download button below card
+              const downloadBtn = document.createElement('button');
+              downloadBtn.className = 'download-btn';
+              downloadBtn.style.marginTop = '20px';
+              downloadBtn.style.display = 'block';
+              downloadBtn.style.alignSelf = 'center';
+              downloadBtn.textContent = 'Download';
+              downloadBtn.onclick = (e) => {
+                e.stopPropagation();
+                const format = 'fbx';
+                const modelName = m.title.replace(/\s+/g, '_');
+                const availableFormats = getAvailableFormats(m);
+                if (!availableFormats.includes(format)) {
+                  alert(`Sorry, ${format.toUpperCase()} format is not available for this model yet.\n\nAvailable formats: ${availableFormats.map(f => f.toUpperCase()).join(', ')}`);
+                  return;
+                }
+                const fileUrl = getFileUrlForFormat(m, format);
+                if (!fileUrl) {
+                  alert(`Download not available for ${format.toUpperCase()} format.`);
+                  return;
+                }
+                const link = document.createElement('a');
+                link.href = fileUrl;
+                link.download = `${modelName}.${format}`;
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                alert(`Downloading ${modelName}.${format}...`);
+              };
+              cardWrapper.appendChild(downloadBtn);
 
-          galleryDiv.appendChild(cardWrapper);
+              galleryDiv.appendChild(cardWrapper);
+            });
+          }
         });
+      } else {
+        // Show purchased page with smooth transition
+        purchasedListPage.classList.remove('active');
+        purchasedListPage.style.display = 'block';
+        setTimeout(() => {
+          purchasedListPage.classList.add('active');
+        }, 10);
+        window.scrollTo(0,0);
+        // Get purchased model IDs
+        let ids = getUserPurchased();
+        // Get models
+        const filtered = models.filter(m => ids.includes(m.id));
+        // Render
+        const galleryDiv = document.getElementById('purchasedListGallery');
+        if (filtered.length === 0) {
+          galleryDiv.innerHTML = `<div id=\"no-results-message\"><div>¯\\_(ツ)_/¯</div><div>No purchased models yet</div></div>`;
+        } else {
+          galleryDiv.innerHTML = '';
+          filtered.forEach(m => {
+            const cardWrapper = document.createElement('div');
+            cardWrapper.style.display = 'flex';
+            cardWrapper.style.flexDirection = 'column';
+            cardWrapper.style.alignItems = 'center';
+            cardWrapper.style.marginBottom = '2.5rem';
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `\n            <img src=\"${m.thumb}\" alt=\"${m.title}\">\n            <div class=\"info\">\n              <h3>${m.title}</h3>\n              <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>\n            </div>`;
+            card.onclick = () => openModelPage(m, false);
+            cardWrapper.appendChild(card);
+
+            // Download button below card
+            const downloadBtn = document.createElement('button');
+            downloadBtn.className = 'download-btn';
+            downloadBtn.style.marginTop = '20px';
+            downloadBtn.style.display = 'block';
+            downloadBtn.style.alignSelf = 'center';
+            downloadBtn.textContent = 'Download';
+            downloadBtn.onclick = (e) => {
+              e.stopPropagation();
+              const format = 'fbx';
+              const modelName = m.title.replace(/\s+/g, '_');
+              const availableFormats = getAvailableFormats(m);
+              if (!availableFormats.includes(format)) {
+                alert(`Sorry, ${format.toUpperCase()} format is not available for this model yet.\n\nAvailable formats: ${availableFormats.map(f => f.toUpperCase()).join(', ')}`);
+                return;
+              }
+              const fileUrl = getFileUrlForFormat(m, format);
+              if (!fileUrl) {
+                alert(`Download not available for ${format.toUpperCase()} format.`);
+                return;
+              }
+              const link = document.createElement('a');
+              link.href = fileUrl;
+              link.download = `${modelName}.${format}`;
+              link.style.display = 'none';
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              alert(`Downloading ${modelName}.${format}...`);
+            };
+            cardWrapper.appendChild(downloadBtn);
+
+            galleryDiv.appendChild(cardWrapper);
+          });
+        }
       }
       // Back button
       document.getElementById('backPurchasedList').onclick = () => {
@@ -4252,6 +4318,35 @@ if (signupBtn) {
         });
       });
     });
+
+    // --- Helper for clean tab transitions ---
+    function switchSectionFadeOutIn(oldSection, newSection, afterShow) {
+      if (!oldSection || !newSection) return;
+      // If already hidden, just show new
+      if (oldSection.style.display === 'none' || !oldSection.classList.contains('active')) {
+        newSection.style.display = 'block';
+        // Force reflow for transition
+        void newSection.offsetWidth;
+        newSection.classList.add('active');
+        if (afterShow) afterShow();
+        return;
+      }
+      // Remove .active to start fade out
+      oldSection.classList.remove('active');
+      // Listen for transition end
+      const onFadeOut = (e) => {
+        if (e.target !== oldSection || e.propertyName !== 'opacity') return;
+        oldSection.style.display = 'none';
+        oldSection.removeEventListener('transitionend', onFadeOut);
+        // Now show new section
+        newSection.style.display = 'block';
+        // Force reflow for transition
+        void newSection.offsetWidth;
+        newSection.classList.add('active');
+        if (afterShow) afterShow();
+      };
+      oldSection.addEventListener('transitionend', onFadeOut);
+    }
   </script>
 
   <!-- Google Identity Services (force English) -->
