@@ -1108,16 +1108,36 @@
     /* --- No Results Message --- */
     #no-results-message {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       align-items: center;
       justify-content: center;
       text-align: center;
-      font-size: 32px;
+      font-size: 24px;
       font-weight: bold;
       height: 60vh;
-      color: white;
-      margin-top: 20px;
-      margin-left: 2vw;
+      color: #f2f2f2;
+      margin-top: 1px;
+      margin-left: 30vw;
+      gap: 14px;
+      white-space: nowrap;
+    }
+    .no-results-emoji {
+      font-size: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 0;
+      background: none;
+      border: none;
+      box-shadow: none;
+      padding: 0;
+    }
+    .no-results-text {
+      font-size: 24px;
+      font-weight: bold;
+      color: #f2f2f2;
+      display: flex;
+      align-items: center;
     }
 
     /* ---------- Form Validation & Error Styling ---------- */
@@ -2366,8 +2386,8 @@
         // Show centered no-results message with correct structure and style
         gallery.innerHTML = `
           <div id="no-results-message">
-            <div>¯\\_(ツ)_/¯</div>
-            <div>No results</div>
+            <span class="no-results-emoji">😐</span>
+            <span class="no-results-text">No results found</span>
           </div>
         `;
         lastRenderedIds = newIds;
