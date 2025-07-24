@@ -587,19 +587,37 @@
       margin-top: -48px; /* Move container even higher up */
     }
     #modelPage .suggested h4 {
-      font-size: 1.23rem; /* Increased font size */
-      font-weight: 700;
-      color: #FFA500; /* Strong orange */
+      font-size: 1.45rem; /* Slightly reduced */
+      font-weight: 800;
+      color: #FFA500;
       letter-spacing: -0.01em;
-      text-align: center; /* Center horizontally */
+      text-align: center;
       width: 100%;
       padding-left: 0;
+      margin-top: 1.2rem;
       margin-bottom: 1.1rem;
-      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-      text-shadow: 0 2px 12px rgba(255, 165, 0, 0.18), 0 1px 4px rgba(0,0,0,0.22); /* Subtle orange glow and shadow */
+      font-family: 'Montserrat', 'Inter', 'Segoe UI', Arial, sans-serif;
       border: none;
       background: none;
       display: block;
+      /* Clean gradient text */
+      background: linear-gradient(90deg, #FFA500 0%, #FFD700 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-fill-color: transparent;
+      /* No glow or shadow */
+      /* Thin underline accent */
+      position: relative;
+    }
+    #modelPage .suggested h4::after {
+      content: '';
+      display: block;
+      margin: 0.45rem auto 0 auto;
+      width: 48px;
+      height: 3px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, #FFA500 0%, #FFD700 100%);
     }
     /* --- Load More Button for Suggested Models --- */
     #suggestedLoadMoreBtn {
