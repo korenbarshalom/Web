@@ -1109,17 +1109,22 @@
     #no-results-message {
       display: flex;
       flex-direction: row;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       text-align: center;
       font-size: 24px;
       font-weight: bold;
-      height: 60vh;
+      height: 750%;
       color: #f2f2f2;
-      margin-top: 1px;
-      margin-left: 30vw;
       gap: 14px;
       white-space: nowrap;
+      /* Remove margin-left and margin-top for true centering */
+      margin: 0;
+      position: absolute;
+      top: 50px;
+      left: 0vw;
+      right: 0;
+      bottom: 0;
     }
     .no-results-emoji {
       font-size: 44px;
@@ -2027,6 +2032,42 @@
     #registerView input.login-input:focus {
       border-color: var(--accent);
     }
+
+    /* --- No Results Message (Search Results Only) --- */
+    #search-no-results-message {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      height: 60vh;
+      color: #f2f2f2;
+      gap: 14px;
+      white-space: nowrap;
+      margin: 0;
+      position: relative;
+      left: 22vw; /* Small leftward offset for visual centering */
+    }
+    .search-no-results-emoji {
+      font-size: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 0;
+      background: none;
+      border: none;
+      box-shadow: none;
+      padding: 0;
+    }
+    .search-no-results-text {
+      font-size: 24px;
+      font-weight: bold;
+      color: #f2f2f2;
+      display: flex;
+      align-items: center;
+    }
   </style>
 </head>
 <body>
@@ -2385,9 +2426,9 @@
       if (list.length === 0) {
         // Show centered no-results message with correct structure and style
         gallery.innerHTML = `
-          <div id="no-results-message">
-            <span class="no-results-emoji">😐</span>
-            <span class="no-results-text">No results found</span>
+          <div id="search-no-results-message">
+            <span class="search-no-results-emoji">😐</span>
+            <span class="search-no-results-text">No results found</span>
           </div>
         `;
         lastRenderedIds = newIds;
@@ -3599,7 +3640,7 @@
           const filtered = models.filter(m => ids.includes(m.id));
           const galleryDiv = document.getElementById('likesListGallery');
           if (filtered.length === 0) {
-            galleryDiv.innerHTML = `<div id=\"no-results-message\"><div>¯\\_(ツ)_/¯</div><div>No models yet</div></div>`;
+            galleryDiv.innerHTML = `<div id="no-results-message"><span class="no-results-emoji">😐</span><span class="no-results-text">${type === 'likes' ? 'No liked models yet' : 'No saved models yet'}</span></div>`;
           } else {
             galleryDiv.innerHTML = '';
             filtered.forEach(m => {
@@ -3631,7 +3672,7 @@
         // Render
         const galleryDiv = document.getElementById('likesListGallery');
         if (filtered.length === 0) {
-          galleryDiv.innerHTML = `<div id=\"no-results-message\"><div>¯\\_(ツ)_/¯</div><div>No models yet</div></div>`;
+          galleryDiv.innerHTML = `<div id="no-results-message"><span class="no-results-emoji">😐</span><span class="no-results-text">${type === 'likes' ? 'No liked models yet' : 'No saved models yet'}</span></div>`;
         } else {
           galleryDiv.innerHTML = '';
           filtered.forEach(m => {
@@ -3698,7 +3739,7 @@
           const filtered = models.filter(m => ids.includes(m.id));
           const galleryDiv = document.getElementById('purchasedListGallery');
           if (filtered.length === 0) {
-            galleryDiv.innerHTML = `<div id=\"no-results-message\"><div>¯\\_(ツ)_/¯</div><div>No purchased models yet</div></div>`;
+            galleryDiv.innerHTML = `<div id="no-results-message"><span class="no-results-emoji">😐</span><span class="no-results-text">No purchased models yet</span></div>`;
           } else {
             galleryDiv.innerHTML = '';
             filtered.forEach(m => {
@@ -3770,7 +3811,7 @@
         // Render
         const galleryDiv = document.getElementById('purchasedListGallery');
         if (filtered.length === 0) {
-          galleryDiv.innerHTML = `<div id=\"no-results-message\"><div>¯\\_(ツ)_/¯</div><div>No purchased models yet</div></div>`;
+          galleryDiv.innerHTML = `<div id="no-results-message"><span class="no-results-emoji">😐</span><span class="no-results-text">No purchased models yet</span></div>`;
         } else {
           galleryDiv.innerHTML = '';
           filtered.forEach(m => {
