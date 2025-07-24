@@ -4074,41 +4074,47 @@ function handleGoogleCredentialResponse(response) {
   }
 }
 
-// --- Initialize Google Sign-In buttons ---
+// --- Initialize Google Sign-In buttons (English forced) ---
 window.addEventListener('DOMContentLoaded', () => {
-  if (window.google?.accounts?.id) {
-    window.google.accounts.id.initialize({
-      client_id: '665196132587-cbo8bflq7cstp7mjjcudoa1k5fu1ftss.apps.googleusercontent.com', // ← זה ה־Client ID שלך
-      callback: handleGoogleCredentialResponse,
-      ux_mode: 'popup' // Using popup, so no redirect_uri needed
-    });
+  const waitForGoogle = setInterval(() => {
+    if (window.google?.accounts?.id) {
+      clearInterval(waitForGoogle);
 
-    // Render login button
-    const loginBtn = document.getElementById('g_id_signin');
-    if (loginBtn) {
-      window.google.accounts.id.renderButton(loginBtn, {
-        theme: 'outline',
-        size: 'large',
-        width: 280,
-        text: 'signin_with',
-        shape: 'rectangular',
-        logo_alignment: 'left'
+      window.google.accounts.id.initialize({
+        client_id: '665196132587-cbo8bflq7cstp7mjjcudoa1k5fu1ftss.apps.googleusercontent.com',
+        callback: handleGoogleCredentialResponse,
+        ux_mode: 'popup'
       });
-    }
 
-    // Render sign-up button
-    const signupBtn = document.getElementById('g_id_signup');
-    if (signupBtn) {
-      window.google.accounts.id.renderButton(signupBtn, {
-        theme: 'outline',
-        size: 'large',
-        width: 280,
-        text: 'signup_with',
-        shape: 'rectangular',
-        logo_alignment: 'left'
-      });
+      // Render login button
+      const loginBtn = document.getElementById('g_id_signin');
+      if (loginBtn) {
+        window.google.accounts.id.renderButton(loginBtn, {
+          theme: 'outline',
+          size: 'large',
+          width: 280,
+          text: 'signin_with',
+          shape: 'rectangular',
+          logo_alignment: 'left',
+          locale: 'en' // Force English
+        });
+      }
+
+      // Render sign-up button
+      const signupBtn = document.getElementById('g_id_signup');
+      if (signupBtn) {
+        window.google.accounts.id.renderButton(signupBtn, {
+          theme: 'outline',
+          size: 'large',
+          width: 280,
+          text: 'signup_with',
+          shape: 'rectangular',
+          logo_alignment: 'left',
+          locale: 'en' // Force English
+        });
+      }
     }
-  }
+  }, 100);
 });
 
 
@@ -4228,5 +4234,9 @@ window.addEventListener('DOMContentLoaded', () => {
       });
     });
   </script>
+
+  <!-- Google Identity Services (force English) -->
+<script src="https://accounts.google.com/gsi/client?hl=en" async defer></script>
+
 </body>
 </html>
