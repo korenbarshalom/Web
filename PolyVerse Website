@@ -1323,7 +1323,7 @@
       align-items: center;
       gap: 0.5rem;
       transform-origin: center center; /* Ensure scaling is centered */
-      margin-left: 4px; /* Nudge buttons slightly right to prevent overflow */
+      margin-left: 2px; /* Nudge buttons slightly right to prevent overflow */
     }
     .like-btn:hover, .list-btn:hover {
       background: #ff9800;
@@ -1383,16 +1383,31 @@
       flex-direction: column;
       align-items: center;
       width: 100%;
+      position: relative; /* allow absolute-positioned back button */
     }
     #backLikesList {
-      align-self: flex-start;
-      margin-left: 2rem;
-      margin-bottom: 1.5rem;
-      margin-top: 0;
+      position: absolute;
+      top: -0.5rem;
+      left: -17.5rem; /* consistent slight right offset */
+      margin: 0;
+      z-index: 2;
     }
     @media (max-width: 700px) {
+      .likes-list-container {
+        padding: 0 0.5rem;
+      }
       #backLikesList {
-        margin-left: 1rem;
+        top: 1rem;
+        left: 1.3rem; /* proportional on small screens */
+        font-size: 1rem;
+        padding: 0.6rem 1.1rem;
+      }
+    }
+    @media (max-width: 500px) {
+      #backLikesList {
+        top: 0.5rem;
+        left: 0.8rem; /* very small screens */
+        padding: 0.5rem 0.8rem;
       }
     }
     #likesListTitle {
@@ -1462,7 +1477,7 @@
     #backPurchasedList {
       position: absolute;
       top: 1.5rem;
-      left: 1.5rem;
+      left: 2.5rem; /* nudged right for better spacing */
       margin: 0;
       z-index: 2;
       padding: 0.7rem 1.4rem;
@@ -1483,7 +1498,7 @@
       }
       #backPurchasedList {
         top: 1rem;
-        left: 1rem;
+        left: 1.3rem; /* keep proportionally consistent on small screens */
         font-size: 1rem;
         padding: 0.6rem 1.1rem;
       }
@@ -1501,7 +1516,7 @@
       }
       #backPurchasedList {
         top: 0.5rem;
-        left: 0.5rem;
+        left: 0.8rem; /* keep proportionally consistent on very small screens */
         padding: 0.5rem 0.8rem;
       }
     }
