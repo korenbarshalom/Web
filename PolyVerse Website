@@ -4100,19 +4100,20 @@ window.addEventListener('DOMContentLoaded', () => {
         });
       }
 
-      // Render sign-up button
-      const signupBtn = document.getElementById('g_id_signup');
-      if (signupBtn) {
-        window.google.accounts.id.renderButton(signupBtn, {
-          theme: 'outline',
-          size: 'large',
-          width: 280,
-          text: 'signup_with',
-          shape: 'rectangular',
-          logo_alignment: 'left',
-          locale: 'en' // Force English
-        });
-      }
+    // Render sign-up button
+const signupBtn = document.getElementById('g_id_signup');
+if (signupBtn) {
+  window.google.accounts.id.renderButton(signupBtn, {
+    theme: 'outline',           // שומר על צבע לבן
+    size: 'large',              // מגדיל טיפה את הטקסט
+    width: 300,                 // טיפה יותר רחב
+    text: 'signup_with',        // טקסט ברור
+    shape: 'rectangular',       // שומר על פינות חדות
+    logo_alignment: 'left',     // לוגו בצד שמאל
+    locale: 'en'                // טקסט באנגלית
+  });
+}
+
     }
   }, 100);
 });
