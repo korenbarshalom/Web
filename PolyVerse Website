@@ -1114,7 +1114,7 @@
       text-align: center;
       font-size: 24px;
       font-weight: bold;
-      height: 750%;
+      height: 500%;
       color: #f2f2f2;
       gap: 14px;
       white-space: nowrap;
@@ -2067,6 +2067,17 @@
       color: #f2f2f2;
       display: flex;
       align-items: center;
+    }
+    #likesListTitle, #listListTitle, #purchasedListTitle {
+      text-align: center;
+      margin-bottom: 2rem;
+      width: 100%;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 2.5rem;
+      letter-spacing: -0.01em;
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
     }
   </style>
 </head>
