@@ -1942,7 +1942,7 @@
     /* ==== Floating-Label Inputs (Register Modal) ==== */
     .input-wrapper {
       position: relative;
-      margin-bottom: 0.7rem; /* Slightly tighter spacing */
+      margin-bottom: 0.8rem; /* Slightly tighter spacing */
     }
 
     /* Ensure previously hidden labels are visible within wrapper */
@@ -2177,8 +2177,8 @@
         <div class="action-row" id="loginActionRow">
           <button class="login-btn" id="loginSubmitBtn">Continue</button>
         </div>
-        <div id="loginSignupText" style="text-align:center; margin-bottom:1rem; font-size:1.08rem; color:#aaa;">
-          Not have an account yet? <a href="#" id="loginToSignup" style="color:var(--accent); font-weight:600; font-size:1.08rem;">Sign up</a>
+        <div id="loginSignupText" style="text-align:center; margin-bottom:1rem; font-size:0.9rem; color:#aaa;">
+          Not have an account yet? <a href="#" id="loginToSignup" style="color:var(--accent); font-weight:600; font-size:1rem;">Sign up</a>
         </div>
 
         <div class="success-message" id="loginSuccess"></div>
@@ -2233,7 +2233,7 @@
         <!-- Google Sign-Up button container -->
         <div id="g_id_signup" style="display:flex;justify-content:center;margin-top:1.2rem;margin-bottom:0.5rem;"></div>
         <p id="googleSignupMsg" style="text-align:center;font-size:0.92rem;color:#888;margin-top:0.5rem;">Or sign up with Google</p>
-        <p style="margin-top:.75rem; font-size:1.08rem;">Already have an account? <a href="#" id="backToLogin" style="color:var(--accent); font-size:1.08rem;">Log In</a></p>
+        <p style="margin-top:.75rem; font-size:1.03rem;">Already have an account? <a href="#" id="backToLogin" style="color:var(--accent); font-size:1.03rem;">Log In</a></p>
       </div>
     </div>
   </div>
