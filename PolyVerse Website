@@ -1942,7 +1942,7 @@
     /* ==== Floating-Label Inputs (Register Modal) ==== */
     .input-wrapper {
       position: relative;
-      margin-bottom: 1.1rem;
+      margin-bottom: 0.7rem; /* Slightly tighter spacing */
     }
 
     /* Ensure previously hidden labels are visible within wrapper */
