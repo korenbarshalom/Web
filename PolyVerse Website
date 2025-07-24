@@ -2556,8 +2556,10 @@
       modelImg.style.display = 'none';
       modelViewer.style.display = 'block';
       viewToggle.style.display = 'none';
-      window.scrollTo(0,0);
-      
+      // Restore instant scroll-to-top ONLY when opening from homepage
+      if (fromHomepage) {
+        window.scrollTo(0,0);
+      }
       // Only render suggested models if coming from homepage or first load
       if (fromHomepage || typeof openModelPage._suggestedInitialized === 'undefined') {
         renderSuggestedModels(m.id);
@@ -2632,7 +2634,11 @@
           </div>
         `;
         // Only open model page, do NOT refresh suggestions
-        card.onclick = () => openModelPage(mod, false);
+        card.onclick = () => {
+          openModelPage(mod, false);
+          // Smooth scroll to top ONLY for model preview page suggested models
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
         suggestedModels.appendChild(card);
       });
       // Add Load More button
@@ -2666,7 +2672,11 @@
               </div>
             `;
             // Only open model page, do NOT refresh suggestions
-            card.onclick = () => openModelPage(mod, false);
+            card.onclick = () => {
+              openModelPage(mod, false);
+              // Smooth scroll to top ONLY for model preview page suggested models
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
             suggestedModels.insertBefore(card, loadMoreBtn);
             card.addEventListener('animationend', () => {
               card.classList.remove('card-appear');
