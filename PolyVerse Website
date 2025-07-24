@@ -2559,8 +2559,14 @@
       viewToggle.style.display = 'none';
       window.scrollTo(0,0);
       
-      // Always render suggested models
-      renderSuggestedModels(m.id);
+      // Only render suggested models if coming from homepage or first load
+      if (fromHomepage || typeof openModelPage._suggestedInitialized === 'undefined') {
+        renderSuggestedModels(m.id);
+        openModelPage._suggestedInitialized = true;
+      } else {
+        // Just update the currentId for the suggested section, but do not refresh cards
+        // Optionally, you could highlight the selected card, but do not refresh suggestions
+      }
       // Only randomize suggestions when coming from homepage
       if (fromHomepage) {
         comingFromHomepage = false;
@@ -2626,6 +2632,7 @@
             <div class="suggested-desc">${mod.desc || ''}</div>
           </div>
         `;
+        // Only open model page, do NOT refresh suggestions
         card.onclick = () => openModelPage(mod, false);
         suggestedModels.appendChild(card);
       });
@@ -2659,6 +2666,7 @@
                 <div class="suggested-desc">${mod.desc || ''}</div>
               </div>
             `;
+            // Only open model page, do NOT refresh suggestions
             card.onclick = () => openModelPage(mod, false);
             suggestedModels.insertBefore(card, loadMoreBtn);
             card.addEventListener('animationend', () => {
