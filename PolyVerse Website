@@ -41,14 +41,48 @@
 
     /* ---------- Buttons ---------- */
     .btn {
-      display:inline-flex; align-items:center; gap:.5rem;
-      padding:.7rem 1.35rem; /* Reduced padding slightly */
-      border:none; border-radius:var(--radius);
-      font-weight:600; cursor:pointer; background:var(--accent);
-      color:#fff; transition:transform .2s, box-shadow .2s;
-      font-size:0.97rem; /* Slightly reduced font size */
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .7rem 2.2rem;
+      border: none;
+      border-radius: var(--radius);
+      font-weight: 700;
+      font-size: 1.18rem;
+      cursor: pointer;
+      background: linear-gradient(90deg, #ff9800 0%, #ff5e13 100%); /* Orange to red gradient */
+      color: #fff;
+      transition: transform .2s, box-shadow .2s, background .2s;
+      box-shadow: 0 2px 8px rgba(255, 152, 0, 0.10);
     }
-    .btn:hover { transform:scale(1.05); box-shadow:0 6px 14px rgba(0,0,0,.4) }
+    .btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 14px rgba(0,0,0,.4);
+      background: linear-gradient(90deg, #ffac33 0%, #ff7043 100%); /* Lighter on hover */
+    }
+
+    /* Ensure arrow and text are styled correctly for all .btns with arrows */
+    .btn {
+      font-family: 'Montserrat', 'Inter', 'Segoe UI', Arial, sans-serif;
+      letter-spacing: -0.01em;
+    }
+
+    /* Specific for Back to Shop button text */
+    #backModel, #backToShopSearch, #backCheckout {
+      font-weight: 700;
+      font-size: 1.18rem;
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      gap: .25rem;
+    }
+    #backModel::before, #backToShopSearch::before, #backCheckout::before {
+     
+      font-size: 1.18rem;
+      font-weight: 700;
+      margin-right: .18rem;
+      color: #fff;
+    }
     .btn:active { transform:scale(.97) }
     .back-btn {
       margin-bottom: 3rem;
