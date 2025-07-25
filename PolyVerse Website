@@ -2230,6 +2230,10 @@
         display: none;
       }
     }
+
+    html {
+      scroll-behavior: smooth;
+    }
   </style>
 </head>
 <body>
@@ -2246,7 +2250,7 @@
     <div class="navbar-center-links">
       <a href="#" class="nav-link">Characters</a>
       <a href="#" class="nav-link">About Us</a>
-      <a href="#" class="nav-link">Contact Us</a>
+      <a href="#contact-section" class="nav-link">Contact Us</a>
       <a href="#" class="nav-link">Terms</a>
     </div>
     <div class="navbar-search-container" id="top-searchbar">
@@ -2392,7 +2396,7 @@
   </section>
 
   <!-- CONTACT INFO FOOTER -->
-  <footer>
+  <footer id="contact-section">
     <h3>Contact Us</h3>
     <p style="margin-top:1.2rem;">Email: korenbarshalom@gmail.com</p>
     <p style="margin-top:0.7rem;">All rights reserved © polyVerse</p>
