@@ -639,7 +639,6 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      text-fill-color: transparent;
       /* No glow or shadow */
       /* Thin underline accent */
       position: relative;
@@ -2159,17 +2158,9 @@
     }
     .btn.back-btn:not(#backModel):not(#backToShopSearch) {
       /* Arrow and text same size, bold */
-    }
-    .btn.back-btn:not(#backModel):not(#backToShopSearch) {
       font-family: 'Montserrat', 'Inter', 'Segoe UI', Arial, sans-serif;
-    }
-    .btn.back-btn:not(#backModel):not(#backToShopSearch) {
       /* Ensure arrow and text are same size and weight */
-    }
-    .btn.back-btn:not(#backModel):not(#backToShopSearch) {
       /* Remove extra margin/padding from arrow */
-    }
-    .btn.back-btn:not(#backModel):not(#backToShopSearch) {
       /* No extra styles needed for ::before, since arrow is in text */
     }
   </style>
