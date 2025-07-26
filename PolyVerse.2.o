@@ -4796,6 +4796,35 @@ if (signupBtn) {
         });
       }
     })();
+
+    // Hide navbar center links on model detail and checkout pages
+    (function() {
+      const navbarLinks = document.querySelector('.navbar-center-links');
+      const modelPage = document.getElementById('modelPage');
+      const checkoutPage = document.getElementById('checkoutPage');
+      
+      function updateNavbarLinksVisibility() {
+        if ((modelPage && modelPage.style.display !== 'none' && modelPage.style.display !== '') ||
+            (checkoutPage && checkoutPage.style.display !== 'none' && checkoutPage.style.display !== '')) {
+          if (navbarLinks) navbarLinks.style.display = 'none';
+        } else {
+          if (navbarLinks) navbarLinks.style.display = '';
+        }
+      }
+      
+      // Monitor for changes in page visibility
+      const observer = new MutationObserver(updateNavbarLinksVisibility);
+      
+      if (modelPage) {
+        observer.observe(modelPage, { attributes: true, attributeFilter: ['style'] });
+      }
+      if (checkoutPage) {
+        observer.observe(checkoutPage, { attributes: true, attributeFilter: ['style'] });
+      }
+      
+      // Initial check
+      updateNavbarLinksVisibility();
+    })();
   </script>
 
   <!-- Google Identity Services (force English) -->
