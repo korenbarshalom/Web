@@ -3943,8 +3943,12 @@
           mainContent.style.display = 'block';
           homepageBanner.style.display = '';
           topSearchbar.style.display = 'none';
-          // Ensure the hero search bar is visible again
           heroSearch.parentElement.classList.remove('hide');
+          heroSearch.value = '';
+          navbarSearch.value = '';
+          lastSearchQuery = '';
+          renderGallery(models, true);
+          hideBackToShopButton();
           window.scrollTo(0,0);
         }, 450);
       };
@@ -4132,6 +4136,11 @@
           homepageBanner.style.display = '';
           topSearchbar.style.display = 'none';
           heroSearch.parentElement.classList.remove('hide');
+          heroSearch.value = '';
+          navbarSearch.value = '';
+          lastSearchQuery = '';
+          renderGallery(models, true);
+          hideBackToShopButton();
           window.scrollTo(0,0);
         }, 450);
       };
