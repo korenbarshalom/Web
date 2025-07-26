@@ -2257,6 +2257,7 @@
     </div>
     <!-- Centered navigation links -->
     <div class="navbar-center-links">
+      <a href="#" class="nav-link" id="homeNavLink">Home</a>
       <a href="#" class="nav-link">Characters</a>
       <a href="#" class="nav-link">About Us</a>
       <a href="#contact-section" class="nav-link">Contact Us</a>
@@ -4661,6 +4662,56 @@ if (signupBtn) {
       };
       oldSection.addEventListener('transitionend', onFadeOut);
     }
+
+    // ===== Home Navbar Link Logic =====
+    (function(){
+      const homeNav = document.getElementById('homeNavLink');
+      if(!homeNav) return;
+      homeNav.addEventListener('click', (e)=>{
+        e.preventDefault();
+        // Always return to homepage view
+        document.body.classList.remove('about-active');
+
+        // Show navbar links
+        if(window.showNavbarLinks) window.showNavbarLinks();
+
+        // Hide special pages
+        const modelPage = document.getElementById('modelPage');
+        if(modelPage) { modelPage.classList.remove('active'); modelPage.style.display = 'none'; }
+        const checkoutPage = document.getElementById('checkoutPage');
+        if(checkoutPage) { checkoutPage.classList.remove('active'); checkoutPage.style.display = 'none'; }
+        const likesListPage = document.getElementById('likesListPage');
+        if(likesListPage) { likesListPage.classList.remove('active'); likesListPage.style.display = 'none'; }
+        const purchasedListPage = document.getElementById('purchasedListPage');
+        if(purchasedListPage) { purchasedListPage.classList.remove('active'); purchasedListPage.style.display = 'none'; }
+
+        // Restore home sections
+        const mainContent = document.getElementById('mainContent');
+        if(mainContent) mainContent.style.display = 'block';
+        const homepageBanner = document.getElementById('homepage-banner');
+        if(homepageBanner) homepageBanner.style.display = '';
+        const heroSearch = document.getElementById('heroSearch');
+        if(heroSearch) heroSearch.parentElement.classList.remove('hide');
+        const topSearchbar = document.getElementById('top-searchbar');
+        if(topSearchbar) topSearchbar.style.display = 'none';
+
+        // Reset gallery
+        if(typeof renderGallery === 'function') {
+          window.lastSearchQuery = '';
+          heroSearch.value = '';
+          renderGallery(models, true);
+        }
+
+        // Hide back-to-shop button if visible
+        if(typeof hideBackToShopButton === 'function') hideBackToShopButton();
+
+        // Scroll to top with same transition as other main switches (instant)
+        const originalScrollBehavior = document.documentElement.style.scrollBehavior;
+        document.documentElement.style.scrollBehavior = 'auto';
+        window.scrollTo(0,0);
+        document.documentElement.style.scrollBehavior = originalScrollBehavior;
+      });
+    })();
   </script>
 
   <!-- Google Identity Services (force English) -->
