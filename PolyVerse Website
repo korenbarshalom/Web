@@ -2660,6 +2660,8 @@
         // Hide homepage banner, show top searchbar
         homepageBanner.style.display = 'none';
         topSearchbar.style.display = 'flex';
+        // Hide navbar links on search page
+        if (window.hideNavbarLinks) window.hideNavbarLinks();
         navbarSearch.value = value;
         // Show gallery, hide model/checkout pages
         modelPage.style.display = 'none';
@@ -2679,6 +2681,8 @@
         modelPage.style.display = 'none';
         checkoutPage.style.display = 'none';
         mainContent.style.display = 'block';
+        // Hide navbar links on search page
+        if (window.hideNavbarLinks) window.hideNavbarLinks();
         window.scrollTo(0,0);
         doSearch(value, true);
         lastSearchQuery = value;
@@ -3389,35 +3393,48 @@
           }
         });
       }, 0);
-      document.getElementById('logoutBtn').onclick = () => {
+      // Use addEventListener instead of onclick to prevent conflicts
+      document.getElementById('logoutBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         localStorage.removeItem('currentUser');
         currentUser = null;
         updateAuthUI();
         menu.remove();
-      };
-      document.getElementById('profileBtn').onclick = () => {
+      });
+      document.getElementById('profileBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         menu.remove();
-        openProfilePage();
-      };
-      document.getElementById('homeBtn').onclick = () => {
+        setTimeout(() => openProfilePage(), 50);
+      });
+      document.getElementById('homeBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         menu.remove();
         // Redirect to homepage
         window.location.href = '/';
-      };
+      });
       // NEW: My Likes and My List
-      document.getElementById('myLikesBtn').onclick = () => {
+      document.getElementById('myLikesBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         menu.remove();
-        openLikesOrListPage('likes');
-      };
-      document.getElementById('myListBtn').onclick = () => {
+        setTimeout(() => openLikesOrListPage('likes'), 50);
+      });
+      document.getElementById('myListBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         menu.remove();
-        openLikesOrListPage('list');
-      };
+        setTimeout(() => openLikesOrListPage('list'), 50);
+      });
       // My Purchased
-      document.getElementById('myPurchasedBtn').onclick = () => {
+      document.getElementById('myPurchasedBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         menu.remove();
-        openPurchasedPage();
-      };
+        setTimeout(() => openPurchasedPage(), 50);
+      });
     }
 
     // --- Fake checkout ---
@@ -3849,6 +3866,8 @@
     }
     // --- Likes/List page logic ---
     function openLikesOrListPage(type) {
+      // Ensure navbar links are visible when opening likes/list pages
+      if (window.showNavbarLinks) window.showNavbarLinks();
       // Hide all other pages
       modelPage.style.display = 'none';
       mainContent.style.display = 'none';
@@ -3946,6 +3965,8 @@
       updateUserInUsers(currentUser);
     }
     function openPurchasedPage() {
+      // Ensure navbar links are visible when opening purchased page
+      if (window.showNavbarLinks) window.showNavbarLinks();
       if (!currentUser) {
         showLoginRequiredModal(() => openPurchasedPage());
         return;
