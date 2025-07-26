@@ -2234,110 +2234,6 @@
     html {
       scroll-behavior: smooth;
     }
-
-    /* --- About Us Standalone Page Styles (additive) --- */
-    #aboutPageStandalone {
-      background: var(--card-bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 70vh;
-      width: 100vw;
-      padding: 0;
-      animation: fadeInUp 0.7s;
-      z-index: 100;
-      position: relative;
-    }
-    .about-container {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 4rem 2rem 2rem 2rem;
-      gap: 3.5rem;
-    }
-    .about-left {
-      flex: 1.2;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      justify-content: center;
-      min-width: 260px;
-    }
-    .about-title {
-      font-family: 'Montserrat', 'Inter', Arial, sans-serif;
-      font-size: 2.7rem;
-      font-weight: 900;
-      color: #fff;
-      margin-bottom: 1.2rem;
-      letter-spacing: 0.01em;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.18);
-    }
-    .about-desc {
-      font-size: 1.22rem;
-      color: #e0e0e0;
-      font-weight: 500;
-      margin-bottom: 0.5rem;
-      line-height: 1.6;
-      max-width: 500px;
-    }
-    .about-right {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 220px;
-    }
-    .about-logo {
-      width: 220px;
-      height: 220px;
-      object-fit: contain;
-      border-radius: 18px;
-      background: #232326;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.18);
-      border: 2px solid #ff9800;
-      margin-left: 0;
-    }
-    @media (max-width: 900px) {
-      .about-container {
-        flex-direction: column-reverse;
-        gap: 2.2rem;
-        padding: 2.5rem 1rem 1.5rem 1rem;
-      }
-      .about-logo {
-        width: 150px;
-        height: 150px;
-      }
-      .about-title {
-        font-size: 2.1rem;
-      }
-      .about-desc {
-        font-size: 1.05rem;
-      }
-    }
-    @media (max-width: 600px) {
-      #aboutPageStandalone {
-        min-height: 60vh;
-        padding: 0;
-      }
-      .about-container {
-        padding: 1.2rem 0.2rem 1.2rem 0.2rem;
-        gap: 1.2rem;
-      }
-      .about-logo {
-        width: 100px;
-        height: 100px;
-      }
-      .about-title {
-        font-size: 1.3rem;
-      }
-      .about-desc {
-        font-size: 0.97rem;
-      }
-    }
   </style>
 </head>
 <body>
@@ -2383,20 +2279,6 @@
       <li><button class="btn btn-outline signup-btn-custom" id="signupBtn">Sign Up</button></li>
     </ul>
   </nav>
-
-  <!-- ABOUT PAGE (independent, not injected into homepage) -->
-  <div id="aboutPageStandalone" style="display:none; min-height: 70vh;">
-    <div class="about-container">
-      <div class="about-left">
-        <h1 class="about-title">polyVerse</h1>
-        <p class="about-desc">polyVerse is a platform for game developers and 3D creators to grab ready-made, fully rigged low-poly characters in seconds. Browse, download, and create freely.</p>
-        <button class="btn back-btn" id="aboutStandaloneBackBtn" style="margin-top:2.5rem;">← Back</button>
-      </div>
-      <div class="about-right">
-        <img class="about-logo" src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjI1NTkzNy5wbmc=/250x600/8NDQ9Y.png" alt="polyVerse logo">
-      </div>
-    </div>
-  </div>
 
   <!-- HERO -->
   <section class="hero" id="homepage-banner">
@@ -2802,6 +2684,8 @@
 
     // --- Model detail & checkout navigation ---
     function openModelPage(m, fromHomepage = true){
+      // Hide navbar links on model page
+      if(window.hideNavbarLinks) window.hideNavbarLinks();
       // Hide hero search, show navbar search
       heroSearch.parentElement.classList.add('hide');
       topSearchbar.style.display = 'flex';
@@ -2994,6 +2878,8 @@
     });
     
     backModel.onclick=()=>{
+      // Show navbar links when returning to home
+      if(window.showNavbarLinks) window.showNavbarLinks();
       modelPage.style.display='none';
       mainContent.style.display='block';
       // Hide navbar search, show hero search
@@ -3020,6 +2906,8 @@
       hideBackToShopButton();
     };
     buyNowBtn.onclick=()=>{
+      // Hide navbar links on checkout page
+      if(window.hideNavbarLinks) window.hideNavbarLinks();
       // Store paid model ID in sessionStorage for post-payment download
       if (lastOpenedModel) {
         sessionStorage.setItem('paidModelId', lastOpenedModel.id);
@@ -3064,12 +2952,14 @@
           }, 10);
           openModelPage(lastOpenedModel);
         }, 450);
-      } else {
+              } else {
         checkoutPage.classList.remove('active');
         setTimeout(() => {
           checkoutPage.style.display = 'none';
           modelPage.style.display = 'none';
           mainContent.style.display = 'block';
+          // Show navbar links when returning to home from checkout
+          if(window.showNavbarLinks) window.showNavbarLinks();
           navbarSearch.value = '';
           heroSearch.parentElement.classList.remove('hide');
           topSearchbar.style.display = 'none';
@@ -4679,6 +4569,8 @@ if (signupBtn) {
     }
     // Attach to all navigation that returns to homepage
     backToShopSearch.onclick = () => {
+      // Show navbar links when returning to home
+      if(window.showNavbarLinks) window.showNavbarLinks();
       // Hide search results and button, show homepage
       mainContent.style.display = 'block';
       homepageBanner.style.display = '';
@@ -4735,96 +4627,6 @@ if (signupBtn) {
       };
       oldSection.addEventListener('transitionend', onFadeOut);
     }
-
-    // --- Minimal Hash Router for Standalone About Page (additive, non-intrusive) ---
-    (function(){
-      const aboutPage = document.getElementById('aboutPageStandalone');
-      const aboutBackBtn = document.getElementById('aboutStandaloneBackBtn');
-      const aboutUsLink = Array.from(document.querySelectorAll('.nav-link')).find(a => a.textContent.trim() === 'About Us');
-      if (!aboutPage || !aboutBackBtn || !aboutUsLink) return;
-      function showAboutPage() {
-        // Hide all other main content, sections, and footers
-        document.querySelectorAll('main, section, footer, #contact-section').forEach(el => {
-          el.style.display = 'none';
-        });
-        aboutPage.style.display = 'flex';
-        window.scrollTo(0,0);
-      }
-      function showHomePage() {
-        // Hide About page, show all other main content, sections, and footers
-        aboutPage.style.display = 'none';
-        document.querySelectorAll('main, section, footer, #contact-section').forEach(el => {
-          if (el.id !== 'aboutPageStandalone') el.style.display = '';
-        });
-        window.scrollTo(0,0);
-      }
-      function handleHashRoute() {
-        if (location.hash === '#/about') {
-          showAboutPage();
-        } else {
-          showHomePage();
-        }
-      }
-      window.addEventListener('hashchange', handleHashRoute);
-      // Initial route
-      handleHashRoute();
-      // Navbar link
-      aboutUsLink.addEventListener('click', function(e){
-        e.preventDefault();
-        location.hash = '#/about';
-      });
-      // Back button
-      aboutBackBtn.addEventListener('click', function(e){
-        e.preventDefault();
-        location.hash = '#/';
-      });
-    })();
-
-    // Patch About Us link to always route to /#/about
-    (function(){
-      // Patch About Us link to always route to /#/about
-      const aboutUsLink = Array.from(document.querySelectorAll('.nav-link')).find(a => a.textContent.trim() === 'About Us');
-      if (aboutUsLink) {
-        aboutUsLink.addEventListener('click', function(e) {
-          e.preventDefault();
-          if (location.hash !== '#/about') {
-            location.hash = '#/about';
-          } else {
-            // If already on /#/about, force hashchange to reload view
-            window.dispatchEvent(new HashChangeEvent('hashchange'));
-          }
-        });
-      }
-    })();
-
-    // Hide navbar center links on model detail and checkout pages
-    (function() {
-      const navbarLinks = document.querySelector('.navbar-center-links');
-      const modelPage = document.getElementById('modelPage');
-      const checkoutPage = document.getElementById('checkoutPage');
-      
-      function updateNavbarLinksVisibility() {
-        if ((modelPage && modelPage.style.display !== 'none' && modelPage.style.display !== '') ||
-            (checkoutPage && checkoutPage.style.display !== 'none' && checkoutPage.style.display !== '')) {
-          if (navbarLinks) navbarLinks.style.display = 'none';
-        } else {
-          if (navbarLinks) navbarLinks.style.display = '';
-        }
-      }
-      
-      // Monitor for changes in page visibility
-      const observer = new MutationObserver(updateNavbarLinksVisibility);
-      
-      if (modelPage) {
-        observer.observe(modelPage, { attributes: true, attributeFilter: ['style'] });
-      }
-      if (checkoutPage) {
-        observer.observe(checkoutPage, { attributes: true, attributeFilter: ['style'] });
-      }
-      
-      // Initial check
-      updateNavbarLinksVisibility();
-    })();
   </script>
 
   <!-- Google Identity Services (force English) -->
@@ -4861,6 +4663,86 @@ if (signupBtn) {
       window.addEventListener("load", onLoad);
     }
   })();
+  </script>
+
+  <!-- ABOUT PAGE SECTION (SPA) -->
+  <style>
+    /* ===== About Page Styles (scoped) ===== */
+    #about-section { display:none; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:2rem; padding:3rem 1.5rem; max-width:1200px; margin:0 auto; }
+    body.about-active #about-section { display:flex; }
+    #about-section .about-text { flex:1 1 350px; color:#fff; }
+    #about-section .about-text h1 { font-size:3rem; margin-bottom:1rem; }
+    #about-section .about-text p { font-size:1.1rem; line-height:1.6; }
+    #about-section .about-img { flex:1 1 400px; text-align:center; }
+    #about-section .about-img img { width:100%; max-width:500px; height:auto; }
+    @media(max-width:768px){
+      #about-section { flex-direction:column; text-align:center; }
+      #about-section .about-img img { max-width:80%; }
+    }
+    /* Hide homepage-only sections while About is active */
+    body.about-active #homepage-banner,
+    body.about-active .hero,
+    body.about-active .model-card-section,
+    body.about-active #contact-section,
+    body.about-active #top-searchbar,
+    body.about-active .hero-search,
+    body.about-active #gallery,
+    body.about-active .gallery { display:none !important; }
+  </style>
+
+  <section id="about-section">
+    <div class="about-text">
+      <h1>polyVerse</h1>
+      <p>A polished marketplace for interactive, rigged low-poly 3D models, complete with smooth previews and a seamless shopping experience.</p>
+      <button id="aboutBackBtn" class="btn" style="margin-top:2rem;">&larr; Back</button>
+    </div>
+    <div class="about-img">
+      <img src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjI1NTcyOS5wbmc=/250x600/N0RNEb.png" alt="polyVerse marketplace preview">
+    </div>
+  </section>
+
+  <script>
+    // ===== Navbar Links Visibility Management =====
+    (function(){
+      const navbarLinks = document.querySelector('.navbar-center-links');
+      
+      function hideNavbarLinks() {
+        if(navbarLinks) navbarLinks.style.display = 'none';
+      }
+      
+      function showNavbarLinks() {
+        if(navbarLinks) navbarLinks.style.display = '';
+      }
+      
+      // Expose globally for use in other functions
+      window.hideNavbarLinks = hideNavbarLinks;
+      window.showNavbarLinks = showNavbarLinks;
+      
+      // Ensure navbar links are visible on page load (home page default)
+      showNavbarLinks();
+    })();
+    
+    // ===== About Page SPA Logic =====
+    (function(){
+      const aboutBackBtn = document.getElementById('aboutBackBtn');
+      const aboutNavLink = Array.from(document.querySelectorAll('.nav-link')).find(l => l.textContent.trim() === 'About Us');
+      function showAbout(e){
+        if(e) e.preventDefault();
+        document.body.classList.add('about-active');
+        window.showNavbarLinks(); // Keep navbar links visible on About page
+        window.scrollTo(0,0);
+      }
+      function goHome(e){
+        if(e) e.preventDefault();
+        document.body.classList.remove('about-active');
+        window.showNavbarLinks(); // Ensure navbar links are visible on home
+        window.scrollTo(0,0);
+      }
+      if(aboutNavLink) aboutNavLink.addEventListener('click', showAbout);
+      if(aboutBackBtn) aboutBackBtn.addEventListener('click', goHome);
+      // Ensure Home page is default on hard refresh
+      document.body.classList.remove('about-active');
+    })();
   </script>
 </body>
 </html>
