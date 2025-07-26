@@ -2243,6 +2243,95 @@
       from { opacity:0; transform:translateY(20px); }
       to { opacity:1; transform:translateY(0); }
     }
+
+    /* ===== About Page Styles (scoped) ===== */
+    #about-section { display:none; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:2rem; padding:3rem 1.5rem; max-width:1200px; margin:0 auto; }
+    body.about-active #about-section { display:flex; }
+    #about-section .about-text { flex:1 1 350px; color:#fff; }
+    #about-section .about-text h1 { font-size:3rem; margin-bottom:1rem; }
+    #about-section .about-text p { font-size:1.1rem; line-height:1.6; }
+    #about-section .about-img { flex:1 1 400px; text-align:center; }
+    #about-section .about-img img { width:100%; max-width:500px; height:auto; }
+    @media(max-width:768px){
+      #about-section { flex-direction:column; text-align:center; }
+      #about-section .about-img img { max-width:80%; }
+    }
+    /* Hide homepage-only sections while About is active */
+    body.about-active #homepage-banner,
+    body.about-active .hero,
+    body.about-active .model-card-section,
+    body.about-active #contact-section,
+    body.about-active #top-searchbar,
+    body.about-active .hero-search,
+    body.about-active #gallery,
+    body.about-active .gallery { display:none !important; }
+    #about-section .about-img img {
+      width: 100%;
+      max-width: 340px;
+      height: auto;
+      border-radius: 28px;
+      box-shadow: 0 6px 32px rgba(0,0,0,0.13);
+      transition: box-shadow 0.3s, transform 0.3s;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: aboutImgFadeIn 0.7s cubic-bezier(.4,.01,.22,1) 0.15s forwards;
+    }
+    @keyframes aboutImgFadeIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    #about-section .about-text {
+      flex: 1 1 350px;
+      color: #fff;
+      padding: 1.2rem 0 1.2rem 0;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: aboutTextFadeIn 0.7s cubic-bezier(.4,.01,.22,1) 0.05s forwards;
+    }
+    @keyframes aboutTextFadeIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    #about-section {
+      display: none;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 2.5rem;
+      padding: 3.2rem 1.5rem 2.5rem 1.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+      background: rgba(34,34,38,0.98);
+      border-radius: 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+    }
+    body.about-active #about-section { display: flex; }
+    #about-section .about-text h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.7rem;
+      font-weight: 900;
+      letter-spacing: -0.01em;
+      color: #ffb74d;
+      background: linear-gradient(90deg, #ffb74d 0%, #ff9800 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    #about-section .about-text p {
+      font-size: 1.13rem;
+      line-height: 1.7;
+      color: #e0e0e0;
+      margin-bottom: 1.7rem;
+      letter-spacing: 0.01em;
+    }
+    #about-section .btn {
+      margin-top: 1.2rem;
+      font-size: 1.08rem;
+      border-radius: 12px;
+      padding: 0.7rem 2.2rem;
+    }
+    @media(max-width:768px){
+      #about-section { flex-direction: column; text-align: center; padding: 2.2rem 0.5rem; }
+      #about-section .about-img img { max-width: 70vw; }
+    }
   </style>
 </head>
 <body>
@@ -4812,7 +4901,7 @@ if (signupBtn) {
       <button id="aboutBackBtn" class="btn" style="margin-top:2rem;">&larr; Back</button>
     </div>
     <div class="about-img">
-      <img src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjI1NTcyOS5wbmc=/250x600/N0RNEb.png" alt="polyVerse marketplace preview">
+      <img src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjMzODc4MC5wbmc=/250x600/Anhp0L.png" alt="polyVerse marketplace preview">
     </div>
   </section>
 
