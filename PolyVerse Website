@@ -2234,6 +2234,15 @@
     html {
       scroll-behavior: smooth;
     }
+
+    body.about-active #about-section {
+      /* Trigger smooth fade/slide in when About page becomes visible */
+      animation: aboutFadeIn 0.38s cubic-bezier(.4,.01,.22,1);
+    }
+    @keyframes aboutFadeIn {
+      from { opacity:0; transform:translateY(20px); }
+      to { opacity:1; transform:translateY(0); }
+    }
   </style>
 </head>
 <body>
