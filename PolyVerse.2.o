@@ -2684,6 +2684,13 @@
 
     // --- Model detail & checkout navigation ---
     function openModelPage(m, fromHomepage = true){
+      // Reset scroll immediately and synchronously before showing page
+      const originalScrollBehavior = document.documentElement.style.scrollBehavior;
+      document.documentElement.style.scrollBehavior = 'auto';
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      window.scrollTo(0, 0);
+      
       // Hide navbar links on model page
       if(window.hideNavbarLinks) window.hideNavbarLinks();
       // Hide hero search, show navbar search
@@ -2697,6 +2704,8 @@
       modelPage.style.display = 'block';
       setTimeout(() => {
         modelPage.classList.add('active');
+        // Restore original scroll behavior after transition
+        document.documentElement.style.scrollBehavior = originalScrollBehavior;
       }, 10);
       // Hide purchased page if present
       const purchasedListPage = document.getElementById('purchasedListPage');
@@ -2906,6 +2915,13 @@
       hideBackToShopButton();
     };
     buyNowBtn.onclick=()=>{
+      // Reset scroll immediately and synchronously before showing checkout
+      const originalScrollBehavior = document.documentElement.style.scrollBehavior;
+      document.documentElement.style.scrollBehavior = 'auto';
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      window.scrollTo(0, 0);
+      
       // Hide navbar links on checkout page
       if(window.hideNavbarLinks) window.hideNavbarLinks();
       // Store paid model ID in sessionStorage for post-payment download
@@ -2919,13 +2935,14 @@
       checkoutPage.style.display = 'block';
       setTimeout(() => {
         checkoutPage.classList.add('active');
+        // Restore original scroll behavior after transition
+        document.documentElement.style.scrollBehavior = originalScrollBehavior;
       }, 10);
       // --- End smooth transition ---
       // Show navbar search, hide hero search and hero banner
       navbarSearch.value = '';
       heroSearch.parentElement.classList.add('hide');
       if(homepageBanner) homepageBanner.style.display = 'none';
-      window.scrollTo(0,0);
       // Render PayPal button for the selected model
       if (lastOpenedModel) {
         renderPayPalButton(lastOpenedModel);
@@ -3481,6 +3498,10 @@
       modelPage.style.display = 'none';
       topSearchbar.style.display = 'none';
       homepageBanner.style.display = '';
+      // Disable browser scroll restoration for consistent behavior
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+      }
       heroSearch.value = '';
     });
 
