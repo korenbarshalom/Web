@@ -2271,10 +2271,15 @@
       height: auto;
       border-radius: 28px;
       box-shadow: 0 6px 32px rgba(0,0,0,0.13);
-      transition: box-shadow 0.3s, transform 0.3s;
+      transition: box-shadow 0.35s cubic-bezier(.4,.01,.22,1), transform 0.35s cubic-bezier(.4,.01,.22,1);
       opacity: 0;
       transform: translateY(30px);
       animation: aboutImgFadeIn 0.7s cubic-bezier(.4,.01,.22,1) 0.15s forwards;
+    }
+    #about-section .about-img img:hover {
+      transform: translateY(0) scale(1.045);
+      box-shadow: 0 12px 48px 0 rgba(255,184,77,0.18), 0 6px 32px rgba(0,0,0,0.18);
+      z-index: 1;
     }
     @keyframes aboutImgFadeIn {
       to { opacity: 1; transform: translateY(0); }
@@ -4897,7 +4902,7 @@ if (signupBtn) {
   <section id="about-section">
     <div class="about-text">
       <h1>polyVerse</h1>
-      <p>A polished marketplace for interactive, rigged low-poly 3D models, complete with smooth previews and a seamless shopping experience.</p>
+      <p>We provide high-quality 3D characters at an affordable price of just $1. Every character on the site is fully human-rigged and ready to use in your game or any other project. Plus, once you purchase a model, it's yours — royalty-free.</p>
       <button id="aboutBackBtn" class="btn" style="margin-top:2rem;">&larr; Back</button>
     </div>
     <div class="about-img">
