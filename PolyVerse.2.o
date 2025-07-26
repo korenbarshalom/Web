@@ -9,7 +9,8 @@
   <title>polyVerse – Low-Poly Rigged Models</title>
 
   <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
   <style>
     html, body {
@@ -19,7 +20,7 @@
     *,*::before,*::after { box-sizing:border-box; margin:0; padding:0 }
     body { font-family:"Inter",sans-serif; line-height:1.6; background:#1e1e20; color:#fff }
     a { text-decoration:none; color:inherit }
-    section, footer { opacity:0; animation:fadeInUp 0.6s ease-out forwards }
+    section, footer { opacity:1; animation:none; }
 
     /* ---------- Design Tokens & Keyframes ---------- */
     :root {
@@ -27,7 +28,7 @@
       --text:#ffffff;
       --card-bg:#2a2a2d;
       --accent:#ff9800;
-      --radius:12px;
+      --radius:8px;
     }
     @keyframes fadeInUp {
       from { opacity:0; transform:translateY(20px) }
@@ -40,14 +41,48 @@
 
     /* ---------- Buttons ---------- */
     .btn {
-      display:inline-flex; align-items:center; gap:.5rem;
-      padding:.7rem 1.35rem; /* Reduced padding slightly */
-      border:none; border-radius:var(--radius);
-      font-weight:600; cursor:pointer; background:var(--accent);
-      color:#fff; transition:transform .2s, box-shadow .2s;
-      font-size:0.97rem; /* Slightly reduced font size */
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .7rem 2.2rem;
+      border: none;
+      border-radius: var(--radius);
+      font-weight: 700;
+      font-size: 1.18rem;
+      cursor: pointer;
+      background: linear-gradient(90deg, #ff9800 0%, #ff5e13 100%); /* Orange to red gradient */
+      color: #fff;
+      transition: transform .2s, box-shadow .2s, background .2s;
+      box-shadow: 0 2px 8px rgba(255, 152, 0, 0.10);
     }
-    .btn:hover { transform:scale(1.05); box-shadow:0 6px 14px rgba(0,0,0,.4) }
+    .btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 14px rgba(0,0,0,.4);
+      background: linear-gradient(90deg, #ffac33 0%, #ff7043 100%); /* Lighter on hover */
+    }
+
+    /* Ensure arrow and text are styled correctly for all .btns with arrows */
+    .btn {
+      font-family: 'Montserrat', 'Inter', 'Segoe UI', Arial, sans-serif;
+      letter-spacing: -0.01em;
+    }
+
+    /* Specific for Back to Shop button text */
+    #backModel, #backToShopSearch, #backCheckout {
+      font-weight: 700;
+      font-size: 1.18rem;
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      gap: .25rem;
+    }
+    #backModel::before, #backToShopSearch::before, #backCheckout::before {
+     
+      font-size: 1.18rem;
+      font-weight: 700;
+      margin-right: .18rem;
+      color: #fff;
+    }
     .btn:active { transform:scale(.97) }
     .back-btn {
       margin-bottom: 3rem;
@@ -119,23 +154,135 @@
     nav ul { display:flex; gap:1.25rem; list-style:none; align-items:center; }
     @media(max-width:600px){ nav ul{ display:none } }
 
-    /* ---------- Hero Section (blue gradient) ---------- */
+    /* ---------- Hero Section (warm orange-red gradient) ---------- */
     .hero {
-      background:linear-gradient(135deg,#2196F3,#1E88E5);
-      padding:4rem 1rem; text-align:center;
+      background: linear-gradient(to right, #ff5f6d, #ffc371);
+      padding: 4rem 1rem;
+      text-align: center;
     }
-    .hero h1 { font-size:2.5rem; margin-bottom:1rem }
-    .hero p  { font-size:1.125rem; margin-bottom:2rem; color:rgba(255,255,255,0.85) }
+    .hero-headline {
+      font-family: 'Montserrat', 'Inter', Arial, sans-serif;
+      font-size: 2.85rem;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 1.1rem;
+      letter-spacing: 0.01em;
+      text-shadow: 0 4px 18px rgba(0,0,0,0.18), 0 1px 4px rgba(0,0,0,0.22);
+      animation: heroFadeInUp 0.8s cubic-bezier(.23,1.02,.47,.98);
+      line-height: 1.13;
+    }
+    .hero-subline {
+      font-size: 1.18rem;
+      color: rgba(255,255,255,0.82);
+      font-weight: 500;
+      margin-bottom: 2.1rem;
+      letter-spacing: 0.04em;
+      text-align: center;
+      animation: heroFadeInUp 1.1s cubic-bezier(.23,1.02,.47,.98) 0.15s both;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    }
+    @keyframes heroFadeInUp {
+      from { opacity:0; transform:translateY(30px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    @media (max-width: 700px) {
+      .hero-headline { font-size: 2.1rem; }
+      .hero-subline { font-size: 1.01rem; }
+    }
 
     /* ---------- Search Bar Styling ---------- */
-    .hero-search { margin-top:1rem }
-    .hero-search input {
-      width:100%; max-width:600px;
-      padding:1rem 1.5rem;
-      border:none; border-radius:var(--radius);
-      outline:none; font-size:1rem;
+    .hero-search {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
-    .hero-search input::placeholder { color:#ccc }
+    .hero-search .modern-search-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      background: linear-gradient(90deg, #ff7e5f 0%, #feb47b 100%);
+      border-radius: 10px;
+      box-shadow: 0 4px 32px rgba(255, 94, 87, 0.10), 0 1.5px 8px rgba(0,0,0,0.08);
+      transition: box-shadow 0.32s cubic-bezier(.4,.01,.22,1), border 0.32s cubic-bezier(.4,.01,.22,1);
+      padding: 0.12rem 0.12rem;
+      display: flex;
+      align-items: center;
+    }
+    .hero-search input#heroSearch {
+      width: 100%;
+      padding: 1.05rem 3.2rem 1.05rem 1.5rem;
+      border: none;
+      border-radius: 10px;
+      outline: none;
+      font-size: 1.08rem;
+      background: rgba(255,255,255,0.98);
+      color: #1e1e20;
+      box-shadow: none;
+      transition: box-shadow 0.32s, border 0.32s, background 0.32s;
+      font-family: inherit;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      position: relative;
+      z-index: 2;
+    }
+    .hero-search .modern-search-wrapper:focus-within {
+      box-shadow: 0 0 0 4px rgba(255,152,0,0.18), 0 8px 32px rgba(255, 94, 87, 0.13), 0 1.5px 8px rgba(0,0,0,0.10);
+      background: linear-gradient(90deg, #ffb347 0%, #ff5f6d 100%);
+    }
+    .hero-search input#heroSearch::placeholder {
+      color: #bdbdbd;
+      opacity: 1;
+      transition: opacity 0.28s cubic-bezier(.4,.01,.22,1);
+    }
+    .hero-search input#heroSearch:focus::placeholder {
+      opacity: 0.25;
+    }
+    .hero-search .search-icon-right {
+      position: absolute;
+      right: 1.1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 1.7rem;
+      width: 1.7rem;
+    }
+    .hero-search .search-icon-right svg {
+      width: 1.7rem;
+      height: 1.7rem;
+      fill: none;
+      stroke: #ff7e5f;
+      stroke-width: 2.2;
+      filter: drop-shadow(0 1px 2px rgba(255,94,87,0.10));
+      transition: stroke 0.22s;
+    }
+    .hero-search .modern-search-wrapper:focus-within .search-icon-right svg {
+      stroke: #ff9800;
+    }
+    @media (max-width: 700px) {
+      .hero-search .modern-search-wrapper {
+        max-width: 98vw;
+        border-radius: 8px;
+      }
+      .hero-search input#heroSearch {
+        font-size: 0.98rem;
+        border-radius: 8px;
+        padding: 0.85rem 2.7rem 0.85rem 1.1rem;
+      }
+      .hero-search .search-icon-right {
+        right: 0.7rem;
+        width: 1.3rem;
+        height: 1.3rem;
+      }
+      .hero-search .search-icon-right svg {
+        width: 1.3rem;
+        height: 1.3rem;
+      }
+    }
 
     /* ---------- Gallery ---------- */
     main { max-width:1280px; margin:2rem auto; padding:0 1rem }
@@ -175,6 +322,35 @@
       background: none !important;
     }
 
+    #loginRequiredModal .modal-content {
+      background: var(--card-bg);
+      padding: 2.2rem 2.2rem 1.7rem 2.2rem !important;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.32);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 320px;
+      max-width: 98vw;
+    }
+
+    #loginRequiredModal .modal-content h2 {
+      margin-bottom: 0.5rem;
+    }
+    #loginRequiredModal .modal-content p {
+      margin-bottom: 1.3rem;
+      text-align: center;
+    }
+    .login-required-btn-group {
+      margin-top: 0.7rem !important;
+      margin-bottom: 0.1rem !important;
+      display: flex;
+      justify-content: center;
+      gap: 1.1rem;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
     .modal-content {
       background:var(--card-bg);
       transform:scale(0.8); opacity:0;
@@ -194,6 +370,14 @@
       min-height: 100vh;
       display: none;
       color: #fff;
+      opacity: 0;
+      transition: opacity 0.45s cubic-bezier(.4,.01,.22,1);
+      pointer-events: none;
+    }
+    #modelPage.active {
+      display: block;
+      opacity: 1;
+      pointer-events: auto;
     }
     #modelPage .model-detail {
       display: flex;
@@ -210,6 +394,157 @@
         flex-direction: row;
         align-items: flex-start;
         gap: 3rem;
+      }
+    }
+    #modelPage .model-viewer-container {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1 1 0%;
+    }
+    /* --- Model Card Layout Improvements --- */
+    #modelPage .model-card-section {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+    }
+    #modelPage .model-media {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      display: block;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      object-fit: contain;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+    }
+    #modelPage .model-info-row {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+      width: 100%;
+      margin-top: 1.5rem;
+      gap: 2rem;
+    }
+    #modelPage .model-info-left {
+      flex: 2 1 0%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    #modelPage .model-title {
+      font-size: 1.65rem; /* Slightly reduced for balance */
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.2rem;
+      line-height: 1.1;
+    }
+    #modelPage .model-desc {
+      font-size: 1.13rem;
+      color: #ccc;
+      margin-bottom: 0.2rem;
+      line-height: 1.5;
+    }
+    #modelPage .model-info-right {
+      flex: 1 1 0%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.7rem;
+      min-width: 180px;
+    }
+    #modelPage .buy-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 1.1rem;
+      margin-bottom: 0.2rem;
+    }
+    #modelPage .price-label {
+      display: inline-block;
+      font-size: 1.32rem; /* Slightly increased for emphasis */
+      font-weight: 700;
+      color: #fff;
+      margin-left: 1rem; /* Clean, balanced spacing from button */
+      letter-spacing: 0.01em;
+      vertical-align: middle;
+      line-height: 1.1;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.13);
+    }
+    #modelPage .model-actions-row {
+      display: flex;
+      flex-direction: row;
+      gap: 1.2rem;
+      margin-top: 1.2rem;
+      margin-bottom: 0.5rem;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    #modelPage .model-actions-row .btn {
+      min-width: 140px;
+      font-size: 1.08rem;
+      border-radius: 10px;
+      border: 2px solid #FFA500;
+      background: transparent;
+      color: #FFA500;
+      font-weight: 600;
+      transition: background 0.18s, color 0.18s, box-shadow 0.18s, transform 0.15s;
+      box-shadow: none;
+      white-space: nowrap;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #modelPage .model-actions-row .btn#listBtn {
+      min-width: 160px; /* Ensure Add to List never wraps */
+      padding-left: 1.7rem;
+      padding-right: 1.7rem;
+    }
+    #modelPage .model-actions-row .btn:hover, #modelPage .model-actions-row .btn:focus {
+      background: rgba(255,165,0,0.10);
+      color: #ffb74d;
+      border-color: #ffb74d;
+      box-shadow: 0 4px 16px rgba(255,165,0,0.13);
+      transform: scale(1.04);
+    }
+    /* --- Comments Section Improvements --- */
+    #modelPage .comments-section {
+      margin-top: 2.5rem;
+      width: 100%;
+      max-width: 600px;
+      align-self: flex-start;
+    }
+    #modelPage .comments-header {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 1.1rem;
+      letter-spacing: -0.01em;
+    }
+    @media (max-width: 900px) {
+      #modelPage .model-info-row {
+        flex-direction: column;
+        gap: 1.5rem;
+        align-items: stretch;
+      }
+      #modelPage .model-info-right {
+        align-items: flex-start;
+        min-width: 0;
+      }
+      #modelPage .comments-section {
+        max-width: 98vw;
       }
     }
     #modelPage .model-viewer-container {
@@ -253,7 +588,7 @@
     #modelPage .back-btn {
       margin-bottom: 2rem;
       margin-top: 0;
-      margin-left: 2rem;
+      margin-left: 2.5rem; /* Slightly more inward for better alignment */
       align-self: flex-start;
     }
     @media (max-width: 700px) {
@@ -266,7 +601,7 @@
         margin-left: 0;
       }
       #modelPage .back-btn {
-        margin-left: 1rem;
+        margin-left: 1.2rem; /* Also slightly more inward on mobile */
       }
     }
     /* --- Suggested/Related Models Sidebar --- */
@@ -286,30 +621,59 @@
       margin-top: -48px; /* Move container even higher up */
     }
     #modelPage .suggested h4 {
-      font-size: 1.22rem;
+      font-size: 1.45rem; /* Slightly reduced */
       font-weight: 800;
-      margin-bottom: 1.1rem;
-      color: #ff9800;
+      color: #FFA500;
       letter-spacing: -0.01em;
-      text-align: left;
+      text-align: center;
       width: 100%;
-      padding: 0.7rem 0 0.5rem 0.2rem;
+      padding-left: 0;
+      margin-top: 1.2rem;
+      margin-bottom: 1.1rem;
+      font-family: 'Montserrat', 'Inter', 'Segoe UI', Arial, sans-serif;
+      border: none;
+      background: none;
+      display: block;
+      /* Clean gradient text */
+      background: linear-gradient(90deg, #FFA500 0%, #FFD700 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      /* No glow or shadow */
+      /* Thin underline accent */
       position: relative;
-      display: flex;
-      align-items: center;
-      min-height: 2.6rem;
     }
     #modelPage .suggested h4::after {
       content: '';
       display: block;
-      position: absolute;
-      left: 0.2rem;
-      bottom: 0.18rem;
-      width: 38px;
+      margin: 0.45rem auto 0 auto;
+      width: 48px;
       height: 3px;
-      background: #ff9800;
       border-radius: 2px;
-      opacity: 0.7;
+      background: linear-gradient(90deg, #FFA500 0%, #FFD700 100%);
+    }
+    /* --- Load More Button for Suggested Models --- */
+    #suggestedLoadMoreBtn {
+      margin: 0.7rem auto 0 auto;
+      display: block;
+      background: linear-gradient(90deg, #ff9800 0%, #ff5e13 100%); /* Match .btn gradient */
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.08rem;
+      border: none;
+      border-radius: 14px;
+      padding: 0.7rem 2.2rem;
+      box-shadow: 0 2px 8px rgba(255,152,0,0.10); /* Subtle shadow like .btn */
+      transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+      cursor: pointer;
+      outline: none;
+      letter-spacing: 0.01em;
+    }
+    #suggestedLoadMoreBtn:hover, #suggestedLoadMoreBtn:focus {
+      background: linear-gradient(90deg, #ffac33 0%, #ff7043 100%); /* Match .btn hover */
+      box-shadow: 0 6px 14px rgba(0,0,0,.4); /* Match .btn hover */
+      transform: scale(1.05);
+      filter: none;
     }
     #modelPage .suggested-card {
       display: flex;
@@ -327,11 +691,12 @@
       max-width: 310px; /* Slightly reduced card width */
       margin: 0 auto 0.08rem auto; /* Slightly reduced bottom margin */
       overflow: hidden;
+      transition: box-shadow 0.2s ease, transform 0.16s, background 0.16s, border 0.16s;
     }
     #modelPage .suggested-card:hover {
       background: #29292d;
-      box-shadow: 0 6px 24px rgba(255,152,0,0.10), 0 4px 16px rgba(0,0,0,0.22);
-      border: 1.5px solid #ff9800;
+      box-shadow: 0 0 0 0 rgba(0,0,0,0.0), 0 0 24px 6px rgba(255,165,0,0.22), 0 4px 16px rgba(0,0,0,0.22); /* Soft orange glow */
+      border: 1.5px solid #FFA500;
       transform: translateY(-2px) scale(1.015);
     }
     #modelPage .suggested-thumb {
@@ -346,7 +711,7 @@
       display: block;
     }
     #modelPage .suggested-card-content {
-      padding: 0.38rem 0.6rem 0.5rem 0.6rem; /* Even further reduced padding for a shorter card */
+      padding: 0.6rem 0.7rem 0.7rem 0.7rem; /* Further reduced padding for a shorter card */
       display: flex;
       flex-direction: column;
       align-items: flex-start;
@@ -457,6 +822,15 @@
     #checkoutPage {
       display:none; padding:2rem; min-height:100vh;
       background:var(--bg); color:var(--text);
+      /* Add transition for smooth fade-in */
+      opacity: 0;
+      transition: opacity 0.45s cubic-bezier(.4,.01,.22,1);
+      pointer-events: none;
+    }
+    #checkoutPage.active {
+      display: block;
+      opacity: 1;
+      pointer-events: auto;
     }
     #checkoutPage form {
       max-width:500px; margin:auto; display:flex; flex-direction:column; gap:1rem;
@@ -582,11 +956,11 @@
     }
     .searchbar-wrapper {
       background: #232326;
-      border: 2px solid #ff9900;
-      transition: border-color 0.2s ease-in-out, background 0.2s ease-in-out;
+      border: 2px solid transparent;
+      transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
       display: flex;
       align-items: center;
-      border-radius: 12px;
+      border-radius: 7px;
       padding: 0 0.5rem;
       width: 100%;
       max-width: 420px;
@@ -594,8 +968,11 @@
       box-shadow: none;
       height: 44px;
     }
+    .searchbar-wrapper:focus-within {
+      border-color: #ff9900;
+      box-shadow: none;
+    }
     .searchbar-wrapper:hover {
-      border-color: #ffae33;
       background: #3a3a3a;
     }
     .searchbar-icon {
@@ -782,16 +1159,41 @@
     /* --- No Results Message --- */
     #no-results-message {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      height: 500%;
+      color: #f2f2f2;
+      gap: 14px;
+      white-space: nowrap;
+      /* Remove margin-left and margin-top for true centering */
+      margin: 0;
+      position: absolute;
+      top: 50px;
+      left: 0vw;
+      right: 0;
+      bottom: 0;
+    }
+    .no-results-emoji {
+      font-size: 44px;
+      display: flex;
       align-items: center;
       justify-content: center;
-      text-align: center;
-      font-size: 32px;
+      margin-right: 0;
+      background: none;
+      border: none;
+      box-shadow: none;
+      padding: 0;
+    }
+    .no-results-text {
+      font-size: 24px;
       font-weight: bold;
-      height: 60vh;
-      color: white;
-      margin-top: 20px;
-      margin-left: 2vw;
+      color: #f2f2f2;
+      display: flex;
+      align-items: center;
     }
 
     /* ---------- Form Validation & Error Styling ---------- */
@@ -996,12 +1398,14 @@
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
+      transform-origin: center center; /* Ensure scaling is centered */
+      margin-left: 2px; /* Nudge buttons slightly right to prevent overflow */
     }
     .like-btn:hover, .list-btn:hover {
       background: #ff9800;
       color: #fff;
       border: 2px solid #ffb74d;
-      transform: translateY(-2px) scale(1.03);
+      transform: scale(1.03); /* Remove translateY to prevent shifting */
     }
     .like-btn.liked, .list-btn.listed {
       background: #ff9800;
@@ -1039,6 +1443,14 @@
       display: none;
       padding: 2.5rem 0 2.5rem 0;
       width: 100%;
+      opacity: 0;
+      transition: opacity 0.45s cubic-bezier(.4,.01,.22,1);
+      pointer-events: none;
+    }
+    #likesListPage.active {
+      display: block;
+      opacity: 1;
+      pointer-events: auto;
     }
     .likes-list-container {
       max-width: 1280px;
@@ -1047,16 +1459,34 @@
       flex-direction: column;
       align-items: center;
       width: 100%;
+      position: relative; /* allow absolute-positioned back button */
     }
     #backLikesList {
-      align-self: flex-start;
-      margin-left: 2rem;
-      margin-bottom: 1.5rem;
-      margin-top: 0;
+      position: absolute;
+      top: -0.5rem;
+      left: -17.5rem; /* consistent slight right offset */
+      margin: 0;
+      z-index: 2;
+      padding: 0.7rem 1.4rem;
+      font-size: 1.08rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
     }
     @media (max-width: 700px) {
+      .likes-list-container {
+        padding: 0 0.5rem;
+      }
       #backLikesList {
-        margin-left: 1rem;
+        top: 1rem;
+        left: 1.3rem; /* proportional on small screens */
+        font-size: 1rem;
+        padding: 0.6rem 1.1rem;
+      }
+    }
+    @media (max-width: 500px) {
+      #backLikesList {
+        top: 0.5rem;
+        left: 0.8rem; /* very small screens */
+        padding: 0.5rem 0.8rem;
       }
     }
     #likesListTitle {
@@ -1105,6 +1535,14 @@
       color: var(--text);
       display: none;
       padding: 2.5rem 0 2.5rem 0;
+      opacity: 0;
+      transition: opacity 0.45s cubic-bezier(.4,.01,.22,1);
+      pointer-events: none;
+    }
+    #purchasedListPage.active {
+      display: block;
+      opacity: 1;
+      pointer-events: auto;
     }
     .purchased-list-container {
       max-width: 1280px;
@@ -1117,8 +1555,8 @@
     }
     #backPurchasedList {
       position: absolute;
-      top: 1.5rem;
-      left: 1.5rem;
+      top: -0.5rem;
+      left: -17.5rem; /* nudged right for better spacing */
       margin: 0;
       z-index: 2;
       padding: 0.7rem 1.4rem;
@@ -1139,7 +1577,7 @@
       }
       #backPurchasedList {
         top: 1rem;
-        left: 1rem;
+        left: 1.3rem; /* keep proportionally consistent on small screens */
         font-size: 1rem;
         padding: 0.6rem 1.1rem;
       }
@@ -1157,7 +1595,7 @@
       }
       #backPurchasedList {
         top: 0.5rem;
-        left: 0.5rem;
+        left: 0.8rem; /* keep proportionally consistent on very small screens */
         padding: 0.5rem 0.8rem;
       }
     }
@@ -1262,6 +1700,644 @@
     body.login-modal-open {
       overflow: hidden !important;
     }
+
+    /* Add underline hover effect for orange links in login/signup modals */
+    #loginModal a,
+    #loginModal a:visited {
+      color: var(--accent);
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.18s;
+      position: relative;
+    }
+    #loginModal a:hover, #loginModal a:focus {
+      text-decoration: underline;
+    }
+
+    .checkout-order-card {
+      background: #232326;
+      border-radius: 18px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+      max-width: 420px;
+      margin: 0 auto 0 auto;
+      padding: 2.1rem 2.1rem 2.1rem 2.1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .checkout-order-content {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 2.2rem;
+      width: 100%;
+    }
+    .checkout-order-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: center;
+      min-width: 160px;
+      flex: 1 1 0%;
+    }
+    .checkout-model-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+      text-align: right;
+      margin-bottom: 0.7rem;
+    }
+    .checkout-model-price {
+      font-size: 1.18rem;
+      font-weight: 700;
+      color: #fff;
+      text-align: right;
+      margin-bottom: 0.5rem;
+    }
+    .checkout-model-meta {
+      font-size: 0.98rem;
+      color: #bbb;
+      text-align: right;
+      margin-top: 0.2rem;
+      font-weight: 500;
+    }
+    .checkout-order-img-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .checkout-model-img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.3);
+      background: #18181a;
+      transition: transform 0.18s cubic-bezier(.4,.01,.22,1), box-shadow 0.18s;
+      cursor: pointer;
+    }
+    .checkout-model-img:hover {
+      transform: scale(1.07);
+      box-shadow: 0 8px 24px rgba(255,152,0,0.18), 0 4px 16px rgba(0,0,0,0.22);
+    }
+    .checkout-secure-line {
+      text-align: center;
+      color: #aaa;
+      font-size: 0.98rem;
+      margin-top: 2.2rem;
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.01em;
+      opacity: 0.85;
+    }
+    @media (max-width: 600px) {
+      .checkout-order-card {
+        max-width: 98vw;
+        padding: 1.2rem 0.5rem 1.2rem 0.5rem;
+      }
+      .checkout-order-content {
+        flex-direction: column-reverse;
+        gap: 1.2rem;
+        align-items: center;
+      }
+      .checkout-order-text {
+        align-items: center;
+        text-align: center;
+        min-width: 0;
+      }
+      .checkout-model-name, .checkout-model-price, .checkout-model-meta {
+        text-align: center !important;
+        align-items: center !important;
+      }
+      .checkout-model-img {
+        width: 110px;
+        height: 110px;
+      }
+    }
+
+    /* --- Custom Login/Signup Button Adjustments --- */
+    .login-btn-custom {
+      color: #e0e0e0 !important;
+      border: 2px solid #e0e0e0 !important;
+      background: transparent !important;
+      font-weight: 600;
+      min-width: 100px !important;
+      min-height: 44px;
+      font-size: 1.05rem;
+      padding: 0.45rem 1.3rem !important;
+      letter-spacing: 0.01em;
+      transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    }
+    .login-btn-custom:hover, .login-btn-custom:focus {
+      background: #232326 !important;
+      color: #fafafa !important;
+      border-color: #bdbdbd !important;
+      box-shadow: none;
+      transform: none;
+    }
+    .signup-btn-custom {
+      min-width: 100px !important;
+      min-height: 44px;
+      font-size: 1.05rem;
+      padding: 0.45rem 1.3rem !important;
+      letter-spacing: 0.01em;
+      transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    }
+    .signup-btn-custom:hover, .signup-btn-custom:focus {
+      background: rgba(255,153,0,0.10);
+      color: #ffa833;
+      border-color: #ffa833;
+      box-shadow: none;
+      transform: none;
+    }
+    /* Remove enlarge-on-hover for signup */
+    .signup-btn-custom.enlarged, .signup-btn-custom:active, .signup-btn-custom:hover {
+      font-size: 1.05rem !important;
+      padding: 0.45rem 1.3rem !important;
+      min-width: 100px !important;
+      min-height: 44px !important;
+      border-radius: 14px !important;
+    }
+    @media (max-width: 600px) {
+      .login-btn-custom, .signup-btn-custom {
+        font-size: 0.97rem !important;
+        padding: 0.4rem 0.8rem !important;
+        min-width: 80px !important;
+        min-height: 36px !important;
+      }
+    }
+
+    /* Custom checkbox for Sign Up form */
+    #termsCheckbox {
+      width: 16px;
+      height: 16px;
+      margin-right: 0.7em;
+      margin-top: 4px;
+      accent-color: #ff9800;
+      flex-shrink: 0;
+      vertical-align: top;
+      appearance: none;
+      -webkit-appearance: none;
+      background: transparent;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      outline: none;
+      cursor: pointer;
+      position: relative;
+      transition: border 0.18s, box-shadow 0.18s;
+      display: inline-block;
+    }
+    #termsCheckbox:checked {
+      background: #ff9800;
+      border-color: #ff9800;
+    }
+    #termsCheckbox:checked::after {
+      content: '\2714';
+      color: #222;
+      font-size: 14px;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-weight: bold;
+      line-height: 1;
+    }
+
+    #profilePage {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      display: none;
+      padding: 2.5rem 0 2.5rem 0;
+      opacity: 0;
+      transition: opacity 0.45s cubic-bezier(.4,.01,.22,1);
+      pointer-events: none;
+    }
+    #profilePage.active {
+      display: block;
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ---- Sign-Up Input Styling Overrides ---- */
+    #registerView label {
+      display: none; /* Hide external labels */
+    }
+    #registerView input.login-input {
+      width: 100%;
+      height: 48px;
+      border-radius: 6px;
+      background: #1f1f23;
+      border: 1px solid #444;
+      color: #f2f2f2;
+      font-size: 15px;
+      font-weight: 500;
+    }
+    #registerView input.login-input:focus {
+      border-color: #6f6f76;
+    }
+    #registerView input.login-input::placeholder {
+      color: #f2f2f2;
+      opacity: 0.85;
+      font-size: 15px;
+      font-weight: 500;
+    }
+    #registerView #passwordStrength {
+      margin-top: 4px;
+      font-size: 12px;
+      color: #9e9e9e;
+    }
+    /* End overrides */
+
+    /* ---- Log-In Input Styling Overrides ---- */
+    #loginView label {
+      display: none; /* Hide external labels outside wrappers */
+    }
+    /* Show floating labels inside input-wrapper */
+    #loginView .input-wrapper label {
+      display: inline-block;
+      width: auto;
+    }
+    #loginView input.login-input {
+      width: 100%;
+      height: 48px;
+      border-radius: 6px;
+      background: #1f1f23;
+      border: 1px solid #444;
+      color: #f2f2f2;
+      font-size: 15px;
+      font-weight: 500;
+    }
+    #loginView input.login-input:focus {
+      border-color: var(--accent);
+    }
+    #loginView input.login-input::placeholder {
+      color: #f2f2f2;
+      opacity: 0.85;
+      font-size: 15px;
+      font-weight: 500;
+    }
+    /* End overrides */
+
+    /* ---- Primary Action Button Overrides (Create Account & Continue) ---- */
+    #loginModal .login-btn,
+    #loginModal .register-submit {
+      font-size: 17px !important; /* Typography */
+      font-weight: 700 !important;
+      border-radius: 4px !important; /* Shape */
+      transition: background 150ms linear !important; /* Hover transition */
+      transform: none !important; /* Remove grow/scale */
+    }
+    #loginModal .login-btn:hover,
+    #loginModal .register-submit:hover {
+      background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), var(--accent) !important; /* Subtle black overlay */
+      transform: none !important; /* Ensure no movement */
+      cursor: pointer;
+    }
+    #loginModal .login-btn:active,
+    #loginModal .register-submit:active {
+      transform: none !important; /* Prevent press translate */
+    }
+    /* ---- End Button Overrides ---- */
+
+    /* ---- Consent Checkbox & Text Overrides ---- */
+    #termsCheckbox {
+      border-radius: 4px !important; /* Ensure radius */
+      transition: border-color 120ms linear, transform 120ms linear !important; /* Hover animation */
+    }
+    #termsCheckbox:hover {
+      border-color: #f7931e !important;
+      transform: scale(1.03);
+    }
+    label[for="termsCheckbox"] {
+      font-size: 14px !important; /* Smaller text */
+    }
+    /* ---- End Checkbox Overrides ---- */
+
+    /* ---- Password Helper Text ---- */
+    #registerView .password-helper {
+      font-size: 12px;
+      color: #9e9e9e;
+      font-weight: 500;
+      margin-top: -30px; /* Raised slightly closer to input */
+      margin-left: 14px; /* Align with input text */
+      display: block;
+      text-align: left;
+    }
+    /* ---- End Helper Text ---- */
+
+    /* ---- Password Visibility Toggle Styles ---- */
+    .password-field { position: relative; }
+    .password-field .toggle-visibility { position: absolute; right: 18px; top: 36%; transform: translateY(-50%); background: transparent; border: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .password-field .toggle-visibility .material-icons { font-size: 18px; color: rgba(242,242,242,0.85); line-height: 1; }
+    .password-field input:focus ~ .toggle-visibility .material-icons { color: #f7931e; }
+    /* ---- End Toggle Styles ---- */
+
+    /* ==== Floating-Label Inputs (Register Modal) ==== */
+    .input-wrapper {
+      position: relative;
+      margin-bottom: 0.8rem; /* Slightly tighter spacing */
+    }
+
+    /* Ensure previously hidden labels are visible within wrapper */
+    #registerView .input-wrapper label {
+      display: inline-block; /* avoid full-width block causing rectangle */
+      width: auto; /* reset width from generic rule to fit content */
+    }
+
+    .input-wrapper label {
+      position: absolute;
+      left: 14px;
+      top: 36%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: rgba(242,242,242,0.85);
+      font-size: 15px;
+      line-height: 1;
+      transition: all 0.18s cubic-bezier(.4,.01,.22,1);
+      background: var(--card-bg); /* match modal background to mask border without extra bar */
+      z-index: 1; /* sit above border */
+    }
+
+    .input-wrapper input::placeholder {
+      color: transparent !important; /* Hide placeholder so label acts as placeholder */
+    }
+
+    /* Float label when field is focused or contains text */
+    .input-wrapper input:focus ~ label,
+    .input-wrapper input:not(:placeholder-shown) ~ label {
+      top: 0; /* place label directly in center of border */
+      left: 10px;
+      font-size: 13px;
+      background: var(--card-bg);
+      padding: 0 6px;
+      color: var(--accent);
+    }
+
+    /* Maintain correct layering for password icon & label overlap */
+    .password-field .toggle-visibility {
+      z-index: 2;
+    }
+
+    /* Highlight outline on focus */
+    #registerView input.login-input:focus {
+      border-color: var(--accent);
+    }
+
+    /* --- No Results Message (Search Results Only) --- */
+    #search-no-results-message {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      height: 60vh;
+      color: #f2f2f2;
+      gap: 14px;
+      white-space: nowrap;
+      margin: 0;
+      position: relative;
+      left: 22vw; /* Small leftward offset for visual centering */
+    }
+    .search-no-results-emoji {
+      font-size: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 0;
+      background: none;
+      border: none;
+      box-shadow: none;
+      padding: 0;
+    }
+    .search-no-results-text {
+      font-size: 24px;
+      font-weight: bold;
+      color: #f2f2f2;
+      display: flex;
+      align-items: center;
+    }
+    #likesListTitle, #listListTitle, #purchasedListTitle {
+      text-align: center;
+      margin-bottom: 2rem;
+      width: 100%;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 2.5rem;
+      letter-spacing: -0.01em;
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    }
+
+    /* --- Fine-tuned Back Button Text Alignment & Sizing --- */
+    .btn.back-btn:not(#backModel):not(#backToShopSearch) {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5em;
+      font-size: 1.15rem;
+      font-weight: 700;
+      padding-left: 1.6em;
+      padding-right: 1.6em;
+      height: 48px;
+      min-height: 48px;
+      min-width: 140px;
+      line-height: 1;
+    }
+    @media (max-width: 600px) {
+      .btn.back-btn:not(#backModel):not(#backToShopSearch) {
+        font-size: 1rem;
+        height: 40px;
+        min-height: 40px;
+        min-width: 110px;
+        padding-left: 1.2em;
+        padding-right: 1.2em;
+      }
+    }
+    .btn.back-btn:not(#backModel):not(#backToShopSearch) {
+      /* Arrow and text same size, bold */
+      font-family: 'Montserrat', 'Inter', 'Segoe UI', Arial, sans-serif;
+      /* Ensure arrow and text are same size and weight */
+      /* Remove extra margin/padding from arrow */
+      /* No extra styles needed for ::before, since arrow is in text */
+    }
+
+    /* --- Centered Navbar Links --- */
+    .navbar-center-links {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.3rem;
+      transform: translateX(-50%);
+      z-index: 1;
+    }
+    .navbar-center-links .nav-link {
+      color: #fff;
+      font-family: 'Montserrat', 'Inter', 'Segoe UI', Arial, sans-serif;
+      font-weight: 500;
+      font-size: 1.11rem;
+      letter-spacing: 0.01em;
+      text-decoration: none;
+      padding: 0.2rem 0.3rem;
+      border-radius: 0;
+      background: none;
+      display: inline-block;
+      position: relative;
+      transition: color 0.18s;
+    }
+    .navbar-center-links .nav-link::after {
+      content: '';
+      display: block;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -2px;
+      height: 2px;
+      background: linear-gradient(90deg, #FFA500 0%, #FFD700 100%);
+      border-radius: 1px;
+      opacity: 0;
+      transform: scaleX(0);
+      transition: opacity 0.22s, transform 0.22s cubic-bezier(.4,.01,.22,1);
+      pointer-events: none;
+    }
+    .navbar-center-links .nav-link:hover::after, .navbar-center-links .nav-link:focus::after {
+      opacity: 1;
+      transform: scaleX(1);
+    }
+    .navbar-center-links .nav-link:hover, .navbar-center-links .nav-link:focus {
+      color: #ffb74d;
+      background: none;
+      box-shadow: none;
+      text-decoration: none;
+    }
+    @media (max-width: 900px) {
+      .navbar-center-links {
+        gap: 0.7rem;
+      }
+      .navbar-center-links .nav-link {
+        font-size: 1rem;
+        padding: 0.18rem 0.18rem;
+      }
+    }
+    @media (max-width: 700px) {
+      .navbar-center-links {
+        display: none;
+      }
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* --- About Us Standalone Page Styles (additive) --- */
+    #aboutPageStandalone {
+      background: var(--card-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 70vh;
+      width: 100vw;
+      padding: 0;
+      animation: fadeInUp 0.7s;
+      z-index: 100;
+      position: relative;
+    }
+    .about-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 4rem 2rem 2rem 2rem;
+      gap: 3.5rem;
+    }
+    .about-left {
+      flex: 1.2;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      min-width: 260px;
+    }
+    .about-title {
+      font-family: 'Montserrat', 'Inter', Arial, sans-serif;
+      font-size: 2.7rem;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 1.2rem;
+      letter-spacing: 0.01em;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    }
+    .about-desc {
+      font-size: 1.22rem;
+      color: #e0e0e0;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      line-height: 1.6;
+      max-width: 500px;
+    }
+    .about-right {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 220px;
+    }
+    .about-logo {
+      width: 220px;
+      height: 220px;
+      object-fit: contain;
+      border-radius: 18px;
+      background: #232326;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+      border: 2px solid #ff9800;
+      margin-left: 0;
+    }
+    @media (max-width: 900px) {
+      .about-container {
+        flex-direction: column-reverse;
+        gap: 2.2rem;
+        padding: 2.5rem 1rem 1.5rem 1rem;
+      }
+      .about-logo {
+        width: 150px;
+        height: 150px;
+      }
+      .about-title {
+        font-size: 2.1rem;
+      }
+      .about-desc {
+        font-size: 1.05rem;
+      }
+    }
+    @media (max-width: 600px) {
+      #aboutPageStandalone {
+        min-height: 60vh;
+        padding: 0;
+      }
+      .about-container {
+        padding: 1.2rem 0.2rem 1.2rem 0.2rem;
+        gap: 1.2rem;
+      }
+      .about-logo {
+        width: 100px;
+        height: 100px;
+      }
+      .about-title {
+        font-size: 1.3rem;
+      }
+      .about-desc {
+        font-size: 0.97rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1269,10 +2345,17 @@
   <!-- NAVBAR -->
   <nav id="navbar">
     <div class="logo">
-     <img src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTkyODkzOS5wbmc=/250x600/IxSF%2Fe.png"
+     <img src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjI1NTkzNy5wbmc=/250x600/8NDQ9Y.png"
      alt="  polyVerse logo"
            alt="polyVerse logo" style="height:32px;width:32px;border-radius:6px">
       <span style="font-weight:600;font-size:1.1rem">polyVerse</span>
+    </div>
+    <!-- Centered navigation links -->
+    <div class="navbar-center-links">
+      <a href="#" class="nav-link">Characters</a>
+      <a href="#" class="nav-link">About Us</a>
+      <a href="#contact-section" class="nav-link">Contact Us</a>
+      <a href="#" class="nav-link">Terms</a>
     </div>
     <div class="navbar-search-container" id="top-searchbar">
       <div class="searchbar-wrapper">
@@ -1296,30 +2379,53 @@
       </div>
     </div>
     <ul>
-      <li><button class="btn btn-outline" id="signupBtn">Sign Up</button></li>
-      <li><button class="btn btn-outline profile-btn-combo" id="loginBtn"><!-- Avatar+Name injected by JS --></button></li>
+      <li><button class="btn btn-outline login-btn-custom" id="loginBtn">Login</button></li>
+      <li><button class="btn btn-outline signup-btn-custom" id="signupBtn">Sign Up</button></li>
     </ul>
   </nav>
 
+  <!-- ABOUT PAGE (independent, not injected into homepage) -->
+  <div id="aboutPageStandalone" style="display:none; min-height: 70vh;">
+    <div class="about-container">
+      <div class="about-left">
+        <h1 class="about-title">polyVerse</h1>
+        <p class="about-desc">polyVerse is a platform for game developers and 3D creators to grab ready-made, fully rigged low-poly characters in seconds. Browse, download, and create freely.</p>
+        <button class="btn back-btn" id="aboutStandaloneBackBtn" style="margin-top:2.5rem;">← Back</button>
+      </div>
+      <div class="about-right">
+        <img class="about-logo" src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjI1NTkzNy5wbmc=/250x600/8NDQ9Y.png" alt="polyVerse logo">
+      </div>
+    </div>
+  </div>
+
   <!-- HERO -->
   <section class="hero" id="homepage-banner">
-    <h1>Any low-poly character you could ever need</h1>
-    <p>Build something beautiful with 20+ free Rigged characters</p>
+    <div class="hero-headline">Grab a rigged low-poly character in seconds.</div>
+    <div class="hero-subline">Over 20 unique models. Download and create instantly.</div>
     <div class="hero-search">
-      <input
-        id="heroSearch"
-        type="search"
-        placeholder="Search for anything"
-        autocomplete="off"
-        autocorrect="off"
-        autocapitalize="off"
-        spellcheck="false"
-      />
+      <div class="modern-search-wrapper">
+        <input
+          id="heroSearch"
+          type="search"
+          placeholder="Search for anything"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+        />
+        <span class="search-icon-right">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" stroke="#ff7e5f" stroke-width="2.2" fill="none"/>
+            <line x1="16.2" y1="16.2" x2="21" y2="21" stroke="#ff7e5f" stroke-width="2.2" stroke-linecap="round"/>
+          </svg>
+        </span>
+      </div>
     </div>
   </section>
 
   <!-- GALLERY -->
   <main id="mainContent">
+    <button class="btn back-btn" id="backToShopSearch" style="display:none;position:absolute;top:120px;left:2vw;z-index:20;">← Back to Shop</button>
     <section class="gallery" id="gallery"></section>
   </main>
 
@@ -1328,38 +2434,31 @@
     <button class="btn back-btn" id="backModel">← Back to Shop</button>
     <div class="model-detail">
       <div class="model-viewer-container">
-        <button class="view-toggle" id="viewToggle">3D View</button>
-        <img id="modelImg" src="" alt="Model preview">
-        <model-viewer 
-          id="modelViewer"
-          camera-controls 
-          auto-rotate 
-          shadow-intensity="1"
-          environment-image="neutral"
-          exposure="0.5"
-          shadow-softness="0.5"
-          style="display:none;">
-        </model-viewer>
-        <div class="desc">
-          <div style="display: flex; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
-            <div style="flex:1 1 200px; min-width:0;">
-              <h2 id="modelTitle"></h2>
-              <p id="modelDesc"></p>
-              <div id="modelActions" style="display:none; margin-top: 1rem; gap: 0.5rem; flex-wrap: wrap;">
-                <button class="btn like-btn" id="likeBtn" title="Like this model" style="display:inline-flex;align-items:center;gap:0.5rem;">
-                  <span id="likeIcon">♡</span> <span>Like</span>
-                </button>
-                <button class="btn list-btn" id="listBtn" title="Add to My List" style="display:inline-flex;align-items:center;gap:0.5rem;">
-                  <span id="listIcon">＋</span> <span>Add to List</span>
-                </button>
-              </div>
-              <!-- Comment Box UI -->
-              <div id="commentsSection" style="margin-top:1.5rem;"></div>
+        <div class="model-card-section">
+          <button class="view-toggle" id="viewToggle">3D View</button>
+          <img id="modelImg" class="model-media" src="" alt="Model preview">
+          <model-viewer 
+            id="modelViewer"
+            class="model-media"
+            camera-controls 
+            auto-rotate 
+            shadow-intensity="1"
+            environment-image="neutral"
+            exposure="0.5"
+            shadow-softness="0.5"
+            style="display:none;">
+          </model-viewer>
+          <div class="model-info-row">
+            <div class="model-info-left">
+              <div class="model-title" id="modelTitle"></div>
+              <div class="model-desc" id="modelDesc"></div>
             </div>
-            <div class="download-container" style="display: flex; align-items: center; gap: 1.1rem; min-height: 48px;">
-              <button class="btn buy-btn" id="buyNowBtn">Buy Now</button>
-              <span id="priceLabel" style="display:none;font-weight:700;color:#fff;white-space:nowrap;font-size:1.08rem;vertical-align:middle;line-height:1;"> </span>
-              <button class="download-btn" id="downloadBtn" style="display:none;">Download</button>
+            <div class="model-info-right">
+              <div class="buy-row">
+                <button class="btn buy-btn" id="buyNowBtn">Buy Now</button>
+                <span class="price-label" id="priceLabel" style="display:none;"></span>
+                <button class="download-btn" id="downloadBtn" style="display:none;">Download</button>
+              </div>
               <div class="download-dropdown" id="downloadDropdown">
                 <a href="#" class="download-option" data-format="fbx">
                   <span class="format-icon">📦</span>
@@ -1368,6 +2467,18 @@
                 </a>
               </div>
             </div>
+          </div>
+          <div class="model-actions-row" id="modelActions" style="display:none;">
+            <button class="btn like-btn" id="likeBtn" title="Like this model">
+              <span id="likeIcon">♡</span> <span>Like</span>
+            </button>
+            <button class="btn list-btn" id="listBtn" title="Add to My List">
+              <span id="listIcon">＋</span> <span>Add to List</span>
+            </button>
+          </div>
+          <div class="comments-section">
+            <div class="comments-header" id="commentsHeader"></div>
+            <div id="commentsSection"></div>
           </div>
         </div>
       </div>
@@ -1382,15 +2493,31 @@
   <section id="checkoutPage">
     <button class="btn back-btn" id="backCheckout">← Back</button>
     <h2 style="text-align:center;margin-bottom:1rem;">Checkout</h2>
+    <!-- Order summary card -->
+    <div id="checkoutOrderCard" class="checkout-order-card">
+      <div class="checkout-order-content">
+        <div class="checkout-order-text">
+          <div id="checkoutModelName" class="checkout-model-name">Model Name</div>
+          <div id="checkoutModelPrice" class="checkout-model-price">$1.00 USD</div>
+          <div id="checkoutModelMeta" class="checkout-model-meta">Formats: FBX, GLTF | Rigged</div>
+        </div>
+        <div class="checkout-order-img-wrapper">
+          <img id="checkoutModelImg" src="" alt="Model preview" class="checkout-model-img">
+        </div>
+      </div>
+    </div>
+    <!-- End order summary card -->
+    <div style="height:2.2rem;"></div>
     <div id="paypal-button-container" style="max-width:400px;margin:2rem auto 0 auto;"></div>
     <button class="btn" id="paidDownloadBtn" style="display:none;background:#ff9800;color:#fff;font-weight:600;font-size:1.1rem;margin:2rem auto 0 auto;max-width:400px;width:100%;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.10);padding:0.85rem 0;">Download FBX Model</button>
+    <div class="checkout-secure-line">🔒 Secure checkout powered by PayPal</div>
   </section>
 
   <!-- CONTACT INFO FOOTER -->
-  <footer>
+  <footer id="contact-section">
     <h3>Contact Us</h3>
-    <p>Email: korenbarshalom@gmail.com</p>
-    <p>Phone: 052-221-5113</p>
+    <p style="margin-top:1.2rem;">Email: korenbarshalom@gmail.com</p>
+    <p style="margin-top:0.7rem;">All rights reserved © polyVerse</p>
   </footer>
 
   <!-- LOGIN / REGISTER MODAL -->
@@ -1403,19 +2530,24 @@
 
       <!-- ===== LOGIN VIEW ===== -->
       <div id="loginView">
-        <label>Username</label>
-        <input type="text" class="login-input" id="loginUsername" placeholder="Your username" required>
+        <div class="input-wrapper">
+          <input type="text" class="login-input" id="loginUsername" placeholder=" " required>
+          <label for="loginUsername">Username</label>
+        </div>
         <div class="error-message" id="loginUsernameError"></div>
 
-        <label>Password</label>
-        <input type="password" class="login-input" id="loginPassword" placeholder="Your password" required>
+        <div class="password-field input-wrapper">
+          <input type="password" class="login-input" id="loginPassword" placeholder=" " required>
+          <label for="loginPassword">Password</label>
+          <button type="button" class="toggle-visibility" aria-label="Show password"><span class="material-icons">visibility_off</span></button>
+        </div>
         <div class="error-message" id="loginPasswordError"></div>
 
         <div class="action-row" id="loginActionRow">
           <button class="login-btn" id="loginSubmitBtn">Continue</button>
         </div>
-        <div id="loginSignupText" style="text-align:center; margin-bottom:1rem; font-size:0.93rem; color:#aaa;">
-          Not have an account yet? <a href="#" id="loginToSignup" style="color:var(--accent); font-weight:600;">Sign up</a>
+        <div id="loginSignupText" style="text-align:center; margin-bottom:1rem; font-size:0.9rem; color:#aaa;">
+          Not have an account yet? <a href="#" id="loginToSignup" style="color:var(--accent); font-weight:600; font-size:1rem;">Sign up</a>
         </div>
 
         <div class="success-message" id="loginSuccess"></div>
@@ -1427,16 +2559,24 @@
 
       <!-- ===== REGISTER VIEW ===== -->
       <div id="registerView">
-        <label>Full Name</label>
-        <input type="text" class="login-input" id="registerName" placeholder="Your Name" required>
+        <div class="input-wrapper">
+          <input type="text" class="login-input" id="registerName" placeholder=" " required>
+          <label for="registerName">Full Name</label>
+        </div>
         <div class="error-message" id="nameError"></div>
 
-        <label>Username</label>
-        <input type="text" class="login-input" id="registerUsername" placeholder="Choose a username" required>
+        <div class="input-wrapper">
+          <input type="text" class="login-input" id="registerUsername" placeholder=" " required>
+          <label for="registerUsername">Username</label>
+        </div>
         <div class="error-message" id="usernameError"></div>
 
-        <label>Password</label>
-        <input type="password" class="login-input" id="registerPassword" placeholder="Choose a strong password" required>
+        <div class="password-field input-wrapper">
+          <input type="password" class="login-input" id="registerPassword" placeholder=" " required>
+          <label for="registerPassword">Password</label>
+          <button type="button" class="toggle-visibility" aria-label="Show password"><span class="material-icons">visibility_off</span></button>
+        </div>
+        <p class="password-helper">Password must be at least 8 characters</p>
         <div class="password-strength" id="passwordStrength">
           <div class="password-strength-bar">
             <div class="password-strength-fill" id="strengthFill"></div>
@@ -1445,13 +2585,24 @@
         </div>
         <div class="error-message" id="passwordError"></div>
 
+        <!-- Terms Checkbox -->
+        <div style="display:flex;align-items:flex-start;margin-bottom:1.1rem;margin-top:0.2rem;">
+          <input type="checkbox" id="termsCheckbox">
+          <label for="termsCheckbox" style="font-size:1.05rem;color:#fff;cursor:pointer;user-select:none;line-height:1.4;display:inline-block;">
+            I accept the
+            <a href="#" style="color:#ff9800;font-weight:600;text-decoration:none;" target="_blank">Terms of Service</a>
+            and
+            <a href="#" style="color:#ff9800;font-weight:600;text-decoration:none;" target="_blank">Privacy Policy</a>
+          </label>
+        </div>
+
         <button class="register-submit" id="registerSubmitBtn">Create Account</button>
         <div class="success-message" id="registerSuccess"></div>
 
         <!-- Google Sign-Up button container -->
         <div id="g_id_signup" style="display:flex;justify-content:center;margin-top:1.2rem;margin-bottom:0.5rem;"></div>
         <p id="googleSignupMsg" style="text-align:center;font-size:0.92rem;color:#888;margin-top:0.5rem;">Or sign up with Google</p>
-        <p style="margin-top:.75rem;">Already have an account? <a href="#" id="backToLogin" style="color:var(--accent);">Log In</a></p>
+        <p style="margin-top:.75rem; font-size:1.03rem;">Already have an account? <a href="#" id="backToLogin" style="color:var(--accent); font-size:1.03rem;">Log In</a></p>
       </div>
     </div>
   </div>
@@ -1492,12 +2643,12 @@
       { id: 12, title: 'Medic', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3OS5wbmc=/250x600/yLs1Oq.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter1.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter1.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
       { id: 13, title: 'Human Model', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3Ni5wbmc=/250x600/YWf1vV.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter10.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter10.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
       { id: 14, title: 'Fire Fighter', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk0NTE3Ny5wbmc=/250x600/S%2FDg5u.png', desc: 'Futuristic soldier rigged for animation.', src: '3Dcharcter5.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DLowPolyCharacter5.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
-      { id: 13, title: 'SteelGuard', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjIwMTU2MS5wbmc=/250x600/NCG7Kb.png', desc: 'Armored robot with drill arm, rigged and ready for animation.', src: 'Villan11.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Villan1.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
-      { id: 13, title: 'InfernoBot', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjIwMTgwNy5wbmc=/250x600/IJYtyS.png', desc: 'Flaming armored bot rigged and ready for animation.', src: 'Villan12.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Villan2.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
-      { id: 13, title: 'Emerald Mage', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjIwMTk2NS5wbmc=/250x600/ky9C0L.png', desc: ' Mystic green sorcerer rigged for animation.', src: 'Villan13.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Villan3.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
-      { id: 13, title: 'Frost King', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjIwMjA2OS5wbmc=/250x600/%2F0h3XD.png', desc: ' Ice-armored mage rigged for animation.', src: 'Villan14.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Villan4.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
-      { id: 13, title: 'Nightblade', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjIwMjEzNy5wbmc=/250x600/OD1IR5.png', desc: ' Shadow assassin rigged for animation.', src: 'Villan15.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Villan5.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
-       { id: 13, title: 'Cinderblade', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjIwMjIxMy5wbmc=/250x600/tJjTaP.png', desc: 'Flame rogue rigged for animation.', src: 'Villan16.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Villan6.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 15, title: 'SteelGuard', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjIwMTU2MS5wbmc=/250x600/NCG7Kb.png', desc: 'Armored robot with drill arm, rigged and ready for animation.', src: 'Villan11.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Villan1.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 16, title: 'InfernoBot', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjIwMTgwNy5wbmc=/250x600/IJYtyS.png', desc: 'Flaming armored bot rigged and ready for animation.', src: 'Villan12.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Villan2.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 17, title: 'Emerald Mage', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjIwMTk2NS5wbmc=/250x600/ky9C0L.png', desc: ' Mystic green sorcerer rigged for animation.', src: 'Villan13.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Villan3.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 18, title: 'Frost King', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjIwMjA2OS5wbmc=/250x600/%2F0h3XD.png', desc: ' Ice-armored mage rigged for animation.', src: 'Villan14.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Villan4.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 19, title: 'Nightblade', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjIwMjEzNy5wbmc=/250x600/OD1IR5.png', desc: ' Shadow assassin rigged for animation.', src: 'Villan15.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Villan5.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
+      { id: 20, title: 'Cinderblade', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjIwMjIxMy5wbmc=/250x600/tJjTaP.png', desc: 'Flame rogue rigged for animation.', src: 'Villan16.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Villan6.fbx', glb: 'AS1.glb', gltf: 'AS1.gltf' },
     ];
 
     // DOM refs
@@ -1553,6 +2704,9 @@
 
     // --- Gallery ---
     function renderGallery(list, animateAll = false){
+      // Hide purchased page if present
+      const purchasedListPage = document.getElementById('purchasedListPage');
+      if (purchasedListPage) purchasedListPage.style.display = 'none';
       // Get IDs of new results
       const newIds = new Set(list.map(m => m.id));
       // Cards that are new (not in lastRenderedIds)
@@ -1562,9 +2716,9 @@
       if (list.length === 0) {
         // Show centered no-results message with correct structure and style
         gallery.innerHTML = `
-          <div id="no-results-message">
-            <div>¯\\_(ツ)_/¯</div>
-            <div>No results</div>
+          <div id="search-no-results-message">
+            <span class="search-no-results-emoji">😐</span>
+            <span class="search-no-results-text">No results found</span>
           </div>
         `;
         lastRenderedIds = newIds;
@@ -1622,6 +2776,7 @@
         window.scrollTo(0,0);
         doSearch(value, true);
         lastSearchQuery = value;
+        showBackToShopButton();
       }
     });
     // Only trigger search on Enter for top searchbar
@@ -1635,24 +2790,13 @@
         window.scrollTo(0,0);
         doSearch(value, true);
         lastSearchQuery = value;
+        showBackToShopButton();
       }
     });
     // Clear search logic for top searchbar
     navbarSearch.addEventListener('input', e => {
       if (e.target.value.trim() === '') {
-        // Hide top searchbar, show homepage banner
-        topSearchbar.style.display = 'none';
-        homepageBanner.style.display = '';
-        // Show main search bar in banner
-        heroSearch.parentElement.classList.remove('hide');
-        heroSearch.value = '';
-        // Hide model/checkout, show gallery
-        modelPage.style.display = 'none';
-        checkoutPage.style.display = 'none';
-        mainContent.style.display = 'block';
-        // Clear results
-        renderGallery(models, true);
-        lastSearchQuery = '';
+        hideBackToShopButton();
       }
     });
 
@@ -1665,7 +2809,14 @@
       // Hide main content, show model page
       mainContent.style.display = 'none';
       checkoutPage.style.display = 'none';
+      modelPage.classList.remove('active');
       modelPage.style.display = 'block';
+      setTimeout(() => {
+        modelPage.classList.add('active');
+      }, 10);
+      // Hide purchased page if present
+      const purchasedListPage = document.getElementById('purchasedListPage');
+      if (purchasedListPage) purchasedListPage.style.display = 'none';
       // Hide hero banner
       if(homepageBanner) homepageBanner.style.display = 'none';
       // Set model details
@@ -1685,11 +2836,20 @@
       modelImg.style.display = 'none';
       modelViewer.style.display = 'block';
       viewToggle.style.display = 'none';
-      window.scrollTo(0,0);
-      
+      // Restore instant scroll-to-top ONLY when opening from homepage
+      if (fromHomepage) {
+        window.scrollTo(0,0);
+      }
+      // Only render suggested models if coming from homepage or first load
+      if (fromHomepage || typeof openModelPage._suggestedInitialized === 'undefined') {
+        renderSuggestedModels(m.id);
+        openModelPage._suggestedInitialized = true;
+      } else {
+        // Just update the currentId for the suggested section, but do not refresh cards
+        // Optionally, you could highlight the selected card, but do not refresh suggestions
+      }
       // Only randomize suggestions when coming from homepage
       if (fromHomepage) {
-        renderSuggestedModels(m.id);
         comingFromHomepage = false;
       }
       
@@ -1713,6 +2873,13 @@
       likeBtn.setAttribute('data-model-id', m.id);
       listBtn.setAttribute('data-model-id', m.id);
       updateLikeListUI(m);
+      // Hide likes/list page and clear gallery if present
+      const likesListPage = document.getElementById('likesListPage');
+      if (likesListPage) {
+        likesListPage.style.display = 'none';
+        const likesListGallery = document.getElementById('likesListGallery');
+        if (likesListGallery) likesListGallery.innerHTML = '';
+      }
     }
 
     // --- Suggested Models Logic ---
@@ -1721,10 +2888,21 @@
       suggestedModels.innerHTML = '<h4>Suggested Models</h4>';
       // Filter out the current model and create a shuffled array
       const availableModels = models.filter(mod => mod.id !== currentId);
-      const shuffledModels = shuffleArray([...availableModels]);
-      // Show only 2–3 cards at once
-      const limit = 3;
-      const modelsToShow = shuffledModels.slice(0, limit);
+      // Track which models are currently shown in suggested
+      let suggestedIndices = [];
+      // Helper to get 3 random models, not repeating the last set
+      function getRandomModels(excludeIndices = []) {
+        const pool = availableModels.filter((_, idx) => !excludeIndices.includes(idx));
+        const shuffled = shuffleArray([...pool]);
+        return shuffled.slice(0, 3);
+      }
+      // Store the last shown indices in a closure
+      if (!renderSuggestedModels._lastIndices) renderSuggestedModels._lastIndices = [];
+      // Get 3 models to show
+      const modelsToShow = getRandomModels(renderSuggestedModels._lastIndices.map(i => i));
+      // Save their indices for next time
+      renderSuggestedModels._lastIndices = modelsToShow.map(m => availableModels.indexOf(m));
+      // Render cards
       modelsToShow.forEach(mod => {
         const card = document.createElement('div');
         card.className = 'suggested-card';
@@ -1735,9 +2913,59 @@
             <div class="suggested-desc">${mod.desc || ''}</div>
           </div>
         `;
-        card.onclick = () => openModelPage(mod, false);
+        // Only open model page, do NOT refresh suggestions
+        card.onclick = () => {
+          openModelPage(mod, false);
+          // Smooth scroll to top ONLY for model preview page suggested models
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
         suggestedModels.appendChild(card);
       });
+      // Add Load More button
+      const loadMoreBtn = document.createElement('button');
+      loadMoreBtn.id = 'suggestedLoadMoreBtn';
+      loadMoreBtn.textContent = 'Load More';
+      loadMoreBtn.onclick = function() {
+        // Animate out old cards
+        const cards = Array.from(suggestedModels.querySelectorAll('.suggested-card'));
+        cards.forEach(card => {
+          card.style.transition = 'opacity 0.32s cubic-bezier(.4,.01,.22,1), transform 0.32s cubic-bezier(.4,.01,.22,1)';
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(30px) scale(0.98)';
+        });
+        loadMoreBtn.disabled = true;
+        setTimeout(() => {
+          // Remove old cards
+          cards.forEach(card => card.remove());
+          // Get new models (avoid showing the same as last time)
+          const newModels = getRandomModels(renderSuggestedModels._lastIndices.map(i => i));
+          renderSuggestedModels._lastIndices = newModels.map(m => availableModels.indexOf(m));
+          // Render new cards with appear animation
+          newModels.forEach(mod => {
+            const card = document.createElement('div');
+            card.className = 'suggested-card card-appear';
+            card.innerHTML = `
+              <img class="suggested-thumb" src="${mod.thumb}" alt="${mod.title}">
+              <div class="suggested-card-content">
+                <div class="suggested-title">${mod.title}</div>
+                <div class="suggested-desc">${mod.desc || ''}</div>
+              </div>
+            `;
+            // Only open model page, do NOT refresh suggestions
+            card.onclick = () => {
+              openModelPage(mod, false);
+              // Smooth scroll to top ONLY for model preview page suggested models
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+            suggestedModels.insertBefore(card, loadMoreBtn);
+            card.addEventListener('animationend', () => {
+              card.classList.remove('card-appear');
+            }, { once: true });
+          });
+          loadMoreBtn.disabled = false;
+        }, 320);
+      };
+      suggestedModels.appendChild(loadMoreBtn);
     }
 
     // Helper function to shuffle array (Fisher-Yates algorithm)
@@ -1785,6 +3013,11 @@
       heroSearch.value = '';
       lastSearchQuery = '';
       renderGallery(models, true);
+      // In openLikesOrListPage, after hiding other pages:
+      const purchasedListPage = document.getElementById('purchasedListPage');
+      if (purchasedListPage) purchasedListPage.style.display = 'none';
+      // Hide the Back to Shop button if visible
+      hideBackToShopButton();
     };
     buyNowBtn.onclick=()=>{
       // Store paid model ID in sessionStorage for post-payment download
@@ -1793,7 +3026,13 @@
       }
       modelPage.style.display='none';
       mainContent.style.display='none';
-      checkoutPage.style.display='block';
+      // --- Begin smooth transition for checkout page ---
+      checkoutPage.classList.remove('active');
+      checkoutPage.style.display = 'block';
+      setTimeout(() => {
+        checkoutPage.classList.add('active');
+      }, 10);
+      // --- End smooth transition ---
       // Show navbar search, hide hero search and hero banner
       navbarSearch.value = '';
       heroSearch.parentElement.classList.add('hide');
@@ -1803,22 +3042,40 @@
       if (lastOpenedModel) {
         renderPayPalButton(lastOpenedModel);
       }
+      // Update checkout preview with selected model info
+      document.getElementById('checkoutModelImg').src = lastOpenedModel.thumb;
+      document.getElementById('checkoutModelName').textContent = lastOpenedModel.title;
+      document.getElementById('checkoutModelPrice').textContent = `$${Number(lastOpenedModel.price).toFixed(2)} USD`;
+      // Compose metadata line
+      let meta = [];
+      if (lastOpenedModel.availableFormats) meta.push('Formats: ' + lastOpenedModel.availableFormats.map(f=>f.toUpperCase()).join(', '));
+      if (lastOpenedModel.desc && /rigged/i.test(lastOpenedModel.desc)) meta.push('Rigged');
+      document.getElementById('checkoutModelMeta').textContent = meta.join(' | ');
     };
     backCheckout.onclick=()=>{
-      // Return to previous model page if available
       if (lastOpenedModel) {
-        checkoutPage.style.display = 'none';
-        openModelPage(lastOpenedModel);
+        checkoutPage.classList.remove('active');
+        setTimeout(() => {
+          checkoutPage.style.display = 'none';
+          modelPage.classList.remove('active');
+          modelPage.style.display = 'block';
+          setTimeout(() => {
+            modelPage.classList.add('active');
+          }, 10);
+          openModelPage(lastOpenedModel);
+        }, 450);
       } else {
-        // Fallback: go to home/shop
-        checkoutPage.style.display = 'none';
-        modelPage.style.display = 'none';
-        mainContent.style.display = 'block';
-        navbarSearch.value = '';
-        heroSearch.parentElement.classList.remove('hide');
-        topSearchbar.style.display = 'none';
-        if(homepageBanner) homepageBanner.style.display = '';
-        window.scrollTo(0,0);
+        checkoutPage.classList.remove('active');
+        setTimeout(() => {
+          checkoutPage.style.display = 'none';
+          modelPage.style.display = 'none';
+          mainContent.style.display = 'block';
+          navbarSearch.value = '';
+          heroSearch.parentElement.classList.remove('hide');
+          topSearchbar.style.display = 'none';
+          if(homepageBanner) homepageBanner.style.display = '';
+          window.scrollTo(0,0);
+        }, 450);
       }
     };
 
@@ -2021,7 +3278,13 @@
         return;
       }
       currentUser = user;
-      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      // Only store minimal info in currentUser
+      const minimalUser = {
+        id: user.username,
+        username: user.username,
+        token: undefined // No token for local login, but keep field for consistency
+      };
+      localStorage.setItem('currentUser', JSON.stringify(minimalUser));
       showSuccess(loginSuccess, 'Login successful! Welcome back!');
       setTimeout(() => {
         closeModal(loginModal);
@@ -2080,7 +3343,7 @@
     function showRegister(){
       loginView.style.display='none';
       registerView.style.display='block';
-      modalTitle.textContent='Create Account';
+      modalTitle.textContent='Sign Up';
       clearAllErrors();
       // Attach event listener for 'Log In' link in register view
       setTimeout(() => {
@@ -2478,13 +3741,24 @@
       // Hide likes/list page and clear gallery
       const likesListPage = document.getElementById('likesListPage');
       if (likesListPage) {
-        likesListPage.style.display = 'none';
+        likesListPage.classList.remove('active');
+        setTimeout(() => { likesListPage.style.display = 'none'; }, 450);
         const likesListGallery = document.getElementById('likesListGallery');
         if (likesListGallery) likesListGallery.innerHTML = '';
       }
-      // Show profile page
+      // Hide purchased page if present
+      const purchasedListPage = document.getElementById('purchasedListPage');
+      if (purchasedListPage) {
+        purchasedListPage.classList.remove('active');
+        setTimeout(() => { purchasedListPage.style.display = 'none'; }, 450);
+      }
+      // Show profile page with smooth transition
       const profilePage = document.getElementById('profilePage');
+      profilePage.classList.remove('active');
       profilePage.style.display = 'block';
+      setTimeout(() => {
+        profilePage.classList.add('active');
+      }, 10);
       window.scrollTo(0,0);
       // Load current user data (from localStorage, not yet saved changes)
       let user = JSON.parse(localStorage.getItem('currentUser'));
@@ -2542,12 +3816,20 @@
       };
       // Back button
       document.getElementById('backProfile').onclick = () => {
-        profilePage.style.display = 'none';
-        mainContent.style.display = 'block';
-        homepageBanner.style.display = '';
-        topSearchbar.style.display = 'none';
-        window.scrollTo(0,0);
+        profilePage.classList.remove('active');
+        setTimeout(() => {
+          profilePage.style.display = 'none';
+          mainContent.style.display = 'block';
+          homepageBanner.style.display = '';
+          topSearchbar.style.display = 'none';
+          window.scrollTo(0,0);
+        }, 450);
       };
+      // In openProfilePage, after hiding other pages:
+      if (purchasedListPage) {
+        purchasedListPage.classList.remove('active');
+        setTimeout(() => { purchasedListPage.style.display = 'none'; }, 450);
+      }
     }
 
     // --- Like/List logic ---
@@ -2650,50 +3932,79 @@
       topSearchbar.style.display = 'none';
       // Hide profile page if present
       const profilePage = document.getElementById('profilePage');
-      if (profilePage) profilePage.style.display = 'none';
-      // Show likes/list page
+      if (profilePage) {
+        profilePage.classList.remove('active');
+        setTimeout(() => { profilePage.style.display = 'none'; }, 450);
+      }
+      // Hide purchased page if present (use fade helper)
+      const purchasedListPage = document.getElementById('purchasedListPage');
       const likesListPage = document.getElementById('likesListPage');
-      likesListPage.style.display = 'block';
-      window.scrollTo(0,0);
-      // Set title
-      const title = type === 'likes' ? 'My Likes' : 'My List';
-      document.getElementById('likesListTitle').textContent = title;
-      // Get model IDs
-      let ids = [];
-      if (type === 'likes') ids = getUserLikes();
-      else ids = getUserList();
-      // Get models
-      const filtered = models.filter(m => ids.includes(m.id));
-      // Render
-      const galleryDiv = document.getElementById('likesListGallery');
-      if (filtered.length === 0) {
-        galleryDiv.innerHTML = `<div id=\"no-results-message\"><div>¯\\_(ツ)_/¯</div><div>No models yet</div></div>`;
-      } else {
-        galleryDiv.innerHTML = '';
-        filtered.forEach(m => {
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.innerHTML = `
-            <img src=\"${m.thumb}\" alt=\"${m.title}\">
-            <div class=\"info\">
-              <h3>${m.title}</h3>
-              <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>
-            </div>`;
-          card.onclick = () => openModelPage(m, false);
-          galleryDiv.appendChild(card);
+      if (purchasedListPage && purchasedListPage.style.display !== 'none') {
+        switchSectionFadeOutIn(purchasedListPage, likesListPage, () => {
+          // Set title and render after fade in
+          const title = type === 'likes' ? 'My Likes' : 'My List';
+          document.getElementById('likesListTitle').textContent = title;
+          let ids = type === 'likes' ? getUserLikes() : getUserList();
+          const filtered = models.filter(m => ids.includes(m.id));
+          const galleryDiv = document.getElementById('likesListGallery');
+          if (filtered.length === 0) {
+            galleryDiv.innerHTML = `<div id="no-results-message"><span class="no-results-emoji">😐</span><span class="no-results-text">${type === 'likes' ? 'No liked models yet' : 'No saved models yet'}</span></div>`;
+          } else {
+            galleryDiv.innerHTML = '';
+            filtered.forEach(m => {
+              const card = document.createElement('div');
+              card.className = 'card';
+              card.innerHTML = `\n            <img src=\"${m.thumb}\" alt=\"${m.title}\">\n            <div class=\"info\">\n              <h3>${m.title}</h3>\n              <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>\n            </div>`;
+              card.onclick = () => openModelPage(m, false);
+              galleryDiv.appendChild(card);
+            });
+          }
         });
+      } else {
+        // Show likes/list page with smooth transition
+        likesListPage.classList.remove('active');
+        likesListPage.style.display = 'block';
+        setTimeout(() => {
+          likesListPage.classList.add('active');
+        }, 10);
+        window.scrollTo(0,0);
+        // Set title
+        const title = type === 'likes' ? 'My Likes' : 'My List';
+        document.getElementById('likesListTitle').textContent = title;
+        // Get model IDs
+        let ids = [];
+        if (type === 'likes') ids = getUserLikes();
+        else ids = getUserList();
+        // Get models
+        const filtered = models.filter(m => ids.includes(m.id));
+        // Render
+        const galleryDiv = document.getElementById('likesListGallery');
+        if (filtered.length === 0) {
+          galleryDiv.innerHTML = `<div id="no-results-message"><span class="no-results-emoji">😐</span><span class="no-results-text">${type === 'likes' ? 'No liked models yet' : 'No saved models yet'}</span></div>`;
+        } else {
+          galleryDiv.innerHTML = '';
+          filtered.forEach(m => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `\n            <img src=\"${m.thumb}\" alt=\"${m.title}\">\n            <div class=\"info\">\n              <h3>${m.title}</h3>\n              <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>\n            </div>`;
+            card.onclick = () => openModelPage(m, false);
+            galleryDiv.appendChild(card);
+          });
+        }
       }
       // Back button
       document.getElementById('backLikesList').onclick = () => {
-        likesListPage.style.display = 'none';
-        // Clear the gallery content to prevent bleed-through
-        document.getElementById('likesListGallery').innerHTML = '';
-        mainContent.style.display = 'block';
-        homepageBanner.style.display = '';
-        topSearchbar.style.display = 'none';
-        // Ensure the hero search bar is visible again
-        heroSearch.parentElement.classList.remove('hide');
-        window.scrollTo(0,0);
+        likesListPage.classList.remove('active');
+        setTimeout(() => {
+          likesListPage.style.display = 'none';
+          document.getElementById('likesListGallery').innerHTML = '';
+          mainContent.style.display = 'block';
+          homepageBanner.style.display = '';
+          topSearchbar.style.display = 'none';
+          // Ensure the hero search bar is visible again
+          heroSearch.parentElement.classList.remove('hide');
+          window.scrollTo(0,0);
+        }, 450);
       };
     }
 
@@ -2722,86 +4033,161 @@
       topSearchbar.style.display = 'none';
       // Hide profile page if present
       const profilePage = document.getElementById('profilePage');
-      if (profilePage) profilePage.style.display = 'none';
-      // Hide likes/list page if present
+      if (profilePage) {
+        profilePage.classList.remove('active');
+        setTimeout(() => { profilePage.style.display = 'none'; }, 450);
+      }
+      // Hide likes/list page if present (use fade helper)
       const likesListPage = document.getElementById('likesListPage');
-      if (likesListPage) likesListPage.style.display = 'none';
-      // Show purchased page
       const purchasedListPage = document.getElementById('purchasedListPage');
-      purchasedListPage.style.display = 'block';
-      window.scrollTo(0,0);
-      // Get purchased model IDs
-      let ids = getUserPurchased();
-      // Get models
-      const filtered = models.filter(m => ids.includes(m.id));
-      // Render
-      const galleryDiv = document.getElementById('purchasedListGallery');
-      if (filtered.length === 0) {
-        galleryDiv.innerHTML = `<div id=\"no-results-message\"><div>¯\\_(ツ)_/¯</div><div>No purchased models yet</div></div>`;
-      } else {
-        galleryDiv.innerHTML = '';
-        filtered.forEach(m => {
-          const cardWrapper = document.createElement('div');
-          cardWrapper.style.display = 'flex';
-          cardWrapper.style.flexDirection = 'column';
-          cardWrapper.style.alignItems = 'center';
-          cardWrapper.style.marginBottom = '2.5rem';
+      if (likesListPage && likesListPage.style.display !== 'none') {
+        switchSectionFadeOutIn(likesListPage, purchasedListPage, () => {
+          // Render after fade in
+          let ids = getUserPurchased();
+          const filtered = models.filter(m => ids.includes(m.id));
+          const galleryDiv = document.getElementById('purchasedListGallery');
+          if (filtered.length === 0) {
+            galleryDiv.innerHTML = `<div id="no-results-message"><span class="no-results-emoji">😐</span><span class="no-results-text">No purchased models yet</span></div>`;
+          } else {
+            galleryDiv.innerHTML = '';
+            filtered.forEach(m => {
+              const cardWrapper = document.createElement('div');
+              cardWrapper.style.display = 'flex';
+              cardWrapper.style.flexDirection = 'column';
+              cardWrapper.style.alignItems = 'center';
+              cardWrapper.style.marginBottom = '2.5rem';
 
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.innerHTML = `
-            <img src=\"${m.thumb}\" alt=\"${m.title}\">
-            <div class=\"info\">
-              <h3>${m.title}</h3>
-              <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>
-            </div>`;
-          card.onclick = () => openModelPage(m, false);
-          cardWrapper.appendChild(card);
+              const card = document.createElement('div');
+              card.className = 'card';
+              card.innerHTML = `
+                <img src=\"${m.thumb}\" alt=\"${m.title}\">
+                <div class=\"info\">
+                  <h3>${m.title}</h3>
+                  <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>
+                </div>`;
+              card.onclick = () => openModelPage(m, false);
+              cardWrapper.appendChild(card);
 
-          // Download button below card
-          const downloadBtn = document.createElement('button');
-          downloadBtn.className = 'download-btn';
-          downloadBtn.style.marginTop = '20px';
-          downloadBtn.style.display = 'block';
-          downloadBtn.style.alignSelf = 'center';
-          downloadBtn.textContent = 'Download';
-          downloadBtn.onclick = (e) => {
-            e.stopPropagation();
-            const format = 'fbx';
-            const modelName = m.title.replace(/\s+/g, '_');
-            const availableFormats = getAvailableFormats(m);
-            if (!availableFormats.includes(format)) {
-              alert(`Sorry, ${format.toUpperCase()} format is not available for this model yet.\n\nAvailable formats: ${availableFormats.map(f => f.toUpperCase()).join(', ')}`);
-              return;
-            }
-            const fileUrl = getFileUrlForFormat(m, format);
-            if (!fileUrl) {
-              alert(`Download not available for ${format.toUpperCase()} format.`);
-              return;
-            }
-            const link = document.createElement('a');
-            link.href = fileUrl;
-            link.download = `${modelName}.${format}`;
-            link.style.display = 'none';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            alert(`Downloading ${modelName}.${format}...`);
-          };
-          cardWrapper.appendChild(downloadBtn);
+              // Download button below card
+              const downloadBtn = document.createElement('button');
+              downloadBtn.className = 'download-btn';
+              downloadBtn.style.marginTop = '20px';
+              downloadBtn.style.display = 'block';
+              downloadBtn.style.alignSelf = 'center';
+              downloadBtn.textContent = 'Download';
+              downloadBtn.onclick = (e) => {
+                e.stopPropagation();
+                const format = 'fbx';
+                const modelName = m.title.replace(/\s+/g, '_');
+                const availableFormats = getAvailableFormats(m);
+                if (!availableFormats.includes(format)) {
+                  alert(`Sorry, ${format.toUpperCase()} format is not available for this model yet.\n\nAvailable formats: ${availableFormats.map(f => f.toUpperCase()).join(', ')}`);
+                  return;
+                }
+                const fileUrl = getFileUrlForFormat(m, format);
+                if (!fileUrl) {
+                  alert(`Download not available for ${format.toUpperCase()} format.`);
+                  return;
+                }
+                const link = document.createElement('a');
+                link.href = fileUrl;
+                link.download = `${modelName}.${format}`;
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                alert(`Downloading ${modelName}.${format}...`);
+              };
+              cardWrapper.appendChild(downloadBtn);
 
-          galleryDiv.appendChild(cardWrapper);
+              galleryDiv.appendChild(cardWrapper);
+            });
+          }
         });
+      } else {
+        // Show purchased page with smooth transition
+        purchasedListPage.classList.remove('active');
+        purchasedListPage.style.display = 'block';
+        setTimeout(() => {
+          purchasedListPage.classList.add('active');
+        }, 10);
+        window.scrollTo(0,0);
+        // Get purchased model IDs
+        let ids = getUserPurchased();
+        // Get models
+        const filtered = models.filter(m => ids.includes(m.id));
+        // Render
+        const galleryDiv = document.getElementById('purchasedListGallery');
+        if (filtered.length === 0) {
+          galleryDiv.innerHTML = `<div id="no-results-message"><span class="no-results-emoji">😐</span><span class="no-results-text">No purchased models yet</span></div>`;
+        } else {
+          galleryDiv.innerHTML = '';
+          filtered.forEach(m => {
+            const cardWrapper = document.createElement('div');
+            cardWrapper.style.display = 'flex';
+            cardWrapper.style.flexDirection = 'column';
+            cardWrapper.style.alignItems = 'center';
+            cardWrapper.style.marginBottom = '2.5rem';
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+              <img src=\"${m.thumb}\" alt=\"${m.title}\">
+              <div class=\"info\">
+                <h3>${m.title}</h3>
+                <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>
+              </div>`;
+            card.onclick = () => openModelPage(m, false);
+            cardWrapper.appendChild(card);
+
+            // Download button below card
+            const downloadBtn = document.createElement('button');
+            downloadBtn.className = 'download-btn';
+            downloadBtn.style.marginTop = '20px';
+            downloadBtn.style.display = 'block';
+            downloadBtn.style.alignSelf = 'center';
+            downloadBtn.textContent = 'Download';
+            downloadBtn.onclick = (e) => {
+              e.stopPropagation();
+              const format = 'fbx';
+              const modelName = m.title.replace(/\s+/g, '_');
+              const availableFormats = getAvailableFormats(m);
+              if (!availableFormats.includes(format)) {
+                alert(`Sorry, ${format.toUpperCase()} format is not available for this model yet.\n\nAvailable formats: ${availableFormats.map(f => f.toUpperCase()).join(', ')}`);
+                return;
+              }
+              const fileUrl = getFileUrlForFormat(m, format);
+              if (!fileUrl) {
+                alert(`Download not available for ${format.toUpperCase()} format.`);
+                return;
+              }
+              const link = document.createElement('a');
+              link.href = fileUrl;
+              link.download = `${modelName}.${format}`;
+              link.style.display = 'none';
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              alert(`Downloading ${modelName}.${format}...`);
+            };
+            cardWrapper.appendChild(downloadBtn);
+
+            galleryDiv.appendChild(cardWrapper);
+          });
+        }
       }
       // Back button
       document.getElementById('backPurchasedList').onclick = () => {
-        purchasedListPage.style.display = 'none';
-        document.getElementById('purchasedListGallery').innerHTML = '';
-        mainContent.style.display = 'block';
-        homepageBanner.style.display = '';
-        topSearchbar.style.display = 'none';
-        heroSearch.parentElement.classList.remove('hide');
-        window.scrollTo(0,0);
+        purchasedListPage.classList.remove('active');
+        setTimeout(() => {
+          purchasedListPage.style.display = 'none';
+          document.getElementById('purchasedListGallery').innerHTML = '';
+          mainContent.style.display = 'block';
+          homepageBanner.style.display = '';
+          topSearchbar.style.display = 'none';
+          heroSearch.parentElement.classList.remove('hide');
+          window.scrollTo(0,0);
+        }, 450);
       };
     }
 
@@ -3047,15 +4433,13 @@
     // --- Comments Logic ---
     function renderComments(modelId) {
       const section = document.getElementById('commentsSection');
-      if (!section) return;
+      const header = document.getElementById('commentsHeader');
+      if (!section || !header) return;
       section.innerHTML = '';
       // Get comments from localStorage (per model)
       const comments = JSON.parse(localStorage.getItem('comments_' + modelId) || '[]');
       // Comments header
-      const header = document.createElement('div');
-      header.style = 'font-weight:600;font-size:1.08rem;margin-bottom:0.7rem;color:#fff;';
       header.textContent = `${comments.length} Comment${comments.length === 1 ? '' : 's'}`;
-      section.appendChild(header);
       // Comments list
       const list = document.createElement('div');
       list.id = 'commentsList';
@@ -3142,49 +4526,62 @@ function handleGoogleCredentialResponse(response) {
       users.push(user);
       saveUsers(users);
     }
-    localStorage.setItem('user', JSON.stringify(user));
-    localStorage.setItem('currentUser', JSON.stringify(user));
+    // Only store minimal info in currentUser
+    const minimalUser = {
+      id: user.sub || user.email,
+      username: user.email,
+      token: response.credential
+    };
+    localStorage.setItem('user', JSON.stringify(user)); // keep full user for legacy, but not for currentUser
+    localStorage.setItem('currentUser', JSON.stringify(minimalUser));
     window.location.href = 'index.html';
   } catch (err) {
     alert('Google login failed: ' + (err?.message || err));
   }
 }
 
-// --- Initialize Google Sign-In buttons ---
+// --- Initialize Google Sign-In buttons (English forced) ---
 window.addEventListener('DOMContentLoaded', () => {
-  if (window.google?.accounts?.id) {
-    window.google.accounts.id.initialize({
-      client_id: '665196132587-cbo8bflq7cstp7mjjcudoa1k5fu1ftss.apps.googleusercontent.com', // ← זה ה־Client ID שלך
-      callback: handleGoogleCredentialResponse,
-      ux_mode: 'popup' // Using popup, so no redirect_uri needed
-    });
+  const waitForGoogle = setInterval(() => {
+    if (window.google?.accounts?.id) {
+      clearInterval(waitForGoogle);
 
-    // Render login button
-    const loginBtn = document.getElementById('g_id_signin');
-    if (loginBtn) {
-      window.google.accounts.id.renderButton(loginBtn, {
-        theme: 'outline',
-        size: 'large',
-        width: 280,
-        text: 'signin_with',
-        shape: 'rectangular',
-        logo_alignment: 'left'
+      window.google.accounts.id.initialize({
+        client_id: '665196132587-cbo8bflq7cstp7mjjcudoa1k5fu1ftss.apps.googleusercontent.com',
+        callback: handleGoogleCredentialResponse,
+        ux_mode: 'popup'
       });
-    }
+
+      // Render login button
+      const loginBtn = document.getElementById('g_id_signin');
+      if (loginBtn) {
+        window.google.accounts.id.renderButton(loginBtn, {
+          theme: 'outline',
+          size: 'large',
+          width: 280,
+          text: 'signin_with',
+          shape: 'rectangular',
+          logo_alignment: 'left',
+          locale: 'en' // Force English
+        });
+      }
 
     // Render sign-up button
-    const signupBtn = document.getElementById('g_id_signup');
-    if (signupBtn) {
-      window.google.accounts.id.renderButton(signupBtn, {
-        theme: 'outline',
-        size: 'large',
-        width: 280,
-        text: 'signup_with',
-        shape: 'rectangular',
-        logo_alignment: 'left'
-      });
+const signupBtn = document.getElementById('g_id_signup');
+if (signupBtn) {
+  window.google.accounts.id.renderButton(signupBtn, {
+    theme: 'outline',           // שומר על צבע לבן
+    size: 'large',              // מגדיל טיפה את הטקסט
+    width: 300,                 // טיפה יותר רחב
+    text: 'signup_with',        // טקסט ברור
+    shape: 'rectangular',       // שומר על פינות חדות
+    logo_alignment: 'left',     // לוגו בצד שמאל
+    locale: 'en'                // טקסט באנגלית
+  });
+}
+
     }
-  }
+  }, 100);
 });
 
 
@@ -3240,6 +4637,201 @@ window.addEventListener('DOMContentLoaded', () => {
       addClass(document.getElementById('loginBtn'), 'enlarged');
       addClass(document.getElementById('signupBtn'), 'enlarged');
     });
+
+    const backToShopSearch = document.getElementById('backToShopSearch');
+
+    // Show the button only when the search page (mainContent) is visible
+    function showBackToShopButton() {
+      if (mainContent.style.display !== 'none') {
+        backToShopSearch.style.display = 'block';
+      } else {
+        backToShopSearch.style.display = 'none';
+      }
+    }
+    function hideBackToShopButton() {
+      backToShopSearch.style.display = 'none';
+    }
+
+    // Update search logic to always show the button on the search page
+    heroSearch.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        // ... existing code ...
+        showBackToShopButton();
+      }
+    });
+    navbarSearch.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        // ... existing code ...
+        showBackToShopButton();
+      }
+    });
+    // Always show the button when on the search page, even if input is empty
+    navbarSearch.addEventListener('input', e => {
+      showBackToShopButton();
+    });
+    // Also show when search page is opened
+    window.addEventListener('DOMContentLoaded', () => {
+      showBackToShopButton();
+    });
+    // Hide when navigating away from search page
+    function hideSearchResultsAndBackButton() {
+      hideBackToShopButton();
+    }
+    // Attach to all navigation that returns to homepage
+    backToShopSearch.onclick = () => {
+      // Hide search results and button, show homepage
+      mainContent.style.display = 'block';
+      homepageBanner.style.display = '';
+      topSearchbar.style.display = 'none';
+      heroSearch.parentElement.classList.remove('hide');
+      navbarSearch.value = '';
+      renderGallery(models, true);
+      hideBackToShopButton();
+      window.scrollTo(0,0);
+    };
+    // Also hide on initial load
+    window.addEventListener('DOMContentLoaded', () => {
+      hideBackToShopButton();
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.password-field .toggle-visibility').forEach(btn => {
+        const input = btn.parentElement.querySelector('input');
+        const icon = btn.querySelector('.material-icons');
+        btn.addEventListener('click', () => {
+          const isHidden = input.type === 'password';
+          input.type = isHidden ? 'text' : 'password';
+          icon.textContent = isHidden ? 'visibility' : 'visibility_off';
+          btn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+        });
+      });
+    });
+
+    // --- Helper for clean tab transitions ---
+    function switchSectionFadeOutIn(oldSection, newSection, afterShow) {
+      if (!oldSection || !newSection) return;
+      // If already hidden, just show new
+      if (oldSection.style.display === 'none' || !oldSection.classList.contains('active')) {
+        newSection.style.display = 'block';
+        // Force reflow for transition
+        void newSection.offsetWidth;
+        newSection.classList.add('active');
+        if (afterShow) afterShow();
+        return;
+      }
+      // Remove .active to start fade out
+      oldSection.classList.remove('active');
+      // Listen for transition end
+      const onFadeOut = (e) => {
+        if (e.target !== oldSection || e.propertyName !== 'opacity') return;
+        oldSection.style.display = 'none';
+        oldSection.removeEventListener('transitionend', onFadeOut);
+        // Now show new section
+        newSection.style.display = 'block';
+        // Force reflow for transition
+        void newSection.offsetWidth;
+        newSection.classList.add('active');
+        if (afterShow) afterShow();
+      };
+      oldSection.addEventListener('transitionend', onFadeOut);
+    }
+
+    // --- Minimal Hash Router for Standalone About Page (additive, non-intrusive) ---
+    (function(){
+      const aboutPage = document.getElementById('aboutPageStandalone');
+      const aboutBackBtn = document.getElementById('aboutStandaloneBackBtn');
+      const aboutUsLink = Array.from(document.querySelectorAll('.nav-link')).find(a => a.textContent.trim() === 'About Us');
+      if (!aboutPage || !aboutBackBtn || !aboutUsLink) return;
+      function showAboutPage() {
+        // Hide all other main content, sections, and footers
+        document.querySelectorAll('main, section, footer, #contact-section').forEach(el => {
+          el.style.display = 'none';
+        });
+        aboutPage.style.display = 'flex';
+        window.scrollTo(0,0);
+      }
+      function showHomePage() {
+        // Hide About page, show all other main content, sections, and footers
+        aboutPage.style.display = 'none';
+        document.querySelectorAll('main, section, footer, #contact-section').forEach(el => {
+          if (el.id !== 'aboutPageStandalone') el.style.display = '';
+        });
+        window.scrollTo(0,0);
+      }
+      function handleHashRoute() {
+        if (location.hash === '#/about') {
+          showAboutPage();
+        } else {
+          showHomePage();
+        }
+      }
+      window.addEventListener('hashchange', handleHashRoute);
+      // Initial route
+      handleHashRoute();
+      // Navbar link
+      aboutUsLink.addEventListener('click', function(e){
+        e.preventDefault();
+        location.hash = '#/about';
+      });
+      // Back button
+      aboutBackBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        location.hash = '#/';
+      });
+    })();
+
+    // Patch About Us link to always route to /#/about
+    (function(){
+      // Patch About Us link to always route to /#/about
+      const aboutUsLink = Array.from(document.querySelectorAll('.nav-link')).find(a => a.textContent.trim() === 'About Us');
+      if (aboutUsLink) {
+        aboutUsLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (location.hash !== '#/about') {
+            location.hash = '#/about';
+          } else {
+            // If already on /#/about, force hashchange to reload view
+            window.dispatchEvent(new HashChangeEvent('hashchange'));
+          }
+        });
+      }
+    })();
+  </script>
+
+  <!-- Google Identity Services (force English) -->
+<script src="https://accounts.google.com/gsi/client?hl=en" async defer></script>
+
+  <script>
+  (function(){
+    if (!window.chatbase || window.chatbase("getState") !== "initialized") {
+      window.chatbase = (...arguments) => {
+        if (!window.chatbase.q) {
+          window.chatbase.q = [];
+        }
+        window.chatbase.q.push(arguments);
+      };
+      window.chatbase = new Proxy(window.chatbase, {
+        get(target, prop) {
+          if (prop === "q") {
+            return target.q;
+          }
+          return (...args) => target(prop, ...args);
+        }
+      });
+    }
+    const onLoad = function() {
+      const script = document.createElement("script");
+      script.src = "https://www.chatbase.co/embed.min.js";
+      script.id = "Rpa_NFsVglRIbTpq2GOMl";
+      script.domain = "www.chatbase.co";
+      document.body.appendChild(script);
+    };
+    if (document.readyState === "complete") {
+      onLoad();
+    } else {
+      window.addEventListener("load", onLoad);
+    }
+  })();
   </script>
 </body>
 </html>
