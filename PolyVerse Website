@@ -3405,7 +3405,6 @@
       document.getElementById('profileBtn').addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        menu.remove();
         setTimeout(() => openProfilePage(), 50);
       });
       document.getElementById('homeBtn').addEventListener('click', (e) => {
@@ -3415,24 +3414,21 @@
         // Redirect to homepage
         window.location.href = '/';
       });
-      // NEW: My Likes and My List
+      // NEW: My Likes and My List - keep menu open for navigation
       document.getElementById('myLikesBtn').addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        menu.remove();
         setTimeout(() => openLikesOrListPage('likes'), 50);
       });
       document.getElementById('myListBtn').addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        menu.remove();
         setTimeout(() => openLikesOrListPage('list'), 50);
       });
-      // My Purchased
+      // My Purchased - keep menu open for navigation
       document.getElementById('myPurchasedBtn').addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        menu.remove();
         setTimeout(() => openPurchasedPage(), 50);
       });
     }
@@ -3866,6 +3862,8 @@
     }
     // --- Likes/List page logic ---
     function openLikesOrListPage(type) {
+      // Exit About Us view if active
+      document.body.classList.remove('about-active');
       // Ensure navbar links are visible when opening likes/list pages
       if (window.showNavbarLinks) window.showNavbarLinks();
       // Hide all other pages
@@ -3965,6 +3963,8 @@
       updateUserInUsers(currentUser);
     }
     function openPurchasedPage() {
+      // Exit About Us view if active
+      document.body.classList.remove('about-active');
       // Ensure navbar links are visible when opening purchased page
       if (window.showNavbarLinks) window.showNavbarLinks();
       if (!currentUser) {
