@@ -2684,13 +2684,15 @@
 
     // --- Model detail & checkout navigation ---
     function openModelPage(m, fromHomepage = true){
-      // Reset scroll immediately and synchronously before showing page
-      const originalScrollBehavior = document.documentElement.style.scrollBehavior;
-      document.documentElement.style.scrollBehavior = 'auto';
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-      window.scrollTo(0, 0);
-      
+      // Reset scroll instantly only when coming from the homepage (not when clicking Suggested Models)
+      let originalScrollBehavior;
+      if (fromHomepage) {
+        originalScrollBehavior = document.documentElement.style.scrollBehavior;
+        document.documentElement.style.scrollBehavior = 'auto';
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        window.scrollTo(0, 0);
+      }
       // Hide navbar links on model page
       if(window.hideNavbarLinks) window.hideNavbarLinks();
       // Hide hero search, show navbar search
@@ -2704,8 +2706,10 @@
       modelPage.style.display = 'block';
       setTimeout(() => {
         modelPage.classList.add('active');
-        // Restore original scroll behavior after transition
-        document.documentElement.style.scrollBehavior = originalScrollBehavior;
+        // Restore original scroll behavior after transition (only if we modified it)
+        if (fromHomepage && originalScrollBehavior !== undefined) {
+          document.documentElement.style.scrollBehavior = originalScrollBehavior;
+        }
       }, 10);
       // Hide purchased page if present
       const purchasedListPage = document.getElementById('purchasedListPage');
@@ -2809,7 +2813,7 @@
         // Only open model page, do NOT refresh suggestions
         card.onclick = () => {
           openModelPage(mod, false);
-          // Smooth scroll to top ONLY for model preview page suggested models
+          // Smooth scroll to top for suggested models navigation
           window.scrollTo({ top: 0, behavior: 'smooth' });
         };
         suggestedModels.appendChild(card);
@@ -2847,7 +2851,7 @@
             // Only open model page, do NOT refresh suggestions
             card.onclick = () => {
               openModelPage(mod, false);
-              // Smooth scroll to top ONLY for model preview page suggested models
+              // Smooth scroll to top for suggested models navigation
               window.scrollTo({ top: 0, behavior: 'smooth' });
             };
             suggestedModels.insertBefore(card, loadMoreBtn);
