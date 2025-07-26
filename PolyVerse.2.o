@@ -2234,6 +2234,109 @@
     html {
       scroll-behavior: smooth;
     }
+
+    body.about-active #about-section {
+      /* Trigger smooth fade/slide in when About page becomes visible */
+      animation: aboutFadeIn 0.38s cubic-bezier(.4,.01,.22,1);
+    }
+    @keyframes aboutFadeIn {
+      from { opacity:0; transform:translateY(20px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+
+    /* ===== About Page Styles (scoped) ===== */
+    #about-section { display:none; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:2rem; padding:3rem 1.5rem; max-width:1200px; margin:0 auto; }
+    body.about-active #about-section { display:flex; }
+    #about-section .about-text { flex:1 1 350px; color:#fff; }
+    #about-section .about-text h1 { font-size:3rem; margin-bottom:1rem; }
+    #about-section .about-text p { font-size:1.1rem; line-height:1.6; }
+    #about-section .about-img { flex:1 1 400px; text-align:center; }
+    #about-section .about-img img { width:100%; max-width:500px; height:auto; }
+    @media(max-width:768px){
+      #about-section { flex-direction:column; text-align:center; }
+      #about-section .about-img img { max-width:80%; }
+    }
+    /* Hide homepage-only sections while About is active */
+    body.about-active #homepage-banner,
+    body.about-active .hero,
+    body.about-active .model-card-section,
+    body.about-active #contact-section,
+    body.about-active #top-searchbar,
+    body.about-active .hero-search,
+    body.about-active #gallery,
+    body.about-active .gallery { display:none !important; }
+    #about-section .about-img img {
+      width: 100%;
+      max-width: 340px;
+      height: auto;
+      border-radius: 28px;
+      box-shadow: 0 6px 32px rgba(0,0,0,0.13);
+      transition: box-shadow 0.35s cubic-bezier(.4,.01,.22,1), transform 0.35s cubic-bezier(.4,.01,.22,1);
+      opacity: 0;
+      transform: translateY(30px);
+      animation: aboutImgFadeIn 0.7s cubic-bezier(.4,.01,.22,1) 0.15s forwards;
+    }
+    #about-section .about-img img:hover {
+      transform: translateY(0) scale(1.045);
+      box-shadow: 0 12px 48px 0 rgba(255,184,77,0.18), 0 6px 32px rgba(0,0,0,0.18);
+      z-index: 1;
+    }
+    @keyframes aboutImgFadeIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    #about-section .about-text {
+      flex: 1 1 350px;
+      color: #fff;
+      padding: 1.2rem 0 1.2rem 0;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: aboutTextFadeIn 0.7s cubic-bezier(.4,.01,.22,1) 0.05s forwards;
+    }
+    @keyframes aboutTextFadeIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    #about-section {
+      display: none;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 2.5rem;
+      padding: 3.2rem 1.5rem 2.5rem 1.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+      background: rgba(34,34,38,0.98);
+      border-radius: 24px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+    }
+    body.about-active #about-section { display: flex; }
+    #about-section .about-text h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.7rem;
+      font-weight: 900;
+      letter-spacing: -0.01em;
+      color: #ffb74d;
+      background: linear-gradient(90deg, #ffb74d 0%, #ff9800 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    #about-section .about-text p {
+      font-size: 1.13rem;
+      line-height: 1.7;
+      color: #e0e0e0;
+      margin-bottom: 1.7rem;
+      letter-spacing: 0.01em;
+    }
+    #about-section .btn {
+      margin-top: 1.2rem;
+      font-size: 1.08rem;
+      border-radius: 12px;
+      padding: 0.7rem 2.2rem;
+    }
+    @media(max-width:768px){
+      #about-section { flex-direction: column; text-align: center; padding: 2.2rem 0.5rem; }
+      #about-section .about-img img { max-width: 70vw; }
+    }
   </style>
 </head>
 <body>
@@ -2248,10 +2351,11 @@
     </div>
     <!-- Centered navigation links -->
     <div class="navbar-center-links">
+      <a href="#" class="nav-link" id="homeNavLink">Home</a>
       <a href="#" class="nav-link">Characters</a>
       <a href="#" class="nav-link">About Us</a>
       <a href="#contact-section" class="nav-link">Contact Us</a>
-      <a href="#" class="nav-link">Terms</a>
+      <a href="terms.html" class="nav-link">Terms</a>
     </div>
     <div class="navbar-search-container" id="top-searchbar">
       <div class="searchbar-wrapper">
@@ -2472,7 +2576,7 @@
           <input type="checkbox" id="termsCheckbox">
           <label for="termsCheckbox" style="font-size:1.05rem;color:#fff;cursor:pointer;user-select:none;line-height:1.4;display:inline-block;">
             I accept the
-            <a href="#" style="color:#ff9800;font-weight:600;text-decoration:none;" target="_blank">Terms of Service</a>
+            <a href="terms.html" style="color:#ff9800;font-weight:600;text-decoration:none;" target="_blank">Terms of Service</a>
             and
             <a href="#" style="color:#ff9800;font-weight:600;text-decoration:none;" target="_blank">Privacy Policy</a>
           </label>
@@ -2650,6 +2754,8 @@
         // Hide homepage banner, show top searchbar
         homepageBanner.style.display = 'none';
         topSearchbar.style.display = 'flex';
+        // Hide navbar links on search page
+        if (window.hideNavbarLinks) window.hideNavbarLinks();
         navbarSearch.value = value;
         // Show gallery, hide model/checkout pages
         modelPage.style.display = 'none';
@@ -2669,6 +2775,8 @@
         modelPage.style.display = 'none';
         checkoutPage.style.display = 'none';
         mainContent.style.display = 'block';
+        // Hide navbar links on search page
+        if (window.hideNavbarLinks) window.hideNavbarLinks();
         window.scrollTo(0,0);
         doSearch(value, true);
         lastSearchQuery = value;
@@ -3379,35 +3487,44 @@
           }
         });
       }, 0);
-      document.getElementById('logoutBtn').onclick = () => {
+      // Use addEventListener instead of onclick to prevent conflicts
+      document.getElementById('logoutBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         localStorage.removeItem('currentUser');
         currentUser = null;
         updateAuthUI();
         menu.remove();
-      };
-      document.getElementById('profileBtn').onclick = () => {
-        menu.remove();
-        openProfilePage();
-      };
-      document.getElementById('homeBtn').onclick = () => {
+      });
+      document.getElementById('profileBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setTimeout(() => openProfilePage(), 50);
+      });
+      document.getElementById('homeBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         menu.remove();
         // Redirect to homepage
         window.location.href = '/';
-      };
-      // NEW: My Likes and My List
-      document.getElementById('myLikesBtn').onclick = () => {
-        menu.remove();
-        openLikesOrListPage('likes');
-      };
-      document.getElementById('myListBtn').onclick = () => {
-        menu.remove();
-        openLikesOrListPage('list');
-      };
-      // My Purchased
-      document.getElementById('myPurchasedBtn').onclick = () => {
-        menu.remove();
-        openPurchasedPage();
-      };
+      });
+      // NEW: My Likes and My List - keep menu open for navigation
+      document.getElementById('myLikesBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setTimeout(() => openLikesOrListPage('likes'), 50);
+      });
+      document.getElementById('myListBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setTimeout(() => openLikesOrListPage('list'), 50);
+      });
+      // My Purchased - keep menu open for navigation
+      document.getElementById('myPurchasedBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setTimeout(() => openPurchasedPage(), 50);
+      });
     }
 
     // --- Fake checkout ---
@@ -3839,6 +3956,10 @@
     }
     // --- Likes/List page logic ---
     function openLikesOrListPage(type) {
+      // Exit About Us view if active
+      document.body.classList.remove('about-active');
+      // Ensure navbar links are visible when opening likes/list pages
+      if (window.showNavbarLinks) window.showNavbarLinks();
       // Hide all other pages
       modelPage.style.display = 'none';
       mainContent.style.display = 'none';
@@ -3916,8 +4037,12 @@
           mainContent.style.display = 'block';
           homepageBanner.style.display = '';
           topSearchbar.style.display = 'none';
-          // Ensure the hero search bar is visible again
           heroSearch.parentElement.classList.remove('hide');
+          heroSearch.value = '';
+          navbarSearch.value = '';
+          lastSearchQuery = '';
+          renderGallery(models, true);
+          hideBackToShopButton();
           window.scrollTo(0,0);
         }, 450);
       };
@@ -3936,6 +4061,10 @@
       updateUserInUsers(currentUser);
     }
     function openPurchasedPage() {
+      // Exit About Us view if active
+      document.body.classList.remove('about-active');
+      // Ensure navbar links are visible when opening purchased page
+      if (window.showNavbarLinks) window.showNavbarLinks();
       if (!currentUser) {
         showLoginRequiredModal(() => openPurchasedPage());
         return;
@@ -4101,6 +4230,11 @@
           homepageBanner.style.display = '';
           topSearchbar.style.display = 'none';
           heroSearch.parentElement.classList.remove('hide');
+          heroSearch.value = '';
+          navbarSearch.value = '';
+          lastSearchQuery = '';
+          renderGallery(models, true);
+          hideBackToShopButton();
           window.scrollTo(0,0);
         }, 450);
       };
@@ -4652,6 +4786,56 @@ if (signupBtn) {
       };
       oldSection.addEventListener('transitionend', onFadeOut);
     }
+
+    // ===== Home Navbar Link Logic =====
+    (function(){
+      const homeNav = document.getElementById('homeNavLink');
+      if(!homeNav) return;
+      homeNav.addEventListener('click', (e)=>{
+        e.preventDefault();
+        // Always return to homepage view
+        document.body.classList.remove('about-active');
+
+        // Show navbar links
+        if(window.showNavbarLinks) window.showNavbarLinks();
+
+        // Hide special pages
+        const modelPage = document.getElementById('modelPage');
+        if(modelPage) { modelPage.classList.remove('active'); modelPage.style.display = 'none'; }
+        const checkoutPage = document.getElementById('checkoutPage');
+        if(checkoutPage) { checkoutPage.classList.remove('active'); checkoutPage.style.display = 'none'; }
+        const likesListPage = document.getElementById('likesListPage');
+        if(likesListPage) { likesListPage.classList.remove('active'); likesListPage.style.display = 'none'; }
+        const purchasedListPage = document.getElementById('purchasedListPage');
+        if(purchasedListPage) { purchasedListPage.classList.remove('active'); purchasedListPage.style.display = 'none'; }
+
+        // Restore home sections
+        const mainContent = document.getElementById('mainContent');
+        if(mainContent) mainContent.style.display = 'block';
+        const homepageBanner = document.getElementById('homepage-banner');
+        if(homepageBanner) homepageBanner.style.display = '';
+        const heroSearch = document.getElementById('heroSearch');
+        if(heroSearch) heroSearch.parentElement.classList.remove('hide');
+        const topSearchbar = document.getElementById('top-searchbar');
+        if(topSearchbar) topSearchbar.style.display = 'none';
+
+        // Reset gallery
+        if(typeof renderGallery === 'function') {
+          window.lastSearchQuery = '';
+          heroSearch.value = '';
+          renderGallery(models, true);
+        }
+
+        // Hide back-to-shop button if visible
+        if(typeof hideBackToShopButton === 'function') hideBackToShopButton();
+
+        // Scroll to top with same transition as other main switches (instant)
+        const originalScrollBehavior = document.documentElement.style.scrollBehavior;
+        document.documentElement.style.scrollBehavior = 'auto';
+        window.scrollTo(0,0);
+        document.documentElement.style.scrollBehavior = originalScrollBehavior;
+      });
+    })();
   </script>
 
   <!-- Google Identity Services (force English) -->
@@ -4718,11 +4902,11 @@ if (signupBtn) {
   <section id="about-section">
     <div class="about-text">
       <h1>polyVerse</h1>
-      <p>A polished marketplace for interactive, rigged low-poly 3D models, complete with smooth previews and a seamless shopping experience.</p>
+      <p>We provide high-quality 3D characters at an affordable price of just $1. Every character on the site is fully human-rigged and ready to use in your game or any other project. Plus, once you purchase a model, it's yours — royalty-free.</p>
       <button id="aboutBackBtn" class="btn" style="margin-top:2rem;">&larr; Back</button>
     </div>
     <div class="about-img">
-      <img src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjI1NTcyOS5wbmc=/250x600/N0RNEb.png" alt="polyVerse marketplace preview">
+      <img src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjMzODc4MC5wbmc=/250x600/Anhp0L.png" alt="polyVerse marketplace preview">
     </div>
   </section>
 
