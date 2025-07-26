@@ -4726,18 +4726,59 @@ if (signupBtn) {
     (function(){
       const aboutBackBtn = document.getElementById('aboutBackBtn');
       const aboutNavLink = Array.from(document.querySelectorAll('.nav-link')).find(l => l.textContent.trim() === 'About Us');
+      
+      function hideAllPages() {
+        // Hide main content pages
+        const mainContent = document.getElementById('mainContent');
+        if(mainContent) mainContent.style.display = 'none';
+        
+        // Hide model and checkout pages
+        const modelPage = document.getElementById('modelPage');
+        if(modelPage) modelPage.style.display = 'none';
+        const checkoutPage = document.getElementById('checkoutPage');
+        if(checkoutPage) checkoutPage.style.display = 'none';
+        
+        // Hide personal pages
+        const likesListPage = document.getElementById('likesListPage');
+        if(likesListPage) {
+          likesListPage.classList.remove('active');
+          likesListPage.style.display = 'none';
+        }
+        const purchasedListPage = document.getElementById('purchasedListPage');
+        if(purchasedListPage) {
+          purchasedListPage.classList.remove('active');
+          purchasedListPage.style.display = 'none';
+        }
+        
+        // Hide search elements
+        const topSearchbar = document.getElementById('top-searchbar');
+        if(topSearchbar) topSearchbar.style.display = 'none';
+        const heroSearch = document.getElementById('heroSearch');
+        if(heroSearch) heroSearch.parentElement.classList.add('hide');
+      }
+      
       function showAbout(e){
         if(e) e.preventDefault();
+        hideAllPages(); // Hide all other pages first
         document.body.classList.add('about-active');
         window.showNavbarLinks(); // Keep navbar links visible on About page
         window.scrollTo(0,0);
       }
+      
       function goHome(e){
         if(e) e.preventDefault();
         document.body.classList.remove('about-active');
+        // Show main content and reset to home state
+        const mainContent = document.getElementById('mainContent');
+        if(mainContent) mainContent.style.display = 'block';
+        const heroSearch = document.getElementById('heroSearch');
+        if(heroSearch) heroSearch.parentElement.classList.remove('hide');
+        const homepageBanner = document.getElementById('homepage-banner');
+        if(homepageBanner) homepageBanner.style.display = '';
         window.showNavbarLinks(); // Ensure navbar links are visible on home
         window.scrollTo(0,0);
       }
+      
       if(aboutNavLink) aboutNavLink.addEventListener('click', showAbout);
       if(aboutBackBtn) aboutBackBtn.addEventListener('click', goHome);
       // Ensure Home page is default on hard refresh
