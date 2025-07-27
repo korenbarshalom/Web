@@ -2337,6 +2337,72 @@
       #about-section { flex-direction: column; text-align: center; padding: 2.2rem 0.5rem; }
       #about-section .about-img img { max-width: 70vw; }
     }
+
+    /* ===== Terms Page Styles (scoped) ===== */
+    #terms-section { display:none; padding:3rem 1.5rem; max-width:1200px; margin:0 auto; }
+    body.terms-active #terms-section { display:block; }
+    #terms-section .terms-text { color:#fff; max-width:800px; margin:0 auto; text-align:center; }
+    #terms-section .terms-text h1 { font-size:3rem; margin-bottom:1.5rem; text-align:center; background: linear-gradient(to right, #ff5f6d, #ffc371); -webkit-background-clip: text; -webkit-text-fill-color: transparent; position: relative; display: inline-block; }
+    #terms-section .terms-text h1::before { content: '•'; color: #ff9800; font-size: 2rem; position: absolute; left: -1.5rem; top: 0.5rem; }
+    #terms-section .terms-text p { font-size:1.1rem; line-height:1.6; margin-bottom:1.5rem; }
+    body.terms-active #homepage-banner,
+    body.terms-active .hero,
+    body.terms-active .model-card-section,
+    body.terms-active #contact-section,
+    body.terms-active #top-searchbar,
+    body.terms-active .hero-search,
+    body.terms-active #gallery,
+    body.terms-active .gallery { display:none !important; }
+    @media(max-width:768px){
+      #terms-section { padding:2rem 1rem; }
+      #terms-section .terms-text h1 { font-size:2.5rem; }
+      #terms-section .terms-text h1::before { font-size:1.5rem; left: -1rem; top:0.3rem; }
+    }
+    #terms-section .terms-text ul { list-style-type: none; padding-left: 0; margin: 1.5rem 0; text-align:left; }
+    #terms-section .terms-text li { font-size:1.1rem; line-height:1.6; margin-bottom:1.5rem; position: relative; padding-left: 1.5rem; }
+    #terms-section .terms-text li::before { content: '•'; color: #ff9800; position: absolute; left: 0; font-size: 1.2rem; }
+    /* --- Smooth fade/slide-in transition for Terms page --- */
+    #terms-section {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.45s cubic-bezier(.4,.01,.22,1), transform 0.45s cubic-bezier(.4,.01,.22,1);
+    }
+    body.terms-active #terms-section {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.45s cubic-bezier(.4,.01,.22,1), transform 0.45s cubic-bezier(.4,.01,.22,1);
+    }
+
+    /* --- Characters Dropdown Custom Styles --- */
+    #charactersDropdown {
+      display: none;
+      position: absolute;
+      left: 0;
+      top: calc(100% + 2px); /* Directly below underline */
+      background: #232326;
+      border-radius: 7px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+      min-width: 180px;
+      z-index: 1001;
+      padding: 0.25em 0;
+      border: 1px solid #29292d;
+    }
+    #charactersDropdown .dropdown-item {
+      display: block;
+      padding: 0.78em 1.25em;
+      color: #fff;
+      font-family: 'Montserrat','Inter',sans-serif;
+      font-size: 1.05rem;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: background 0.18s, color 0.18s;
+      margin: 0 4px;
+    }
+    #charactersDropdown .dropdown-item:hover, #charactersDropdown .dropdown-item:focus {
+      background: linear-gradient(90deg, #ff9800 0%, #ffb74d 100%);
+      color: #232326;
+      outline: none;
+    }
   </style>
 </head>
 <body>
@@ -2352,10 +2418,18 @@
     <!-- Centered navigation links -->
     <div class="navbar-center-links">
       <a href="#" class="nav-link" id="homeNavLink">Home</a>
-      <a href="#" class="nav-link">Characters</a>
+      <div style="position:relative;display:inline-block;">
+        <a href="#" class="nav-link" id="charactersDropdownBtn">Characters</a>
+        <div id="charactersDropdown">
+          <a href="#" class="dropdown-item">Villains</a>
+          <a href="#" class="dropdown-item">Heroes</a>
+          <a href="#" class="dropdown-item">Humans</a>
+          <a href="#" class="dropdown-item">Stylized Characters</a>
+        </div>
+      </div>
       <a href="#" class="nav-link">About Us</a>
       <a href="#contact-section" class="nav-link">Contact Us</a>
-      <a href="#" class="nav-link">Terms</a>
+      <a href="#/terms" class="nav-link">Terms</a>
     </div>
     <div class="navbar-search-container" id="top-searchbar">
       <div class="searchbar-wrapper">
@@ -4836,6 +4910,19 @@ if (signupBtn) {
         document.documentElement.style.scrollBehavior = originalScrollBehavior;
       });
     })();
+
+    // --- Characters Dropdown ---
+    const charBtn = document.getElementById('charactersDropdownBtn');
+    const charDropdown = document.getElementById('charactersDropdown');
+    charBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      charDropdown.style.display = charDropdown.style.display === 'block' ? 'none' : 'block';
+    });
+    document.addEventListener('click', function(e) {
+      if (!charBtn.contains(e.target) && !charDropdown.contains(e.target)) {
+        charDropdown.style.display = 'none';
+      }
+    });
   </script>
 
   <!-- Google Identity Services (force English) -->
@@ -4935,6 +5022,10 @@ if (signupBtn) {
     (function(){
       const aboutBackBtn = document.getElementById('aboutBackBtn');
       const aboutNavLink = Array.from(document.querySelectorAll('.nav-link')).find(l => l.textContent.trim() === 'About Us');
+      const homeNavLink = Array.from(document.querySelectorAll('.nav-link')).find(l => l.textContent.trim() === 'Home');
+      const charactersNavLink = Array.from(document.querySelectorAll('.nav-link')).find(l => l.textContent.trim() === 'Characters');
+      const contactNavLink = Array.from(document.querySelectorAll('.nav-link')).find(l => l.textContent.trim() === 'Contact Us');
+      const footerSection = document.getElementById('contact-section');
       
       function hideAllPages() {
         // Hide main content pages
@@ -4964,6 +5055,14 @@ if (signupBtn) {
         if(topSearchbar) topSearchbar.style.display = 'none';
         const heroSearch = document.getElementById('heroSearch');
         if(heroSearch) heroSearch.parentElement.classList.add('hide');
+        // Hide Terms section if visible
+        const termsSection = document.getElementById('terms-section');
+        if(termsSection) termsSection.style.display = 'none';
+        document.body.classList.remove('terms-active');
+        // Hide About section if visible
+        const aboutSection = document.getElementById('about-section');
+        if(aboutSection) aboutSection.style.display = 'none';
+        document.body.classList.remove('about-active');
       }
       
       function showAbout(e){
@@ -4972,6 +5071,9 @@ if (signupBtn) {
         document.body.classList.add('about-active');
         window.showNavbarLinks(); // Keep navbar links visible on About page
         window.scrollTo(0,0);
+        // Show About section
+        const aboutSection = document.getElementById('about-section');
+        if(aboutSection) aboutSection.style.display = '';
       }
       
       function goHome(e){
@@ -4984,15 +5086,213 @@ if (signupBtn) {
         if(heroSearch) heroSearch.parentElement.classList.remove('hide');
         const homepageBanner = document.getElementById('homepage-banner');
         if(homepageBanner) homepageBanner.style.display = '';
+        // Hide Terms section if visible
+        const termsSection = document.getElementById('terms-section');
+        if(termsSection) termsSection.style.display = 'none';
+        document.body.classList.remove('terms-active');
+        // Hide About section if visible
+        const aboutSection = document.getElementById('about-section');
+        if(aboutSection) aboutSection.style.display = 'none';
         window.showNavbarLinks(); // Ensure navbar links are visible on home
         window.scrollTo(0,0);
       }
       
       if(aboutNavLink) aboutNavLink.addEventListener('click', showAbout);
       if(aboutBackBtn) aboutBackBtn.addEventListener('click', goHome);
+      if(homeNavLink) homeNavLink.addEventListener('click', goHome);
+      if(charactersNavLink) charactersNavLink.addEventListener('click', function(e) { e.preventDefault(); });
+      if(contactNavLink) contactNavLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        // Helper to check if homepage is active
+        function isHomeActive() {
+          // Home: mainContent visible, not about-active, not terms-active, not model/checkout/likes/purchased/profile page
+          const mainContent = document.getElementById('mainContent');
+          const aboutSection = document.getElementById('about-section');
+          const termsSection = document.getElementById('terms-section');
+          const modelPage = document.getElementById('modelPage');
+          const checkoutPage = document.getElementById('checkoutPage');
+          const likesListPage = document.getElementById('likesListPage');
+          const purchasedListPage = document.getElementById('purchasedListPage');
+          const profilePage = document.getElementById('profilePage');
+          return (
+            mainContent && mainContent.style.display !== 'none' &&
+            (!aboutSection || aboutSection.style.display === 'none') &&
+            (!termsSection || termsSection.style.display === 'none') &&
+            (!modelPage || modelPage.style.display === 'none') &&
+            (!checkoutPage || checkoutPage.style.display === 'none') &&
+            (!likesListPage || likesListPage.style.display === 'none') &&
+            (!purchasedListPage || purchasedListPage.style.display === 'none') &&
+            (!profilePage || profilePage.style.display === 'none') &&
+            !document.body.classList.contains('about-active') &&
+            !document.body.classList.contains('terms-active')
+          );
+        }
+        function scrollToFooter() {
+          if (footerSection) {
+            footerSection.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+        if (isHomeActive()) {
+          scrollToFooter();
+        } else {
+          // Go to home, then scroll to footer after transition
+          goHome();
+          setTimeout(scrollToFooter, 450); // Wait for fade/transition
+        }
+      });
       // Ensure Home page is default on hard refresh
       document.body.classList.remove('about-active');
     })();
+  </script>
+
+  <!-- TERMS PAGE SECTION (SPA) -->
+  <style>
+  /* ===== Terms Page Styles (scoped) ===== */
+  #terms-section { display:none; padding:3rem 1.5rem; max-width:1200px; margin:0 auto; }
+  body.terms-active #terms-section { display:block; }
+  #terms-section .terms-text { color:#fff; max-width:800px; margin:0 auto; text-align:center; }
+  #terms-section .terms-text h1 { font-size:3rem; margin-bottom:1.5rem; text-align:center; background: linear-gradient(to right, #ff5f6d, #ffc371); -webkit-background-clip: text; -webkit-text-fill-color: transparent; position: relative; display: inline-block; }
+  #terms-section .terms-text h1::before { content: '•'; color: #ff9800; font-size: 2rem; position: absolute; left: -1.5rem; top: 0.5rem; }
+  #terms-section .terms-text p { font-size:1.1rem; line-height:1.6; margin-bottom:1.5rem; }
+  body.terms-active #homepage-banner,
+  body.terms-active .hero,
+  body.terms-active .model-card-section,
+  body.terms-active #contact-section,
+  body.terms-active #top-searchbar,
+  body.terms-active .hero-search,
+  body.terms-active #gallery,
+  body.terms-active .gallery { display:none !important; }
+  @media(max-width:768px){
+    #terms-section { padding:2rem 1rem; }
+    #terms-section .terms-text h1 { font-size:2.5rem; }
+    #terms-section .terms-text h1::before { font-size:1.5rem; left: -1rem; top:0.3rem; }
+  }
+  /* --- Smooth fade/slide-in transition for Terms page --- */
+  #terms-section {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.45s cubic-bezier(.4,.01,.22,1), transform 0.45s cubic-bezier(.4,.01,.22,1);
+  }
+  body.terms-active #terms-section {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.45s cubic-bezier(.4,.01,.22,1), transform 0.45s cubic-bezier(.4,.01,.22,1);
+  }
+  </style>
+  <section id="terms-section">
+    <div class="terms-text">
+      <h1>Terms</h1>
+      <ul>
+        <li>Welcome to polyVerse. By accessing or purchasing any content on our site, you agree to the following terms:</li>
+        <li>All 3D models on polyVerse are sold for $1.00 each and provided in .fbx format only.</li>
+        <li>Each purchase grants you a royalty-free license to use the models in personal or commercial projects.</li>
+        <li>All models are fully human-rigged and game-ready for engines like Unity and Unreal.</li>
+        <li>Redistribution, resale, or repackaging of the models is strictly prohibited.</li>
+        <li>All purchases are final — no refunds or exchanges.</li>
+        <li>We may update these terms from time to time. Continued use of the site indicates your agreement to any updates.</li>
+      </ul>
+      <button id="termsBackBtn" class="btn" style="margin:2rem auto 0; display:block; max-width:200px; margin-left: calc(50% - 120px);">← Back</button>
+    </div>
+  </section>
+  <script>
+  (function(){
+    const termsNavLink = Array.from(document.querySelectorAll('.nav-link')).find(l => l.textContent.trim() === 'Terms');
+    const termsBackBtn = document.getElementById('termsBackBtn');
+    function hideAllPages() {
+      const mainContent = document.getElementById('mainContent');
+      if(mainContent) mainContent.style.display = 'none';
+      const modelPage = document.getElementById('modelPage');
+      if(modelPage) modelPage.style.display = 'none';
+      const checkoutPage = document.getElementById('checkoutPage');
+      if(checkoutPage) checkoutPage.style.display = 'none';
+      const likesListPage = document.getElementById('likesListPage');
+      if(likesListPage) {
+        likesListPage.classList.remove('active');
+        likesListPage.style.display = 'none';
+      }
+      const purchasedListPage = document.getElementById('purchasedListPage');
+      if(purchasedListPage) {
+        purchasedListPage.classList.remove('active');
+        purchasedListPage.style.display = 'none';
+      }
+      const topSearchbar = document.getElementById('top-searchbar');
+      if(topSearchbar) topSearchbar.style.display = 'none';
+      const heroSearch = document.getElementById('heroSearch');
+      if(heroSearch) heroSearch.parentElement.classList.add('hide');
+    }
+    function showTerms(e){
+      if(e) e.preventDefault();
+      hideAllPages();
+      // Prepare for transition
+      const termsSection = document.getElementById('terms-section');
+      if (termsSection) {
+        termsSection.style.display = 'block';
+        termsSection.style.opacity = '0';
+        termsSection.style.transform = 'translateY(24px)';
+      }
+      document.body.classList.add('terms-active');
+      window.showNavbarLinks();
+      window.scrollTo(0,0);
+      location.hash = '/terms';
+      // Trigger transition after a short delay to ensure style is applied
+      setTimeout(() => {
+        if (termsSection) {
+          termsSection.style.opacity = '1';
+          termsSection.style.transform = 'translateY(0)';
+        }
+      }, 10);
+      // Hide About section if visible
+      const aboutSection = document.getElementById('about-section');
+      if(aboutSection) aboutSection.style.display = 'none';
+      document.body.classList.remove('about-active');
+    }
+    function goHome(e){
+      if(e) e.preventDefault();
+      document.body.classList.remove('terms-active');
+      const mainContent = document.getElementById('mainContent');
+      if(mainContent) mainContent.style.display = 'block';
+      const homepageBanner = document.getElementById('homepage-banner');
+      if(homepageBanner) homepageBanner.style.display = '';
+      const heroSearch = document.getElementById('heroSearch');
+      if(heroSearch) heroSearch.parentElement.classList.remove('hide');
+      // Hide Terms section if visible
+      const termsSection = document.getElementById('terms-section');
+      if(termsSection) termsSection.style.display = 'none';
+      window.showNavbarLinks();
+      window.scrollTo(0,0);
+      location.hash = '';
+    }
+    if(termsNavLink) termsNavLink.addEventListener('click', showTerms);
+    if(termsBackBtn) termsBackBtn.addEventListener('click', goHome);
+    window.addEventListener('hashchange', function() {
+      if (location.hash === '#/terms') {
+        showTerms();
+      } else {
+        goHome();
+      }
+    });
+    // --- FORCE HOME VIEW ON PAGE LOAD (fix for refresh bug) ---
+    window.addEventListener('DOMContentLoaded', function() {
+      // Always reset to Home view on load
+      document.body.classList.remove('terms-active');
+      const mainContent = document.getElementById('mainContent');
+      if(mainContent) mainContent.style.display = 'block';
+      const homepageBanner = document.getElementById('homepage-banner');
+      if(homepageBanner) homepageBanner.style.display = '';
+      const heroSearch = document.getElementById('heroSearch');
+      if(heroSearch) heroSearch.parentElement.classList.remove('hide');
+      // Hide Terms section if visible
+      const termsSection = document.getElementById('terms-section');
+      if(termsSection) termsSection.style.display = 'none';
+      window.showNavbarLinks();
+      window.scrollTo(0,0);
+      location.hash = '';
+    });
+    // Remove auto-show Terms on load
+    // if (location.hash === '#/terms') {
+    //   showTerms();
+    // }
+  })();
   </script>
 </body>
 </html>
