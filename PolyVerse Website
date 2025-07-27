@@ -2652,6 +2652,7 @@
             I accept the
             <a href="#/terms" class="terms-link" style="color:#ff9800;font-weight:600;">Terms of Service</a>
           </label>
+          <div class="error-message" id="termsError" style="margin-top:0.4rem;"></div>
         </div>
 
         <button class="register-submit" id="registerSubmitBtn">Create Account</button>
@@ -3271,7 +3272,7 @@
       setTimeout(() => element.classList.remove('show'), 3000);
     }
     function clearAllErrors() {
-      [nameError, usernameError, passwordError, loginUsernameError, loginPasswordError].forEach(el => {
+      [nameError, usernameError, passwordError, loginUsernameError, loginPasswordError, termsError].forEach(el => {
         hideError(el);
       });
       [registerName, registerUsername, registerPassword, loginUsername, loginPassword].forEach(el => {
@@ -4976,8 +4977,13 @@ if (signupBtn) {
         if (typeof closeModal === 'function' && loginModal && loginModal.classList.contains('active')) {
           closeModal(loginModal);
         }
-        // Navigate to the internal Terms page
-        location.hash = '/terms';
+        // Ensure navigation to Terms page always works
+        if (location.hash === '#/terms') {
+          // Force hashchange event to re-trigger Terms view
+          window.dispatchEvent(new HashChangeEvent('hashchange'));
+        } else {
+          location.hash = '/terms';
+        }
       });
     }
   </script>
