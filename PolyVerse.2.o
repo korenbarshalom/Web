@@ -2342,7 +2342,7 @@
     #terms-section { display:none; padding:3rem 1.5rem; max-width:1200px; margin:0 auto; }
     body.terms-active #terms-section { display:block; }
     #terms-section .terms-text { color:#fff; max-width:800px; margin:0 auto; text-align:center; }
-    #terms-section .terms-text h1 { font-size:3rem; margin-bottom:1.5rem; text-align:center; background: linear-gradient(to right, #ff5f6d, #ffc371); -webkit-background-clip: text; -webkit-text-fill-color: transparent; position: relative; display: inline-block; }
+    #terms-section .terms-text h1 { font-size:3rem; margin-bottom:1.5rem; text-align:center; background: linear-gradient(to right, #ff5f6d, #ffc371); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; position: relative; display: inline-block; }
     #terms-section .terms-text h1::before { content: '•'; color: #ff9800; font-size: 2rem; position: absolute; left: -1.5rem; top: 0.5rem; }
     #terms-section .terms-text p { font-size:1.1rem; line-height:1.6; margin-bottom:1.5rem; }
     body.terms-active #homepage-banner,
@@ -2372,6 +2372,37 @@
       transform: translateY(0);
       transition: opacity 0.45s cubic-bezier(.4,.01,.22,1), transform 0.45s cubic-bezier(.4,.01,.22,1);
     }
+
+    /* --- Characters Dropdown Custom Styles --- */
+    #charactersDropdown {
+      display: none;
+      position: absolute;
+      left: 0;
+      top: calc(100% + 2px); /* Directly below underline */
+      background: #232326;
+      border-radius: 7px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+      min-width: 180px;
+      z-index: 1001;
+      padding: 0.25em 0;
+      border: 1px solid #29292d;
+    }
+    #charactersDropdown .dropdown-item {
+      display: block;
+      padding: 0.78em 1.25em;
+      color: #fff;
+      font-family: 'Montserrat','Inter',sans-serif;
+      font-size: 1.05rem;
+      text-decoration: none;
+      border-radius: 4px;
+      transition: color 0.18s;
+      margin: 0 4px;
+    }
+    #charactersDropdown .dropdown-item:hover, #charactersDropdown .dropdown-item:focus {
+      color: #ff9800;
+      background: #232326;
+      outline: none;
+    }
   </style>
 </head>
 <body>
@@ -2387,7 +2418,15 @@
     <!-- Centered navigation links -->
     <div class="navbar-center-links">
       <a href="#" class="nav-link" id="homeNavLink">Home</a>
-      <a href="#" class="nav-link">Characters</a>
+      <div style="position:relative;display:inline-block;">
+        <a href="#" class="nav-link" id="charactersDropdownBtn">Characters</a>
+        <div id="charactersDropdown">
+          <a href="#" class="dropdown-item">Villains</a>
+          <a href="#" class="dropdown-item">Heroes</a>
+          <a href="#" class="dropdown-item">Humans</a>
+          <a href="#" class="dropdown-item">Stylized Characters</a>
+        </div>
+      </div>
       <a href="#" class="nav-link">About Us</a>
       <a href="#contact-section" class="nav-link">Contact Us</a>
       <a href="#/terms" class="nav-link">Terms</a>
@@ -3819,6 +3858,8 @@
         purchasedListPage.classList.remove('active');
         setTimeout(() => { purchasedListPage.style.display = 'none'; }, 450);
       }
+      // Always show navbar links when opening profile
+      if (window.showNavbarLinks) window.showNavbarLinks();
       // Show profile page with smooth transition
       const profilePage = document.getElementById('profilePage');
       profilePage.classList.remove('active');
@@ -4871,6 +4912,19 @@ if (signupBtn) {
         document.documentElement.style.scrollBehavior = originalScrollBehavior;
       });
     })();
+
+    // --- Characters Dropdown ---
+    const charBtn = document.getElementById('charactersDropdownBtn');
+    const charDropdown = document.getElementById('charactersDropdown');
+    charBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      charDropdown.style.display = charDropdown.style.display === 'block' ? 'none' : 'block';
+    });
+    document.addEventListener('click', function(e) {
+      if (!charBtn.contains(e.target) && !charDropdown.contains(e.target)) {
+        charDropdown.style.display = 'none';
+      }
+    });
   </script>
 
   <!-- Google Identity Services (force English) -->
@@ -4976,6 +5030,13 @@ if (signupBtn) {
       const footerSection = document.getElementById('contact-section');
       
       function hideAllPages() {
+        // Hide profile page (if visible) to avoid stacking
+        const profilePage = document.getElementById('profilePage');
+        if(profilePage) {
+          profilePage.classList.remove('active');
+          profilePage.style.display = 'none';
+        }
+
         // Hide main content pages
         const mainContent = document.getElementById('mainContent');
         if(mainContent) mainContent.style.display = 'none';
@@ -5051,41 +5112,37 @@ if (signupBtn) {
       if(charactersNavLink) charactersNavLink.addEventListener('click', function(e) { e.preventDefault(); });
       if(contactNavLink) contactNavLink.addEventListener('click', function(e) {
         e.preventDefault();
-        // Helper to check if homepage is active
-        function isHomeActive() {
-          // Home: mainContent visible, not about-active, not terms-active, not model/checkout/likes/purchased/profile page
-          const mainContent = document.getElementById('mainContent');
-          const aboutSection = document.getElementById('about-section');
-          const termsSection = document.getElementById('terms-section');
-          const modelPage = document.getElementById('modelPage');
-          const checkoutPage = document.getElementById('checkoutPage');
-          const likesListPage = document.getElementById('likesListPage');
-          const purchasedListPage = document.getElementById('purchasedListPage');
-          const profilePage = document.getElementById('profilePage');
-          return (
-            mainContent && mainContent.style.display !== 'none' &&
-            (!aboutSection || aboutSection.style.display === 'none') &&
-            (!termsSection || termsSection.style.display === 'none') &&
-            (!modelPage || modelPage.style.display === 'none') &&
-            (!checkoutPage || checkoutPage.style.display === 'none') &&
-            (!likesListPage || likesListPage.style.display === 'none') &&
-            (!purchasedListPage || purchasedListPage.style.display === 'none') &&
-            (!profilePage || profilePage.style.display === 'none') &&
-            !document.body.classList.contains('about-active') &&
-            !document.body.classList.contains('terms-active')
-          );
-        }
-        function scrollToFooter() {
-          if (footerSection) {
-            footerSection.scrollIntoView({ behavior: 'smooth' });
-          }
-        }
-        if (isHomeActive()) {
-          scrollToFooter();
-        } else {
-          // Go to home, then scroll to footer after transition
-          goHome();
-          setTimeout(scrollToFooter, 450); // Wait for fade/transition
+        // Always hide all internal/account/special sections before showing home/footer
+        const modelPage = document.getElementById('modelPage');
+        if(modelPage) modelPage.style.display = 'none';
+        const checkoutPage = document.getElementById('checkoutPage');
+        if(checkoutPage) checkoutPage.style.display = 'none';
+        const likesListPage = document.getElementById('likesListPage');
+        if(likesListPage) { likesListPage.classList.remove('active'); likesListPage.style.display = 'none'; }
+        const purchasedListPage = document.getElementById('purchasedListPage');
+        if(purchasedListPage) { purchasedListPage.classList.remove('active'); purchasedListPage.style.display = 'none'; }
+        const profilePage = document.getElementById('profilePage');
+        if(profilePage) { profilePage.classList.remove('active'); profilePage.style.display = 'none'; }
+        // Hide About and Terms sections if visible
+        const aboutSection = document.getElementById('about-section');
+        if(aboutSection) aboutSection.style.display = 'none';
+        document.body.classList.remove('about-active');
+        const termsSection = document.getElementById('terms-section');
+        if(termsSection) termsSection.style.display = 'none';
+        document.body.classList.remove('terms-active');
+        // Show homepage and footer
+        const mainContent = document.getElementById('mainContent');
+        if(mainContent) mainContent.style.display = 'block';
+        const homepageBanner = document.getElementById('homepage-banner');
+        if(homepageBanner) homepageBanner.style.display = '';
+        const heroSearch = document.getElementById('heroSearch');
+        if(heroSearch) heroSearch.parentElement.classList.remove('hide');
+        const topSearchbar = document.getElementById('top-searchbar');
+        if(topSearchbar) topSearchbar.style.display = 'none';
+        window.showNavbarLinks && window.showNavbarLinks();
+        // Scroll to footer
+        if (footerSection) {
+          footerSection.scrollIntoView({ behavior: 'smooth' });
         }
       });
       // Ensure Home page is default on hard refresh
@@ -5099,7 +5156,7 @@ if (signupBtn) {
   #terms-section { display:none; padding:3rem 1.5rem; max-width:1200px; margin:0 auto; }
   body.terms-active #terms-section { display:block; }
   #terms-section .terms-text { color:#fff; max-width:800px; margin:0 auto; text-align:center; }
-  #terms-section .terms-text h1 { font-size:3rem; margin-bottom:1.5rem; text-align:center; background: linear-gradient(to right, #ff5f6d, #ffc371); -webkit-background-clip: text; -webkit-text-fill-color: transparent; position: relative; display: inline-block; }
+  #terms-section .terms-text h1 { font-size:3rem; margin-bottom:1.5rem; text-align:center; background: linear-gradient(to right, #ff5f6d, #ffc371); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; position: relative; display: inline-block; }
   #terms-section .terms-text h1::before { content: '•'; color: #ff9800; font-size: 2rem; position: absolute; left: -1.5rem; top: 0.5rem; }
   #terms-section .terms-text p { font-size:1.1rem; line-height:1.6; margin-bottom:1.5rem; }
   body.terms-active #homepage-banner,
@@ -5147,6 +5204,13 @@ if (signupBtn) {
     const termsNavLink = Array.from(document.querySelectorAll('.nav-link')).find(l => l.textContent.trim() === 'Terms');
     const termsBackBtn = document.getElementById('termsBackBtn');
     function hideAllPages() {
+      // Hide profile page (if visible) to avoid stacking when navigating to Terms
+      const profilePage = document.getElementById('profilePage');
+      if(profilePage) {
+        profilePage.classList.remove('active');
+        profilePage.style.display = 'none';
+      }
+
       const mainContent = document.getElementById('mainContent');
       if(mainContent) mainContent.style.display = 'none';
       const modelPage = document.getElementById('modelPage');
