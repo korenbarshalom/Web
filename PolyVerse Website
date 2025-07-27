@@ -2342,7 +2342,7 @@
     #terms-section { display:none; padding:3rem 1.5rem; max-width:1200px; margin:0 auto; }
     body.terms-active #terms-section { display:block; }
     #terms-section .terms-text { color:#fff; max-width:800px; margin:0 auto; text-align:center; }
-    #terms-section .terms-text h1 { font-size:3rem; margin-bottom:1.5rem; text-align:center; background: linear-gradient(to right, #ff5f6d, #ffc371); -webkit-background-clip: text; -webkit-text-fill-color: transparent; position: relative; display: inline-block; }
+    #terms-section .terms-text h1 { font-size:3rem; margin-bottom:1.5rem; text-align:center; background: linear-gradient(to right, #ff5f6d, #ffc371); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; position: relative; display: inline-block; }
     #terms-section .terms-text h1::before { content: '•'; color: #ff9800; font-size: 2rem; position: absolute; left: -1.5rem; top: 0.5rem; }
     #terms-section .terms-text p { font-size:1.1rem; line-height:1.6; margin-bottom:1.5rem; }
     body.terms-active #homepage-banner,
@@ -5156,7 +5156,7 @@ if (signupBtn) {
   #terms-section { display:none; padding:3rem 1.5rem; max-width:1200px; margin:0 auto; }
   body.terms-active #terms-section { display:block; }
   #terms-section .terms-text { color:#fff; max-width:800px; margin:0 auto; text-align:center; }
-  #terms-section .terms-text h1 { font-size:3rem; margin-bottom:1.5rem; text-align:center; background: linear-gradient(to right, #ff5f6d, #ffc371); -webkit-background-clip: text; -webkit-text-fill-color: transparent; position: relative; display: inline-block; }
+  #terms-section .terms-text h1 { font-size:3rem; margin-bottom:1.5rem; text-align:center; background: linear-gradient(to right, #ff5f6d, #ffc371); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; position: relative; display: inline-block; }
   #terms-section .terms-text h1::before { content: '•'; color: #ff9800; font-size: 2rem; position: absolute; left: -1.5rem; top: 0.5rem; }
   #terms-section .terms-text p { font-size:1.1rem; line-height:1.6; margin-bottom:1.5rem; }
   body.terms-active #homepage-banner,
