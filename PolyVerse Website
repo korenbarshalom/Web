@@ -5030,6 +5030,13 @@ if (signupBtn) {
       const footerSection = document.getElementById('contact-section');
       
       function hideAllPages() {
+        // Hide profile page (if visible) to avoid stacking
+        const profilePage = document.getElementById('profilePage');
+        if(profilePage) {
+          profilePage.classList.remove('active');
+          profilePage.style.display = 'none';
+        }
+
         // Hide main content pages
         const mainContent = document.getElementById('mainContent');
         if(mainContent) mainContent.style.display = 'none';
@@ -5197,6 +5204,13 @@ if (signupBtn) {
     const termsNavLink = Array.from(document.querySelectorAll('.nav-link')).find(l => l.textContent.trim() === 'Terms');
     const termsBackBtn = document.getElementById('termsBackBtn');
     function hideAllPages() {
+      // Hide profile page (if visible) to avoid stacking when navigating to Terms
+      const profilePage = document.getElementById('profilePage');
+      if(profilePage) {
+        profilePage.classList.remove('active');
+        profilePage.style.display = 'none';
+      }
+
       const mainContent = document.getElementById('mainContent');
       if(mainContent) mainContent.style.display = 'none';
       const modelPage = document.getElementById('modelPage');
