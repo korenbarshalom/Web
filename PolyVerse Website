@@ -5105,7 +5105,7 @@ if (signupBtn) {
       if(charactersNavLink) charactersNavLink.addEventListener('click', function(e) { e.preventDefault(); });
       if(contactNavLink) contactNavLink.addEventListener('click', function(e) {
         e.preventDefault();
-        // Always hide all internal/account sections before showing home/footer
+        // Always hide all internal/account/special sections before showing home/footer
         const modelPage = document.getElementById('modelPage');
         if(modelPage) modelPage.style.display = 'none';
         const checkoutPage = document.getElementById('checkoutPage');
@@ -5116,6 +5116,13 @@ if (signupBtn) {
         if(purchasedListPage) { purchasedListPage.classList.remove('active'); purchasedListPage.style.display = 'none'; }
         const profilePage = document.getElementById('profilePage');
         if(profilePage) { profilePage.classList.remove('active'); profilePage.style.display = 'none'; }
+        // Hide About and Terms sections if visible
+        const aboutSection = document.getElementById('about-section');
+        if(aboutSection) aboutSection.style.display = 'none';
+        document.body.classList.remove('about-active');
+        const termsSection = document.getElementById('terms-section');
+        if(termsSection) termsSection.style.display = 'none';
+        document.body.classList.remove('terms-active');
         // Show homepage and footer
         const mainContent = document.getElementById('mainContent');
         if(mainContent) mainContent.style.display = 'block';
