@@ -3523,6 +3523,16 @@
       }
     }
     function showUserMenu() {
+      const loginBtn = document.getElementById('loginBtn');
+      loginBtn.style.position = 'relative';
+      
+      // Check if menu already exists (toggle functionality)
+      const existingMenu = loginBtn.querySelector('div');
+      if (existingMenu) {
+        existingMenu.remove();
+        return;
+      }
+      
       const menu = document.createElement('div');
       menu.style.cssText = `
         position: absolute;
@@ -3549,8 +3559,6 @@
         <button id="myPurchasedBtn" class="user-menu-option">My Purchased</button>
         <button id="logoutBtn" class="user-menu-option">Logout</button>
       `;
-      const loginBtn = document.getElementById('loginBtn');
-      loginBtn.style.position = 'relative';
       loginBtn.appendChild(menu);
       setTimeout(() => {
         document.addEventListener('click', function closeMenu(e) {
