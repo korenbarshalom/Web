@@ -5105,41 +5105,30 @@ if (signupBtn) {
       if(charactersNavLink) charactersNavLink.addEventListener('click', function(e) { e.preventDefault(); });
       if(contactNavLink) contactNavLink.addEventListener('click', function(e) {
         e.preventDefault();
-        // Helper to check if homepage is active
-        function isHomeActive() {
-          // Home: mainContent visible, not about-active, not terms-active, not model/checkout/likes/purchased/profile page
-          const mainContent = document.getElementById('mainContent');
-          const aboutSection = document.getElementById('about-section');
-          const termsSection = document.getElementById('terms-section');
-          const modelPage = document.getElementById('modelPage');
-          const checkoutPage = document.getElementById('checkoutPage');
-          const likesListPage = document.getElementById('likesListPage');
-          const purchasedListPage = document.getElementById('purchasedListPage');
-          const profilePage = document.getElementById('profilePage');
-          return (
-            mainContent && mainContent.style.display !== 'none' &&
-            (!aboutSection || aboutSection.style.display === 'none') &&
-            (!termsSection || termsSection.style.display === 'none') &&
-            (!modelPage || modelPage.style.display === 'none') &&
-            (!checkoutPage || checkoutPage.style.display === 'none') &&
-            (!likesListPage || likesListPage.style.display === 'none') &&
-            (!purchasedListPage || purchasedListPage.style.display === 'none') &&
-            (!profilePage || profilePage.style.display === 'none') &&
-            !document.body.classList.contains('about-active') &&
-            !document.body.classList.contains('terms-active')
-          );
-        }
-        function scrollToFooter() {
-          if (footerSection) {
-            footerSection.scrollIntoView({ behavior: 'smooth' });
-          }
-        }
-        if (isHomeActive()) {
-          scrollToFooter();
-        } else {
-          // Go to home, then scroll to footer after transition
-          goHome();
-          setTimeout(scrollToFooter, 450); // Wait for fade/transition
+        // Always hide all internal/account sections before showing home/footer
+        const modelPage = document.getElementById('modelPage');
+        if(modelPage) modelPage.style.display = 'none';
+        const checkoutPage = document.getElementById('checkoutPage');
+        if(checkoutPage) checkoutPage.style.display = 'none';
+        const likesListPage = document.getElementById('likesListPage');
+        if(likesListPage) { likesListPage.classList.remove('active'); likesListPage.style.display = 'none'; }
+        const purchasedListPage = document.getElementById('purchasedListPage');
+        if(purchasedListPage) { purchasedListPage.classList.remove('active'); purchasedListPage.style.display = 'none'; }
+        const profilePage = document.getElementById('profilePage');
+        if(profilePage) { profilePage.classList.remove('active'); profilePage.style.display = 'none'; }
+        // Show homepage and footer
+        const mainContent = document.getElementById('mainContent');
+        if(mainContent) mainContent.style.display = 'block';
+        const homepageBanner = document.getElementById('homepage-banner');
+        if(homepageBanner) homepageBanner.style.display = '';
+        const heroSearch = document.getElementById('heroSearch');
+        if(heroSearch) heroSearch.parentElement.classList.remove('hide');
+        const topSearchbar = document.getElementById('top-searchbar');
+        if(topSearchbar) topSearchbar.style.display = 'none';
+        window.showNavbarLinks && window.showNavbarLinks();
+        // Scroll to footer
+        if (footerSection) {
+          footerSection.scrollIntoView({ behavior: 'smooth' });
         }
       });
       // Ensure Home page is default on hard refresh
