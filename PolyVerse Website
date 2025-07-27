@@ -4925,6 +4925,49 @@ if (signupBtn) {
         charDropdown.style.display = 'none';
       }
     });
+
+    // --- Category Filtering Logic (Characters Dropdown) ---
+    const categoryModelMap = {
+      'Villains': [15, 16, 17, 18, 19, 20],
+      'Humans': [1, 2, 13],
+      'Stylized Characters': [4, 5, 6, 7, 8, 9, 10, 11, 12, 14]
+    };
+
+    // Attach click handlers to each dropdown item
+    document.querySelectorAll('#charactersDropdown .dropdown-item').forEach(item => {
+      item.addEventListener('click', e => {
+        e.preventDefault();
+        const category = item.textContent.trim();
+        if (!(category in categoryModelMap)) return; // Ignore unsupported categories
+
+        // 1. Prepare the Search Results page state
+        homepageBanner.style.display = 'none';
+        topSearchbar.style.display = 'flex';
+        if (window.hideNavbarLinks) window.hideNavbarLinks();
+
+        // 2. Reset any previous search query
+        navbarSearch.value = '';
+        heroSearch.value = '';
+        lastSearchQuery = '';
+
+        // 3. Ensure correct sections are visible/hidden
+        modelPage.style.display = 'none';
+        checkoutPage.style.display = 'none';
+        mainContent.style.display = 'block';
+        window.scrollTo(0, 0);
+
+        // 4. Filter models by the selected category and render
+        const filtered = models.filter(m => categoryModelMap[category].includes(m.id));
+        renderGallery(filtered, true);
+
+        // 5. Show the Back to Shop button (if available)
+        if (typeof showBackToShopButton === 'function') showBackToShopButton();
+
+        // 6. Close the dropdown menu after selection
+        const charDropdownEl = document.getElementById('charactersDropdown');
+        if (charDropdownEl) charDropdownEl.style.display = 'none';
+      });
+    });
   </script>
 
   <!-- Google Identity Services (force English) -->
