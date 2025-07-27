@@ -4972,6 +4972,8 @@ if (signupBtn) {
       const aboutNavLink = Array.from(document.querySelectorAll('.nav-link')).find(l => l.textContent.trim() === 'About Us');
       const homeNavLink = Array.from(document.querySelectorAll('.nav-link')).find(l => l.textContent.trim() === 'Home');
       const charactersNavLink = Array.from(document.querySelectorAll('.nav-link')).find(l => l.textContent.trim() === 'Characters');
+      const contactNavLink = Array.from(document.querySelectorAll('.nav-link')).find(l => l.textContent.trim() === 'Contact Us');
+      const footerSection = document.getElementById('contact-section');
       
       function hideAllPages() {
         // Hide main content pages
@@ -5047,6 +5049,45 @@ if (signupBtn) {
       if(aboutBackBtn) aboutBackBtn.addEventListener('click', goHome);
       if(homeNavLink) homeNavLink.addEventListener('click', goHome);
       if(charactersNavLink) charactersNavLink.addEventListener('click', function(e) { e.preventDefault(); });
+      if(contactNavLink) contactNavLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        // Helper to check if homepage is active
+        function isHomeActive() {
+          // Home: mainContent visible, not about-active, not terms-active, not model/checkout/likes/purchased/profile page
+          const mainContent = document.getElementById('mainContent');
+          const aboutSection = document.getElementById('about-section');
+          const termsSection = document.getElementById('terms-section');
+          const modelPage = document.getElementById('modelPage');
+          const checkoutPage = document.getElementById('checkoutPage');
+          const likesListPage = document.getElementById('likesListPage');
+          const purchasedListPage = document.getElementById('purchasedListPage');
+          const profilePage = document.getElementById('profilePage');
+          return (
+            mainContent && mainContent.style.display !== 'none' &&
+            (!aboutSection || aboutSection.style.display === 'none') &&
+            (!termsSection || termsSection.style.display === 'none') &&
+            (!modelPage || modelPage.style.display === 'none') &&
+            (!checkoutPage || checkoutPage.style.display === 'none') &&
+            (!likesListPage || likesListPage.style.display === 'none') &&
+            (!purchasedListPage || purchasedListPage.style.display === 'none') &&
+            (!profilePage || profilePage.style.display === 'none') &&
+            !document.body.classList.contains('about-active') &&
+            !document.body.classList.contains('terms-active')
+          );
+        }
+        function scrollToFooter() {
+          if (footerSection) {
+            footerSection.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+        if (isHomeActive()) {
+          scrollToFooter();
+        } else {
+          // Go to home, then scroll to footer after transition
+          goHome();
+          setTimeout(scrollToFooter, 450); // Wait for fade/transition
+        }
+      });
       // Ensure Home page is default on hard refresh
       document.body.classList.remove('about-active');
     })();
