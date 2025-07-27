@@ -2361,6 +2361,17 @@
     #terms-section .terms-text ul { list-style-type: none; padding-left: 0; margin: 1.5rem 0; text-align:left; }
     #terms-section .terms-text li { font-size:1.1rem; line-height:1.6; margin-bottom:1.5rem; position: relative; padding-left: 1.5rem; }
     #terms-section .terms-text li::before { content: '•'; color: #ff9800; position: absolute; left: 0; font-size: 1.2rem; }
+    /* --- Smooth fade/slide-in transition for Terms page --- */
+    #terms-section {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.45s cubic-bezier(.4,.01,.22,1), transform 0.45s cubic-bezier(.4,.01,.22,1);
+    }
+    body.terms-active #terms-section {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.45s cubic-bezier(.4,.01,.22,1), transform 0.45s cubic-bezier(.4,.01,.22,1);
+    }
   </style>
 </head>
 <body>
@@ -4988,6 +4999,10 @@ if (signupBtn) {
         if(topSearchbar) topSearchbar.style.display = 'none';
         const heroSearch = document.getElementById('heroSearch');
         if(heroSearch) heroSearch.parentElement.classList.add('hide');
+        // Hide Terms section if visible
+        const termsSection = document.getElementById('terms-section');
+        if(termsSection) termsSection.style.display = 'none';
+        document.body.classList.remove('terms-active');
       }
       
       function showAbout(e){
@@ -5008,6 +5023,10 @@ if (signupBtn) {
         if(heroSearch) heroSearch.parentElement.classList.remove('hide');
         const homepageBanner = document.getElementById('homepage-banner');
         if(homepageBanner) homepageBanner.style.display = '';
+        // Hide Terms section if visible
+        const termsSection = document.getElementById('terms-section');
+        if(termsSection) termsSection.style.display = 'none';
+        document.body.classList.remove('terms-active');
         window.showNavbarLinks(); // Ensure navbar links are visible on home
         window.scrollTo(0,0);
       }
@@ -5040,6 +5059,17 @@ if (signupBtn) {
     #terms-section { padding:2rem 1rem; }
     #terms-section .terms-text h1 { font-size:2.5rem; }
     #terms-section .terms-text h1::before { font-size:1.5rem; left: -1rem; top:0.3rem; }
+  }
+  /* --- Smooth fade/slide-in transition for Terms page --- */
+  #terms-section {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.45s cubic-bezier(.4,.01,.22,1), transform 0.45s cubic-bezier(.4,.01,.22,1);
+  }
+  body.terms-active #terms-section {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.45s cubic-bezier(.4,.01,.22,1), transform 0.45s cubic-bezier(.4,.01,.22,1);
   }
   </style>
   <section id="terms-section">
@@ -5086,10 +5116,24 @@ if (signupBtn) {
     function showTerms(e){
       if(e) e.preventDefault();
       hideAllPages();
+      // Prepare for transition
+      const termsSection = document.getElementById('terms-section');
+      if (termsSection) {
+        termsSection.style.display = 'block';
+        termsSection.style.opacity = '0';
+        termsSection.style.transform = 'translateY(24px)';
+      }
       document.body.classList.add('terms-active');
       window.showNavbarLinks();
       window.scrollTo(0,0);
       location.hash = '/terms';
+      // Trigger transition after a short delay to ensure style is applied
+      setTimeout(() => {
+        if (termsSection) {
+          termsSection.style.opacity = '1';
+          termsSection.style.transform = 'translateY(0)';
+        }
+      }, 10);
     }
     function goHome(e){
       if(e) e.preventDefault();
@@ -5100,6 +5144,9 @@ if (signupBtn) {
       if(homepageBanner) homepageBanner.style.display = '';
       const heroSearch = document.getElementById('heroSearch');
       if(heroSearch) heroSearch.parentElement.classList.remove('hide');
+      // Hide Terms section if visible
+      const termsSection = document.getElementById('terms-section');
+      if(termsSection) termsSection.style.display = 'none';
       window.showNavbarLinks();
       window.scrollTo(0,0);
       location.hash = '';
@@ -5113,9 +5160,27 @@ if (signupBtn) {
         goHome();
       }
     });
-    if (location.hash === '#/terms') {
-      showTerms();
-    }
+    // --- FORCE HOME VIEW ON PAGE LOAD (fix for refresh bug) ---
+    window.addEventListener('DOMContentLoaded', function() {
+      // Always reset to Home view on load
+      document.body.classList.remove('terms-active');
+      const mainContent = document.getElementById('mainContent');
+      if(mainContent) mainContent.style.display = 'block';
+      const homepageBanner = document.getElementById('homepage-banner');
+      if(homepageBanner) homepageBanner.style.display = '';
+      const heroSearch = document.getElementById('heroSearch');
+      if(heroSearch) heroSearch.parentElement.classList.remove('hide');
+      // Hide Terms section if visible
+      const termsSection = document.getElementById('terms-section');
+      if(termsSection) termsSection.style.display = 'none';
+      window.showNavbarLinks();
+      window.scrollTo(0,0);
+      location.hash = '';
+    });
+    // Remove auto-show Terms on load
+    // if (location.hash === '#/terms') {
+    //   showTerms();
+    // }
   })();
   </script>
 </body>
