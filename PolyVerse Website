@@ -2650,9 +2650,7 @@
           <input type="checkbox" id="termsCheckbox">
           <label for="termsCheckbox" style="font-size:1.05rem;color:#fff;cursor:pointer;user-select:none;line-height:1.4;display:inline-block;">
             I accept the
-            <a href="#" style="color:#ff9800;font-weight:600;text-decoration:none;" target="_blank">Terms of Service</a>
-            and
-            <a href="#" style="color:#ff9800;font-weight:600;text-decoration:none;" target="_blank">Privacy Policy</a>
+            <a href="#/terms" class="terms-link" style="color:#ff9800;font-weight:600;">Terms of Service</a>
           </label>
         </div>
 
@@ -4968,6 +4966,20 @@ if (signupBtn) {
         if (charDropdownEl) charDropdownEl.style.display = 'none';
       });
     });
+
+    // --- Terms of Service link inside Sign Up modal ---
+    const termsLinkModal = document.querySelector('#registerView .terms-link');
+    if (termsLinkModal) {
+      termsLinkModal.addEventListener('click', e => {
+        e.preventDefault();
+        // Close the Sign Up modal if it is open
+        if (typeof closeModal === 'function' && loginModal && loginModal.classList.contains('active')) {
+          closeModal(loginModal);
+        }
+        // Navigate to the internal Terms page
+        location.hash = '/terms';
+      });
+    }
   </script>
 
   <!-- Google Identity Services (force English) -->
