@@ -4970,6 +4970,8 @@ if (signupBtn) {
     (function(){
       const aboutBackBtn = document.getElementById('aboutBackBtn');
       const aboutNavLink = Array.from(document.querySelectorAll('.nav-link')).find(l => l.textContent.trim() === 'About Us');
+      const homeNavLink = Array.from(document.querySelectorAll('.nav-link')).find(l => l.textContent.trim() === 'Home');
+      const charactersNavLink = Array.from(document.querySelectorAll('.nav-link')).find(l => l.textContent.trim() === 'Characters');
       
       function hideAllPages() {
         // Hide main content pages
@@ -5003,6 +5005,10 @@ if (signupBtn) {
         const termsSection = document.getElementById('terms-section');
         if(termsSection) termsSection.style.display = 'none';
         document.body.classList.remove('terms-active');
+        // Hide About section if visible
+        const aboutSection = document.getElementById('about-section');
+        if(aboutSection) aboutSection.style.display = 'none';
+        document.body.classList.remove('about-active');
       }
       
       function showAbout(e){
@@ -5011,6 +5017,9 @@ if (signupBtn) {
         document.body.classList.add('about-active');
         window.showNavbarLinks(); // Keep navbar links visible on About page
         window.scrollTo(0,0);
+        // Show About section
+        const aboutSection = document.getElementById('about-section');
+        if(aboutSection) aboutSection.style.display = '';
       }
       
       function goHome(e){
@@ -5027,12 +5036,17 @@ if (signupBtn) {
         const termsSection = document.getElementById('terms-section');
         if(termsSection) termsSection.style.display = 'none';
         document.body.classList.remove('terms-active');
+        // Hide About section if visible
+        const aboutSection = document.getElementById('about-section');
+        if(aboutSection) aboutSection.style.display = 'none';
         window.showNavbarLinks(); // Ensure navbar links are visible on home
         window.scrollTo(0,0);
       }
       
       if(aboutNavLink) aboutNavLink.addEventListener('click', showAbout);
       if(aboutBackBtn) aboutBackBtn.addEventListener('click', goHome);
+      if(homeNavLink) homeNavLink.addEventListener('click', goHome);
+      if(charactersNavLink) charactersNavLink.addEventListener('click', function(e) { e.preventDefault(); });
       // Ensure Home page is default on hard refresh
       document.body.classList.remove('about-active');
     })();
@@ -5134,6 +5148,10 @@ if (signupBtn) {
           termsSection.style.transform = 'translateY(0)';
         }
       }, 10);
+      // Hide About section if visible
+      const aboutSection = document.getElementById('about-section');
+      if(aboutSection) aboutSection.style.display = 'none';
+      document.body.classList.remove('about-active');
     }
     function goHome(e){
       if(e) e.preventDefault();
