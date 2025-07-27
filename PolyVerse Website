@@ -3858,6 +3858,8 @@
         purchasedListPage.classList.remove('active');
         setTimeout(() => { purchasedListPage.style.display = 'none'; }, 450);
       }
+      // Always show navbar links when opening profile
+      if (window.showNavbarLinks) window.showNavbarLinks();
       // Show profile page with smooth transition
       const profilePage = document.getElementById('profilePage');
       profilePage.classList.remove('active');
