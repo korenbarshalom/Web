@@ -5367,5 +5367,148 @@ if (signupBtn) {
     // }
   })();
   </script>
+
+  <!-- COOKIE CONSENT BANNER -->
+  <div id="cookieConsentBanner" style="display:none;">
+    <div class="cookie-banner-content">
+      <span class="cookie-banner-message">We use cookies to enhance your experience.</span>
+      <button class="cookie-btn accept" id="cookieAcceptBtn">Accept</button>
+      <button class="cookie-btn cancel" id="cookieCancelBtn">Cancel</button>
+    </div>
+  </div>
+
+  <style>
+  #cookieConsentBanner {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    pointer-events: none;
+    background: none;
+    transition: none;
+  }
+  #cookieConsentBanner .cookie-banner-content {
+    background: #232326;
+    color: #fff;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.32), 0 1.5px 8px rgba(255,152,0,0.10);
+    border-radius: 16px 16px 0 0;
+    padding: 1.1rem 2.2rem 1.1rem 2.2rem;
+    margin: 0 0 1.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    min-width: 320px;
+    max-width: 98vw;
+    opacity: 0;
+    transform: translateY(40px);
+    pointer-events: auto;
+    transition: opacity 0.45s cubic-bezier(.4,.01,.22,1), transform 0.45s cubic-bezier(.4,.01,.22,1);
+  }
+  #cookieConsentBanner.show .cookie-banner-content {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  #cookieConsentBanner.hide .cookie-banner-content {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  .cookie-banner-message {
+    font-size: 1.08rem;
+    font-weight: 500;
+    color: #fff;
+    margin-right: 1.2rem;
+    letter-spacing: 0.01em;
+    flex: 1 1 auto;
+  }
+  .cookie-btn {
+    font-family: 'Montserrat', 'Inter', Arial, sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.5rem;
+    margin-left: 0.5rem;
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s, box-shadow 0.18s, transform 0.15s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    outline: none;
+  }
+  .cookie-btn.accept {
+    background: linear-gradient(90deg, #ff9800 0%, #ff5e13 100%);
+    color: #fff;
+  }
+  .cookie-btn.accept:hover, .cookie-btn.accept:focus {
+    background: linear-gradient(90deg, #ffac33 0%, #ff7043 100%);
+    color: #fff;
+  }
+  .cookie-btn.cancel {
+    background: #444;
+    color: #fff;
+  }
+  .cookie-btn.cancel:hover, .cookie-btn.cancel:focus {
+    background: #666;
+    color: #fff;
+  }
+  @media (max-width: 600px) {
+    #cookieConsentBanner .cookie-banner-content {
+      padding: 0.8rem 0.7rem 0.8rem 0.7rem;
+      min-width: 0;
+      font-size: 0.97rem;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.7rem;
+    }
+    .cookie-banner-message {
+      margin-right: 0;
+      margin-bottom: 0.7rem;
+      text-align: center;
+    }
+    .cookie-btn {
+      width: 100%;
+      margin-left: 0;
+      margin-bottom: 0.4rem;
+    }
+  }
+  </style>
+
+  <script>
+  (function(){
+    const banner = document.getElementById('cookieConsentBanner');
+    const acceptBtn = document.getElementById('cookieAcceptBtn');
+    const cancelBtn = document.getElementById('cookieCancelBtn');
+    let hideTimeout = null;
+
+    function showBanner() {
+      if (!banner) return;
+      banner.style.display = 'flex';
+      banner.classList.remove('hide');
+      // Force reflow for animation
+      void banner.offsetWidth;
+      banner.classList.add('show');
+      // Hide after 20 seconds if not already hidden
+      hideTimeout = setTimeout(hideBanner, 20000);
+    }
+    function hideBanner() {
+      if (!banner) return;
+      banner.classList.remove('show');
+      banner.classList.add('hide');
+      if (hideTimeout) clearTimeout(hideTimeout);
+      setTimeout(() => {
+        banner.style.display = 'none';
+      }, 450);
+    }
+    // Accept/Cancel click handlers
+    if (acceptBtn) acceptBtn.onclick = hideBanner;
+    if (cancelBtn) cancelBtn.onclick = hideBanner;
+
+    // Show on load/refresh
+    window.addEventListener('DOMContentLoaded', showBanner);
+  })();
+  </script>
 </body>
 </html>
