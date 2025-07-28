@@ -2245,17 +2245,92 @@
     }
 
     /* ===== About Page Styles (scoped) ===== */
-    #about-section { display:none; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:2rem; padding:3rem 1.5rem; max-width:1200px; margin:0 auto; }
-    body.about-active #about-section { display:flex; }
-    #about-section .about-text { flex:1 1 350px; color:#fff; }
-    #about-section .about-text h1 { font-size:3rem; margin-bottom:1rem; }
-    #about-section .about-text p { font-size:1.1rem; line-height:1.6; }
-    #about-section .about-img { flex:1 1 400px; text-align:center; }
-    #about-section .about-img img { width:100%; max-width:500px; height:auto; }
-    @media(max-width:768px){
-      #about-section { flex-direction:column; text-align:center; }
-      #about-section .about-img img { max-width:80%; }
+    #about-section { 
+      display:none; 
+      flex-wrap:wrap; 
+      align-items:center; 
+      justify-content:center;
+      gap:3rem; 
+      padding:4rem 2rem; 
+      max-width:1100px; 
+      margin:0 auto;
+      background: rgba(34,34,38,0.95);
+      border-radius:24px;
+      box-shadow:0 8px 28px rgba(0,0,0,0.2);
+      transition: transform 0.4s ease, opacity 0.4s ease;
     }
+    body.about-active #about-section { 
+      display:flex;
+      animation: aboutFadeIn 0.5s ease-out;
+    }
+    #about-section .about-text { 
+      flex:1 1 450px; 
+      color:#fff;
+      padding:1rem 0;
+      opacity:0;
+      transform:translateY(15px);
+      animation: aboutTextFadeIn 0.7s ease-out 0.2s forwards;
+    }
+    #about-section .about-text h1 { 
+      font-size:2.8rem; 
+      margin-bottom:1.2rem; 
+      font-weight:900;
+      letter-spacing:-0.01em;
+      color:#ffb74d;
+      background:linear-gradient(90deg, #ffb74d 0%, #ff9800 100%);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      position:relative;
+    }
+    #about-section .about-text h1::after {
+      content:'';
+      position:absolute;
+      bottom:-8px;
+      left:0;
+      width:60px;
+      height:3px;
+      background:linear-gradient(90deg, #ffb74d 0%, #ff9800 100%);
+      border-radius:2px;
+    }
+    #about-section .about-text p { 
+      font-size:1.15rem; 
+      line-height:1.8; 
+      color:#e0e0e0;
+      margin-bottom:1.5rem;
+      letter-spacing:0.01em;
+    }
+    #about-section .about-img { 
+      flex:1 0 320px; 
+      text-align:center;
+      max-width:320px;
+    }
+    #about-section .about-img img { 
+      width:100%;
+      max-width:320px;
+      height:auto;
+      border-radius:16px;
+      box-shadow:0 6px 28px rgba(0,0,0,0.15);
+      transition:transform 0.35s ease-out, box-shadow 0.35s ease-out;
+      opacity:0;
+      transform:translateY(20px);
+      animation:aboutImgFadeIn 0.7s ease-out 0.3s forwards;
+    }
+    #about-section .about-img img:hover { 
+      transform:scale(1.03);
+      box-shadow:0 12px 36px 0 rgba(255,184,77,0.18), 0 6px 28px rgba(0,0,0,0.2);
+    }
+    @keyframes aboutImgFadeIn {
+      to { opacity:1; transform:translateY(0); }
+    }
+    @keyframes aboutTextFadeIn {
+      to { opacity:1; transform:translateY(0); }
+    }
+    @keyframes aboutFadeIn {
+      from { opacity:0.6; transform:translateY(10px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+    
     /* Hide homepage-only sections while About is active */
     body.about-active #homepage-banner,
     body.about-active .hero,
@@ -2264,77 +2339,38 @@
     body.about-active .hero-search,
     body.about-active #gallery,
     body.about-active .gallery { display:none !important; }
-    #about-section .about-img img {
-      width: 100%;
-      max-width: 340px;
-      height: auto;
-      border-radius: 28px;
-      box-shadow: 0 6px 32px rgba(0,0,0,0.13);
-      transition: box-shadow 0.35s cubic-bezier(.4,.01,.22,1), transform 0.35s cubic-bezier(.4,.01,.22,1);
-      opacity: 0;
-      transform: translateY(30px);
-      animation: aboutImgFadeIn 0.7s cubic-bezier(.4,.01,.22,1) 0.15s forwards;
-    }
-    #about-section .about-img img:hover {
-      transform: translateY(0) scale(1.045);
-      box-shadow: 0 12px 48px 0 rgba(255,184,77,0.18), 0 6px 32px rgba(0,0,0,0.18);
-      z-index: 1;
-    }
-    @keyframes aboutImgFadeIn {
-      to { opacity: 1; transform: translateY(0); }
-    }
-    #about-section .about-text {
-      flex: 1 1 350px;
-      color: #fff;
-      padding: 1.2rem 0 1.2rem 0;
-      opacity: 0;
-      transform: translateY(30px);
-      animation: aboutTextFadeIn 0.7s cubic-bezier(.4,.01,.22,1) 0.05s forwards;
-    }
-    @keyframes aboutTextFadeIn {
-      to { opacity: 1; transform: translateY(0); }
-    }
-    #about-section {
-      display: none;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: 2.5rem;
-      padding: 3.2rem 1.5rem 2.5rem 1.5rem;
-      max-width: 900px;
-      margin: 0 auto;
-      background: rgba(34,34,38,0.98);
-      border-radius: 24px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.13);
-    }
-    body.about-active #about-section { display: flex; }
-    #about-section .about-text h1 {
-      font-size: 2.5rem;
-      margin-bottom: 0.7rem;
-      font-weight: 900;
-      letter-spacing: -0.01em;
-      color: #ffb74d;
-      background: linear-gradient(90deg, #ffb74d 0%, #ff9800 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    #about-section .about-text p {
-      font-size: 1.13rem;
-      line-height: 1.7;
-      color: #e0e0e0;
-      margin-bottom: 1.7rem;
-      letter-spacing: 0.01em;
-    }
     #about-section .btn {
-      margin-top: 1.2rem;
-      font-size: 1.08rem;
-      border-radius: 12px;
-      padding: 0.7rem 2.2rem;
+      margin-top:1.5rem;
+      font-size:1.1rem;
+      border-radius:12px;
+      padding:0.8rem 2.2rem;
+      background:transparent;
+      color:#ff9800;
+      border:2px solid #ff9800;
+      transition:background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+    }
+    #about-section .btn:hover {
+      background:rgba(255,152,0,0.1);
+      color:#ffb74d;
+      transform:translateY(-2px);
     }
     @media(max-width:768px){
-      #about-section { flex-direction: column; text-align: center; padding: 2.2rem 0.5rem; }
-      #about-section .about-img img { max-width: 70vw; }
+      #about-section { 
+        flex-direction:column; 
+        text-align:center; 
+        padding:3rem 1.5rem;
+        gap:2rem;
+      }
+      #about-section .about-img { 
+        max-width:280px; 
+      }
+      #about-section .about-img img { 
+        max-width:260px; 
+      }
+      #about-section .about-text h1::after {
+        left:50%;
+        transform:translateX(-50%);
+      }
     }
 
     /* ===== Terms Page Styles (scoped) ===== */
@@ -2575,8 +2611,9 @@
   <section id="about-section">
     <div class="about-text">
       <h1>polyVerse</h1>
-      <p>We provide high-quality 3D characters at an affordable price of just $1. Every character on the site is fully human-rigged and ready to use in your game or any other project. Plus, once you purchase a model, it's yours — royalty-free.</p>
-      <button id="aboutBackBtn" class="btn" style="margin-top:2rem;">&larr; Back</button>
+      <p>We provide high-quality 3D characters at an affordable price of just $1. Every character on the site is fully human-rigged and ready to use in your game or any other project.</p>
+      <p>Our library includes a diverse range of models from heroes to villains, all optimized for games and animation projects. Each model is carefully designed with clean topology and proper rigging.</p>
+      <button id="aboutBackBtn" class="btn">&larr; Back to Home</button>
     </div>
     <div class="about-img">
       <img src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjMzODc4MC5wbmc=/250x600/Anhp0L.png" alt="polyVerse marketplace preview">
@@ -5114,6 +5151,12 @@ if (signupBtn) {
     body.about-active .hero-search,
     body.about-active #gallery,
     body.about-active .gallery { display:none !important; }
+    
+    /* Smooth page transition when activating About page */
+    body.about-active {
+      background: linear-gradient(to bottom, #1e1e20, #232326);
+      transition: background 0.4s ease;
+    }
   </style>
 
   <script>
