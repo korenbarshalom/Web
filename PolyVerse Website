@@ -4947,6 +4947,39 @@ if (signupBtn) {
         const category = item.textContent.trim();
         if (!(category in categoryModelMap)) return; // Ignore unsupported categories
 
+        // First, ensure we hide all other pages/sections
+        // Hide any special pages that might be active
+        document.body.classList.remove('about-active');
+        document.body.classList.remove('terms-active');
+        
+        // Hide profile page if visible
+        const profilePage = document.getElementById('profilePage');
+        if (profilePage) {
+          profilePage.classList.remove('active');
+          profilePage.style.display = 'none';
+        }
+        
+        // Hide likes/list page if visible
+        const likesListPage = document.getElementById('likesListPage');
+        if (likesListPage) {
+          likesListPage.classList.remove('active');
+          likesListPage.style.display = 'none';
+        }
+        
+        // Hide purchased page if visible
+        const purchasedListPage = document.getElementById('purchasedListPage');
+        if (purchasedListPage) {
+          purchasedListPage.classList.remove('active');
+          purchasedListPage.style.display = 'none';
+        }
+        
+        // Hide any other sections that might be visible
+        const termsSection = document.getElementById('terms-section');
+        if (termsSection) termsSection.style.display = 'none';
+        
+        const aboutSection = document.getElementById('about-section');
+        if (aboutSection) aboutSection.style.display = 'none';
+
         // 1. Prepare the Search Results page state
         homepageBanner.style.display = 'none';
         topSearchbar.style.display = 'flex';
