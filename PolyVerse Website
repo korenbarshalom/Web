@@ -3640,6 +3640,7 @@
         currentUser = null;
         updateAuthUI();
         menu.remove();
+        openModal(loginModal);
       });
       document.getElementById('profileBtn').addEventListener('click', (e) => {
         e.preventDefault();
