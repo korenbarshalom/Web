@@ -2260,7 +2260,6 @@
     body.about-active #homepage-banner,
     body.about-active .hero,
     body.about-active .model-card-section,
-    body.about-active #contact-section,
     body.about-active #top-searchbar,
     body.about-active .hero-search,
     body.about-active #gallery,
@@ -2348,7 +2347,6 @@
     body.terms-active #homepage-banner,
     body.terms-active .hero,
     body.terms-active .model-card-section,
-    body.terms-active #contact-section,
     body.terms-active #top-searchbar,
     body.terms-active .hero-search,
     body.terms-active #gallery,
@@ -2571,6 +2569,35 @@
     <div id="paypal-button-container" style="max-width:400px;margin:2rem auto 0 auto;"></div>
     <button class="btn" id="paidDownloadBtn" style="display:none;background:#ff9800;color:#fff;font-weight:600;font-size:1.1rem;margin:2rem auto 0 auto;max-width:400px;width:100%;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.10);padding:0.85rem 0;">Download FBX Model</button>
     <div class="checkout-secure-line">🔒 Secure checkout powered by PayPal</div>
+  </section>
+
+  <!-- ABOUT PAGE SECTION (SPA) -->
+  <section id="about-section">
+    <div class="about-text">
+      <h1>polyVerse</h1>
+      <p>We provide high-quality 3D characters at an affordable price of just $1. Every character on the site is fully human-rigged and ready to use in your game or any other project. Plus, once you purchase a model, it's yours — royalty-free.</p>
+      <button id="aboutBackBtn" class="btn" style="margin-top:2rem;">&larr; Back</button>
+    </div>
+    <div class="about-img">
+      <img src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjMzODc4MC5wbmc=/250x600/Anhp0L.png" alt="polyVerse marketplace preview">
+    </div>
+  </section>
+
+  <!-- TERMS PAGE SECTION (SPA) -->
+  <section id="terms-section">
+    <div class="terms-text">
+      <h1>Terms</h1>
+      <ul>
+        <li>Welcome to polyVerse. By accessing or purchasing any content on our site, you agree to the following terms:</li>
+        <li>All 3D models on polyVerse are sold for $1.00 each and provided in .fbx format only.</li>
+        <li>Each purchase grants you a royalty-free license to use the models in personal or commercial projects.</li>
+        <li>All models are fully human-rigged and game-ready for engines like Unity and Unreal.</li>
+        <li>Redistribution, resale, or repackaging of the models is strictly prohibited.</li>
+        <li>All purchases are final — no refunds or exchanges.</li>
+        <li>We may update these terms from time to time. Continued use of the site indicates your agreement to any updates.</li>
+      </ul>
+      <button id="termsBackBtn" class="btn" style="margin:2rem auto 0; display:block; max-width:200px; margin-left: calc(50% - 120px);">← Back</button>
+    </div>
   </section>
 
   <!-- CONTACT INFO FOOTER -->
@@ -5083,23 +5110,11 @@ if (signupBtn) {
     body.about-active #homepage-banner,
     body.about-active .hero,
     body.about-active .model-card-section,
-    body.about-active #contact-section,
     body.about-active #top-searchbar,
     body.about-active .hero-search,
     body.about-active #gallery,
     body.about-active .gallery { display:none !important; }
   </style>
-
-  <section id="about-section">
-    <div class="about-text">
-      <h1>polyVerse</h1>
-      <p>We provide high-quality 3D characters at an affordable price of just $1. Every character on the site is fully human-rigged and ready to use in your game or any other project. Plus, once you purchase a model, it's yours — royalty-free.</p>
-      <button id="aboutBackBtn" class="btn" style="margin-top:2rem;">&larr; Back</button>
-    </div>
-    <div class="about-img">
-      <img src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjMzODc4MC5wbmc=/250x600/Anhp0L.png" alt="polyVerse marketplace preview">
-    </div>
-  </section>
 
   <script>
     // ===== Navbar Links Visibility Management =====
@@ -5264,7 +5279,6 @@ if (signupBtn) {
   body.terms-active #homepage-banner,
   body.terms-active .hero,
   body.terms-active .model-card-section,
-  body.terms-active #contact-section,
   body.terms-active #top-searchbar,
   body.terms-active .hero-search,
   body.terms-active #gallery,
@@ -5286,21 +5300,6 @@ if (signupBtn) {
     transition: opacity 0.45s cubic-bezier(.4,.01,.22,1), transform 0.45s cubic-bezier(.4,.01,.22,1);
   }
   </style>
-  <section id="terms-section">
-    <div class="terms-text">
-      <h1>Terms</h1>
-      <ul>
-        <li>Welcome to polyVerse. By accessing or purchasing any content on our site, you agree to the following terms:</li>
-        <li>All 3D models on polyVerse are sold for $1.00 each and provided in .fbx format only.</li>
-        <li>Each purchase grants you a royalty-free license to use the models in personal or commercial projects.</li>
-        <li>All models are fully human-rigged and game-ready for engines like Unity and Unreal.</li>
-        <li>Redistribution, resale, or repackaging of the models is strictly prohibited.</li>
-        <li>All purchases are final — no refunds or exchanges.</li>
-        <li>We may update these terms from time to time. Continued use of the site indicates your agreement to any updates.</li>
-      </ul>
-      <button id="termsBackBtn" class="btn" style="margin:2rem auto 0; display:block; max-width:200px; margin-left: calc(50% - 120px);">← Back</button>
-    </div>
-  </section>
   <script>
   (function(){
     const termsNavLink = Array.from(document.querySelectorAll('.nav-link')).find(l => l.textContent.trim() === 'Terms');
