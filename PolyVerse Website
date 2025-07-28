@@ -2610,7 +2610,7 @@
   <!-- ABOUT PAGE SECTION (SPA) -->
   <section id="about-section">
     <div class="about-text">
-      <h1>polyVerse</h1>
+      <h1>About  polyVerse</h1>
       <p>We provide high-quality 3D characters at an affordable price of just $1. Every character on the site is fully human-rigged and ready to use in your game or any other project.</p>
       <p>Our library includes a diverse range of models from heroes to villains, all optimized for games and animation projects. Each model is carefully designed with clean topology and proper rigging.</p>
       <button id="aboutBackBtn" class="btn">&larr; Back to Home</button>
