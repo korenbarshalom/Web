@@ -2633,7 +2633,7 @@
         <li>All purchases are final — no refunds or exchanges.</li>
         <li>We may update these terms from time to time. Continued use of the site indicates your agreement to any updates.</li>
       </ul>
-      <button id="termsBackBtn" class="btn" style="margin:2rem auto 0; display:block; max-width:200px; margin-left: calc(50% - 120px);">← Back</button>
+      <button id="termsBackBtn" class="btn" style="margin:2rem auto 0; display:block; max-width:200px; margin-left:auto; margin-right:auto;">← Back</button>
     </div>
   </section>
 
