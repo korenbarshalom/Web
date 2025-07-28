@@ -3393,6 +3393,11 @@
       if (nameErrorMsg || usernameErrorMsg || passwordErrorMsg) {
         return;
       }
+      const termsCheckbox = document.getElementById('termsCheckbox');
+      if (!termsCheckbox.checked) {
+        showError(termsError, 'You must accept the Terms of Service to continue.');
+        return;
+      }
       // Simulate backend: check for duplicate username
       const users = getUsers();
       if (users.some(u => u.username === username)) {
