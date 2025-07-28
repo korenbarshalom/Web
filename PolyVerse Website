@@ -3915,6 +3915,18 @@
       checkoutPage.style.display = 'none';
       homepageBanner.style.display = 'none';
       topSearchbar.style.display = 'none';
+      // Hide About Us if active
+      const aboutSection = document.getElementById('about-section');
+      if (aboutSection) {
+        aboutSection.style.display = 'none';
+      }
+      document.body.classList.remove('about-active');
+      // Hide Terms if active
+      const termsSection = document.getElementById('terms-section');
+      if (termsSection) {
+        termsSection.style.display = 'none';
+      }
+      document.body.classList.remove('terms-active');
       // Hide likes/list page and clear gallery
       const likesListPage = document.getElementById('likesListPage');
       if (likesListPage) {
