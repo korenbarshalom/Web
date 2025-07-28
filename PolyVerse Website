@@ -1824,7 +1824,7 @@
       min-width: 100px !important;
       min-height: 44px;
       font-size: 1.05rem;
-      padding: 0.45rem 1.3rem !important;
+      padding: 0.45rem 1.0rem !important;
       letter-spacing: 0.01em;
       transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.2s;
     }
@@ -1839,7 +1839,7 @@
       min-width: 100px !important;
       min-height: 44px;
       font-size: 1.05rem;
-      padding: 0.45rem 1.3rem !important;
+      padding: 0.45rem 1.0rem !important;
       letter-spacing: 0.01em;
       transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.2s;
     }
@@ -1861,7 +1861,7 @@
     @media (max-width: 600px) {
       .login-btn-custom, .signup-btn-custom {
         font-size: 0.97rem !important;
-        padding: 0.4rem 0.8rem !important;
+        padding: 0.4rem 0.6rem !important;
         min-width: 80px !important;
         min-height: 36px !important;
       }
