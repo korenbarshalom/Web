@@ -4105,6 +4105,12 @@
     function openLikesOrListPage(type) {
       // Exit About Us view if active
       document.body.classList.remove('about-active');
+      const aboutSection = document.getElementById('about-section');
+      if (aboutSection) aboutSection.style.display = 'none';
+      // Exit Terms view if active
+      const termsSection = document.getElementById('terms-section');
+      if (termsSection) termsSection.style.display = 'none';
+      document.body.classList.remove('terms-active');
       // Ensure navbar links are visible when opening likes/list pages
       if (window.showNavbarLinks) window.showNavbarLinks();
       // Hide all other pages
@@ -4210,6 +4216,12 @@
     function openPurchasedPage() {
       // Exit About Us view if active
       document.body.classList.remove('about-active');
+      const aboutSection = document.getElementById('about-section');
+      if (aboutSection) aboutSection.style.display = 'none';
+      // Exit Terms view if active
+      const termsSection = document.getElementById('terms-section');
+      if (termsSection) termsSection.style.display = 'none';
+      document.body.classList.remove('terms-active');
       // Ensure navbar links are visible when opening purchased page
       if (window.showNavbarLinks) window.showNavbarLinks();
       if (!currentUser) {
