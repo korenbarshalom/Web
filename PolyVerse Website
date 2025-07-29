@@ -1103,8 +1103,14 @@
       opacity: 0.8;
       transition: transform 0.2s;
     }
-    .download-btn:hover::after, .download-btn[aria-expanded="true"]::after {
+    .download-btn:hover::after {
+      transform: translateY(-50%);
+    }
+    .download-btn[aria-expanded="true"]::after {
       transform: translateY(-50%) rotate(180deg);
+    }
+    .download-btn[aria-expanded="true"] {
+      border-radius: 8px;
     }
 
     /* Position the download button container */
