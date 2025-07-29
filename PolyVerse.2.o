@@ -1023,75 +1023,108 @@
     /* ---------- Download Dropdown Panel ---------- */
     .download-dropdown {
       position: absolute;
-      bottom: 100%;
+      top: calc(100% + 8px);
       right: 0;
       background: var(--card-bg);
       border-radius: 12px;
-      padding: 1rem;
+      padding: 0.8rem;
       box-shadow: 0 8px 32px rgba(0,0,0,0.4);
       border: 1px solid rgba(255,255,255,0.1);
       display: none;
       flex-direction: column;
-      gap: 0.5rem;
-      min-width: 140px;
+      gap: 0.6rem;
+      min-width: 180px;
       z-index: 100;
-      margin-bottom: 0.5rem;
       backdrop-filter: blur(10px);
     }
     .download-dropdown.active {
       display: flex;
-      animation: fadeInUp 0.2s ease-out;
+      animation: fadeInUp 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+      transform-origin: top right;
     }
-    .download-dropdown::after {
+    .download-dropdown::before {
       content: '';
       position: absolute;
-      top: 100%;
+      bottom: 100%;
       right: 20px;
       width: 0;
       height: 0;
-      border-left: 6px solid transparent;
-      border-right: 6px solid transparent;
-      border-top: 6px solid var(--card-bg);
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 8px solid var(--card-bg);
     }
     .download-option {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1rem;
+      gap: 0.75rem;
+      padding: 0.8rem 1rem;
       background: #232326;
       border: none;
       border-radius: 8px;
       color: #fff;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
       text-decoration: none;
-      font-size: 0.9rem;
+      font-size: 1rem;
+      outline: none;
     }
-    .download-option:hover {
+    .download-option:hover, .download-option:focus {
       background: #2a2a2d;
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
+    .download-option:focus {
+      box-shadow: 0 0 0 2px var(--accent);
+    }
     .download-option:active {
       transform: translateY(0);
+      background: rgba(255, 152, 0, 0.2);
     }
     .download-option .format-icon {
-      font-size: 1.1rem;
-      opacity: 0.8;
+      font-size: 1.2rem;
+      opacity: 0.9;
     }
     .download-option .format-name {
       font-weight: 600;
     }
-    .download-option .format-ext {
-      opacity: 0.6;
-      font-size: 0.8rem;
+    
+    /* Disabled state */
+    .download-option.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+      background: #1e1e20;
+    }
+    
+    /* Hover state styles for download button */
+    .download-btn {
+      position: relative;
+    }
+    .download-btn::after {
+      content: '▼';
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.7rem;
+      opacity: 0.8;
+      transition: transform 0.2s;
+    }
+    .download-btn:hover::after, .download-btn[aria-expanded="true"]::after {
+      transform: translateY(-50%) rotate(180deg);
     }
 
     /* Position the download button container */
     .download-container {
       position: relative;
       display: inline-block;
+    }
+    
+    /* Customized animation for dropdown */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(8px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     /* Update buy button to be download button for free models */
@@ -1101,6 +1134,7 @@
       font-size: 1rem;
       font-weight: 600;
       padding: 0.5rem 1.25rem;
+      padding-right: 2rem; /* Added space for the dropdown arrow */
       border: none;
       border-radius: 8px;
       margin-left: auto;
@@ -1113,11 +1147,16 @@
       max-width: 160px;
       text-align: center;
       cursor: pointer;
+      position: relative; /* For positioning the dropdown arrow */
     }
     .download-btn:hover {
       background: #ffb74d;
       box-shadow: 0 4px 16px rgba(0,0,0,0.13);
       transform: translateY(-2px) scale(1.03);
+    }
+    .download-btn:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--accent), 0 4px 16px rgba(0,0,0,0.13);
     }
     @media (max-width: 700px) {
       .download-btn {
@@ -1824,7 +1863,7 @@
       min-width: 100px !important;
       min-height: 44px;
       font-size: 1.05rem;
-      padding: 0.45rem 1.3rem !important;
+      padding: 0.45rem 1.0rem !important;
       letter-spacing: 0.01em;
       transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.2s;
     }
@@ -1839,7 +1878,7 @@
       min-width: 100px !important;
       min-height: 44px;
       font-size: 1.05rem;
-      padding: 0.45rem 1.3rem !important;
+      padding: 0.45rem 1.0rem !important;
       letter-spacing: 0.01em;
       transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.2s;
     }
@@ -1861,7 +1900,7 @@
     @media (max-width: 600px) {
       .login-btn-custom, .signup-btn-custom {
         font-size: 0.97rem !important;
-        padding: 0.4rem 0.8rem !important;
+        padding: 0.4rem 0.6rem !important;
         min-width: 80px !important;
         min-height: 36px !important;
       }
@@ -2245,97 +2284,132 @@
     }
 
     /* ===== About Page Styles (scoped) ===== */
-    #about-section { display:none; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:2rem; padding:3rem 1.5rem; max-width:1200px; margin:0 auto; }
-    body.about-active #about-section { display:flex; }
-    #about-section .about-text { flex:1 1 350px; color:#fff; }
-    #about-section .about-text h1 { font-size:3rem; margin-bottom:1rem; }
-    #about-section .about-text p { font-size:1.1rem; line-height:1.6; }
-    #about-section .about-img { flex:1 1 400px; text-align:center; }
-    #about-section .about-img img { width:100%; max-width:500px; height:auto; }
-    @media(max-width:768px){
-      #about-section { flex-direction:column; text-align:center; }
-      #about-section .about-img img { max-width:80%; }
+    #about-section { 
+      display:none; 
+      flex-wrap:wrap; 
+      align-items:center; 
+      justify-content:center;
+      gap:3rem; 
+      padding:4rem 2rem; 
+      max-width:1100px; 
+      margin:0 auto;
+      background: rgba(34,34,38,0.95);
+      border-radius:24px;
+      box-shadow:0 8px 28px rgba(0,0,0,0.2);
+      transition: transform 0.4s ease, opacity 0.4s ease;
     }
+    body.about-active #about-section { 
+      display:flex;
+      animation: aboutFadeIn 0.5s ease-out;
+    }
+    #about-section .about-text { 
+      flex:1 1 450px; 
+      color:#fff;
+      padding:1rem 0;
+      opacity:0;
+      transform:translateY(15px);
+      animation: aboutTextFadeIn 0.7s ease-out 0.2s forwards;
+    }
+    #about-section .about-text h1 { 
+      font-size:2.8rem; 
+      margin-bottom:1.2rem; 
+      font-weight:900;
+      letter-spacing:-0.01em;
+      color:#ffb74d;
+      background:linear-gradient(90deg, #ffb74d 0%, #ff9800 100%);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      position:relative;
+    }
+    #about-section .about-text h1::after {
+      content:'';
+      position:absolute;
+      bottom:-8px;
+      left:0;
+      width:60px;
+      height:3px;
+      background:linear-gradient(90deg, #ffb74d 0%, #ff9800 100%);
+      border-radius:2px;
+    }
+    #about-section .about-text p { 
+      font-size:1.15rem; 
+      line-height:1.8; 
+      color:#e0e0e0;
+      margin-bottom:1.5rem;
+      letter-spacing:0.01em;
+    }
+    #about-section .about-img { 
+      flex:1 0 320px; 
+      text-align:center;
+      max-width:320px;
+    }
+    #about-section .about-img img { 
+      width:100%;
+      max-width:320px;
+      height:auto;
+      border-radius:16px;
+      box-shadow:0 6px 28px rgba(0,0,0,0.15);
+      transition:transform 0.35s ease-out, box-shadow 0.35s ease-out;
+      opacity:0;
+      transform:translateY(20px);
+      animation:aboutImgFadeIn 0.7s ease-out 0.3s forwards;
+    }
+    #about-section .about-img img:hover { 
+      transform:scale(1.03);
+      box-shadow:0 12px 36px 0 rgba(255,184,77,0.18), 0 6px 28px rgba(0,0,0,0.2);
+    }
+    @keyframes aboutImgFadeIn {
+      to { opacity:1; transform:translateY(0); }
+    }
+    @keyframes aboutTextFadeIn {
+      to { opacity:1; transform:translateY(0); }
+    }
+    @keyframes aboutFadeIn {
+      from { opacity:0.6; transform:translateY(10px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+    
     /* Hide homepage-only sections while About is active */
     body.about-active #homepage-banner,
     body.about-active .hero,
     body.about-active .model-card-section,
-    body.about-active #contact-section,
     body.about-active #top-searchbar,
     body.about-active .hero-search,
     body.about-active #gallery,
     body.about-active .gallery { display:none !important; }
-    #about-section .about-img img {
-      width: 100%;
-      max-width: 340px;
-      height: auto;
-      border-radius: 28px;
-      box-shadow: 0 6px 32px rgba(0,0,0,0.13);
-      transition: box-shadow 0.35s cubic-bezier(.4,.01,.22,1), transform 0.35s cubic-bezier(.4,.01,.22,1);
-      opacity: 0;
-      transform: translateY(30px);
-      animation: aboutImgFadeIn 0.7s cubic-bezier(.4,.01,.22,1) 0.15s forwards;
-    }
-    #about-section .about-img img:hover {
-      transform: translateY(0) scale(1.045);
-      box-shadow: 0 12px 48px 0 rgba(255,184,77,0.18), 0 6px 32px rgba(0,0,0,0.18);
-      z-index: 1;
-    }
-    @keyframes aboutImgFadeIn {
-      to { opacity: 1; transform: translateY(0); }
-    }
-    #about-section .about-text {
-      flex: 1 1 350px;
-      color: #fff;
-      padding: 1.2rem 0 1.2rem 0;
-      opacity: 0;
-      transform: translateY(30px);
-      animation: aboutTextFadeIn 0.7s cubic-bezier(.4,.01,.22,1) 0.05s forwards;
-    }
-    @keyframes aboutTextFadeIn {
-      to { opacity: 1; transform: translateY(0); }
-    }
-    #about-section {
-      display: none;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: 2.5rem;
-      padding: 3.2rem 1.5rem 2.5rem 1.5rem;
-      max-width: 900px;
-      margin: 0 auto;
-      background: rgba(34,34,38,0.98);
-      border-radius: 24px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.13);
-    }
-    body.about-active #about-section { display: flex; }
-    #about-section .about-text h1 {
-      font-size: 2.5rem;
-      margin-bottom: 0.7rem;
-      font-weight: 900;
-      letter-spacing: -0.01em;
-      color: #ffb74d;
-      background: linear-gradient(90deg, #ffb74d 0%, #ff9800 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    #about-section .about-text p {
-      font-size: 1.13rem;
-      line-height: 1.7;
-      color: #e0e0e0;
-      margin-bottom: 1.7rem;
-      letter-spacing: 0.01em;
-    }
     #about-section .btn {
-      margin-top: 1.2rem;
-      font-size: 1.08rem;
-      border-radius: 12px;
-      padding: 0.7rem 2.2rem;
+      margin-top:1.5rem;
+      font-size:1.1rem;
+      border-radius:12px;
+      padding:0.8rem 2.2rem;
+      background:transparent;
+      color:#ff9800;
+      border:2px solid #ff9800;
+      transition:background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+    }
+    #about-section .btn:hover {
+      background:rgba(255,152,0,0.1);
+      color:#ffb74d;
+      transform:translateY(-2px);
     }
     @media(max-width:768px){
-      #about-section { flex-direction: column; text-align: center; padding: 2.2rem 0.5rem; }
-      #about-section .about-img img { max-width: 70vw; }
+      #about-section { 
+        flex-direction:column; 
+        text-align:center; 
+        padding:3rem 1.5rem;
+        gap:2rem;
+      }
+      #about-section .about-img { 
+        max-width:280px; 
+      }
+      #about-section .about-img img { 
+        max-width:260px; 
+      }
+      #about-section .about-text h1::after {
+        left:50%;
+        transform:translateX(-50%);
+      }
     }
 
     /* ===== Terms Page Styles (scoped) ===== */
@@ -2348,7 +2422,6 @@
     body.terms-active #homepage-banner,
     body.terms-active .hero,
     body.terms-active .model-card-section,
-    body.terms-active #contact-section,
     body.terms-active #top-searchbar,
     body.terms-active .hero-search,
     body.terms-active #gallery,
@@ -2517,14 +2590,19 @@
               <div class="buy-row">
                 <button class="btn buy-btn" id="buyNowBtn">Buy Now</button>
                 <span class="price-label" id="priceLabel" style="display:none;"></span>
-                <button class="download-btn" id="downloadBtn" style="display:none;">Download</button>
-              </div>
-              <div class="download-dropdown" id="downloadDropdown">
-                <a href="#" class="download-option" data-format="fbx">
-                  <span class="format-icon">📦</span>
-                  <span class="format-name">FBX</span>
-                  <span class="format-ext">.fbx</span>
-                </a>
+                <div class="download-container">
+                  <button class="download-btn" id="downloadBtn" style="display:none;" data-fbx-url="" data-glb-url="" aria-haspopup="true" aria-expanded="false" aria-controls="downloadDropdown">Download</button>
+                  <div class="download-dropdown" id="downloadDropdown" role="menu" aria-labelledby="downloadBtn">
+                    <a href="#" class="download-option" data-format="fbx" role="menuitem" tabindex="-1">
+                      <span class="format-icon">📦</span>
+                      <span class="format-name">Download .fbx</span>
+                    </a>
+                    <a href="#" class="download-option" data-format="glb" role="menuitem" tabindex="-1">
+                      <span class="format-icon">🔶</span>
+                      <span class="format-name">Download .glb</span>
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -2571,6 +2649,37 @@
     <div id="paypal-button-container" style="max-width:400px;margin:2rem auto 0 auto;"></div>
     <button class="btn" id="paidDownloadBtn" style="display:none;background:#ff9800;color:#fff;font-weight:600;font-size:1.1rem;margin:2rem auto 0 auto;max-width:400px;width:100%;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.10);padding:0.85rem 0;">Download FBX Model</button>
     <div class="checkout-secure-line">🔒 Secure checkout powered by PayPal</div>
+  </section>
+
+  <!-- ABOUT PAGE SECTION (SPA) -->
+  <section id="about-section">
+    <div class="about-text">
+      <h1>About  polyVerse</h1>
+      <p>We provide high-quality 3D characters at an affordable price of just $1. Every character on the site is fully human-rigged and ready to use in your game or any other project.</p>
+      <p>Our library includes a diverse range of models from heroes to villains, all optimized for games and animation projects. Each model is carefully designed with clean topology and proper rigging.</p>
+      <button id="aboutBackBtn" class="btn">&larr; Back to Home</button>
+    </div>
+    <div class="about-img">
+      <img src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjMzODc4MC5wbmc=/250x600/Anhp0L.png" alt="polyVerse marketplace preview">
+    </div>
+  </section>
+
+  <!-- TERMS PAGE SECTION (SPA) -->
+  <section id="terms-section">
+    <div class="terms-text">
+      <h1>Terms</h1>
+      <ul>
+        <li>Welcome to polyVerse. By accessing or purchasing any content on our site, you agree to the following terms:</li>
+        <li>All 3D models on polyVerse are sold for $1.00 each and provided in .fbx format only.</li>
+        <li>Each purchase grants you a royalty-free license to use the models in personal or commercial projects.</li>
+        <li>All models are fully human-rigged and game-ready for engines like Unity and Unreal.</li>
+        <li>Redistribution, resale, or repackaging of the models is strictly prohibited.</li>
+        <li>All purchases are final — no refunds or exchanges.</li>
+        <li>We may update these terms from time to time. Continued use of the site indicates your agreement to any updates.</li>
+        <li>All 3D models, website content, and brand assets are protected by copyright © 2025 polyVerse. Unauthorized copying, redistribution, or commercial use outside the terms of the license is strictly prohibited.</li>
+      </ul>
+      <button id="termsBackBtn" class="btn" style="margin:2rem auto 0; display:block; max-width:200px; margin-left:auto; margin-right:auto;">← Back</button>
+    </div>
   </section>
 
   <!-- CONTACT INFO FOOTER -->
@@ -2650,10 +2759,9 @@
           <input type="checkbox" id="termsCheckbox">
           <label for="termsCheckbox" style="font-size:1.05rem;color:#fff;cursor:pointer;user-select:none;line-height:1.4;display:inline-block;">
             I accept the
-            <a href="#" style="color:#ff9800;font-weight:600;text-decoration:none;" target="_blank">Terms of Service</a>
-            and
-            <a href="#" style="color:#ff9800;font-weight:600;text-decoration:none;" target="_blank">Privacy Policy</a>
+            <a href="#/terms" class="terms-link" style="color:#ff9800;font-weight:600;">Terms of Service</a>
           </label>
+          <div class="error-message" id="termsError" style="margin-top:0.4rem;"></div>
         </div>
 
         <button class="register-submit" id="registerSubmitBtn">Create Account</button>
@@ -2689,7 +2797,7 @@
     // === DATA & HOOKS ===
     const DEFAULT_PROFILE_IMAGE = 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTk1ODQ0MS5wbmc=/250x600/j0omjw.png';
     const models = [
-      { id: 1, title: 'Human Character Base', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQwMy5wbmc=/250x600/vaWBiI.png', desc: 'A versatile low-poly human base mesh, ready for your animations and rigs.', src: 'A20.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx1.fbx', glb: 'A20.glb', gltf: 'A20.gltf' },
+      { id: 1, title: 'Human Character Base', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQwMy5wbmc=/250x600/vaWBiI.png', desc: 'A versatile low-poly human base mesh, ready for your animations and rigs.', src: 'A20.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx1.fbx', glb: 'A20.glb', gltf: 'A20.gltf' },
       { id: 2, title: 'Human Character Base', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTM1NS5wbmc=/250x600/iV5gql.png', desc: 'Alternate low-poly human model optimized for mobile and VR.', src: '3DHuman11.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx.fbx', glb: '3DHuman11.glb', gltf: '3DHuman11.gltf' },
       { id: 3, title: 'Player Model', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg5NTQ4NC5wbmc=/250x600/FAM6Ft.png', desc: 'A stylized player avatar with simple topology for game characters.', src: 'A19.glb', availableFormats: ['glb', 'fbx', 'gltf'], fbx: '3DCustomBean.fbx', glb: 'A19.glb', gltf: 'A19.gltf' },
       { id: 4, title: 'Farmer', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMTg1NTgzNy5wbmc=/250x600/xUXRMO.png', desc: 'A medieval knight in low-poly style.', src: 'AFramer.gltf', availableFormats: ['gltf', 'fbx', 'glb'], fbx: '3DHumanfbx6.fbx', glb: 'AFramer.glb', gltf: 'AFramer.gltf' },
@@ -2945,6 +3053,37 @@
         downloadBtn.style.display = 'none';
         priceLabel.style.display = 'inline-block';
         priceLabel.textContent = `$${Number(m.price).toFixed(2)} USD`;
+      }
+      
+      // Set download URLs as data attributes on download button
+      const fbxUrl = m.fbx ? m.fbx : '';
+      const glbUrl = m.glb ? m.glb : '';
+      
+      downloadBtn.setAttribute('data-fbx-url', fbxUrl);
+      downloadBtn.setAttribute('data-glb-url', glbUrl);
+      
+      // Update download options - disable those formats that aren't available
+      const fbxOption = document.querySelector('.download-option[data-format="fbx"]');
+      const glbOption = document.querySelector('.download-option[data-format="glb"]');
+      
+      if (fbxOption) {
+        if (m.fbx) {
+          fbxOption.classList.remove('disabled');
+          fbxOption.removeAttribute('aria-disabled');
+        } else {
+          fbxOption.classList.add('disabled');
+          fbxOption.setAttribute('aria-disabled', 'true');
+        }
+      }
+      
+      if (glbOption) {
+        if (m.glb) {
+          glbOption.classList.remove('disabled');
+          glbOption.removeAttribute('aria-disabled');
+        } else {
+          glbOption.classList.add('disabled');
+          glbOption.setAttribute('aria-disabled', 'true');
+        }
       }
       // Always show Like/List buttons
       modelActions.style.display = 'flex';
@@ -3273,7 +3412,7 @@
       setTimeout(() => element.classList.remove('show'), 3000);
     }
     function clearAllErrors() {
-      [nameError, usernameError, passwordError, loginUsernameError, loginPasswordError].forEach(el => {
+      [nameError, usernameError, passwordError, loginUsernameError, loginPasswordError, termsError].forEach(el => {
         hideError(el);
       });
       [registerName, registerUsername, registerPassword, loginUsername, loginPassword].forEach(el => {
@@ -3328,6 +3467,11 @@
       if (usernameErrorMsg) showError(usernameError, usernameErrorMsg);
       if (passwordErrorMsg) showError(passwordError, passwordErrorMsg);
       if (nameErrorMsg || usernameErrorMsg || passwordErrorMsg) {
+        return;
+      }
+      const termsCheckbox = document.getElementById('termsCheckbox');
+      if (!termsCheckbox.checked) {
+        showError(termsError, 'You must accept the Terms of Service to continue.');
         return;
       }
       // Simulate backend: check for duplicate username
@@ -3524,6 +3668,16 @@
       }
     }
     function showUserMenu() {
+      const loginBtn = document.getElementById('loginBtn');
+      loginBtn.style.position = 'relative';
+      
+      // Check if menu already exists (toggle functionality)
+      const existingMenu = loginBtn.querySelector('div');
+      if (existingMenu) {
+        existingMenu.remove();
+        return;
+      }
+      
       const menu = document.createElement('div');
       menu.style.cssText = `
         position: absolute;
@@ -3550,8 +3704,6 @@
         <button id="myPurchasedBtn" class="user-menu-option">My Purchased</button>
         <button id="logoutBtn" class="user-menu-option">Logout</button>
       `;
-      const loginBtn = document.getElementById('loginBtn');
-      loginBtn.style.position = 'relative';
       loginBtn.appendChild(menu);
       setTimeout(() => {
         document.addEventListener('click', function closeMenu(e) {
@@ -3569,6 +3721,7 @@
         currentUser = null;
         updateAuthUI();
         menu.remove();
+        openModal(loginModal);
       });
       document.getElementById('profileBtn').addEventListener('click', (e) => {
         e.preventDefault();
@@ -3611,12 +3764,70 @@
     downloadBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       downloadDropdown.classList.toggle('active');
+      
+      // When opening the dropdown, set aria attributes for accessibility
+      if (downloadDropdown.classList.contains('active')) {
+        downloadBtn.setAttribute('aria-expanded', 'true');
+        downloadBtn.setAttribute('aria-controls', 'downloadDropdown');
+        
+        // Set focus to first item in dropdown
+        setTimeout(() => {
+          const firstOption = downloadDropdown.querySelector('.download-option');
+          if (firstOption) firstOption.focus();
+        }, 10);
+      } else {
+        downloadBtn.setAttribute('aria-expanded', 'false');
+      }
     });
 
     // Close dropdown when clicking outside
     document.addEventListener('click', (e) => {
       if (!downloadBtn.contains(e.target) && !downloadDropdown.contains(e.target)) {
         downloadDropdown.classList.remove('active');
+        downloadBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Close dropdown on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && downloadDropdown.classList.contains('active')) {
+        downloadDropdown.classList.remove('active');
+        downloadBtn.setAttribute('aria-expanded', 'false');
+        // Return focus to the download button
+        downloadBtn.focus();
+      }
+    });
+
+    // Handle keyboard navigation within dropdown
+    downloadDropdown.addEventListener('keydown', (e) => {
+      if (!downloadDropdown.classList.contains('active')) return;
+      
+      const options = Array.from(downloadDropdown.querySelectorAll('.download-option'));
+      const currentIndex = options.findIndex(option => document.activeElement === option);
+      
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          if (currentIndex < options.length - 1) {
+            options[currentIndex + 1].focus();
+          }
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          if (currentIndex > 0) {
+            options[currentIndex - 1].focus();
+          } else {
+            // Cycle back to download button when at the top
+            downloadBtn.focus();
+          }
+          break;
+        case 'Enter':
+        case ' ':
+          if (document.activeElement.classList.contains('download-option')) {
+            e.preventDefault();
+            document.activeElement.click();
+          }
+          break;
       }
     });
 
@@ -3627,22 +3838,16 @@
         const format = e.currentTarget.dataset.format;
         const modelName = lastOpenedModel ? lastOpenedModel.title.replace(/\s+/g, '_') : 'model';
         
-        // Check what formats are actually available for this model
-        const availableFormats = getAvailableFormats(lastOpenedModel);
-        
-        if (!availableFormats.includes(format)) {
-          // Format not available - show message
-          alert(`Sorry, ${format.toUpperCase()} format is not available for this model yet.\n\nAvailable formats: ${availableFormats.map(f => f.toUpperCase()).join(', ')}`);
-          downloadDropdown.classList.remove('active');
-          return;
-        }
-        
-        // Get the correct file URL for this format
-        const fileUrl = getFileUrlForFormat(lastOpenedModel, format);
+        // Get the URL from the download button data attributes
+        const urlAttribute = `data-${format}-url`;
+        const fileUrl = downloadBtn.getAttribute(urlAttribute);
         
         if (!fileUrl) {
-          alert(`Download not available for ${format.toUpperCase()} format.`);
+          // Show a non-blocking toast message
+          showToastMessage('Download failed. This format is not available.');
           downloadDropdown.classList.remove('active');
+          downloadBtn.setAttribute('aria-expanded', 'false');
+          downloadBtn.focus();
           return;
         }
         
@@ -3652,18 +3857,64 @@
         link.download = `${modelName}.${format}`;
         link.style.display = 'none';
         
-        // Trigger download
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        // Add error handling
+        link.onerror = () => {
+          // Show error toast if download fails
+          showToastMessage('Download failed. Please try again.');
+        };
+        
+        // Simulate a network request and then trigger download
+        setTimeout(() => {
+          try {
+            // Trigger download
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          } catch (err) {
+            // Show error toast if download fails
+            showToastMessage('Download failed. Please try again.');
+          }
+        }, 100);
         
         // Close dropdown
         downloadDropdown.classList.remove('active');
-        
-        // Show success message
-        alert(`Downloading ${modelName}.${format}...`);
+        downloadBtn.setAttribute('aria-expanded', 'false');
+        downloadBtn.focus();
       });
     });
+
+    // Helper function to show a non-blocking toast message
+    function showToastMessage(message) {
+      const toast = document.createElement('div');
+      toast.className = 'toast-message';
+      toast.textContent = message;
+      toast.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+      `;
+      document.body.appendChild(toast);
+      
+      // Fade in
+      setTimeout(() => {
+        toast.style.opacity = '1';
+      }, 10);
+      
+      // Remove after 3 seconds
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => document.body.removeChild(toast), 300);
+      }, 3000);
+    }
 
     // Helper function to get available formats for a model
     function getAvailableFormats(model) {
@@ -3844,6 +4095,18 @@
       checkoutPage.style.display = 'none';
       homepageBanner.style.display = 'none';
       topSearchbar.style.display = 'none';
+      // Hide About Us if active
+      const aboutSection = document.getElementById('about-section');
+      if (aboutSection) {
+        aboutSection.style.display = 'none';
+      }
+      document.body.classList.remove('about-active');
+      // Hide Terms if active
+      const termsSection = document.getElementById('terms-section');
+      if (termsSection) {
+        termsSection.style.display = 'none';
+      }
+      document.body.classList.remove('terms-active');
       // Hide likes/list page and clear gallery
       const likesListPage = document.getElementById('likesListPage');
       if (likesListPage) {
@@ -4034,6 +4297,12 @@
     function openLikesOrListPage(type) {
       // Exit About Us view if active
       document.body.classList.remove('about-active');
+      const aboutSection = document.getElementById('about-section');
+      if (aboutSection) aboutSection.style.display = 'none';
+      // Exit Terms view if active
+      const termsSection = document.getElementById('terms-section');
+      if (termsSection) termsSection.style.display = 'none';
+      document.body.classList.remove('terms-active');
       // Ensure navbar links are visible when opening likes/list pages
       if (window.showNavbarLinks) window.showNavbarLinks();
       // Hide all other pages
@@ -4139,6 +4408,12 @@
     function openPurchasedPage() {
       // Exit About Us view if active
       document.body.classList.remove('about-active');
+      const aboutSection = document.getElementById('about-section');
+      if (aboutSection) aboutSection.style.display = 'none';
+      // Exit Terms view if active
+      const termsSection = document.getElementById('terms-section');
+      if (termsSection) termsSection.style.display = 'none';
+      document.body.classList.remove('terms-active');
       // Ensure navbar links are visible when opening purchased page
       if (window.showNavbarLinks) window.showNavbarLinks();
       if (!currentUser) {
@@ -4503,9 +4778,38 @@
         } else {
           purchasedLabel.style.display = 'block';
         }
-        // Show Download FBX button
+        // Show Download button and update URLs
+        const fbxUrl = model.fbx ? model.fbx : '';
+        const glbUrl = model.glb ? model.glb : '';
+        
+        downloadBtn.setAttribute('data-fbx-url', fbxUrl);
+        downloadBtn.setAttribute('data-glb-url', glbUrl);
         downloadBtn.style.display = 'block';
         priceLabel.style.display = 'none';
+        
+        // Update download options availability
+        const fbxOption = document.querySelector('.download-option[data-format="fbx"]');
+        const glbOption = document.querySelector('.download-option[data-format="glb"]');
+        
+        if (fbxOption) {
+          if (fbxUrl) {
+            fbxOption.classList.remove('disabled');
+            fbxOption.removeAttribute('aria-disabled');
+          } else {
+            fbxOption.classList.add('disabled');
+            fbxOption.setAttribute('aria-disabled', 'true');
+          }
+        }
+        
+        if (glbOption) {
+          if (glbUrl) {
+            glbOption.classList.remove('disabled');
+            glbOption.removeAttribute('aria-disabled');
+          } else {
+            glbOption.classList.add('disabled');
+            glbOption.setAttribute('aria-disabled', 'true');
+          }
+        }
       } else {
         // Not purchased: restore normal state
         buyNowBtn.style.display = 'block';
@@ -4925,6 +5229,101 @@ if (signupBtn) {
         charDropdown.style.display = 'none';
       }
     });
+
+    // --- Category Filtering Logic (Characters Dropdown) ---
+    const categoryModelMap = {
+      'Villains': [15, 16, 17, 18, 19, 20],
+      'Humans': [1, 2, 13],
+      'Stylized Characters': [4, 5, 6, 7, 8, 9, 10, 11, 12, 14]
+    };
+
+    // Attach click handlers to each dropdown item
+    document.querySelectorAll('#charactersDropdown .dropdown-item').forEach(item => {
+      item.addEventListener('click', e => {
+        e.preventDefault();
+        const category = item.textContent.trim();
+        if (!(category in categoryModelMap)) return; // Ignore unsupported categories
+
+        // First, ensure we hide all other pages/sections
+        // Hide any special pages that might be active
+        document.body.classList.remove('about-active');
+        document.body.classList.remove('terms-active');
+        
+        // Hide profile page if visible
+        const profilePage = document.getElementById('profilePage');
+        if (profilePage) {
+          profilePage.classList.remove('active');
+          profilePage.style.display = 'none';
+        }
+        
+        // Hide likes/list page if visible
+        const likesListPage = document.getElementById('likesListPage');
+        if (likesListPage) {
+          likesListPage.classList.remove('active');
+          likesListPage.style.display = 'none';
+        }
+        
+        // Hide purchased page if visible
+        const purchasedListPage = document.getElementById('purchasedListPage');
+        if (purchasedListPage) {
+          purchasedListPage.classList.remove('active');
+          purchasedListPage.style.display = 'none';
+        }
+        
+        // Hide any other sections that might be visible
+        const termsSection = document.getElementById('terms-section');
+        if (termsSection) termsSection.style.display = 'none';
+        
+        const aboutSection = document.getElementById('about-section');
+        if (aboutSection) aboutSection.style.display = 'none';
+
+        // 1. Prepare the Search Results page state
+        homepageBanner.style.display = 'none';
+        topSearchbar.style.display = 'flex';
+        if (window.hideNavbarLinks) window.hideNavbarLinks();
+
+        // 2. Reset any previous search query
+        navbarSearch.value = '';
+        heroSearch.value = '';
+        lastSearchQuery = '';
+
+        // 3. Ensure correct sections are visible/hidden
+        modelPage.style.display = 'none';
+        checkoutPage.style.display = 'none';
+        mainContent.style.display = 'block';
+        window.scrollTo(0, 0);
+
+        // 4. Filter models by the selected category and render
+        const filtered = models.filter(m => categoryModelMap[category].includes(m.id));
+        renderGallery(filtered, true);
+
+        // 5. Show the Back to Shop button (if available)
+        if (typeof showBackToShopButton === 'function') showBackToShopButton();
+
+        // 6. Close the dropdown menu after selection
+        const charDropdownEl = document.getElementById('charactersDropdown');
+        if (charDropdownEl) charDropdownEl.style.display = 'none';
+      });
+    });
+
+    // --- Terms of Service link inside Sign Up modal ---
+    const termsLinkModal = document.querySelector('#registerView .terms-link');
+    if (termsLinkModal) {
+      termsLinkModal.addEventListener('click', e => {
+        e.preventDefault();
+        // Close the Sign Up modal if it is open
+        if (typeof closeModal === 'function' && loginModal && loginModal.classList.contains('active')) {
+          closeModal(loginModal);
+        }
+        // Ensure navigation to Terms page always works
+        if (location.hash === '#/terms') {
+          // Force hashchange event to re-trigger Terms view
+          window.dispatchEvent(new HashChangeEvent('hashchange'));
+        } else {
+          location.hash = '/terms';
+        }
+      });
+    }
   </script>
 
   <!-- Google Identity Services (force English) -->
@@ -4981,23 +5380,17 @@ if (signupBtn) {
     body.about-active #homepage-banner,
     body.about-active .hero,
     body.about-active .model-card-section,
-    body.about-active #contact-section,
     body.about-active #top-searchbar,
     body.about-active .hero-search,
     body.about-active #gallery,
     body.about-active .gallery { display:none !important; }
+    
+    /* Smooth page transition when activating About page */
+    body.about-active {
+      background: linear-gradient(to bottom, #1e1e20, #232326);
+      transition: background 0.4s ease;
+    }
   </style>
-
-  <section id="about-section">
-    <div class="about-text">
-      <h1>polyVerse</h1>
-      <p>We provide high-quality 3D characters at an affordable price of just $1. Every character on the site is fully human-rigged and ready to use in your game or any other project. Plus, once you purchase a model, it's yours — royalty-free.</p>
-      <button id="aboutBackBtn" class="btn" style="margin-top:2rem;">&larr; Back</button>
-    </div>
-    <div class="about-img">
-      <img src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjMzODc4MC5wbmc=/250x600/Anhp0L.png" alt="polyVerse marketplace preview">
-    </div>
-  </section>
 
   <script>
     // ===== Navbar Links Visibility Management =====
@@ -5162,7 +5555,6 @@ if (signupBtn) {
   body.terms-active #homepage-banner,
   body.terms-active .hero,
   body.terms-active .model-card-section,
-  body.terms-active #contact-section,
   body.terms-active #top-searchbar,
   body.terms-active .hero-search,
   body.terms-active #gallery,
@@ -5184,21 +5576,6 @@ if (signupBtn) {
     transition: opacity 0.45s cubic-bezier(.4,.01,.22,1), transform 0.45s cubic-bezier(.4,.01,.22,1);
   }
   </style>
-  <section id="terms-section">
-    <div class="terms-text">
-      <h1>Terms</h1>
-      <ul>
-        <li>Welcome to polyVerse. By accessing or purchasing any content on our site, you agree to the following terms:</li>
-        <li>All 3D models on polyVerse are sold for $1.00 each and provided in .fbx format only.</li>
-        <li>Each purchase grants you a royalty-free license to use the models in personal or commercial projects.</li>
-        <li>All models are fully human-rigged and game-ready for engines like Unity and Unreal.</li>
-        <li>Redistribution, resale, or repackaging of the models is strictly prohibited.</li>
-        <li>All purchases are final — no refunds or exchanges.</li>
-        <li>We may update these terms from time to time. Continued use of the site indicates your agreement to any updates.</li>
-      </ul>
-      <button id="termsBackBtn" class="btn" style="margin:2rem auto 0; display:block; max-width:200px; margin-left: calc(50% - 120px);">← Back</button>
-    </div>
-  </section>
   <script>
   (function(){
     const termsNavLink = Array.from(document.querySelectorAll('.nav-link')).find(l => l.textContent.trim() === 'Terms');
@@ -5304,6 +5681,149 @@ if (signupBtn) {
     // if (location.hash === '#/terms') {
     //   showTerms();
     // }
+  })();
+  </script>
+
+  <!-- COOKIE CONSENT BANNER -->
+  <div id="cookieConsentBanner" style="display:none;">
+    <div class="cookie-banner-content">
+      <span class="cookie-banner-message">We use cookies to enhance your experience.</span>
+      <button class="cookie-btn accept" id="cookieAcceptBtn">Accept</button>
+      <button class="cookie-btn cancel" id="cookieCancelBtn">Cancel</button>
+    </div>
+  </div>
+
+  <style>
+  #cookieConsentBanner {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    pointer-events: none;
+    background: none;
+    transition: none;
+  }
+  #cookieConsentBanner .cookie-banner-content {
+    background: #232326;
+    color: #fff;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.32), 0 1.5px 8px rgba(255,152,0,0.10);
+    border-radius: 16px 16px 0 0;
+    padding: 1.1rem 2.2rem 1.1rem 2.2rem;
+    margin: 0 0 1.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    min-width: 320px;
+    max-width: 98vw;
+    opacity: 0;
+    transform: translateY(40px);
+    pointer-events: auto;
+    transition: opacity 0.45s cubic-bezier(.4,.01,.22,1), transform 0.45s cubic-bezier(.4,.01,.22,1);
+  }
+  #cookieConsentBanner.show .cookie-banner-content {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  #cookieConsentBanner.hide .cookie-banner-content {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  .cookie-banner-message {
+    font-size: 1.08rem;
+    font-weight: 500;
+    color: #fff;
+    margin-right: 1.2rem;
+    letter-spacing: 0.01em;
+    flex: 1 1 auto;
+  }
+  .cookie-btn {
+    font-family: 'Montserrat', 'Inter', Arial, sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.5rem;
+    margin-left: 0.5rem;
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s, box-shadow 0.18s, transform 0.15s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    outline: none;
+  }
+  .cookie-btn.accept {
+    background: linear-gradient(90deg, #ff9800 0%, #ff5e13 100%);
+    color: #fff;
+  }
+  .cookie-btn.accept:hover, .cookie-btn.accept:focus {
+    background: linear-gradient(90deg, #ffac33 0%, #ff7043 100%);
+    color: #fff;
+  }
+  .cookie-btn.cancel {
+    background: #444;
+    color: #fff;
+  }
+  .cookie-btn.cancel:hover, .cookie-btn.cancel:focus {
+    background: #666;
+    color: #fff;
+  }
+  @media (max-width: 600px) {
+    #cookieConsentBanner .cookie-banner-content {
+      padding: 0.8rem 0.7rem 0.8rem 0.7rem;
+      min-width: 0;
+      font-size: 0.97rem;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.7rem;
+    }
+    .cookie-banner-message {
+      margin-right: 0;
+      margin-bottom: 0.7rem;
+      text-align: center;
+    }
+    .cookie-btn {
+      width: 100%;
+      margin-left: 0;
+      margin-bottom: 0.4rem;
+    }
+  }
+  </style>
+
+  <script>
+  (function(){
+    const banner = document.getElementById('cookieConsentBanner');
+    const acceptBtn = document.getElementById('cookieAcceptBtn');
+    const cancelBtn = document.getElementById('cookieCancelBtn');
+    let hideTimeout = null;
+
+    function showBanner() {
+      if (!banner) return;
+      banner.style.display = 'flex';
+      banner.classList.remove('hide');
+      // Force reflow for animation
+      void banner.offsetWidth;
+      banner.classList.add('show');
+      // Hide after 20 seconds if not already hidden
+      hideTimeout = setTimeout(hideBanner, 20000);
+    }
+    function hideBanner() {
+      if (!banner) return;
+      banner.classList.remove('show');
+      banner.classList.add('hide');
+      if (hideTimeout) clearTimeout(hideTimeout);
+      setTimeout(() => {
+        banner.style.display = 'none';
+      }, 450);
+    }
+    // Accept/Cancel click handlers
+    if (acceptBtn) acceptBtn.onclick = hideBanner;
+    if (cancelBtn) cancelBtn.onclick = hideBanner;
+
+    // Show on load/refresh
+    window.addEventListener('DOMContentLoaded', showBanner);
   })();
   </script>
 </body>
