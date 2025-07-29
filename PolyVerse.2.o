@@ -1027,19 +1027,19 @@
       right: 0;
       background: var(--card-bg);
       border-radius: 12px;
-      padding: 0.8rem;
+      padding: 0.6rem;
       box-shadow: 0 8px 32px rgba(0,0,0,0.4);
       border: 1px solid rgba(255,255,255,0.1);
       display: none;
       flex-direction: column;
-      gap: 0.6rem;
-      min-width: 180px;
+      gap: 0.4rem;
+      min-width: 100px;
       z-index: 100;
       backdrop-filter: blur(10px);
     }
     .download-dropdown.active {
       display: flex;
-      animation: fadeInUp 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: fadeInUp 0.12s ease-out;
       transform-origin: top right;
     }
     .download-dropdown::before {
@@ -1054,9 +1054,7 @@
       border-bottom: 8px solid var(--card-bg);
     }
     .download-option {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
+      display: block;
       padding: 0.8rem 1rem;
       background: #232326;
       border: none;
@@ -1064,29 +1062,23 @@
       color: #fff;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: background 0.15s ease;
       text-decoration: none;
       font-size: 1rem;
       outline: none;
+      text-align: center;
+      width: 100%;
     }
-    .download-option:hover, .download-option:focus {
+    .download-option:hover {
       background: #2a2a2d;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      border: 1px solid var(--accent);
     }
     .download-option:focus {
-      box-shadow: 0 0 0 2px var(--accent);
+      background: #2a2a2d;
+      /* No orange border on focus - only on hover */
     }
     .download-option:active {
-      transform: translateY(0);
       background: rgba(255, 152, 0, 0.2);
-    }
-    .download-option .format-icon {
-      font-size: 1.2rem;
-      opacity: 0.9;
-    }
-    .download-option .format-name {
-      font-weight: 600;
     }
     
     /* Disabled state */
@@ -1123,8 +1115,8 @@
     
     /* Customized animation for dropdown */
     @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(8px) scale(0.98); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     /* Update buy button to be download button for free models */
@@ -1152,7 +1144,6 @@
     .download-btn:hover {
       background: #ffb74d;
       box-shadow: 0 4px 16px rgba(0,0,0,0.13);
-      transform: translateY(-2px) scale(1.03);
     }
     .download-btn:focus {
       outline: none;
@@ -2594,12 +2585,10 @@
                   <button class="download-btn" id="downloadBtn" style="display:none;" data-fbx-url="" data-glb-url="" aria-haspopup="true" aria-expanded="false" aria-controls="downloadDropdown">Download</button>
                   <div class="download-dropdown" id="downloadDropdown" role="menu" aria-labelledby="downloadBtn">
                     <a href="#" class="download-option" data-format="fbx" role="menuitem" tabindex="-1">
-                      <span class="format-icon">📦</span>
-                      <span class="format-name">Download .fbx</span>
+                      fbx
                     </a>
                     <a href="#" class="download-option" data-format="glb" role="menuitem" tabindex="-1">
-                      <span class="format-icon">🔶</span>
-                      <span class="format-name">Download .glb</span>
+                      glb
                     </a>
                   </div>
                 </div>
@@ -3770,11 +3759,7 @@
         downloadBtn.setAttribute('aria-expanded', 'true');
         downloadBtn.setAttribute('aria-controls', 'downloadDropdown');
         
-        // Set focus to first item in dropdown
-        setTimeout(() => {
-          const firstOption = downloadDropdown.querySelector('.download-option');
-          if (firstOption) firstOption.focus();
-        }, 10);
+        // Don't auto-focus any option - let user hover naturally
       } else {
         downloadBtn.setAttribute('aria-expanded', 'false');
       }
