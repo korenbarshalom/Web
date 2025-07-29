@@ -1023,75 +1023,100 @@
     /* ---------- Download Dropdown Panel ---------- */
     .download-dropdown {
       position: absolute;
-      bottom: 100%;
+      top: calc(100% + 8px);
       right: 0;
       background: var(--card-bg);
       border-radius: 12px;
-      padding: 1rem;
+      padding: 0.6rem;
       box-shadow: 0 8px 32px rgba(0,0,0,0.4);
       border: 1px solid rgba(255,255,255,0.1);
       display: none;
       flex-direction: column;
-      gap: 0.5rem;
-      min-width: 140px;
+      gap: 0.4rem;
+      min-width: 100px;
       z-index: 100;
-      margin-bottom: 0.5rem;
       backdrop-filter: blur(10px);
     }
     .download-dropdown.active {
       display: flex;
-      animation: fadeInUp 0.2s ease-out;
+      animation: fadeInUp 0.12s ease-out;
+      transform-origin: top right;
     }
-    .download-dropdown::after {
+    .download-dropdown::before {
       content: '';
       position: absolute;
-      top: 100%;
+      bottom: 100%;
       right: 20px;
       width: 0;
       height: 0;
-      border-left: 6px solid transparent;
-      border-right: 6px solid transparent;
-      border-top: 6px solid var(--card-bg);
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 8px solid var(--card-bg);
     }
     .download-option {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1rem;
+      display: block;
+      padding: 0.8rem 1rem;
       background: #232326;
       border: none;
       border-radius: 8px;
       color: #fff;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: background 0.15s ease;
       text-decoration: none;
-      font-size: 0.9rem;
+      font-size: 1rem;
+      outline: none;
+      text-align: center;
+      width: 100%;
     }
     .download-option:hover {
       background: #2a2a2d;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      border: 1px solid var(--accent);
+    }
+    .download-option:focus {
+      background: #2a2a2d;
+      /* No orange border on focus - only on hover */
     }
     .download-option:active {
-      transform: translateY(0);
+      background: rgba(255, 152, 0, 0.2);
     }
-    .download-option .format-icon {
-      font-size: 1.1rem;
+    
+    /* Disabled state */
+    .download-option.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+      background: #1e1e20;
+    }
+    
+    /* Hover state styles for download button */
+    .download-btn {
+      position: relative;
+    }
+    .download-btn::after {
+      content: '▼';
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.7rem;
       opacity: 0.8;
+      transition: transform 0.2s;
     }
-    .download-option .format-name {
-      font-weight: 600;
-    }
-    .download-option .format-ext {
-      opacity: 0.6;
-      font-size: 0.8rem;
+    .download-btn:hover::after, .download-btn[aria-expanded="true"]::after {
+      transform: translateY(-50%) rotate(180deg);
     }
 
     /* Position the download button container */
     .download-container {
       position: relative;
       display: inline-block;
+    }
+    
+    /* Customized animation for dropdown */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     /* Update buy button to be download button for free models */
@@ -1101,6 +1126,7 @@
       font-size: 1rem;
       font-weight: 600;
       padding: 0.5rem 1.25rem;
+      padding-right: 2rem; /* Added space for the dropdown arrow */
       border: none;
       border-radius: 8px;
       margin-left: auto;
@@ -1113,11 +1139,15 @@
       max-width: 160px;
       text-align: center;
       cursor: pointer;
+      position: relative; /* For positioning the dropdown arrow */
     }
     .download-btn:hover {
       background: #ffb74d;
       box-shadow: 0 4px 16px rgba(0,0,0,0.13);
-      transform: translateY(-2px) scale(1.03);
+    }
+    .download-btn:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--accent), 0 4px 16px rgba(0,0,0,0.13);
     }
     @media (max-width: 700px) {
       .download-btn {
@@ -2551,14 +2581,17 @@
               <div class="buy-row">
                 <button class="btn buy-btn" id="buyNowBtn">Buy Now</button>
                 <span class="price-label" id="priceLabel" style="display:none;"></span>
-                <button class="download-btn" id="downloadBtn" style="display:none;">Download</button>
-              </div>
-              <div class="download-dropdown" id="downloadDropdown">
-                <a href="#" class="download-option" data-format="fbx">
-                  <span class="format-icon">📦</span>
-                  <span class="format-name">FBX</span>
-                  <span class="format-ext">.fbx</span>
-                </a>
+                <div class="download-container">
+                  <button class="download-btn" id="downloadBtn" style="display:none;" data-fbx-url="" data-glb-url="" aria-haspopup="true" aria-expanded="false" aria-controls="downloadDropdown">Download</button>
+                  <div class="download-dropdown" id="downloadDropdown" role="menu" aria-labelledby="downloadBtn">
+                    <a href="#" class="download-option" data-format="fbx" role="menuitem" tabindex="-1">
+                      fbx
+                    </a>
+                    <a href="#" class="download-option" data-format="glb" role="menuitem" tabindex="-1">
+                      glb
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -2604,6 +2637,7 @@
     <div style="height:2.2rem;"></div>
     <div id="paypal-button-container" style="max-width:400px;margin:2rem auto 0 auto;"></div>
     <button class="btn" id="paidDownloadBtn" style="display:none;background:#ff9800;color:#fff;font-weight:600;font-size:1.1rem;margin:2rem auto 0 auto;max-width:400px;width:100%;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.10);padding:0.85rem 0;">Download FBX Model</button>
+    <button class="btn" id="paidDownloadGlbBtn" style="display:none;background:#ff9800;color:#fff;font-weight:600;font-size:1.1rem;margin:1rem auto 0 auto;max-width:400px;width:100%;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.10);padding:0.85rem 0;">Download GLB Model</button>
     <div class="checkout-secure-line">🔒 Secure checkout powered by PayPal</div>
   </section>
 
@@ -3009,6 +3043,37 @@
         downloadBtn.style.display = 'none';
         priceLabel.style.display = 'inline-block';
         priceLabel.textContent = `$${Number(m.price).toFixed(2)} USD`;
+      }
+      
+      // Set download URLs as data attributes on download button
+      const fbxUrl = m.fbx ? m.fbx : '';
+      const glbUrl = m.glb ? m.glb : '';
+      
+      downloadBtn.setAttribute('data-fbx-url', fbxUrl);
+      downloadBtn.setAttribute('data-glb-url', glbUrl);
+      
+      // Update download options - disable those formats that aren't available
+      const fbxOption = document.querySelector('.download-option[data-format="fbx"]');
+      const glbOption = document.querySelector('.download-option[data-format="glb"]');
+      
+      if (fbxOption) {
+        if (m.fbx) {
+          fbxOption.classList.remove('disabled');
+          fbxOption.removeAttribute('aria-disabled');
+        } else {
+          fbxOption.classList.add('disabled');
+          fbxOption.setAttribute('aria-disabled', 'true');
+        }
+      }
+      
+      if (glbOption) {
+        if (m.glb) {
+          glbOption.classList.remove('disabled');
+          glbOption.removeAttribute('aria-disabled');
+        } else {
+          glbOption.classList.add('disabled');
+          glbOption.setAttribute('aria-disabled', 'true');
+        }
       }
       // Always show Like/List buttons
       modelActions.style.display = 'flex';
@@ -3689,12 +3754,66 @@
     downloadBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       downloadDropdown.classList.toggle('active');
+      
+      // When opening the dropdown, set aria attributes for accessibility
+      if (downloadDropdown.classList.contains('active')) {
+        downloadBtn.setAttribute('aria-expanded', 'true');
+        downloadBtn.setAttribute('aria-controls', 'downloadDropdown');
+        
+        // Don't auto-focus any option - let user hover naturally
+      } else {
+        downloadBtn.setAttribute('aria-expanded', 'false');
+      }
     });
 
     // Close dropdown when clicking outside
     document.addEventListener('click', (e) => {
       if (!downloadBtn.contains(e.target) && !downloadDropdown.contains(e.target)) {
         downloadDropdown.classList.remove('active');
+        downloadBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Close dropdown on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && downloadDropdown.classList.contains('active')) {
+        downloadDropdown.classList.remove('active');
+        downloadBtn.setAttribute('aria-expanded', 'false');
+        // Return focus to the download button
+        downloadBtn.focus();
+      }
+    });
+
+    // Handle keyboard navigation within dropdown
+    downloadDropdown.addEventListener('keydown', (e) => {
+      if (!downloadDropdown.classList.contains('active')) return;
+      
+      const options = Array.from(downloadDropdown.querySelectorAll('.download-option'));
+      const currentIndex = options.findIndex(option => document.activeElement === option);
+      
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          if (currentIndex < options.length - 1) {
+            options[currentIndex + 1].focus();
+          }
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          if (currentIndex > 0) {
+            options[currentIndex - 1].focus();
+          } else {
+            // Cycle back to download button when at the top
+            downloadBtn.focus();
+          }
+          break;
+        case 'Enter':
+        case ' ':
+          if (document.activeElement.classList.contains('download-option')) {
+            e.preventDefault();
+            document.activeElement.click();
+          }
+          break;
       }
     });
 
@@ -3705,22 +3824,16 @@
         const format = e.currentTarget.dataset.format;
         const modelName = lastOpenedModel ? lastOpenedModel.title.replace(/\s+/g, '_') : 'model';
         
-        // Check what formats are actually available for this model
-        const availableFormats = getAvailableFormats(lastOpenedModel);
-        
-        if (!availableFormats.includes(format)) {
-          // Format not available - show message
-          alert(`Sorry, ${format.toUpperCase()} format is not available for this model yet.\n\nAvailable formats: ${availableFormats.map(f => f.toUpperCase()).join(', ')}`);
-          downloadDropdown.classList.remove('active');
-          return;
-        }
-        
-        // Get the correct file URL for this format
-        const fileUrl = getFileUrlForFormat(lastOpenedModel, format);
+        // Get the URL from the download button data attributes
+        const urlAttribute = `data-${format}-url`;
+        const fileUrl = downloadBtn.getAttribute(urlAttribute);
         
         if (!fileUrl) {
-          alert(`Download not available for ${format.toUpperCase()} format.`);
+          // Show a non-blocking toast message
+          showToastMessage('Download failed. This format is not available.');
           downloadDropdown.classList.remove('active');
+          downloadBtn.setAttribute('aria-expanded', 'false');
+          downloadBtn.focus();
           return;
         }
         
@@ -3730,25 +3843,74 @@
         link.download = `${modelName}.${format}`;
         link.style.display = 'none';
         
-        // Trigger download
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        // Add error handling
+        link.onerror = () => {
+          // Show error toast if download fails
+          showToastMessage('Download failed. Please try again.');
+        };
+        
+        // Simulate a network request and then trigger download
+        setTimeout(() => {
+          try {
+            // Trigger download
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          } catch (err) {
+            // Show error toast if download fails
+            showToastMessage('Download failed. Please try again.');
+          }
+        }, 100);
         
         // Close dropdown
         downloadDropdown.classList.remove('active');
-        
-        // Show success message
-        alert(`Downloading ${modelName}.${format}...`);
+        downloadBtn.setAttribute('aria-expanded', 'false');
+        downloadBtn.focus();
       });
     });
+
+    // Helper function to show a non-blocking toast message
+    function showToastMessage(message) {
+      const toast = document.createElement('div');
+      toast.className = 'toast-message';
+      toast.textContent = message;
+      toast.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+      `;
+      document.body.appendChild(toast);
+      
+      // Fade in
+      setTimeout(() => {
+        toast.style.opacity = '1';
+      }, 10);
+      
+      // Remove after 3 seconds
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => document.body.removeChild(toast), 300);
+      }, 3000);
+    }
 
     // Helper function to get available formats for a model
     function getAvailableFormats(model) {
       if (!model) return [];
       
-      // Only FBX is available now
-      return ['fbx'];
+      const formats = [];
+      if (model.fbx) formats.push('fbx');
+      if (model.glb) formats.push('glb');
+      
+      return formats;
     }
 
     // Helper function to get the correct file URL for a format
@@ -3759,9 +3921,12 @@
       if (!availableFormats.includes(format)) {
         return null;
       }
-      // Only FBX is available now
-      if (model.fbx) {
+      // Return the appropriate file URL based on format
+      if (format === 'fbx' && model.fbx) {
         return model.fbx;
+      }
+      if (format === 'glb' && model.glb) {
+        return model.glb;
       }
       return null;
     }
@@ -4020,6 +4185,12 @@
           mainContent.style.display = 'block';
           homepageBanner.style.display = '';
           topSearchbar.style.display = 'none';
+          heroSearch.parentElement.classList.remove('hide');
+          heroSearch.value = '';
+          navbarSearch.value = '';
+          lastSearchQuery = '';
+          renderGallery(models, true);
+          hideBackToShopButton();
           window.scrollTo(0,0);
         }, 450);
       };
@@ -4507,6 +4678,7 @@
       // If already purchased in this session, show download button immediately
       if (isModelPurchasedSession(model.id)) {
         paidDownloadBtn.style.display = 'block';
+        paidDownloadGlbBtn.style.display = 'block';
         // Hide PayPal button
         container.innerHTML = '<div style="color:#4CAF50;font-weight:600;font-size:1.1rem;text-align:center;margin:1.5rem 0;">Purchased ✔</div>';
         return;
@@ -4540,6 +4712,39 @@
         // Show success message (same as free download)
         alert(`Downloading ${modelName}.${format}...`);
       };
+
+      // GLB Download Button functionality
+      const paidDownloadGlbBtn = document.getElementById('paidDownloadGlbBtn');
+      if (paidDownloadGlbBtn) {
+        paidDownloadGlbBtn.onclick = function() {
+          // Always use the current model (from payment context)
+          const format = 'glb';
+          const modelName = model ? model.title.replace(/\s+/g, '_') : 'model';
+          // Check what formats are actually available for this model
+          const availableFormats = getAvailableFormats(model);
+          if (!availableFormats.includes(format)) {
+            alert(`Sorry, ${format.toUpperCase()} format is not available for this model yet.\n\nAvailable formats: ${availableFormats.map(f => f.toUpperCase()).join(', ')}`);
+            return;
+          }
+          // Get the correct file URL for this format
+          const fileUrl = getFileUrlForFormat(model, format);
+          if (!fileUrl) {
+            alert(`Download not available for ${format.toUpperCase()} format.`);
+            return;
+          }
+          // Create download link
+          const link = document.createElement('a');
+          link.href = fileUrl;
+          link.download = `${modelName}.${format}`;
+          link.style.display = 'none';
+          // Trigger download
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          // Show success message (same as free download)
+          alert(`Downloading ${modelName}.${format}...`);
+        };
+      }
       // Remove any previous PayPal button if present
       if (window.paypal && container) {
         window.paypal.Buttons({
@@ -4568,14 +4773,16 @@
           onApprove: function(data, actions) {
             return actions.order.capture().then(function(details) {
               // After successful payment, show the download button and mark as purchased in session
-              if (model && model.fbx) {
+              if (model && (model.fbx || model.glb)) {
                 setModelPurchasedSession(model.id);
                 paidDownloadBtn.style.display = 'block';
+                paidDownloadGlbBtn.style.display = 'block';
                 // Hide PayPal button and show Purchased label
                 container.innerHTML = '<div style="color:#4CAF50;font-weight:600;font-size:1.1rem;text-align:center;margin:1.5rem 0;">Purchased ✔</div>';
               } else {
                 paidDownloadBtn.style.display = 'none';
-                alert('No FBX file available for this model.');
+                paidDownloadGlbBtn.style.display = 'none';
+                alert('No download files available for this model.');
               }
             });
           },
@@ -4605,9 +4812,38 @@
         } else {
           purchasedLabel.style.display = 'block';
         }
-        // Show Download FBX button
+        // Show Download button and update URLs
+        const fbxUrl = model.fbx ? model.fbx : '';
+        const glbUrl = model.glb ? model.glb : '';
+        
+        downloadBtn.setAttribute('data-fbx-url', fbxUrl);
+        downloadBtn.setAttribute('data-glb-url', glbUrl);
         downloadBtn.style.display = 'block';
         priceLabel.style.display = 'none';
+        
+        // Update download options availability
+        const fbxOption = document.querySelector('.download-option[data-format="fbx"]');
+        const glbOption = document.querySelector('.download-option[data-format="glb"]');
+        
+        if (fbxOption) {
+          if (fbxUrl) {
+            fbxOption.classList.remove('disabled');
+            fbxOption.removeAttribute('aria-disabled');
+          } else {
+            fbxOption.classList.add('disabled');
+            fbxOption.setAttribute('aria-disabled', 'true');
+          }
+        }
+        
+        if (glbOption) {
+          if (glbUrl) {
+            glbOption.classList.remove('disabled');
+            glbOption.removeAttribute('aria-disabled');
+          } else {
+            glbOption.classList.add('disabled');
+            glbOption.setAttribute('aria-disabled', 'true');
+          }
+        }
       } else {
         // Not purchased: restore normal state
         buyNowBtn.style.display = 'block';
@@ -4633,6 +4869,8 @@
       // After rendering PayPal, also update model page UI if returning
       updateModelPagePurchaseUI(model);
     };
+
+
 
     // When returning to checkout page, update UI for session-purchased state
     const _originalBackCheckout = backCheckout.onclick;
