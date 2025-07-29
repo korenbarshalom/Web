@@ -2670,7 +2670,7 @@
       <h1>Terms</h1>
       <ul>
         <li>Welcome to polyVerse. By accessing or purchasing any content on our site, you agree to the following terms:</li>
-        <li>All 3D models on polyVerse are sold for $1.00 each and provided in .fbx format only.</li>
+        <li>All 3D models on polyVerse are sold for $1.00 each and provided in .fbx and .glb formats.</li>
         <li>Each purchase grants you a royalty-free license to use the models in personal or commercial projects.</li>
         <li>All models are fully human-rigged and game-ready for engines like Unity and Unreal.</li>
         <li>Redistribution, resale, or repackaging of the models is strictly prohibited.</li>
@@ -3278,7 +3278,8 @@
       document.getElementById('checkoutModelPrice').textContent = `$${Number(lastOpenedModel.price).toFixed(2)} USD`;
       // Compose metadata line
       let meta = [];
-      if (lastOpenedModel.availableFormats) meta.push('Formats: ' + lastOpenedModel.availableFormats.map(f=>f.toUpperCase()).join(', '));
+      const availableFormats = getAvailableFormats(lastOpenedModel);
+      if (availableFormats.length > 0) meta.push('Formats: ' + availableFormats.map(f=>f.toUpperCase()).join(', '));
       if (lastOpenedModel.desc && /rigged/i.test(lastOpenedModel.desc)) meta.push('Rigged');
       document.getElementById('checkoutModelMeta').textContent = meta.join(' | ');
     };
@@ -3919,6 +3920,7 @@
       const formats = [];
       if (model.fbx) formats.push('fbx');
       if (model.glb) formats.push('glb');
+      // Note: GLTF is intentionally excluded from available formats
       
       return formats;
     }
