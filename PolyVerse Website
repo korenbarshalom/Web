@@ -1420,7 +1420,7 @@
       border-radius: 8px;
       padding: 0.5rem 1.25rem;
       box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-      transition: background 0.18s, box-shadow 0.18s, color 0.18s, border 0.18s, transform 0.15s;
+      transition: all 0.18s ease;
       min-width: 110px;
       max-width: 160px;
       text-align: center;
@@ -1428,19 +1428,29 @@
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      transform-origin: center center; /* Ensure scaling is centered */
-      margin-left: 2px; /* Nudge buttons slightly right to prevent overflow */
+      transform-origin: center center;
+      margin-left: 2px;
+      transform: scale(1);
     }
     .like-btn:hover, .list-btn:hover {
-      background: #ff9800;
+      background: #ffb74d;
       color: #fff;
       border: 2px solid #ffb74d;
-      transform: scale(1.03); /* Remove translateY to prevent shifting */
+      transform: scale(1.03);
+      box-shadow: 0 4px 16px rgba(255, 152, 0, 0.3);
     }
     .like-btn.liked, .list-btn.listed {
       background: #ff9800;
       color: #fff;
+      border: 2px solid #ff9800;
+      transform: scale(1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    }
+    .like-btn.liked:hover, .list-btn.listed:hover {
+      background: #ffb74d;
       border: 2px solid #ffb74d;
+      transform: scale(1.03);
+      box-shadow: 0 4px 16px rgba(255, 152, 0, 0.3);
     }
     .like-btn.liked #likeIcon {
       color: #fff;
@@ -4066,6 +4076,11 @@
           margin-top: 0.5rem;
           width: 100%;
           justify-content: center;
+        }
+        .profile-save-btn:hover {
+          transform: none;
+          background: linear-gradient(90deg, #ffac33 0%, #ff7043 100%);
+          box-shadow: 0 6px 14px rgba(0,0,0,.4);
         }
         @media (max-width: 600px) {
           .profile-container {
