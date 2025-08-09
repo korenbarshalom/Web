@@ -5296,6 +5296,7 @@ if (signupBtn) {
     // --- Category Filtering Logic (Characters Dropdown) ---
     const categoryModelMap = {
       'Villains': [15, 16, 17, 18, 19, 20],
+      'Heroes': [],
       'Humans': [1, 2, 13],
       'Stylized Characters': [4, 5, 6, 7, 8, 9, 10, 11, 12, 14]
     };
@@ -5357,7 +5358,33 @@ if (signupBtn) {
         window.scrollTo(0, 0);
 
         // 4. Filter models by the selected category and render
-        const filtered = models.filter(m => categoryModelMap[category].includes(m.id));
+        const filtered = (function(){
+          if (category === 'Heroes') {
+            const heroNames = [
+              'archer',
+              'wizard',
+              'knight',
+              'forest knight',
+              'frost knight', // include common variant present in data
+              'kinght'        // handle existing typo variant
+            ];
+            return models.filter(m => heroNames.includes(m.title.trim().toLowerCase()));
+          }
+          // Default (ID-based) filtering
+          let list = models.filter(m => categoryModelMap[category].includes(m.id));
+          if (category === 'Villains') {
+            const excludedNames = [
+              'archer',
+              'wizard',
+              'knight',
+              'forest knight',
+              'frost knight',
+              'kinght'
+            ];
+            list = list.filter(m => !excludedNames.includes(m.title.trim().toLowerCase()));
+          }
+          return list;
+        })();
         renderGallery(filtered, true);
 
         // 5. Show the Back to Shop button (if available)
