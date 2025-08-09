@@ -2823,6 +2823,10 @@
       { id: 18, title: 'Frost King', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjIwMjA2OS5wbmc=/250x600/%2F0h3XD.png', desc: ' Ice-armored mage rigged for animation.', src: 'Villan14.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Villan4.fbx', glb: 'Frost KingGLB.glb', gltf: 'AS1.gltf' },
       { id: 19, title: 'Nightblade', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjIwMjEzNy5wbmc=/250x600/OD1IR5.png', desc: ' Shadow assassin rigged for animation.', src: 'Villan15.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Villan5.fbx', glb: 'NightbladeGLB.glb', gltf: 'AS1.gltf' },
       { id: 20, title: 'Cinderblade', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjIwMjIxMy5wbmc=/250x600/tJjTaP.png', desc: 'Flame rogue rigged for animation.', src: 'Villan16.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Villan6.fbx', glb: 'CinderbladeGLB.glb', gltf: 'AS1.gltf' },
+       { id: 20, title: 'Archer', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjY1MDYxNy5wbmc=/250x600/3MdNWL.png', desc: 'Skilled bowman in green cloak.', src: 'Hero1GLB.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Hero1.fbx', glb: 'Hero1GLB.glb', gltf: 'AS1.gltf' },
+        { id: 20, title: 'Frost Knight ', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjY1MDYxOC5wbmc=/250x600/EWE73O.png', desc: 'Ice-armored sword fighter.', src: 'Hero4GLB.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Hero4.fbx', glb: 'Hero4GLBglb', gltf: 'AS1.gltf' },
+         { id: 20, title: 'Wizard', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjY1MDYyMC5wbmc=/250x600/Hgw3MU.png', desc: 'Robed master of magic.', src: 'Hero2GLB.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Hero2.fbx', glb: 'Hero2GLB.glb', gltf: 'AS1.gltf' },
+          { id: 20, title: 'Kinght', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjY1MDYxOS5wbmc=/250x600/8tYlTf.png', desc: 'Hammer and shield armored fighter.', src: 'Hero3GLB.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Hero3.fbx', glb: 'Hero3GLB.glb', gltf: 'AS1.gltf' },
     ];
 
     // DOM refs
