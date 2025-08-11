@@ -2827,6 +2827,7 @@
         { id: 20, title: 'Frost Knight ', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjY1MDYxOC5wbmc=/250x600/EWE73O.png', desc: 'Ice-armored sword fighter.', src: 'Hero4GLB.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Hero4.fbx', glb: 'Hero4GLBglb', gltf: 'AS1.gltf' },
          { id: 20, title: 'Wizard', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjY1MDYyMC5wbmc=/250x600/Hgw3MU.png', desc: 'Robed master of magic.', src: 'Hero2GLB.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Hero2.fbx', glb: 'Hero2GLB.glb', gltf: 'AS1.gltf' },
           { id: 20, title: 'Kinght', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjY1MDYxOS5wbmc=/250x600/8tYlTf.png', desc: 'Hammer and shield armored fighter.', src: 'Hero3GLB.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Hero3.fbx', glb: 'Hero3GLB.glb', gltf: 'AS1.gltf' },
+           { id: 20, title: ' Shadowblade', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjY4MDA0My5wbmc=/250x600/8WwzzU.png', desc: 'Stealthy warrior wielding a blazing crimson sword.', src: 'Hero5R.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'Hero5.fbx', glb: 'Hero5R.glb', gltf: 'AS1.gltf' },
     ];
 
     // DOM refs
