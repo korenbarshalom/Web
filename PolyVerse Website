@@ -5367,7 +5367,8 @@ if (signupBtn) {
               'knight',
               'forest knight',
               'frost knight', // include common variant present in data
-              'kinght'        // handle existing typo variant
+              'kinght',        // handle existing typo variant
+              'shadowblade'
             ];
             return models.filter(m => heroNames.includes(m.title.trim().toLowerCase()));
           }
@@ -5380,7 +5381,8 @@ if (signupBtn) {
               'knight',
               'forest knight',
               'frost knight',
-              'kinght'
+              'kinght',
+              'shadowblade'
             ];
             list = list.filter(m => !excludedNames.includes(m.title.trim().toLowerCase()));
           }
