@@ -6,7 +6,7 @@
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>polyVerse – Low-Poly Rigged Models</title>
+  <title>polyversehub – Low-Poly Rigged Models</title>
 
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
@@ -2491,9 +2491,9 @@
   <nav id="navbar">
     <div class="logo">
      <img src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjI1NTkzNy5wbmc=/250x600/8NDQ9Y.png"
-     alt="  polyVerse logo"
-           alt="polyVerse logo" style="height:32px;width:32px;border-radius:6px">
-      <span style="font-weight:600;font-size:1.1rem">polyVerse</span>
+     alt="  polyversehub logo"
+           alt="polyversehub logo" style="height:32px;width:32px;border-radius:6px">
+      <span style="font-weight:600;font-size:1.1rem">polyversehub</span>
     </div>
     <!-- Centered navigation links -->
     <div class="navbar-center-links">
@@ -2660,13 +2660,13 @@
   <!-- ABOUT PAGE SECTION (SPA) -->
   <section id="about-section">
     <div class="about-text">
-      <h1>About  polyVerse</h1>
+      <h1>About  polyversehub</h1>
       <p>We provide high-quality 3D characters at an affordable price of just $1. Every character on the site is fully human-rigged and ready to use in your game or any other project.</p>
       <p>Our library includes a diverse range of models from heroes to villains, all optimized for games and animation projects. Each model is carefully designed with clean topology and proper rigging.</p>
       <button id="aboutBackBtn" class="btn">&larr; Back to Home</button>
     </div>
     <div class="about-img">
-      <img src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjMzODc4MC5wbmc=/250x600/Anhp0L.png" alt="polyVerse marketplace preview">
+      <img src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjMzODc4MC5wbmc=/250x600/Anhp0L.png" alt="polyversehub marketplace preview">
     </div>
   </section>
 
@@ -2675,14 +2675,14 @@
     <div class="terms-text">
       <h1>Terms</h1>
       <ul>
-        <li>Welcome to polyVerse. By accessing or purchasing any content on our site, you agree to the following terms:</li>
-        <li>All 3D models on polyVerse are sold for $1.00 each and provided in .fbx and .glb formats.</li>
+        <li>Welcome to polyversehub. By accessing or purchasing any content on our site, you agree to the following terms:</li>
+        <li>All 3D models on polyversehub are sold for $1.00 each and provided in .fbx and .glb formats.</li>
         <li>Each purchase grants you a royalty-free license to use the models in personal or commercial projects.</li>
         <li>All models are fully human-rigged and game-ready for engines like Unity and Unreal.</li>
         <li>Redistribution, resale, or repackaging of the models is strictly prohibited.</li>
         <li>All purchases are final — no refunds or exchanges.</li>
         <li>We may update these terms from time to time. Continued use of the site indicates your agreement to any updates.</li>
-        <li>All 3D models, website content, and brand assets are protected by copyright © 2025 polyVerse. Unauthorized copying, redistribution, or commercial use outside the terms of the license is strictly prohibited.</li>
+        <li>All 3D models, website content, and brand assets are protected by copyright © 2025 polyversehub. Unauthorized copying, redistribution, or commercial use outside the terms of the license is strictly prohibited.</li>
       </ul>
       <button id="termsBackBtn" class="btn" style="margin:2rem auto 0; display:block; max-width:200px; margin-left:auto; margin-right:auto;">← Back</button>
     </div>
@@ -2692,7 +2692,7 @@
   <footer id="contact-section">
     <h3>Contact Us</h3>
     <p style="margin-top:1.2rem;">Email: korenbarshalom@gmail.com</p>
-    <p style="margin-top:0.7rem;">All rights reserved © polyVerse</p>
+    <p style="margin-top:0.7rem;">All rights reserved © polyversehub</p>
   </footer>
 
   <!-- LOGIN / REGISTER MODAL -->
