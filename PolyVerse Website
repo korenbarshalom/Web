@@ -13,6 +13,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "url": "https://polyversehub.com",
+    "logo": "https://storage.polyversehub.com/WebsiteMainLogo.png",
+    "name": "PolyverseHub"
+  }
+  </script>
+
   <style>
     html, body {
       overflow-x: hidden;
