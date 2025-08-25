@@ -6,8 +6,11 @@
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="description" content="PolyverseHub – Low-Poly 3D Characters and Models for your Unity & Unreal projects. Explore unique rigged game assets." />
+  <meta name="keywords" content="polyverse, polyversehub, 3d characters, low poly 3d, 3d models for games, unity assets, unreal assets" />
+  <link rel="canonical" href="https://polyversehub.com/" />
   <link rel="icon" type="image/png" href="https://storage.polyversehub.com/favicon-32x32.png">
-  <title>polyversehub – Low-Poly Rigged Models</title>
+  <title>PolyverseHub | Low-Poly 3D Characters & Models for Games</title>
 
   <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
@@ -2536,8 +2539,8 @@
   <nav id="navbar">
     <div class="logo">
      <img src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjI1NTkzNy5wbmc=/250x600/8NDQ9Y.png"
-     alt="  polyversehub logo"
-           alt="polyversehub logo" style="height:32px;width:32px;border-radius:6px">
+     alt="PolyverseHub - Low Poly 3D Characters for Games"
+           alt="PolyverseHub - Low Poly 3D Characters for Games" style="height:32px;width:32px;border-radius:6px">
       <span style="font-weight:600;font-size:1.1rem">polyversehub</span>
     </div>
     <!-- Centered navigation links -->
@@ -2585,8 +2588,8 @@
 
   <!-- HERO -->
   <section class="hero" id="homepage-banner">
-    <div class="hero-headline">Grab a rigged low-poly character in seconds.</div>
-    <div class="hero-subline">Over 20 unique models. Download and create instantly.</div>
+    <h1 class="hero-headline">Low-Poly 3D Characters & Models for Games</h1>
+    <h2 class="hero-subline">Rigged Assets for Unity & Unreal</h2>
     <div class="hero-search">
       <div class="modern-search-wrapper">
         <input
@@ -2621,7 +2624,7 @@
       <div class="model-viewer-container">
         <div class="model-card-section">
           <button class="view-toggle" id="viewToggle">3D View</button>
-          <img id="modelImg" class="model-media" src="" alt="Model preview">
+          <img id="modelImg" class="model-media" src="" alt="Low Poly 3D Character for Games - PolyverseHub">
           <model-viewer 
             id="modelViewer"
             class="model-media"
@@ -2690,7 +2693,7 @@
           <div id="checkoutModelMeta" class="checkout-model-meta">Formats: FBX, GLTF | Rigged</div>
         </div>
         <div class="checkout-order-img-wrapper">
-          <img id="checkoutModelImg" src="" alt="Model preview" class="checkout-model-img">
+          <img id="checkoutModelImg" src="" alt="Low Poly 3D Character for Games - PolyverseHub" class="checkout-model-img">
         </div>
       </div>
     </div>
@@ -2711,7 +2714,7 @@
       <button id="aboutBackBtn" class="btn">&larr; Back to Home</button>
     </div>
     <div class="about-img">
-      <img src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjMzODc4MC5wbmc=/250x600/Anhp0L.png" alt="polyversehub marketplace preview">
+      <img src="https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjMzODc4MC5wbmc=/250x600/Anhp0L.png" alt="PolyverseHub - Low Poly 3D Characters and Models for Games">
     </div>
   </section>
 
@@ -2974,7 +2977,7 @@
         const card=document.createElement('div');
         card.className='card';
         card.innerHTML=`
-          <img src="${m.thumb}" alt="${m.title}">
+          <img src="${m.thumb}" alt="Low Poly 3D Character ${m.title} for Games - PolyverseHub">
           <div class="info">
             <h3>${m.title}</h3>
             <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>
@@ -3203,7 +3206,7 @@
         const card = document.createElement('div');
         card.className = 'suggested-card';
         card.innerHTML = `
-          <img class="suggested-thumb" src="${mod.thumb}" alt="${mod.title}">
+          <img class="suggested-thumb" src="${mod.thumb}" alt="Low Poly 3D Character ${mod.title} for Games - PolyverseHub">
           <div class="suggested-card-content">
             <div class="suggested-title">${mod.title}</div>
             <div class="suggested-desc">${mod.desc || ''}</div>
@@ -3241,7 +3244,7 @@
             const card = document.createElement('div');
             card.className = 'suggested-card card-appear';
             card.innerHTML = `
-              <img class="suggested-thumb" src="${mod.thumb}" alt="${mod.title}">
+              <img class="suggested-thumb" src="${mod.thumb}" alt="Low Poly 3D Character ${mod.title} for Games - PolyverseHub">
               <div class="suggested-card-content">
                 <div class="suggested-title">${mod.title}</div>
                 <div class="suggested-desc">${mod.desc || ''}</div>
@@ -4428,7 +4431,7 @@
             filtered.forEach(m => {
               const card = document.createElement('div');
               card.className = 'card';
-              card.innerHTML = `\n            <img src=\"${m.thumb}\" alt=\"${m.title}\">\n            <div class=\"info\">\n              <h3>${m.title}</h3>\n              <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>\n            </div>`;
+              card.innerHTML = `\n            <img src=\"${m.thumb}\" alt=\"Low Poly 3D Character ${m.title} for Games - PolyverseHub\">\n            <div class=\"info\">\n              <h3>${m.title}</h3>\n              <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>\n            </div>`;
               card.onclick = () => openModelPage(m, false);
               galleryDiv.appendChild(card);
             });
@@ -4460,7 +4463,7 @@
           filtered.forEach(m => {
             const card = document.createElement('div');
             card.className = 'card';
-            card.innerHTML = `\n            <img src=\"${m.thumb}\" alt=\"${m.title}\">\n            <div class=\"info\">\n              <h3>${m.title}</h3>\n              <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>\n            </div>`;
+            card.innerHTML = `\n            <img src=\"${m.thumb}\" alt=\"Low Poly 3D Character ${m.title} for Games - PolyverseHub\">\n            <div class=\"info\">\n              <h3>${m.title}</h3>\n              <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>\n            </div>`;
             card.onclick = () => openModelPage(m, false);
             galleryDiv.appendChild(card);
           });
@@ -4548,7 +4551,7 @@
               const card = document.createElement('div');
               card.className = 'card';
               card.innerHTML = `
-                <img src=\"${m.thumb}\" alt=\"${m.title}\">
+                <img src=\"${m.thumb}\" alt=\"Low Poly 3D Character ${m.title} for Games - PolyverseHub\">
                 <div class=\"info\">
                   <h3>${m.title}</h3>
                   <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>
@@ -4620,7 +4623,7 @@
             const card = document.createElement('div');
             card.className = 'card';
             card.innerHTML = `
-              <img src=\"${m.thumb}\" alt=\"${m.title}\">
+              <img src=\"${m.thumb}\" alt=\"Low Poly 3D Character ${m.title} for Games - PolyverseHub\">
               <div class=\"info\">
                 <h3>${m.title}</h3>
                 <p>${m.price?`$${m.price.toFixed(2)}`:'Free'}</p>
