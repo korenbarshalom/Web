@@ -2552,6 +2552,7 @@
           <a href="#" class="dropdown-item">Villains</a>
           <a href="#" class="dropdown-item">Heroes</a>
           <a href="#" class="dropdown-item">Humans</a>
+          <a href="#" class="dropdown-item">Adventure</a>
           <a href="#" class="dropdown-item">Stylized Characters</a>
         </div>
       </div>
@@ -2902,7 +2903,7 @@
             { id: 20, title: 'Enchanter', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjkxMDMwOS5wbmc=/250x600/tdsOfc.png', desc: 'Mystical character equipped with a magical staff for casting spells.', src: 'https://storage.polyversehub.com/Adventure4GLBView.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'https://storage.polyversehub.com/Adventure4fbx.fbx', glb: 'https://storage.polyversehub.com/Adventure4GLB.glb', gltf: 'AS1.gltf' },
              { id: 20, title: 'Explorer', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjkxMDMwNy5wbmc=/250x600/JkifX%2B.png', desc: 'Adventurer equipped with a short sword and exploration gear.', src: 'https://storage.polyversehub.com/Adventure3GLBView.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'https://storage.polyversehub.com/Adventure3fbx.fbx', glb: 'https://storage.polyversehub.com/Adventure3GLB.glb', gltf: 'AS1.gltf' },
              { id: 20, title: 'Assassin', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjkxMDMwOC5wbmc=/250x600/hjd6kZ.png', desc: 'Silent killer armed with a dark pistol for precise strikes.', src: 'https://storage.polyversehub.com/Adventure2GLBView.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'https://storage.polyversehub.com/Adventure2fbx.fbx', glb: 'https://storage.polyversehub.com/Adventure2GLB.glb', gltf: 'AS1.gltf' },
-              { id: 20, title: 'Cyberbot', price: 0, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjkxMDMwNS5wbmc=/250x600/%2FKPn%2Fn.png', desc: 'Robotic warrior armed with a futuristic pistol and visor helmet.', src: 'https://storage.polyversehub.com/Adventure5GLBView.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'https://storage.polyversehub.com/Adventure5fbx.fbx', glb: 'https://storage.polyversehub.com/Adventure5GLB.glb', gltf: 'AS1.gltf' },
+              { id: 20, title: 'Cyberbot', price: 1, thumb: 'https://img.itch.zone/aW1hZ2UvMzY3MzAwMi8yMjkxMDMwNS5wbmc=/250x600/%2FKPn%2Fn.png', desc: 'Robotic warrior armed with a futuristic pistol and visor helmet.', src: 'https://storage.polyversehub.com/Adventure5GLBView.glb', availableFormats: ['gltf', 'fbx', 'glb'], fbx: 'https://storage.polyversehub.com/Adventure5fbx.fbx', glb: 'https://storage.polyversehub.com/Adventure5GLB.glb', gltf: 'AS1.gltf' },
     ];
 
     // DOM refs
@@ -5374,7 +5375,8 @@ if (signupBtn) {
       'Villains': [15, 16, 17, 18, 19, 20],
       'Heroes': [],
       'Humans': [1, 2, 13],
-      'Stylized Characters': [4, 5, 6, 7, 8, 9, 10, 11, 12, 14]
+      'Stylized Characters': [4, 5, 6, 7, 8, 9, 10, 11, 12, 14],
+      'Adventure': []
     };
 
     // Attach click handlers to each dropdown item
@@ -5447,6 +5449,16 @@ if (signupBtn) {
             ];
             return models.filter(m => heroNames.includes(m.title.trim().toLowerCase()));
           }
+          if (category === 'Adventure') {
+            const adventureNames = [
+              'pirate',
+              'enchanter',
+              'explorer',
+              'assassin',
+              'cyberbot'
+            ];
+            return models.filter(m => adventureNames.includes(m.title.trim().toLowerCase()));
+          }
           // Default (ID-based) filtering
           let list = models.filter(m => categoryModelMap[category].includes(m.id));
           if (category === 'Villains') {
@@ -5457,7 +5469,12 @@ if (signupBtn) {
               'forest knight',
               'frost knight',
               'kinght',
-              'shadowblade'
+              'shadowblade',
+              'pirate',
+              'enchanter',
+              'explorer',
+              'assassin',
+              'cyberbot'
             ];
             list = list.filter(m => !excludedNames.includes(m.title.trim().toLowerCase()));
           }
