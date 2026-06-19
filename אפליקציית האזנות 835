@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>האזנות ל-A835D המפוארת</title>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- ספרייה לצילום מסך -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+      :root {
+        --primary: #0052cc; 
+        --primary-light: #0066ff;
+        --bg: #f4f7f9;
+        --card: #ffffff;
+        --text-main: #1d1d1f;
+        --text-muted: #6e6e73;
+        --border: #d2d2d7;
+        --radius: 18px;
+        --shadow: 0 12px 35px rgba(0, 0, 0, 0.04);
+      }
+
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+        font-family: 'Assistant', sans-serif;
+      }
+
+      body {
+        background-color: var(--bg);
+        color: var(--text-main);
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      /* כותרת כחולה עם כפתור שיתוף */
+      header {
+        width: 100%;
+        background: var(--primary);
+        color: white;
+        padding: 18px;
+        text-align: center;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      header h1 { margin: 0; font-size: 1.1rem; font-weight: 700; flex-grow: 1; }
+
+      /* כפתור שלח האזנות בצד שמאל */
+      .btn-share-header {
+        position: absolute;
+        left: 12px;
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 6px 10px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        backdrop-filter: blur(5px);
+      }
+
+      .btn-share-header:active { background: rgba(255, 255, 255, 0.3); transform: scale(0.95); }
+
+      .container {
+        width: 100%;
+        max-width: 480px;
+        padding: 16px;
+      }
+
+      /* כרטיסיית קלט (נעלמת ב-GO) */
+      #inputCard {
+        background: var(--card);
+        border-radius: var(--radius);
+        padding: 22px;
+        box-shadow: var(--shadow);
+        margin-bottom: 16px;
+        border: 1px solid rgba(0,0,0,0.02);
+      }
+
+      /* פס סיכום משופר */
+      #summaryCard {
+        display: none;
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 10px 18px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(0, 82, 204, 0.15);
+        align-items: center;
+        justify-content: space-between;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .summary-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text-main);
+      }
+
+      .summary-divider { width: 1px; height: 16px; background: var(--border); }
+      .summary-item { display: flex; align-items: center; gap: 6px; }
+
+      .btn-reset {
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        padding: 5px 14px;
+        border-radius: 10px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        cursor: pointer;
+        color: var(--primary);
+      }
+
+      .form-group { margin-bottom: 16px; }
+      label { display: block; font-size: 0.88rem; font-weight: 600; margin-bottom: 8px; padding-right: 4px; }
+
+      input[type="number"], input[type="time"], input[type="text"], select {
+        width: 100%; padding: 14px 16px; border: 1.5px solid #e5e5e7; border-radius: 12px; font-size: 1rem; background: #fbfbfd; outline: none;
+      }
+
+      #sendForm {
+        width: 100%; background: var(--primary-light); color: white; border: none; padding: 15px; border-radius: 14px; font-size: 1.1rem; font-weight: 700; cursor: pointer; box-shadow: 0 6px 16px rgba(0, 102, 255, 0.25);
+      }
+
+      /* תוצאות */
+      #captureArea { background: var(--bg); padding: 4px; border-radius: 12px; } /* האזור שיצולם */
+      
+      .shift-card {
+        background: white; padding: 14px 16px; border-radius: 14px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #f2f2f7; box-shadow: 0 2px 8px rgba(0,0,0,0.02); min-height: 66px;
+      }
+
+      /* זמן: שעת התחלה משמאל, שעת סיום מימין */
+      .shift-time {
+        font-weight: 700; font-size: 1rem; color: var(--text-main); min-width: 110px; direction: ltr; text-align: left;
+      }
+
+      .shift-card select, .custom-soldier-input {
+        width: auto; height: 38px; padding: 0 10px; font-size: 0.9rem; border: none; background: #f2f2f7; border-radius: 8px;
+      }
+      
+      .custom-soldier-input { width: 140px !important; border: 1px solid var(--border) !important; background: #f8f9fa !important; }
+
+      .badge-shemnash {
+        background: #f1f5f9; color: #475569; font-size: 0.72rem; font-weight: 800; padding: 4px 10px; border-radius: 8px; border: 1px solid #e2e8f0; margin-right: auto; margin-left: 10px; display: flex; align-items: center; gap: 4px; white-space: nowrap;
+      }
+      .badge-shemnash::before { content: '🧹'; font-size: 0.85rem; }
+
+      .rules-card { background: #f9f9fb; border: 1px solid var(--border); padding: 20px; border-radius: var(--radius); margin-top: 10px; margin-bottom: 50px; }
+      .rules-card h3 { margin: 0 0 16px 0; font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+      .rules-list { margin: 0; padding-right: 18px; font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; }
+      .rules-list li { margin-bottom: 10px; }
+      
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+  </head>
+  <body>
+
+    <header>
+      <button class="btn-share-header" onclick="shareAsImage()">
+        <span>שלח האזנות</span> 📤
+      </button>
+      <h1>האזנות ל-A835D המפוארת</h1>
+    </header>
+
+    <div class="container">
+      <!-- פס סיכום -->
+      <div id="summaryCard">
+        <div class="summary-info">
+          <div class="summary-item">👤 <span id="sumPeople"></span></div>
+          <div class="summary-divider"></div>
+          <div class="summary-item" style="direction: ltr;">🕒 <span id="sumStart"></span> - <span id="sumEnd"></span></div>
+        </div>
+        <button class="btn-reset" onclick="resetApp()">איפוס</button>
+      </div>
+
+      <!-- כרטיסיית קלט -->
+      <div id="inputCard">
+        <div class="form-group">
+          <label for="people">מספר המאזינים</label>
+          <input type="number" id="people" placeholder="הכנס מספר מאזינים" required />
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="start">שעת התחלה</label>
+            <input id="start" type="time" value="22:00" required />
+          </div>
+          <div class="form-group">
+            <label for="end">שעת סיום</label>
+            <input id="end" type="time" value="06:00" required />
+          </div>
+        </div>
+
+        <button id="sendForm">GO</button>
+      </div>
+
+      <!-- אזור שיצולם וישותף -->
+      <div id="captureArea">
+        <div id="result"></div>
+
+        <div class="rules-card">
+          <h3>📋 דגשים ונהלי ספינה</h3>
+          <ul class="rules-list">
+            <li><strong>00:00:</strong> יש לבצע גם שמנ"ש.</li>
+            <li><strong>ביקורת גנרטור:</strong> כל שעה.</li>
+            <li><strong>ביקורת קשר:</strong> כל חצי שעה - מיידי.</li>
+            <li><strong>במיידי:</strong> מאזין ב' מלא, עמדות היקשרות חצי ב'.</li>
+            <li><strong>במיידי:</strong> כל 4 שעות שמנ"ש מטרו נוזלים - יומן ספינה.</li>
+            <li><strong>במיידי:</strong> כל מי שיוצא מהספינה לשלוח הודעה להסגן (עד 3 אנשים בחוץ).</li>
+            <li><strong>ידיעה:</strong> להעיר את הסגן ואת קודקוד.</li>
+            <li><strong>יציאה:</strong> להעיף את הספינה באוויר, יבבות פעמונים, להעיר את צי'ף ראשון ואז את כולם, אור לבן וצעקות.</li>
+            <li><strong>הערה:</strong> להעיר אחד את השני בכיף! כל מה שצריך להעיר את הסגן או הצי'ף. שתהיה אחלה האזנה!</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const soldiers = ["שם המאזין", "ביטון", "טריסטר", "רני", "טומי", "ברשה", "בלדוט", "מטוס", "גבריץ", "אלבז", "לבייב", "other"];
+      const resultDiv = document.getElementById("result");
+      const inputCard = document.getElementById("inputCard");
+      const summaryCard = document.getElementById("summaryCard");
+      const dropdownHTML = soldiers.map((s, idx) => `<option value="${s}" ${idx === 0 ? 'disabled selected' : ''}>${s}</option>`).join("");
+
+      function resetApp() {
+        summaryCard.style.display = "none";
+        inputCard.style.display = "block";
+        resultDiv.innerHTML = "";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      // פונקציית צילום ושיתוף
+      async function shareAsImage() {
+        const area = document.getElementById('captureArea');
+        if (resultDiv.innerHTML === "") {
+            alert("קודם צריך ליצור האזנות (ללחוץ על GO)");
+            return;
+        }
+
+        try {
+          const canvas = await html2canvas(area, {
+            backgroundColor: "#f4f7f9",
+            scale: 2, // איכות גבוהה יותר
+            useCORS: true
+          });
+
+          canvas.toBlob(async (blob) => {
+            const file = new File([blob], 'hazanot.png', { type: 'image/png' });
+            
+            // בדיקה אם המכשיר תומך בשיתוף קבצים
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+              await navigator.share({
+                files: [file],
+                title: 'לוח האזנות A835D',
+                text: 'מצורף לוח האזנות מעודכן'
+              });
+            } else {
+              // fallback למקרה שאין שיתוף (דסקטופ) - מוריד את התמונה
+              const link = document.createElement('a');
+              link.download = 'לוח_האזנות.png';
+              link.href = URL.createObjectURL(blob);
+              link.click();
+            }
+          }, 'image/png');
+        } catch (err) {
+          console.error("Error sharing:", err);
+        }
+      }
+
+      document.getElementById("sendForm").addEventListener("click", function(e) {
+          e.preventDefault();
+          const pVal = document.getElementById("people").value;
+          const sVal = document.getElementById("start").value;
+          const eVal = document.getElementById("end").value;
+
+          if(!pVal || !sVal || !eVal) { alert("נא למלא את כל השדות"); return; }
+
+          document.getElementById("sumPeople").innerText = pVal;
+          document.getElementById("sumStart").innerText = sVal;
+          document.getElementById("sumEnd").innerText = eVal;
+          
+          inputCard.style.display = "none";
+          summaryCard.style.display = "flex";
+
+          resultDiv.innerHTML = "";
+          const people = parseInt(pVal);
+          let dStart = new Date("2007-01-01T" + sVal);
+          let dEnd = new Date("2007-01-01T" + eVal);
+          if (dEnd < dStart) dEnd = new Date("2007-01-02T" + eVal);
+
+          const totalMinutes = (dEnd - dStart) / 1000 / 60;
+          const timePerPerson = totalMinutes / people;
+          const coeff = 1000 * 60 * 5;
+
+          for (let i = 0; i < people; i++) {
+            let shiftStart = new Date(dStart.getTime() + (i * timePerPerson * 60000));
+            let shiftEnd = new Date(dStart.getTime() + ((i + 1) * timePerPerson * 60000));
+            let rStart = new Date(Math.round(shiftStart.getTime() / coeff) * coeff);
+            let rEnd = new Date(Math.round(shiftEnd.getTime() / coeff) * coeff);
+
+            const tStrStart = rStart.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+            const tStrEnd = rEnd.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+
+            const shiftCard = document.createElement('div');
+            shiftCard.className = 'shift-card';
+            shiftCard.style.animationDelay = `${i * 0.05}s`;
+            shiftCard.innerHTML = `<div class="shift-time">${tStrStart} - ${tStrEnd}</div><select>${dropdownHTML}</select>`;
+
+            const checkDates = [
+                new Date("2007-01-01T00:00"), new Date("2007-01-01T04:00"), new Date("2007-01-01T08:00"),
+                new Date("2007-01-02T00:00"), new Date("2007-01-02T04:00"), new Date("2007-01-02T08:00")
+            ];
+            if (checkDates.some(cp => cp >= rStart && cp < rEnd)) {
+                const badge = document.createElement('span');
+                badge.className = 'badge-shemnash';
+                badge.innerText = 'שמנ"ש';
+                shiftCard.insertBefore(badge, shiftCard.querySelector('select'));
+            }
+            resultDiv.appendChild(shiftCard);
+          }
+
+          document.querySelectorAll(".shift-card select").forEach(select => {
+            select.addEventListener("change", function() {
+              if (this.value === "other") {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'custom-soldier-input';
+                input.placeholder = 'הקלד שמות...';
+                this.replaceWith(input);
+                input.focus();
+              }
+            });
+          });
+      });
+    </script>
+  </body>
+</html>
